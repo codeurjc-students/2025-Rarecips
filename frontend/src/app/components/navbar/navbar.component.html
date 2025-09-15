@@ -15,7 +15,7 @@
     <div class="flex items-center gap-2">
       <div class="nav-item active px-3 py-4" (click)="navigateTo('home')">
         <i class="flex items-center justify-end ti ti-home-filled w-4 h-4 text-xl"></i>
-        <span class="text-lg font-semibold">Inicio</span>
+        <span class="text-lg font-semibold">Home</span>
       </div>
       @if (isAdmin) {
       <div class="nav-item px-3 py-4" (click)="navigateTo('admin')">
@@ -25,15 +25,15 @@
       }
       <div class="nav-item px-3 py-4" (click)="navigateTo('explore')">
         <i class="flex items-center ti ti-compass w-4 h-4 text-xl"></i>
-        <span class="text-lg">Explorar</span>
+        <span class="text-lg">Explore</span>
       </div>
       <div class="nav-item px-3 py-4" (click)="navigateTo('ingredients')">
         <i class="flex items-center ti ti-basket w-4 h-4 text-xl"></i>
-        <span class="text-lg">Ingredientes</span>
+        <span class="text-lg">Ingredients</span>
       </div>
       <div class="nav-item px-3 py-4" (click)="navigateTo('reports')">
         <i class="flex items-center ti ti-chart-donut w-4 h-4 text-xl"></i>
-        <span class="text-lg">Salud</span>
+        <span class="text-lg">Health</span>
       </div>
     </div>
   </div>
@@ -44,7 +44,7 @@
     <div class="search-container">
       <div class="flex gap-4 search-input-wrapper !py-4">
         <i class="ti ti-search search-icon flex items-center justify-center text-xl"></i>
-        <input type="text" class="search-input" placeholder="Buscar">
+        <input type="text" class="search-input" placeholder="Search">
         <button class="search-clear-btn">
           <i class="ti ti-x flex items-center justify-center"></i>
         </button>

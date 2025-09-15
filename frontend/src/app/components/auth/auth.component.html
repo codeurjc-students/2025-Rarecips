@@ -4,7 +4,9 @@
         <div class="branding-section">
             <div class="branding-content">
                 <img src="assets/logo/Rarecips_Iconologo2.svg" alt="Rarecips Iconologo" class="logo" />
-                <p class="brand-subtitle">Descubre, crea y comparte recetas únicas que despiertan tus sentidos</p>
+                <p class="brand-subtitle">
+                    Discover, create, and share unique recipes that awaken your senses
+                </p>
 
                 <!-- Floating Recipe Cards -->
                 <div class="floating-preview-cards">
@@ -105,11 +107,11 @@
             <div class="auth-tabs glass gap-2">
                 <button class="auth-tab" [class.active]="activeTab === 'login'" (click)="switchTab('login')">
                     <i class="ti ti-login text-xl" aria-hidden="true"></i>
-                    Iniciar Sesión
+                    Log in
                 </button>
                 <button class="auth-tab" style="color: var(--primary-700)" [class.active]="activeTab === 'register'" (click)="switchTab('register')">
                     <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
-                    Registrarse
+                    Sign up
                 </button>
             </div>
             <div class="auth-section">
@@ -119,8 +121,12 @@
                     <div class="auth-form glass" [class.active]="activeTab === 'login'"
                         [class.hidden]="activeTab !== 'login'">
                         <div class="form-header">
-                            <h2 class="form-title">¡Bienvenido de vuelta!</h2>
-                            <p class="form-subtitle">Inicia sesión para continuar tu aventura culinaria</p>
+                            <h2 class="form-title">
+                                Welcome back!
+                            </h2>
+                            <p class="form-subtitle">
+                                Log in to continue your culinary adventure
+                            </p>
                         </div>
 
                         <form class="form-content" (ngSubmit)="onLogin()">
@@ -129,16 +135,16 @@
                                 <div class="input-wrapper">
                                     <i class="ti ti-mail text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                     <input type="email" id="login-email" class="form-input glass-input"
-                                        placeholder="tu@email.com" [(ngModel)]="loginForm.email" name="email" required>
+                                        placeholder="your@email.com" [(ngModel)]="loginForm.email" name="email" required>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="login-password" class="form-label">Contraseña</label>
+                                <label for="login-password" class="form-label">Password</label>
                                 <div class="input-wrapper">
                                     <i class="ti ti-lock text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                     <input [type]="showLoginPassword ? 'text' : 'password'" id="login-password"
-                                        class="form-input glass-input" placeholder="Tu contraseña"
+                                        class="form-input glass-input" placeholder="Your password"
                                         [(ngModel)]="loginForm.password" name="password" required>
                                     <button type="button" class="password-toggle"
                                         (click)="showLoginPassword = !showLoginPassword">
@@ -157,15 +163,15 @@
                                     <input type="checkbox" class="form-checkbox" [(ngModel)]="loginForm.rememberMe"
                                         name="rememberMe">
                                     <span class="checkbox-custom glass-input"></span>
-                                    <span class="checkbox-label">Recordarme</span>
+                                    <span class="checkbox-label">Remember me</span>
                                 </label>
-                                <a href="#" class="forgot-link" (click)="onForgotPassword($event)">¿Olvidaste tu
-                                    contraseña?</a>
+                                <a href="#" class="forgot-link" (click)="onForgotPassword($event)">Forgot your
+                                    password?</a>
                             </div>
 
                             <button type="submit" class="form-submit glass-button">
                                 <i class="ti ti-login text-xl" aria-hidden="true"></i>
-                                Iniciar Sesión
+                                Log In
                             </button>
                         </form>
                     </div>
@@ -174,28 +180,30 @@
                     <div class="auth-form glass" [class.active]="activeTab === 'register'"
                         [class.hidden]="activeTab !== 'register'">
                         <div class="form-header">
-                            <h2 class="form-title">¡Únete a Rarecips!</h2>
-                            <p class="form-subtitle">Crea tu cuenta y comienza a explorar sabores únicos</p>
+                            <h2 class="form-title">
+                                Join Rarecips!
+                            </h2>
+                            <p class="form-subtitle">Create your account and start exploring unique flavors</p>
                         </div>
 
                         <form class="form-content" (ngSubmit)="onRegister()">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="register-firstname" class="form-label">Nombre</label>
+                                    <label for="register-firstname" class="form-label">Name</label>
                                     <div class="input-wrapper">
                                         <i class="ti ti-circle-number-1 text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                         <input type="text" id="register-firstname" class="form-input glass-input"
-                                            placeholder="Tu nombre" [(ngModel)]="registerForm.firstName"
+                                            placeholder="Your name" [(ngModel)]="registerForm.firstName"
                                             name="firstName" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="register-lastname" class="form-label">Apellido</label>
+                                    <label for="register-lastname" class="form-label">Surname</label>
                                     <div class="input-wrapper">
                                         <i class="ti ti-circle-number-2 text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                         <input type="text" id="register-lastname" class="form-input glass-input"
-                                            placeholder="Tu apellido" [(ngModel)]="registerForm.lastName"
+                                            placeholder="Your surname" [(ngModel)]="registerForm.lastName"
                                             name="lastName" required>
                                     </div>
                                 </div>
@@ -206,17 +214,17 @@
                                 <div class="input-wrapper">
                                     <i class="ti ti-mail text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                     <input type="email" id="register-email" class="form-input glass-input"
-                                        placeholder="tu@email.com" [(ngModel)]="registerForm.email" name="email"
+                                        placeholder="your@email.com" [(ngModel)]="registerForm.email" name="email"
                                         required>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="register-password" class="form-label">Contraseña</label>
+                                <label for="register-password" class="form-label">Password</label>
                                 <div class="input-wrapper">
                                     <i class="ti ti-lock text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                     <input [type]="showRegisterPassword ? 'text' : 'password'" id="register-password"
-                                        class="form-input glass-input" placeholder="Crea una contraseña segura"
+                                        class="form-input glass-input" placeholder="Choose a secure password"
                                         [(ngModel)]="registerForm.password" name="password" required>
                                     <button type="button" class="password-toggle"
                                         (click)="showRegisterPassword = !showRegisterPassword">
@@ -231,8 +239,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="register-confirm-password" class="form-label">Confirmar
-                                    Contraseña</label>
+                                <label for="register-confirm-password" class="form-label">Confirm your
+                                    Password</label>
                                 <div class="input-wrapper">
                                     <i class="ti ti-lock-check text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                     <input [type]="showConfirmPassword ? 'text' : 'password'"
@@ -257,15 +265,15 @@
                                         name="acceptTerms" required>
                                     <span class="checkbox-custom glass-input"></span>
                                     <span class="checkbox-label">
-                                        Acepto los <a href="#" class="terms-link">términos y condiciones</a> y la
-                                        <a href="#" class="terms-link">política de privacidad</a>
+                                        I accept the <a href="#" class="terms-link">terms and conditions</a> and
+                                        <a href="#" class="terms-link">privacy policy</a>
                                     </span>
                                 </label>
                             </div>
 
                             <button type="submit" class="form-submit glass-button">
                                 <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
-                                Crear Cuenta
+                                Create Account
                             </button>
                         </form>
                     </div>
