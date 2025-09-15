@@ -1,0 +1,17 @@
+<div class="flex justify-center items-center min-h-screen">
+    <div class="absolute flex justify-center items-center flex-col glass rounded-3xl w-3/4 h-3/4"
+        style="background: var(--primary-200-40);">
+        <div class="w-64 h-64 glass !rounded-full z-0" style="background: var(--primary-300);">
+            <div (click)="toggleEgg()" class="flex items-center justify-center text-9xl ml-[70px] h-[inherit]"
+                style="color: var(--primary-500)">
+                <i class="ti ti-egg egg fixed"></i>
+                <i class="ti ti-egg-cracked egg-cr fixed"></i>
+            </div>
+        </div>
+        <span class="mt-4 font-extrabold text-4xl z-0">Ups...</span>
+        <span class="mt-2 font-bold text-lg z-0">Parece que algo salió mal.</span>
+        <div class="z-0 glass rounded flex mt-4" style="background: var(--gradient-primary);">
+            <button routerLink="/" class="btn-primary"><i class="ti ti-home"></i> Volver</button>
+        </div>
+    </div>
+</div>

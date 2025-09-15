@@ -1,0 +1,131 @@
+<!-- Floating Navigation Bar -->
+<nav
+  class="fixed top-6 left-1/2 z-50 -translate-x-1/2 flex w-[95vw] max-w-8xl max-h-20 items-center justify-between rounded-3xl backdrop-blur-md shadow-lg px-8 py-2 transition-all gap-4"
+  style="background-color: var(--primary-300-40);" id="navbar">
+
+  <!-- Left side - Logo -->
+  <div class="flex items-center mt-2 min-w-fit">
+    <a (click)="logoClicked($event)" href="#" class="flex flex-col items-center">
+      <img class="h-16 object-cover transition-transform hover:scale-105" [src]="logoSrc" alt="Logo" />
+    </a>
+  </div>
+
+  <!-- Center - Navigation Items -->
+  <div class="w-full">
+    <div class="flex items-center gap-2">
+      <div class="nav-item active px-3 py-4" (click)="navigateTo('home')">
+        <i class="flex items-center justify-end ti ti-home-filled w-4 h-4 text-xl"></i>
+        <span class="text-lg font-semibold">Inicio</span>
+      </div>
+      @if (isAdmin) {
+      <div class="nav-item px-3 py-4" (click)="navigateTo('admin')">
+        <i class="flex items-center ti ti-shield-lock w-4 h-4 text-xl"></i>
+        <span class="text-lg">Admin</span>
+      </div>
+      }
+      <div class="nav-item px-3 py-4" (click)="navigateTo('explore')">
+        <i class="flex items-center ti ti-compass w-4 h-4 text-xl"></i>
+        <span class="text-lg">Explorar</span>
+      </div>
+      <div class="nav-item px-3 py-4" (click)="navigateTo('ingredients')">
+        <i class="flex items-center ti ti-basket w-4 h-4 text-xl"></i>
+        <span class="text-lg">Ingredientes</span>
+      </div>
+      <div class="nav-item px-3 py-4" (click)="navigateTo('reports')">
+        <i class="flex items-center ti ti-chart-donut w-4 h-4 text-xl"></i>
+        <span class="text-lg">Salud</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right side - Actions -->
+  <div class="flex items-center gap-4">
+    <!-- Search Bar -->
+    <div class="search-container">
+      <div class="flex gap-4 search-input-wrapper !py-4">
+        <i class="ti ti-search search-icon flex items-center justify-center text-xl"></i>
+        <input type="text" class="search-input" placeholder="Buscar">
+        <button class="search-clear-btn">
+          <i class="ti ti-x flex items-center justify-center"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Theme Selector -->
+    <!-- Theme Dropdown -->
+    <div class="dropdown-container py-2" id="themeDropdown">
+      <input type="checkbox" id="dropdownCheckbox" class="hidden" />
+      <label class="dropdown-trigger" id="dropdownTrigger" for="dropdownCheckbox">
+        <i class="flex items-center justify-center ti ti-palette w-8 h-[2.75rem] text-default-font text-body-bold text-xl" style="color: var(--primary-700);"></i>
+        <i id="dropdownIcon" class="flex items-center ti ti-caret-down-filled" style="color: var(--primary-700);"></i>
+      </label>
+
+      <div (click)="selectItem($event)" class="dropdown-menu mt-2 right-56" id="dropdownMenu"
+        style="background-color: var(--primary-50); transform: translateX(-1rem);">
+        @for (color of themes; track color) {
+        <button class="dropdown-item" data-value="favorite" [id]="'theme-' + color">
+          <div class="theme-circle flex items-center justify-center" [class]="'theme-' + color">
+            <div class="theme-colors flex gap-0.5">
+              <span class="theme-color" style="background-color: var(--primary-100)"></span>
+              <span class="theme-color" style="background-color: var(--primary-500)"></span>
+              <span class="theme-color" style="background-color: var(--primary-600)"></span>
+              <span class="theme-color" style="background-color: var(--primary-700)"></span>
+            </div>
+          </div>
+        </button>
+        }
+      </div>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="dropdown-container py-2">
+      <input type="checkbox" class="hidden" />
+      <label class="dropdown-trigger">
+        <i class="flex items-center justify-center ti ti-language w-8 h-[2.75rem] text-default-font text-body-bold text-xl" style="color: var(--primary-700);"></i>
+        <i class="flex items-center ti ti-caret-down-filled" style="color: var(--primary-700);"></i>
+      </label>
+
+      <div class="dropdown-menu mt-2 right-44" id="dropdownMenu"
+        style="background-color: var(--primary-50); transform: translateX(-1rem);">
+      </div>
+    </div>
+
+    @if (isAuthenticated) {
+    <!-- Login/Register Button -->
+    <button class="auth-btn !rounded-2xl !py-4 h-full" (click)="openAuth()" style="background: var(--gradient-primary);">
+      <i class="flex items-center justify-center ti ti-login text-xl"></i>
+      <span>Acceder</span>
+    </button>
+    }
+
+    <!-- Notifications Button -->
+    <button class="icon-btn p-6" title="Notificaciones">
+      <i class="ti ti-bell text-xl"></i>
+    </button>
+
+    <div class="flex items-center">
+      <button id="userMenuButton"
+        class="relative inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-100">
+        <img class="aspect-square h-full w-full object-cover" src="/assets/img/user.png" alt="User avatar" />
+      </button>
+      <!-- Dropdown Menu (hidden by default) -->
+      <div id="userDropdown"
+        class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-50">
+        <div class="py-1">
+          <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-default-font hover:bg-neutral-50">
+            <i data-feather="user" class="w-4 h-4"></i>
+            Profile
+          </a>
+          <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-default-font hover:bg-neutral-50">
+            <i data-feather="settings" class="w-4 h-4"></i>
+            Settings
+          </a>
+          <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-default-font hover:bg-neutral-50">
+            <i data-feather="log-out" class="w-4 h-4"></i>
+            Log out
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
