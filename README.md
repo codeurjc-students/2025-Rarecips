@@ -51,6 +51,8 @@ The platform provides users full control over the content they're allowed to see
 
 - User registration and authentication
 - User profile management
+- User notifications
+- User ingredient list management
 - Stat tracking
 - User and content moderation
 - Recipe browsing with search and filtering
@@ -58,7 +60,7 @@ The platform provides users full control over the content they're allowed to see
 - Recipe sharing through media and format enriched text powered uploading
 - Recipe reviewing and rating
 - Recipe saving and bookmarking
-- Health report feedbacking
+- Health report feedbacking: Registered users can check health statistics based off their liked recipes simulating a consumption analysis
 
 ### Technical Objectives
 Modern, scalable, maintainable and continous-deployment supported architecture using the newest technologies and best practices.
@@ -101,12 +103,14 @@ The project will follow an agile, iterative, and incremental development process
 - Recipe sharing through media and format enriched text powered uploading (Registered users)
 - Recipe reviewing and rating (Registered users)
 - User profile management (Registered users)
+- User ingredient list management (registered users)
 - Recipe saving and bookmarking (Registered users)
 - Health report feedbacking (Registered users)
 - Stat tracking (Registered users)
 
 ### Intricate
 - User and content moderation (Admins)
+- User notifications through websockets (Registered users)
 - Analytics dashboard viewing (Admins)
 - Personalized recommendations (Registered users)
 
@@ -131,7 +135,7 @@ The main entry point of the application, showcasing featured recipes, collection
 - Recipe
 ---
 <p>
-   <img src="readme-resources/landing.jpg" width="70%"/>
+   <img src="readme-resources/landing.jpg"/>
 </p>
 
 #### Authentication - Login
@@ -141,7 +145,7 @@ User login screen with email/username and password authentication.
 - Landing
 ---
 <p>
-   <img src="readme-resources/login.jpg" width="70%"/>
+   <img src="readme-resources/login.jpg"/>
 </p>
 
 #### Authentication - Sign Up
@@ -151,7 +155,7 @@ User registration screen for creating new accounts with profile information.
 
 ---
 <p>
-   <img src="readme-resources/signup.jpg" width="70%"/>
+   <img src="readme-resources/signup.jpg"/>
 </p>
 
 #### Explore
@@ -167,7 +171,7 @@ Browse and search through all available recipes, users, ingredients and collecti
 - Recipe
 ---
 <p>
-   <img src="readme-resources/explore.jpg" width="70%"/>
+   <img src="readme-resources/explore.jpg"/>
 </p>
 
 #### Recipe View
@@ -183,7 +187,7 @@ Detailed view of individual recipes showing ingredients, instructions, and user 
 ---
 
 <p>
-   <img src="readme-resources/recipe.jpg" width="70%"/>
+   <img src="readme-resources/recipe.jpg"/>
 </p>
 
 #### Recipe Editor
@@ -199,7 +203,7 @@ Create and edit recipes with rich text formatting and media upload capabilities.
 ---
 
 <p>
-   <img src="readme-resources/editRecipe.jpg" width="70%"/>
+   <img src="readme-resources/editRecipe.jpg"/>
 </p>
 
 #### Profile
@@ -215,7 +219,7 @@ Display user information, statistics, and personal recipe collections.
 ---
 
 <p>
-   <img src="readme-resources/profile.jpg" width="70%"/>
+   <img src="readme-resources/profile.jpg"/>
 </p>
 
 #### Profile Edit
@@ -231,7 +235,7 @@ Edit user profile information, preferences, and account settings.
 ---
 
 <p>
-   <img src="readme-resources/editProfile.jpg" width="70%"/>
+   <img src="readme-resources/editProfile.jpg"/>
 </p>
 
 #### Ingredients
@@ -246,7 +250,7 @@ Manage and browse ingredient database with nutritional information.
 ---
 
 <p>
-   <img src="readme-resources/ingredients.jpg" width="70%"/>
+   <img src="readme-resources/ingredients.jpg"/>
 </p>
 
 #### Health Reports
@@ -261,7 +265,7 @@ View personalized health and nutrition reports based on recipe consumption.
 ---
 
 <p>
-   <img src="readme-resources/health.jpg" width="70%"/>
+   <img src="readme-resources/health.jpg"/>
 </p>
 
 #### Admin Panel
@@ -277,7 +281,7 @@ Administrative dashboard for content moderation and system analytics (Admin user
 ---
 
 <p>
-   <img src="readme-resources/admin.jpg" width="70%"/>
+   <img src="readme-resources/admin.jpg"/>
 </p>
 
 #### Error Page
@@ -293,7 +297,7 @@ Custom error page for handling various application errors gracefully.
 ---
 
 <p>
-   <img src="readme-resources/error.jpg" width="70%"/>
+   <img src="readme-resources/error.jpg"/>
 </p>
 
 ### Entities
@@ -301,12 +305,11 @@ Custom error page for handling various application errors gracefully.
 - **Recipe:** id, label, image, people, ingredients, difficulty, dish types, meal types, cuisine type, diet labels, health labels, cautions, time, weight, calories, average rating, author, reviews, creation date, modification date
 - **Review:** id, recipe, rating, comment, author, creation date, modification date
 - **Ingredient** id, description, quantity, measure, weight
-- **Report** id, user, details
 
 ### User Permissions
 - **Unregistered:** Browse, view recipes
 - **Registered:** Unregistered user permissions, recipe CRUD, profile CRUD, report querying, user stats
-- **Admin:** Registered user permissions, content and user moderation, system analytics viewing
+- **Admin:** Registered user permissions, ingredient CRUD, content and user moderation, system analytics viewing
 
 ### Images
 - Recipes: Multiple images per recipe, with images in ingredients
@@ -317,9 +320,9 @@ Custom error page for handling various application errors gracefully.
 - Admin dashboard: Bar and pie charts for recipe stats, user activity
 
 ### Complementary Technology
-- Docker for deployment
-- GitHub Actions for CI/CD
-- ...
+- Notifications through websockets
+- Recipe exporting to PDF
+- User lists batch importing/exporting
 
 ### Advanced Algorithm/Query
 - Personalized recipe recommendations based on user preferences and activity
