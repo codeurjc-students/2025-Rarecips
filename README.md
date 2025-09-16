@@ -307,9 +307,20 @@ Custom error page for handling various application errors gracefully.
 - **Ingredient** id, description, quantity, measure, weight
 
 ### User Permissions
-- **Unregistered:** Browse, view recipes
-- **Registered:** Unregistered user permissions, recipe CRUD, profile CRUD, report querying, user stats
-- **Admin:** Registered user permissions, ingredient CRUD, content and user moderation, system analytics viewing
+
+|          | Unregistered | Registered | Admin |
+|--------------------------|:------------:|:----------:|:-----:|
+| Browse recipes            |      ✓       |     ✓      |   ✓   |
+| View recipes              |      ✓       |     ✓      |   ✓   |
+| Recipe CRUD               |              |     ✓      |   ✓   |
+| Profile CRUD              |              |     ✓      |   ✓   |
+| Report querying           |              |     ✓      |   ✓   |
+| User stats                |              |     ✓      |   ✓   |
+| Ingredient CRUD           |              |            |   ✓   |
+| Content moderation        |              |            |   ✓   |
+| User moderation           |              |            |   ✓   |
+| System analytics viewing  |              |            |   ✓   |
+
 
 ### Images
 - Recipes: Multiple images per recipe, with images in ingredients
@@ -330,7 +341,7 @@ Custom error page for handling various application errors gracefully.
 ## 📈 Project Tracking
 
 - [GitHub Project Board](https://github.com/codeurjc-students/2025-Rarecips/projects)
-- [Development Blog](https://medium.com/)
+- [Development Blog](https://medium.com/@b.vita.2020)
 
 ## 👤 Author
 
