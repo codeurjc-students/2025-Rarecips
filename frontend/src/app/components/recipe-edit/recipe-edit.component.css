@@ -1,0 +1,327 @@
+/* Recipe Editor Specific Styles */
+
+/* Form section animations */
+.form-section {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ingredient and instruction item animations */
+.ingredient-item,
+.instruction-item {
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.ingredient-item:hover,
+.instruction-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--primary-200);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Drag and drop styling */
+.ingredient-item .grip-handle,
+.instruction-item .grip-handle {
+  cursor: grab;
+}
+
+.ingredient-item .grip-handle:active,
+.instruction-item .grip-handle:active {
+  cursor: grabbing;
+}
+
+/* Image upload area */
+.image-upload-area {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.image-upload-area:hover {
+  border-color: var(--primary-300) !important;
+  background: var(--primary-100-60) !important;
+}
+
+.image-upload-area.dragover {
+  border-color: var(--primary-500) !important;
+  background: var(--primary-200) !important;
+  transform: scale(1.02);
+}
+
+/* Image preview */
+.image-preview {
+  transition: all 0.3s ease;
+}
+
+.image-preview:hover {
+  transform: scale(1.05);
+}
+
+/* Tag selection animations */
+.tag-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.tag-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+}
+
+.tag-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px var(--primary-200);
+}
+
+.tag-item.selected {
+  background: var(--primary-500) !important;
+  color: white !important;
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px var(--primary-200);
+}
+
+.tag-item.unselected {
+  background: var(--primary-100) !important;
+  color: var(--primary-700) !important;
+}
+
+/* Form input enhancements */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary-500) !important;
+  box-shadow: 0 0 0 3px var(--primary-200);
+  outline: none;
+}
+
+input.invalid,
+textarea.invalid,
+select.invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+/* Step numbers */
+.step-number {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-400));
+  color: white;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+/* Button hover effects */
+.add-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.add-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.add-button:hover::before {
+  left: 100%;
+}
+
+.add-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 140, 255, 0.25);
+}
+
+/* Delete button animations */
+.delete-button {
+  transition: all 0.3s ease;
+}
+
+.delete-button:hover {
+  transform: scale(1.1);
+  background: #fee2e2 !important;
+}
+
+.delete-button:hover i {
+  color: #dc2626 !important;
+}
+
+/* Form validation styles */
+.field-error {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  animation: slideInDown 0.3s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Success states */
+.field-success {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Action buttons container */
+.action-buttons {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.action-buttons button {
+  position: relative;
+  overflow: hidden;
+}
+
+.action-buttons button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.action-buttons button:hover::before {
+  left: 100%;
+}
+
+/* Enhanced glass effect */
+.glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ingredient-item,
+  .instruction-item {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .ingredient-item .ingredient-inputs {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+  }
+}
+
+/* Time input enhancements */
+.time-input {
+  position: relative;
+}
+
+.time-input::after {
+  content: attr(data-unit);
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-400);
+  pointer-events: none;
+}
+
+/* Category and difficulty selects */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+  appearance: none;
+}
+
+/* Sortable list indicators */
+.sortable-ghost {
+  opacity: 0.5;
+}
+
+.sortable-chosen {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(79, 140, 255, 0.2);
+}
+
+/* Progress indicator */
+.form-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--primary-100);
+  z-index: 1000;
+}
+
+.form-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-500), var(--primary-400));
+  transition: width 0.3s ease;
+}
