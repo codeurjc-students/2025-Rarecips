@@ -33,6 +33,42 @@
    
 </p>
 
+## ✅ Table of Contents
+
+- [Summary]()
+- [Mockup]()
+- [Objectives]()
+   - [Functional Objectives]()
+   - [Technical Objectives]()
+- [Methodology]()
+- [Detailed Features]()
+   - [Basic]()
+   - [Intermediate]()
+   - [Intricate]()
+- [Analysis]()
+   - [Screens & Navigation]()
+      - [Landing Page]()
+      - [Authentication - Login]()
+      - [Authentication - Signup]()
+      - [Explore]()
+      - [Recipe View]()
+      - [Recipe Edit]()
+      - [Profile View]()
+      - [Profile Edit]()
+      - [Ingredients]()
+      - [health Reports]()
+      - [Admin Panel]()
+      - [Error Page]()
+   - [Entities]()
+   - [User Permissions]()
+   - [Images]()
+   - [Charts]()
+   - [Complementary Technology]()
+   - [Advanced Algorithm/Query]()
+   - [Optional Addons]()
+- [Project Tracking]()
+- [Author]()
+
 ## 📝 Summary
 
 Rarecips is a progressive web application designed to help users discover, share, and manage unique and rare recipes from around the world. The platform allows users to browse, upload, review, and save recipes, fostering a community of culinary enthusiasts.
@@ -144,7 +180,7 @@ User login screen with email/username and password authentication.
    <img src="readme-resources/login.jpg" width="70%"/>
 </p>
 
-#### Authentication - Sign Up
+#### Authentication - Signup
 User registration screen for creating new accounts with profile information.
 ###### Pages that can be accessed from here:
 - Login
@@ -186,7 +222,7 @@ Detailed view of individual recipes showing ingredients, instructions, and user 
    <img src="readme-resources/recipe.jpg" width="70%"/>
 </p>
 
-#### Recipe Editor
+#### Recipe Edit
 Create and edit recipes with rich text formatting and media upload capabilities.
 ###### Pages that can be accessed from here:
 - Login
@@ -202,7 +238,7 @@ Create and edit recipes with rich text formatting and media upload capabilities.
    <img src="readme-resources/editRecipe.jpg" width="70%"/>
 </p>
 
-#### Profile
+#### Profile View
 Display user information, statistics, and personal recipe collections.
 ###### Pages that can be accessed from here:
 - Login
@@ -323,6 +359,14 @@ Custom error page for handling various application errors gracefully.
 
 ### Advanced Algorithm/Query
 - Personalized recipe recommendations based on user preferences and activity
+
+### Optional Addons
+- Automated testing
+- Native Image Packaging
+- Cloud Deployment (app, database)
+- Continuous Deployment
+- WebSockets as Rest-complementary communication technology
+- Responsive mobile design
 
 ## 📈 Project Tracking
 
