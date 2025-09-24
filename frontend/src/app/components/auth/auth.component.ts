@@ -1,5 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, Renderer2, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { filter } from 'rxjs/operators';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 interface LoginForm {
   email: string;
@@ -7,7 +9,7 @@ interface LoginForm {
   rememberMe: boolean;
 }
 
-interface RegisterForm {
+interface SignupForm {
   firstName: string;
   lastName: string;
   email: string;
@@ -24,11 +26,11 @@ interface RegisterForm {
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent implements AfterViewInit {
-  activeTab: 'login' | 'register' = 'login';
+  activeTab: 'login' | 'signup' = 'login';
   
   // Password visibility toggles
   showLoginPassword = false;
-  showRegisterPassword = false;
+  showSignupPassword = false;
   showConfirmPassword = false;
   
   // Form data
@@ -38,7 +40,7 @@ export class AuthComponent implements AfterViewInit {
     rememberMe: false
   };
   
-  registerForm: RegisterForm = {
+  signupForm: SignupForm = {
     firstName: '',
     lastName: '',
     email: '',
@@ -49,18 +51,23 @@ export class AuthComponent implements AfterViewInit {
   
   // Loading states
   isLoading = false;
-  
-  constructor() { }
+
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) { 
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {});
+  }
 
   ngAfterViewInit(): void {
     this.randomizeCardPositions();
   }
   
   /**
-   * Switch between login and register tabs
+   * Switch between login and signup tabs
    */
-  switchTab(tab: 'login' | 'register'): void {
+  switchTab(tab: 'login' | 'signup'): void {
     this.activeTab = tab;
+    this.router.navigate([`/${tab}`]);
     this.resetForms();
   }
   
@@ -81,11 +88,11 @@ export class AuthComponent implements AfterViewInit {
   /**
    * Handle registration form submission
    */
-  onRegister(): void {
-    if (this.validateRegisterForm()) {
+  onSignup(): void {
+    if (this.validateSignupForm()) {
       this.isLoading = true;
       setTimeout(() => {
-        console.log('Registration attempt:', this.registerForm);
+        console.log('Registration attempt:', this.signupForm);
         this.isLoading = false;
         alert('¡Registro exitoso! Bienvenido a Rarecips.');
         this.switchTab('login');
@@ -104,8 +111,8 @@ export class AuthComponent implements AfterViewInit {
     return true;
   }
   
-  private validateRegisterForm(): boolean {
-    const { firstName, lastName, email, password, confirmPassword, acceptTerms } = this.registerForm;
+  private validateSignupForm(): boolean {
+    const { firstName, lastName, email, password, confirmPassword, acceptTerms } = this.signupForm;
     
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       alert('Por favor, completa todos los campos requeridos.');
@@ -130,9 +137,9 @@ export class AuthComponent implements AfterViewInit {
    */
   private resetForms(): void {
     this.loginForm = { email: '', password: '', rememberMe: false };
-    this.registerForm = { firstName: '', lastName: '', email: '', password: '', confirmPassword: '', acceptTerms: false };
+    this.signupForm = { firstName: '', lastName: '', email: '', password: '', confirmPassword: '', acceptTerms: false };
     this.showLoginPassword = false;
-    this.showRegisterPassword = false;
+    this.showSignupPassword = false;
     this.showConfirmPassword = false;
   }
 

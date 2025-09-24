@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, OnDestroy, Host, NgModule } from '@angular/core';
+import { Component, HostListener, OnInit, Host, NgModule } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -8,7 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
     standalone: true,
     styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class NavbarComponent implements OnInit {
 
     themes = [
         "tangerine-light",
@@ -29,9 +29,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     isAuthenticated = false;
     isAdmin = false;
 
-    ngOnDestroy(): void {
-        //
+    constructor(private router: Router) {
     }
+
     ngOnInit(): void {
         const body = document.querySelector('body');
         const navbar = document.getElementById('navbar');
@@ -88,9 +88,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
         }
     }
 
-    navigateTo(route: string): void {
-        // Handle navigation logic
-        console.log('Navigating to:', route);
+    navigateTo(route: string, event?: Event): void {
+        this.router.navigate([`/${route}`]);
+        let currentNavButton = (event?.target as HTMLElement).closest('.nav-item') as HTMLElement;
+        let navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach((item) => {
+            if (item.classList.contains('active'))
+            item.classList.remove('active')
+            console.log(item);
+
+        });
+        currentNavButton.classList.add('active');
     }
 
     selectLanguage(event: Event): void {

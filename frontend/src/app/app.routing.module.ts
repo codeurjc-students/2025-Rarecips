@@ -19,6 +19,7 @@ export const routes: Routes = [
   { path: "", component: HomeComponent },
   { path: "login", component: AuthComponent },
   { path: "signup", component: AuthComponent },
+  { path: "me", component: ProfileViewComponent },
   { path: "users/:id", component: ProfileViewComponent },
   { path: "users/:id/edit", component: ProfileEditComponent },
   { path: "explore", component: ExploreComponent },

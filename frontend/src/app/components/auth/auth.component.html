@@ -109,7 +109,7 @@
                     <i class="ti ti-login text-xl" aria-hidden="true"></i>
                     Log in
                 </button>
-                <button class="auth-tab" style="color: var(--primary-700)" [class.active]="activeTab === 'register'" (click)="switchTab('register')">
+                <button class="auth-tab" style="color: var(--primary-700)" [class.active]="activeTab === 'signup'" (click)="switchTab('signup')">
                     <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
                     Sign up
                 </button>
@@ -176,9 +176,9 @@
                         </form>
                     </div>
 
-                    <!-- Register Form -->
-                    <div class="auth-form glass" [class.active]="activeTab === 'register'"
-                        [class.hidden]="activeTab !== 'register'">
+                    <!-- signup Form -->
+                    <div class="auth-form glass" [class.active]="activeTab === 'signup'"
+                        [class.hidden]="activeTab !== 'signup'">
                         <div class="form-header">
                             <h2 class="form-title">
                                 Join Rarecips!
@@ -186,52 +186,52 @@
                             <p class="form-subtitle">Create your account and start exploring unique flavors</p>
                         </div>
 
-                        <form class="form-content" (ngSubmit)="onRegister()">
+                        <form class="form-content" (ngSubmit)="onSignup()">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="register-firstname" class="form-label">Name</label>
+                                    <label for="signup-firstname" class="form-label">Name</label>
                                     <div class="input-wrapper">
                                         <i class="ti ti-circle-number-1 text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
-                                        <input type="text" id="register-firstname" class="form-input glass-input"
-                                            placeholder="Your name" [(ngModel)]="registerForm.firstName"
+                                        <input type="text" id="signup-firstname" class="form-input glass-input"
+                                            placeholder="Your name" [(ngModel)]="signupForm.firstName"
                                             name="firstName" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="register-lastname" class="form-label">Surname</label>
+                                    <label for="signup-lastname" class="form-label">Surname</label>
                                     <div class="input-wrapper">
                                         <i class="ti ti-circle-number-2 text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
-                                        <input type="text" id="register-lastname" class="form-input glass-input"
-                                            placeholder="Your surname" [(ngModel)]="registerForm.lastName"
+                                        <input type="text" id="signup-lastname" class="form-input glass-input"
+                                            placeholder="Your surname" [(ngModel)]="signupForm.lastName"
                                             name="lastName" required>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="register-email" class="form-label">Email</label>
+                                <label for="signup-email" class="form-label">Email</label>
                                 <div class="input-wrapper">
                                     <i class="ti ti-mail text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
-                                    <input type="email" id="register-email" class="form-input glass-input"
-                                        placeholder="your@email.com" [(ngModel)]="registerForm.email" name="email"
+                                    <input type="email" id="signup-email" class="form-input glass-input"
+                                        placeholder="your@email.com" [(ngModel)]="signupForm.email" name="email"
                                         required>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="register-password" class="form-label">Password</label>
+                                <label for="signup-password" class="form-label">Password</label>
                                 <div class="input-wrapper">
                                     <i class="ti ti-lock text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
-                                    <input [type]="showRegisterPassword ? 'text' : 'password'" id="register-password"
+                                    <input [type]="showSignupPassword ? 'text' : 'password'" id="signup-password"
                                         class="form-input glass-input" placeholder="Choose a secure password"
-                                        [(ngModel)]="registerForm.password" name="password" required>
+                                        [(ngModel)]="signupForm.password" name="password" required>
                                     <button type="button" class="password-toggle"
-                                        (click)="showRegisterPassword = !showRegisterPassword">
-                                        @if (!showRegisterPassword) {
+                                        (click)="showSignupPassword = !showSignupPassword">
+                                        @if (!showSignupPassword) {
                                         <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                         }
-                                        @if (showRegisterPassword) {
+                                        @if (showSignupPassword) {
                                         <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                         }
                                     </button>
@@ -239,13 +239,13 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="register-confirm-password" class="form-label">Confirm your
+                                <label for="signup-confirm-password" class="form-label">Confirm your
                                     Password</label>
                                 <div class="input-wrapper">
                                     <i class="ti ti-lock-check text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                     <input [type]="showConfirmPassword ? 'text' : 'password'"
-                                        id="register-confirm-password" class="form-input glass-input"
-                                        placeholder="Confirma tu contraseña" [(ngModel)]="registerForm.confirmPassword"
+                                        id="signup-confirm-password" class="form-input glass-input"
+                                        placeholder="Confirma tu contraseña" [(ngModel)]="signupForm.confirmPassword"
                                         name="confirmPassword" required>
                                     <button type="button" class="password-toggle"
                                         (click)="showConfirmPassword = !showConfirmPassword">
@@ -261,7 +261,7 @@
 
                             <div class="form-options">
                                 <label class="checkbox-wrapper">
-                                    <input type="checkbox" class="form-checkbox" [(ngModel)]="registerForm.acceptTerms"
+                                    <input type="checkbox" class="form-checkbox" [(ngModel)]="signupForm.acceptTerms"
                                         name="acceptTerms" required>
                                     <span class="checkbox-custom glass-input"></span>
                                     <span class="checkbox-label">

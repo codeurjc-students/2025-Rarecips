@@ -683,7 +683,7 @@
 
 .auth-tab.active {
     background: var(--gradient-primary);
-    color: white;
+    color: white !important;
     box-shadow: 0 4px 12px var(--primary-300);
 }
 
