@@ -76,26 +76,12 @@ public class User {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Review> reviews = new HashSet<>();
 
-    // Ingredients a user has saved
-    @ManyToMany
-    @JoinTable(name = "user_saved_food",
-            joinColumns = @JoinColumn(name = "username"),
-            inverseJoinColumns = @JoinColumn(name = "food_id"))
-    private List<Food> savedFood = new ArrayList<>();
-
     // Recipes a user has saved
     @ManyToMany
     @JoinTable(name = "user_saved_recipes",
             joinColumns = @JoinColumn(name = "username"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
     private List<Recipe> savedRecipes = new ArrayList<>();
-
-    // Health reports a user has been given
-    @OneToMany
-    @JoinTable(name = "user_reports",
-            joinColumns = @JoinColumn(name = "username"),
-            inverseJoinColumns = @JoinColumn(name = "report_id"))
-    private List<Report> reports = new ArrayList<>();
     
     public enum Role {
         USER, ADMIN

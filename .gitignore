@@ -23,7 +23,7 @@
 hs_err_pid*
 replay_pid*
 
-/target
+/backend/target/*
 .idea/
 
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.

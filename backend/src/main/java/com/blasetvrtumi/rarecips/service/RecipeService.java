@@ -31,4 +31,10 @@ public class RecipeService {
         return recipeRepository.findAll(pageable).getContent();
     }
 
+    public Page<Recipe> getRecipes(String sortBy, int size, int page) {
+        Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return recipeRepository.findAll(pageable);
+    }
+
 }

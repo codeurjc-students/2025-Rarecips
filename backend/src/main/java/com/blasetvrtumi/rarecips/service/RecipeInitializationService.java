@@ -20,9 +20,6 @@ import java.sql.SQLException;
 public class RecipeInitializationService {
 
     @Autowired
-    private FoodRepository foodRepository;
-
-    @Autowired
     private IngredientRepository ingredientRepository;
 
     @Autowired
@@ -71,19 +68,12 @@ public class RecipeInitializationService {
                     ingredients = recipeJson.optJSONArray("ingredients", new JSONArray()).toList().stream()
                     .map(obj -> {
                         JSONObject ingredientJson = new JSONObject((HashMap<?, ?>) obj);
-                        Food food = foodRepository.findByName(ingredientJson.optString("food"));
-                        if (food == null) {
-                            food = new Food(ingredientJson.optString("food"),
-                                    ingredientJson.optString("foodCategory", null),
-                                    ingredientJson.optString("image", null));
-                        }
-                        foodRepository.save(food);
                         String description = ingredientJson.optString("text", null);
                         Float quantity = ingredientJson.optFloat("quantity", 0.0f);
                         String measure = ingredientJson.optString("measure", "<unit>");
                         Float weight = ingredientJson.optFloat("weight", 0.0f);
                         String category = ingredientJson.optString("foodCategory", null);
-                        Ingredient ingredient = new Ingredient(food, description, quantity, measure, weight);
+                        Ingredient ingredient = new Ingredient(description, quantity, measure, weight);
                         ingredientRepository.save(ingredient);
                         return ingredient;
                     })

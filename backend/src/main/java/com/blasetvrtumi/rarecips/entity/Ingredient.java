@@ -14,10 +14,6 @@ public class Ingredient {
     private Long id;
 
     @JsonView(BasicInfo.class)
-    @ManyToOne
-    private Food food;
-
-    @JsonView(BasicInfo.class)
     private String description;
 
     @JsonView(BasicInfo.class)
@@ -32,8 +28,7 @@ public class Ingredient {
     public Ingredient() {
     }
 
-    public Ingredient(Food food, String description, Float quantity, String measure, Float weight) {
-        this.food = food;
+    public Ingredient(String description, Float quantity, String measure, Float weight) {
         this.description = description;
         this.quantity = quantity;
         this.measure = measure;
