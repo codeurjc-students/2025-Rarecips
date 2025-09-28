@@ -17,6 +17,9 @@ public class Ingredient {
     private String description;
 
     @JsonView(BasicInfo.class)
+    private String food;
+
+    @JsonView(BasicInfo.class)
     private Float quantity;
 
     @JsonView(BasicInfo.class)
@@ -28,8 +31,9 @@ public class Ingredient {
     public Ingredient() {
     }
 
-    public Ingredient(String description, Float quantity, String measure, Float weight) {
+    public Ingredient(String description, String food, Float quantity, String measure, Float weight) {
         this.description = description;
+        this.food = food;
         this.quantity = quantity;
         this.measure = measure;
         this.weight = weight;

@@ -45,6 +45,8 @@ public class RecipeInitializationService {
 
                 String label = recipeJson.optString("label", null);
 
+                String description = recipeJson.optString("description", null);
+
                 List<String> dietLabels = recipeJson.optJSONArray("dietLabels", new JSONArray()).toList().stream()
                         .map(Object::toString)
                         .toList();
@@ -68,12 +70,12 @@ public class RecipeInitializationService {
                     ingredients = recipeJson.optJSONArray("ingredients", new JSONArray()).toList().stream()
                     .map(obj -> {
                         JSONObject ingredientJson = new JSONObject((HashMap<?, ?>) obj);
-                        String description = ingredientJson.optString("text", null);
+                        String ingDescription = ingredientJson.optString("text", null);
                         Float quantity = ingredientJson.optFloat("quantity", 0.0f);
                         String measure = ingredientJson.optString("measure", "<unit>");
                         Float weight = ingredientJson.optFloat("weight", 0.0f);
-                        String category = ingredientJson.optString("foodCategory", null);
-                        Ingredient ingredient = new Ingredient(description, quantity, measure, weight);
+                        String food = ingredientJson.optString("food", null);
+                        Ingredient ingredient = new Ingredient(ingDescription, food, quantity, measure, weight);
                         ingredientRepository.save(ingredient);
                         return ingredient;
                     })
@@ -94,6 +96,11 @@ public class RecipeInitializationService {
                         .map(Object::toString)
                         .toList();
 
+                List<String> steps = recipeJson.optJSONArray("steps", new JSONArray()).toList().stream()
+                        .map(Object::toString)
+                        .toList();
+
+
                 Float totalTime = recipeJson.optFloat("totalTime", 0.0f);
                 Float totalWeight = recipeJson.optFloat("totalWeight", 0.0f);
                 Float calories = recipeJson.optFloat("calories", 0.0f);
@@ -107,9 +114,9 @@ public class RecipeInitializationService {
                 }
 
                 // Create a new Recipe object
-                Recipe recipe = new Recipe(label, dietLabels, healthLabels, cautions,
+                Recipe recipe = new Recipe(label, description, dietLabels, healthLabels, cautions,
                         people, ingredients, difficulty, dishTypes, mealTypes, cuisineType, totalTime,
-                        totalWeight, calories, recipeAuthor);
+                        totalWeight, calories, recipeAuthor, steps);
 
                 // Save the new recipe to the database
                 recipeRepository.save(recipe);

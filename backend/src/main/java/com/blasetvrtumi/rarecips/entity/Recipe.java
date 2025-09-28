@@ -31,14 +31,17 @@ public class Recipe {
 
     public interface cautionsInfo {
     }
-    
+
     @Id
-    @SequenceGenerator(name = "seq", initialValue = 0)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
+    @JsonView(BasicInfo.class)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
+
     @JsonView(BasicInfo.class)
     private String label;
+
+    @JsonView(BasicInfo.class)
+    String description;
 
     @Lob
     @JsonIgnore
@@ -67,17 +70,18 @@ public class Recipe {
     private List<String> mealTypes = new ArrayList<>();
 
     @ElementCollection
+    @JsonView(BasicInfo.class)
     private List<String> cuisineType = new ArrayList<>();
 
-    @JsonView(dietLabelsInfo.class)
+    @JsonView(BasicInfo.class)
     @ElementCollection
     private List<String> dietLabels = new ArrayList<>();
 
-    @JsonView(healthLabelsInfo.class)
+    @JsonView(BasicInfo.class)
     @ElementCollection
     private List<String> healthLabels = new ArrayList<>();
 
-    @JsonView(cautionsInfo.class)
+    @JsonView(BasicInfo.class)
     @ElementCollection
     private List<String> cautions = new ArrayList<>();
 
@@ -93,17 +97,23 @@ public class Recipe {
     @JsonView(BasicInfo.class)
     private Float rating;
 
-    @ManyToOne
-    @JoinColumn(name = "author")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonView(BasicInfo.class)
+    @JoinColumn(name = "author_username", referencedColumnName = "username")
     private User author;
-    
+
+    @ElementCollection
+    @JsonView(BasicInfo.class)
+    private List<String> steps = new ArrayList<>();
+
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @JsonView(BasicInfo.class)
     private List<Review> reviews = new ArrayList<>();
-    
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
@@ -112,10 +122,12 @@ public class Recipe {
         // Default constructor
     }
 
-    public Recipe(String label, List<String> dietLabels, List<String> healthLabels, List<String> cautions, Integer people, List<Ingredient> ingredients,
-                  int difficulty, List<String> dishTypes, List<String> mealTypes, List<String> cuisineType,
-                  Float totalTime, Float totalWeight, Float calories, User author) {
+    public Recipe(String label, String description, List<String> dietLabels, List<String> healthLabels, List<String> cautions,
+            Integer people, List<Ingredient> ingredients,
+            int difficulty, List<String> dishTypes, List<String> mealTypes, List<String> cuisineType,
+            Float totalTime, Float totalWeight, Float calories, User author, List<String> steps) {
         this.label = label;
+        this.description = description;
         this.dietLabels = dietLabels;
         this.healthLabels = healthLabels;
         this.cautions = cautions;
@@ -129,6 +141,7 @@ public class Recipe {
         this.totalWeight = totalWeight;
         this.calories = calories;
         this.author = author;
+        this.steps = steps;
     }
 
     public Blob localImageToBlob(String imagePath) throws IOException, SQLException {
@@ -161,6 +174,9 @@ public class Recipe {
     }
 
     public String blobToString(Blob blob) throws SQLException {
+        if (blob == null) {
+            return null;
+        }
         byte[] bytes = blob.getBytes(1, (int) blob.length());
         String userImage = Base64.getEncoder().encodeToString(bytes);
         return userImage;
@@ -170,8 +186,152 @@ public class Recipe {
         return id;
     }
 
-    public User getAuthor() {
-        return author;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public Blob getImageFile() {
+        return imageFile;
+    }
+
+    public String getImageString() {
+        return imageString;
+    }
+
+    public Integer getPeople() {
+        return people;
+    }
+
+    public void setPeople(Integer people) {
+        this.people = people;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public List<String> getDishTypes() {
+        return dishTypes;
+    }
+
+    public void setDishTypes(List<String> dishTypes) {
+        this.dishTypes = dishTypes;
+    }
+
+    public List<String> getMealTypes() {
+        return mealTypes;
+    }
+
+    public void setMealTypes(List<String> mealTypes) {
+        this.mealTypes = mealTypes;
+    }
+
+    public List<String> getCuisineType() {
+        return cuisineType;
+    }
+
+    public void setCuisineType(List<String> cuisineType) {
+        this.cuisineType = cuisineType;
+    }
+
+    public List<String> getDietLabels() {
+        return dietLabels;
+    }
+
+    public void setDietLabels(List<String> dietLabels) {
+        this.dietLabels = dietLabels;
+    }
+
+    public List<String> getHealthLabels() {
+        return healthLabels;
+    }
+
+    public void setHealthLabels(List<String> healthLabels) {
+        this.healthLabels = healthLabels;
+    }
+
+    public List<String> getCautions() {
+        return cautions;
+    }
+
+    public void setCautions(List<String> cautions) {
+        this.cautions = cautions;
+    }
+
+    public Float getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(Float totalTime) {
+        this.totalTime = totalTime;
+    }
+
+    public Float getTotalWeight() {
+        return totalWeight;
+    }
+
+    public void setTotalWeight(Float totalWeight) {
+        this.totalWeight = totalWeight;
+    }
+
+    public Float getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Float calories) {
+        this.calories = calories;
+    }
+
+    public Float getRating() {
+        return rating;
+    }
+
+    public void setRating(Float rating) {
+        this.rating = rating;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getAuthor() {
+        return author.getUsername();
     }
 
     public List<Review> getReviews() {
