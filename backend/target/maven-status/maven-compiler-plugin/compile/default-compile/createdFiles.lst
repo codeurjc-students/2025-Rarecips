@@ -28,5 +28,6 @@ com\blasetvrtumi\rarecips\entity\Recipe.class
 com\blasetvrtumi\rarecips\entity\User$Role.class
 com\blasetvrtumi\rarecips\entity\User$Recipes.class
 com\blasetvrtumi\rarecips\entity\Ingredient.class
+com\blasetvrtumi\rarecips\controller\LandingController.class
 com\blasetvrtumi\rarecips\service\RecipeService.class
 com\blasetvrtumi\rarecips\entity\Food$BasicInfo.class

@@ -10,9 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/recipes")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class RecipeController {
-    
-    
+
+    @Autowired
+    private RecipeService recipeService;
+
+    @GetMapping("/api/recipes/{id}")
+    public ResponseEntity<?> getRecipeById(@PathVariable Long id) {
+        return ResponseEntity.ok(recipeService.findById(id));
+    }
 }

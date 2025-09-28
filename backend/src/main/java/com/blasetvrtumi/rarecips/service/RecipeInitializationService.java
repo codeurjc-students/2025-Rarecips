@@ -40,7 +40,7 @@ public class RecipeInitializationService {
         if (recipes != null && recipes.length() > 0) {
 
             // Add all recipes from the JSON file to the database
-            for (int i = 0; i < recipes.length() - 1; i++) {
+            for (int i = 0; i < 20/*recipes.length() - 1*/; i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
 
                 String label = recipeJson.optString("label", null);
