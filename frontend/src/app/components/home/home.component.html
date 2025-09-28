@@ -56,7 +56,8 @@
           <div>
             <h2 class="text-2xl font-bold text-primary mb-4">Based in your preferences</h2>
             <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
-              <!-- Recipe Card 2 -->
+              <!-- Recipe Card -->
+               @for (recipe of recipeList; track recipe.id) {
               <div class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
                 <!-- Glass Reflection Effect -->
                 <div
@@ -67,7 +68,7 @@
                 <div class="relative aspect-43 overflow-hidden">
                   <img
                     src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
-                    alt="Classic Caesar Salad" class="recipe-image" style="height: -webkit-fill-available;">
+                    alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;">
 
                   <!-- Gradient Overlay -->
                   <div class="absolute inset-0 gradient-overlay"></div>
@@ -92,12 +93,24 @@
 
                   <!-- Category Badge -->
                   <div class="absolute top-4 left-4">
-                    <span class="badge badge-dark text-xs px-3 py-1">Breakfast</span>
+                    <span class="badge badge-dark text-xs px-3 py-1">{{recipe.mealTypes[0]}}</span>
                   </div>
 
                   <!-- Difficulty Badge -->
                   <div class="absolute bottom-4 left-4">
-                    <div class="badge badge-green text-xs font-medium backdrop-blur-sm">Easy</div>
+                      @if (recipe.difficulty < 3) {
+                        <div class="badge badge-green text-xs font-medium backdrop-blur-sm">
+                          <span>Easy</span>
+                        </div>
+                      } @else if (recipe.difficulty === 3) {
+                        <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">
+                          <span>Medium</span>
+                        </div>
+                      } @else {
+                        <div class="badge badge-red text-xs font-medium backdrop-blur-sm">
+                          <span>Hard</span>
+                        </div>
+                      }
                   </div>
                 </div>
 
@@ -105,7 +118,7 @@
                 <div class="p-6 space-y-4">
                   <!-- Title and Rating -->
                   <div class="space-y-2">
-                    <h3 class="text-xl font-bold text-primary line-clamp-2">Oatmeal Banana Pancakes</h3>
+                    <h3 class="text-xl font-bold text-primary line-clamp-2">{{recipe.title}}</h3>
 
                     <div class="flex items-center justify-between">
                       <div class="star-rating">
@@ -129,14 +142,14 @@
                           <polygon
                             points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
                         </svg>
-                        <span class="text-secondary text-sm ml-2">4.5 (28)</span>
+                        <span class="text-secondary text-sm ml-2">{{recipe.rating}} ({{recipe.reviews.length}})</span>
                       </div>
                     </div>
                   </div>
 
                   <!-- Description -->
                   <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                    Fluffy oat and banana pancakes, perfect for a healthy and delicious breakfast.
+                    {{recipe.description}}
                   </p>
 
                   <!-- Meta Information -->
@@ -147,7 +160,7 @@
                         <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"
                           stroke-linecap="round" stroke-linejoin="round" />
                       </svg>
-                      <span>15 min</span>
+                      <span>{{recipe.totalTime}} min</span>
                     </div>
                     <div class="flex items-center gap-1">
                       <svg class="w-4 h-4" viewBox="0 0 24 24">
@@ -157,23 +170,23 @@
                         <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor"
                           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                       </svg>
-                      <span>2 people</span>
+                      <span>{{recipe.people}} people</span>
                     </div>
                   </div>
 
                   <!-- Tags -->
                   <div class="flex flex-wrap gap-2">
                     <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Classic</span>
+                      style="background-color: var(--primary-300);">{{recipe.dishTypes[0]}}</span>
                     <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Dessert</span>
+                      style="background-color: var(--primary-300);">{{recipe.dietLabels[0]}}</span>
                     <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Vegetarian</span>
+                      style="background-color: var(--primary-300);">{{recipe.healthLabels[0]}}</span>
                   </div>
 
                   <!-- View Button -->
                   <div class="rounded flex" style="background: var(--gradient-primary);">
-                    <button class="btn btn-primary w-full">
+                    <button class="btn btn-primary w-full" (click)="viewRecipe(recipe.id)">
                       <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"
                           stroke-linecap="round" stroke-linejoin="round" fill="none" />
@@ -184,263 +197,7 @@
                   </div>
                 </div>
               </div>
-              <!-- Recipe Card 1 -->
-              <div class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                <!-- Glass Reflection Effect -->
-                <div
-                  class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                </div>
-
-                <!-- Image Container -->
-                <div class="relative aspect-43 overflow-hidden">
-                  <img
-                    src="https://res.cloudinary.com/subframe/image/upload/v1724705396/uploads/302/wvpuc4kznngymxhsw1w5.png"
-                    alt="Spicy Thai Basil Chicken" class="recipe-image" style="height: -webkit-fill-available;">
-
-                  <!-- Gradient Overlay -->
-                  <div class="absolute inset-0 gradient-overlay"></div>
-
-                  <!-- Top Right Actions -->
-                  <div class="absolute top-4 right-4 flex gap-2">
-                    <button class="btn btn-icon glass-strong text-primary">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path
-                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                          fill="none" />
-                      </svg>
-                    </button>
-                    <button class="btn btn-icon glass-strong text-primary">
-                      <svg class="w-4 h-4 fill-orange-500 text-orange-500" viewBox="0 0 24 24">
-                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <!-- Category Badge -->
-                  <div class="absolute top-4 left-4">
-                    <span class="badge badge-dark text-xs px-3 py-1">Lunch / Dinner</span>
-                  </div>
-
-                  <!-- Difficulty Badge -->
-                  <div class="absolute bottom-4 left-4">
-                    <div class="badge badge-red text-xs font-medium backdrop-blur-sm">Hard</div>
-                  </div>
-                </div>
-
-                <!-- Content -->
-                <div class="p-6 space-y-4">
-                  <!-- Title and Rating -->
-                  <div class="space-y-2">
-                    <h3 class="text-xl font-bold text-primary line-clamp-2">Spicy Thai Basil Chicken</h3>
-
-                    <div class="flex items-center justify-between">
-                      <div class="star-rating">
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <span class="text-secondary text-sm ml-2">4.8 (34)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Description -->
-                  <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                    A delicious and aromatic Thai dish with fresh basil and perfectly balanced spices that will transport you
-                    straight to Bangkok.
-                  </p>
-
-                  <!-- Meta Information -->
-                  <div class="flex items-center gap-4 text-secondary text-sm">
-                    <div class="flex items-center gap-1">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
-                        <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                      <span>35 min</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none" />
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor"
-                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                      <span>4 people</span>
-                    </div>
-                  </div>
-
-                  <!-- Tags -->
-                  <div class="flex flex-wrap gap-2">
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Spicy</span>
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Asian</span>
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Quick</span>
-                  </div>
-
-                  <!-- View Button -->
-                  <div class="rounded flex" style="background: var(--gradient-primary);">
-                    <button class="btn btn-primary w-full">
-                      <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" />
-                      </svg>
-                      View recipe
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Recipe Card 2 -->
-              <div class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                <!-- Glass Reflection Effect -->
-                <div
-                  class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                </div>
-
-                <!-- Image Container -->
-                <div class="relative aspect-43 overflow-hidden">
-                  <img
-                    src="https://res.cloudinary.com/subframe/image/upload/v1723780577/uploads/302/hhmv6ey0yajkadnmcp0a.png"
-                    alt="Classic Caesar Salad" class="recipe-image" style="height: -webkit-fill-available;">
-
-                  <!-- Gradient Overlay -->
-                  <div class="absolute inset-0 gradient-overlay"></div>
-
-                  <!-- Top Right Actions -->
-                  <div class="absolute top-4 right-4 flex gap-2">
-                    <button class="btn btn-icon glass-strong text-primary">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path
-                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                          fill="none" />
-                      </svg>
-                    </button>
-                    <button class="btn btn-icon glass-strong text-primary">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor"
-                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <!-- Category Badge -->
-                  <div class="absolute top-4 left-4">
-                    <span class="badge badge-dark text-xs px-3 py-1">Lunch / Dinner</span>
-                  </div>
-
-                  <!-- Difficulty Badge -->
-                  <div class="absolute bottom-4 left-4">
-                    <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">Medium</div>
-                  </div>
-                </div>
-
-                <!-- Content -->
-                <div class="p-6 space-y-4">
-                  <!-- Title and Rating -->
-                  <div class="space-y-2">
-                    <h3 class="text-xl font-bold text-primary line-clamp-2">Classic Caesar Salad</h3>
-
-                    <div class="flex items-center justify-between">
-                      <div class="star-rating">
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <span class="text-secondary text-sm ml-2">4.5 (28)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Description -->
-                  <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                    Fresh romaine lettuce with homemade Caesar dressing, Parmesan cheese, and crunchy croutons.
-                  </p>
-
-                  <!-- Meta Information -->
-                  <div class="flex items-center gap-4 text-secondary text-sm">
-                    <div class="flex items-center gap-1">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
-                        <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                      <span>15 min</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none" />
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor"
-                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                      <span>2 people</span>
-                    </div>
-                  </div>
-
-                  <!-- Tags -->
-                  <div class="flex flex-wrap gap-2">
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Classic</span>
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Salad</span>
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">#Vegetarian</span>
-                  </div>
-
-                  <!-- View Button -->
-                  <div class="rounded flex" style="background: var(--gradient-primary);">
-                    <button class="btn btn-primary w-full">
-                      <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" />
-                      </svg>
-                      View recipe
-                    </button>
-                  </div>
-                </div>
-              </div>
+              }
             </div>
           </div>
         </div>

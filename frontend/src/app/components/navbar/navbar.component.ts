@@ -77,7 +77,6 @@ export class NavbarComponent implements OnInit {
             const body = document.querySelector('body');
             const navbar = document.getElementById('navbar');
             this.themes.forEach(theme => {
-                console.log(theme);
                 theme = "theme-" + theme;
                 if (theme === item?.id) return;
                 body?.classList.remove(theme);
@@ -93,12 +92,25 @@ export class NavbarComponent implements OnInit {
         let currentNavButton = (event?.target as HTMLElement).closest('.nav-item') as HTMLElement;
         let navItems = document.querySelectorAll('.nav-item');
         navItems.forEach((item) => {
-            if (item.classList.contains('active'))
-            item.classList.remove('active')
-            console.log(item);
-
+            if (item.classList.contains('active')) {
+                item.classList.remove('active')
+                let label = item.children[0] as HTMLElement;
+                label.classList.forEach(c => {
+                    if (c.endsWith('-filled')) {
+                        label.classList.remove(c);
+                        label.classList.add(c.replace('-filled', ''));
+                    }
+                });
+            }
         });
         currentNavButton.classList.add('active');
+        let label = currentNavButton.children[0] as HTMLElement;
+        label.classList.forEach(c => {
+            if (c.startsWith('ti-') && !c.endsWith('-filled')) {
+                label.classList.remove(c);
+                label.classList.add(c + '-filled');
+            }
+        });
     }
 
     selectLanguage(event: Event): void {
