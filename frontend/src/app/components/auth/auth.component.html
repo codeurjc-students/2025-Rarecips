@@ -1,0 +1,284 @@
+<div class="auth-container">
+    <div class="auth-wrapper glass">
+        <!-- Left Side - Branding -->
+        <div class="branding-section">
+            <div class="branding-content">
+                <img src="assets/logo/Rarecips_Iconologo2.svg" alt="Rarecips Iconologo" class="logo" />
+                <p class="brand-subtitle">
+                    Discover, create, and share unique recipes that awaken your senses
+                </p>
+
+                <!-- Floating Recipe Cards -->
+                <div class="floating-preview-cards">
+                    <div class="preview-card glass-strong">
+                        <div class="preview-image preview-image-1"></div>
+                        <div class="preview-content">
+                            <h4>Pasta Carbonara</h4>
+                            <div class="preview-rating">
+                                <span class="stars">★★★★★</span>
+                                <span class="rating-text">4.8</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-card glass-strong">
+                        <div class="preview-image preview-image-2"></div>
+                        <div class="preview-content">
+                            <h4>Thai Curry</h4>
+                            <div class="preview-rating">
+                                <span class="stars">★★★★☆</span>
+                                <span class="rating-text">4.6</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-card glass-strong">
+                        <div class="preview-image preview-image-3"></div>
+                        <div class="preview-content">
+                            <h4>Chocolate Cake</h4>
+                            <div class="preview-rating">
+                                <span class="stars">★★★★★</span>
+                                <span class="rating-text">4.9</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-card glass-strong">
+                        <div class="preview-image preview-image-4"></div>
+                        <div class="preview-content">
+                            <h4>Pizza Margherita</h4>
+                            <div class="preview-rating">
+                                <span class="stars">★★★★☆</span>
+                                <span class="rating-text">4.7</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-card glass-strong">
+                        <div class="preview-image preview-image-5"></div>
+                        <div class="preview-content">
+                            <h4>Sushi Roll</h4>
+                            <div class="preview-rating">
+                                <span class="stars">★★★★★</span>
+                                <span class="rating-text">4.9</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-card glass-strong">
+                        <div class="preview-image preview-image-6"></div>
+                        <div class="preview-content">
+                            <h4>Paella Valenciana</h4>
+                            <div class="preview-rating">
+                                <span class="stars">★★★★★</span>
+                                <span class="rating-text">4.8</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-card glass-strong">
+                        <div class="preview-image preview-image-7"></div>
+                        <div class="preview-content">
+                            <h4>Ramen Japonés</h4>
+                            <div class="preview-rating">
+                                <span class="stars">★★★★☆</span>
+                                <span class="rating-text">4.5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-card glass-strong">
+                        <div class="preview-image preview-image-8"></div>
+                        <div class="preview-content">
+                            <h4>Tacos Mexicanos</h4>
+                            <div class="preview-rating">
+                                <span class="stars">★★★★★</span>
+                                <span class="rating-text">4.7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Auth Forms -->
+        <div class="auth-tab-container">
+            <!-- Tab Navigation -->
+            <div class="auth-tabs glass gap-2">
+                <button class="auth-tab" [class.active]="activeTab === 'login'" (click)="switchTab('login')">
+                    <i class="ti ti-login text-xl" aria-hidden="true"></i>
+                    Log in
+                </button>
+                <button class="auth-tab" style="color: var(--primary-700)" [class.active]="activeTab === 'signup'" (click)="switchTab('signup')">
+                    <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
+                    Sign up
+                </button>
+            </div>
+            <div class="auth-section">
+                <div class="auth-forms-container">
+
+                    <!-- Login Form -->
+                    <div class="auth-form glass" [class.active]="activeTab === 'login'"
+                        [class.hidden]="activeTab !== 'login'">
+                        <div class="form-header">
+                            <h2 class="form-title">
+                                Welcome back!
+                            </h2>
+                            <p class="form-subtitle">
+                                Log in to continue your culinary adventure
+                            </p>
+                        </div>
+
+                        <form class="form-content" (ngSubmit)="onLogin()">
+                            <div class="form-group">
+                                <label for="login-email" class="form-label">Email</label>
+                                <div class="input-wrapper">
+                                    <i class="ti ti-mail text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                    <input type="email" id="login-email" class="form-input glass-input"
+                                        placeholder="your@email.com" [(ngModel)]="loginForm.email" name="email" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="login-password" class="form-label">Password</label>
+                                <div class="input-wrapper">
+                                    <i class="ti ti-lock text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                    <input [type]="showLoginPassword ? 'text' : 'password'" id="login-password"
+                                        class="form-input glass-input" placeholder="Your password"
+                                        [(ngModel)]="loginForm.password" name="password" required>
+                                    <button type="button" class="password-toggle"
+                                        (click)="showLoginPassword = !showLoginPassword">
+                                        @if (!showLoginPassword) {
+                                        <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                        }
+                                        @if (showLoginPassword) {
+                                        <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-options">
+                                <label class="checkbox-wrapper">
+                                    <input type="checkbox" class="form-checkbox" [(ngModel)]="loginForm.rememberMe"
+                                        name="rememberMe">
+                                    <span class="checkbox-custom glass-input"></span>
+                                    <span class="checkbox-label">Remember me</span>
+                                </label>
+                                <a href="#" class="forgot-link" (click)="onForgotPassword($event)">Forgot your
+                                    password?</a>
+                            </div>
+
+                            <button type="submit" class="form-submit glass-button">
+                                <i class="ti ti-login text-xl" aria-hidden="true"></i>
+                                Log In
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- signup Form -->
+                    <div class="auth-form glass" [class.active]="activeTab === 'signup'"
+                        [class.hidden]="activeTab !== 'signup'">
+                        <div class="form-header">
+                            <h2 class="form-title">
+                                Join Rarecips!
+                            </h2>
+                            <p class="form-subtitle">Create your account and start exploring unique flavors</p>
+                        </div>
+
+                        <form class="form-content" (ngSubmit)="onSignup()">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="signup-firstname" class="form-label">Name</label>
+                                    <div class="input-wrapper">
+                                        <i class="ti ti-circle-number-1 text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                        <input type="text" id="signup-firstname" class="form-input glass-input"
+                                            placeholder="Your name" [(ngModel)]="signupForm.firstName"
+                                            name="firstName" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="signup-lastname" class="form-label">Surname</label>
+                                    <div class="input-wrapper">
+                                        <i class="ti ti-circle-number-2 text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                        <input type="text" id="signup-lastname" class="form-input glass-input"
+                                            placeholder="Your surname" [(ngModel)]="signupForm.lastName"
+                                            name="lastName" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="signup-email" class="form-label">Email</label>
+                                <div class="input-wrapper">
+                                    <i class="ti ti-mail text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                    <input type="email" id="signup-email" class="form-input glass-input"
+                                        placeholder="your@email.com" [(ngModel)]="signupForm.email" name="email"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="signup-password" class="form-label">Password</label>
+                                <div class="input-wrapper">
+                                    <i class="ti ti-lock text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                    <input [type]="showSignupPassword ? 'text' : 'password'" id="signup-password"
+                                        class="form-input glass-input" placeholder="Choose a secure password"
+                                        [(ngModel)]="signupForm.password" name="password" required>
+                                    <button type="button" class="password-toggle"
+                                        (click)="showSignupPassword = !showSignupPassword">
+                                        @if (!showSignupPassword) {
+                                        <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                        }
+                                        @if (showSignupPassword) {
+                                        <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="signup-confirm-password" class="form-label">Confirm your
+                                    Password</label>
+                                <div class="input-wrapper">
+                                    <i class="ti ti-lock-check text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                    <input [type]="showConfirmPassword ? 'text' : 'password'"
+                                        id="signup-confirm-password" class="form-input glass-input"
+                                        placeholder="Confirma tu contraseña" [(ngModel)]="signupForm.confirmPassword"
+                                        name="confirmPassword" required>
+                                    <button type="button" class="password-toggle"
+                                        (click)="showConfirmPassword = !showConfirmPassword">
+                                        @if (!showConfirmPassword) {
+                                        <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                        }
+                                        @if (showConfirmPassword) {
+                                        <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-options">
+                                <label class="checkbox-wrapper">
+                                    <input type="checkbox" class="form-checkbox" [(ngModel)]="signupForm.acceptTerms"
+                                        name="acceptTerms" required>
+                                    <span class="checkbox-custom glass-input"></span>
+                                    <span class="checkbox-label">
+                                        I accept the <a href="#" class="terms-link">terms and conditions</a> and
+                                        <a href="#" class="terms-link">privacy policy</a>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="form-submit glass-button">
+                                <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
+                                Create Account
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
