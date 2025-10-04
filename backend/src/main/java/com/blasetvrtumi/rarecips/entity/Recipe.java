@@ -1,6 +1,7 @@
 package com.blasetvrtumi.rarecips.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -276,6 +277,10 @@ public class Recipe {
 
     public void setCautions(List<String> cautions) {
         this.cautions = cautions;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Float getTotalTime() {
