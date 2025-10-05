@@ -372,4 +372,8 @@ public class Recipe {
         this.rating = (Float) sum / reviews.size();
     }
 
+    public List<String> getSteps() {
+        return steps;
+    }
+
 }

@@ -4,14 +4,11 @@ C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\back
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\controller\RecipeController.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\controller\ReviewController.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\controller\ViewController.java
-C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\entity\Food.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\entity\Ingredient.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\entity\Recipe.java
-C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\entity\Report.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\entity\Review.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\entity\User.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\RarecipsApplication.java
-C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\repository\FoodRepository.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\repository\IngredientRepository.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\repository\RecipeRepository.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\repository\ReviewRepository.java
@@ -19,3 +16,4 @@ C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\back
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\service\RecipeInitializationService.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\service\RecipeService.java
 C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\service\ReviewService.java
+C:\Users\blase\OneDrive - Universidad Rey Juan Carlos\Uni\TFG\2025-Rarecips\backend\src\main\java\com\blasetvrtumi\rarecips\service\UserService.java

@@ -1,10 +1,7 @@
-com\blasetvrtumi\rarecips\entity\Food.class
 com\blasetvrtumi\rarecips\repository\ReviewRepository.class
 com\blasetvrtumi\rarecips\service\ReviewService.class
 com\blasetvrtumi\rarecips\entity\User$Username.class
 com\blasetvrtumi\rarecips\service\RecipeInitializationService.class
-com\blasetvrtumi\rarecips\repository\FoodRepository.class
-com\blasetvrtumi\rarecips\entity\Report.class
 com\blasetvrtumi\rarecips\repository\UserRepository.class
 com\blasetvrtumi\rarecips\entity\Ingredient$BasicInfo.class
 com\blasetvrtumi\rarecips\entity\Recipe$dietLabelsInfo.class
@@ -30,4 +27,3 @@ com\blasetvrtumi\rarecips\entity\User$Recipes.class
 com\blasetvrtumi\rarecips\entity\Ingredient.class
 com\blasetvrtumi\rarecips\controller\LandingController.class
 com\blasetvrtumi\rarecips\service\RecipeService.class
-com\blasetvrtumi\rarecips\entity\Food$BasicInfo.class

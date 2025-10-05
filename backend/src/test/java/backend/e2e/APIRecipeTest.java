@@ -123,6 +123,7 @@ public class APIRecipeTest {
                 .when()
                 .get("/recipes/{id}", recipe1Id)
                 .then()
+                .log().all()
                 .statusCode(200)
                 .extract()
                 .jsonPath();
@@ -132,6 +133,7 @@ public class APIRecipeTest {
                 .when()
                 .get("/recipes/{id}", recipe2Id)
                 .then()
+                .log().all()
                 .statusCode(200)
                 .extract()
                 .jsonPath();

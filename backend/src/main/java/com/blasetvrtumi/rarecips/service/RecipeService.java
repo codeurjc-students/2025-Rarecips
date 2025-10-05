@@ -3,6 +3,8 @@ package com.blasetvrtumi.rarecips.service;
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
+import com.blasetvrtumi.rarecips.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,9 @@ public class RecipeService {
     @Autowired
     private RecipeRepository recipeRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public Recipe findById(Long id) {
         return recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
@@ -37,6 +42,12 @@ public class RecipeService {
         Page<Recipe> recipes = recipeRepository.findAll(pageable);
         System.out.println(recipes.getContent().get(0).getId());
         return recipes;
+    }
+
+    public Recipe createRecipe(Recipe recipe, String username) {
+        User author = userRepository.findByUsername(username);
+        recipe.setAuthor(author);
+        return recipeRepository.save(recipe);
     }
 
 }
