@@ -40,7 +40,6 @@ public class RecipeService {
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Recipe> recipes = recipeRepository.findAll(pageable);
-        System.out.println(recipes.getContent().get(0).getId());
         return recipes;
     }
 
@@ -48,6 +47,29 @@ public class RecipeService {
         User author = userRepository.findByUsername(username);
         recipe.setAuthor(author);
         return recipeRepository.save(recipe);
+    }
+
+    public Object findAll() {
+        List<Recipe> recipes = recipeRepository.findAll();
+        Map<String, Object> response = new HashMap<>();
+        response.put("recipes", recipes.stream().map(recipe -> {
+            Map<String, Object> recipeMap = new HashMap<>();
+            recipeMap.put("id", recipe.getId());
+            recipeMap.put("label", recipe.getLabel());
+            recipeMap.put("description", recipe.getDescription());
+            recipeMap.put("difficulty", recipe.getDifficulty());
+            recipeMap.put("totalTime", recipe.getTotalTime());
+            recipeMap.put("calories", recipe.getCalories());
+            if (recipe.getAuthor() != null) {
+                Map<String, Object> authorMap = new HashMap<>();
+                authorMap.put("username", recipe.getAuthor());
+                recipeMap.put("author", authorMap);
+            } else {
+                recipeMap.put("author", null);
+            }
+            return recipeMap;
+        }).collect(Collectors.toList()));
+        return response;
     }
 
 }

@@ -1,4 +1,5 @@
 com\blasetvrtumi\rarecips\repository\ReviewRepository.class
+com\blasetvrtumi\rarecips\service\UserService.class
 com\blasetvrtumi\rarecips\service\ReviewService.class
 com\blasetvrtumi\rarecips\entity\User$Username.class
 com\blasetvrtumi\rarecips\service\RecipeInitializationService.class

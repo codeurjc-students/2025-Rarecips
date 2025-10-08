@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.sql.Blob;
@@ -24,10 +26,8 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = RarecipsApplication.class)
+@DirtiesContext
 public class APIRecipeTest {
-
-    @LocalServerPort
-    private int port = 8443;
 
     @Autowired
     private RecipeRepository recipeRepository;
@@ -44,7 +44,7 @@ public class APIRecipeTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-        RestAssured.baseURI = "http://localhost:" + port + "/api";
+        RestAssured.baseURI = "http://localhost:8443/api";
 
         userRepository.save(testUser);
 
@@ -105,6 +105,7 @@ public class APIRecipeTest {
                 .param("size", 4)
                 .param("page", 0)
                 .when()
+                .log().all()
                 .get("/recipes")
                 .then()
                 .log().all()

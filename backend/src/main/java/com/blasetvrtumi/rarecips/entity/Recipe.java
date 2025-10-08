@@ -336,6 +336,9 @@ public class Recipe {
     }
 
     public String getAuthor() {
+        if (author == null) {
+            return null;
+        }
         return author.getUsername();
     }
 
