@@ -23,6 +23,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": "dist/rarecips",
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
