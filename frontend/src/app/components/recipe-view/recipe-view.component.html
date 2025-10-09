@@ -1,0 +1,243 @@
+<div class="flex min-h-screen w-full flex-col items-start justify-center">
+    <!-- Main Content -->
+    <div
+        class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
+        <div class="flex w-full max-w-screen-2xl min-h-full flex-col items-start gap-8">
+            <div class="flex flex-row gap-8">
+                <div class="flex flex-col gap-8 w-3/4">
+                    <!-- Recipe Header -->
+                    <div class="flex w-full flex-col gap-8 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                        style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                        <div class="flex items-center gap-8">
+                            <!-- Recipe Image -->
+                            <div class="relative w-2/4 h-96">
+                                <img class="w-full h-full rounded-3xl object-cover shadow-lg"
+                                    src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
+                                    alt="{{ recipe?.title }}" />
+
+                                <!-- Image Actions -->
+                                <div class="absolute top-4 right-4 flex gap-2">
+                                    <button
+                                        class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md">
+                                        <i class="ti ti-heart text-xl" style="color: var(--primary-500);"></i>
+                                    </button>
+                                    <button
+                                        class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md">
+                                        <i class="ti ti-bookmark text-xl" style="color: var(--primary-500);"></i>
+                                    </button>
+                                    <button
+                                        class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md">
+                                        <i class="ti ti-share text-xl" style="color: var(--primary-500);"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Recipe Info -->
+                            <div class="w-3/4">
+                                <button
+                                    class="absolute top-8 right-8 w-12 h-12 flex items-center justify-center rounded-xl"
+                                    style="background: var(--gradient-primary); color: white;">
+                                    <i class="ti ti-edit text-primary-700 text-xl"></i>
+                                </button>
+                                <div class="flex flex-col gap-6">
+                                    <div class="flex flex-col gap-4">
+                                        <h1 class="text-4xl font-bold recipe-title"
+                                            style="color: var(--primary-700); font-kerning: none;">
+                                            {{ recipe?.title }}
+                                        </h1>
+                                        <!-- Tags -->
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                                                style="background: var(--primary-500); color: white;">
+                                                <i class="ti ti-flag mr-1 text-sm"></i>
+                                                {{ recipe?.cuisineType?.[0] }}
+                                            </span>
+                                            <span class="flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                                                style="background: var(--primary-300-40); color: var(--primary-700);">
+                                                <i class="ti ti-wheat-off mr-1 text-sm"></i>
+                                                {{ recipe?.dietLabels?.[0] }}
+                                            </span>
+                                            <span class="flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                                                style="background: var(--primary-300-40); color: var(--primary-700);">
+                                                <i class="ti ti-ladle mr-1 text-sm"></i>
+                                                {{ recipe?.mealTypes?.[0]}}
+                                            </span>
+                                        </div>
+                                        <p class="text-lg" style="color: var(--primary-400);">
+                                            {{ recipe?.description }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Author Info -->
+                                    <div class="flex items-center gap-4">
+                                        <img class="w-12 h-12 rounded-full object-cover" src="/assets/img/user.png"
+                                            alt="Chef" />
+                                        <div>
+                                            <p class="font-semibold" style="color: var(--primary-700);">Chef {{ recipe?.author }}</p>
+                                            <p class="text-sm" style="color: var(--primary-400);">Published on
+                                                {{ recipe?.createdAt}}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-center">
+                                        <hr class="border-t w-3/4" style="border-color: var(--primary-300);" />
+                                    </div>
+
+                                    <!-- Recipe Stats -->
+                                    <div class="flex flex-row justify-center md:grid-cols-4 gap-4">
+                                        <div class="flex flex-col items-center p-4 glass h-full w-full"
+                                            style="background: var(--primary-200-40);">
+                                            <i class="ti ti-clock text-2xl mb-2" style="color: var(--primary-500);"></i>
+                                            <span class="text-sm font-semibold"
+                                                style="color: var(--primary-400);">Time</span>
+                                            <span class="text-lg font-bold" style="color: var(--primary-700);">{{ recipe?.totalTime }}
+                                                min</span>
+                                        </div>
+                                        <div class="flex flex-col items-center p-4 glass h-full w-full"
+                                            style="background: var(--primary-200-40);">
+                                            <i class="ti ti-users text-2xl mb-2" style="color: var(--primary-500);"></i>
+                                            <span class="text-sm font-semibold"
+                                                style="color: var(--primary-400);">Servings</span>
+                                            <span class="text-lg font-bold" style="color: var(--primary-700);">{{ recipe?.people }}</span>
+                                        </div>
+                                        <div class="flex flex-col items-center p-4 glass h-full w-full"
+                                            style="background: var(--primary-200-40);">
+                                            <i class="ti ti-star text-2xl mb-2" style="color: var(--primary-500);"></i>
+                                            <span class="text-sm font-semibold"
+                                                style="color: var(--primary-400);">Rating</span>
+                                            <span class="text-lg font-bold"
+                                                style="color: var(--primary-700);">{{ recipe?.rating }}</span>
+                                        </div>
+                                        <div class="flex flex-col items-center p-4 glass h-auto w-full"
+                                            style="background: var(--primary-200-40);">
+                                            <div class="flex flex-row justify-center gap-0 mb-2">
+                                                <i class="flex justify-center ti ti-point-filled text-xl w-4"
+                                                    style="color: var(--primary-500);"></i>
+                                                <i class="flex justify-center ti ti-point-filled text-xl w-4"
+                                                    style="color: var(--primary-500);"></i>
+                                                <i class="flex justify-center ti ti-point text-xl w-3.5"
+                                                    style="color: var(--primary-500);"></i>
+                                            </div>
+                                            <span class="text-sm font-semibold"
+                                                style="color: var(--primary-400);">Difficulty</span>
+                                            <span class="text-lg font-bold"
+                                                style="color: var(--primary-700);">{{ recipe?.difficulty }}/5</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-center">
+                                        <button
+                                            class="w-auto px-4 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
+                                            style="background: var(--gradient-primary); color: white;">
+                                            <i class="ti ti-pencil-star text-xl"></i>
+                                            Write a review
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Tabs -->
+                    <div class="flex w-full">
+                        <div class="tabs glass text-nowrap w-full">
+                            <button class="tab active">
+                                <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
+                                Instructions
+                            </button>
+                            <button class="tab">
+                                <i class="ti ti-report text-2xl" aria-hidden="true"></i>
+                                Nutrition
+                            </button>
+                            <button class="tab">
+                                <i class="ti ti-stars text-2xl" aria-hidden="true"></i>
+                                Reviews ({{ recipe?.reviews?.length || 0 }})
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recipe Content -->
+                    <div class="gap-8 w-full">
+
+                        <!-- Instructions Panel -->
+                        <div class="lg:col-span-2">
+                            <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                                style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+                                <!-- Timer Helper -->
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="flex items-center gap-1 text-center">
+                                        <i class="ti ti-clock text-2xl" style="color: var(--primary-700);"></i>
+                                        <p class="font-semibold" style="color: var(--primary-700);">Total Time: {{ recipe?.totalTime }} minutes</p>
+                                    </div>
+                                    <button
+                                        class="max-w-xs w-1/5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
+                                        style="background: var(--gradient-primary); color: white;">
+                                        <i class="ti ti-tools-kitchen text-xl"></i>
+                                        Start
+                                    </button>
+                                </div>
+
+                                <div class="space-y-6">
+                                    <!-- Steps -->
+                                    @for (step of recipe?.steps; track $index) {
+                                    <div class="flex items-center gap-6 instruction-step">
+                                        <div class="flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0"
+                                            style="background: var(--primary-500); color: white; font-weight: bold;">
+                                            {{ $index + 1 }}
+                                        </div>
+                                        <div class="flex-1 p-4 glass" style="background: var(--primary-200-40);">
+                                            <p class="font-medium" style="color: var(--primary-700);">{{ step }}</p>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col w-1/4">
+                    <!-- Ingredients Panel -->
+                    <div class="lg:col-span-1">
+                        <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass sticky top-8"
+                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                            <div class="flex items-center justify-between">
+                                <h3 class="flex items-center text-xl font-semibold" style="color: var(--primary-700);">
+                                    <i class="ti ti-shopping-cart mr-2"></i>
+                                    Ingredients
+                                </h3>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="yield" class="hidden" />
+                                    <label for="yield" class="cursor-pointer">
+                                        <div class="selector flex flex-row items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border-none"
+                                            style="background: var(--primary-300-40); color: var(--primary-700);">
+                                            <span>6 people</span>
+                                            <i class="ti ti-caret-down-filled ml-1"></i>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                @for (ingredient of recipe?.ingredients; track $index) {
+                                <label class="flex items-center glass gap-4 p-3 ingredient-item cursor-pointer"
+                                    style="background: var(--primary-200-40);">
+                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                                        style="accent-color: var(--primary-500);">
+                                    <span class="w-7 h-7 checkbox-custom glass-input !rounded-full"></span>
+                                    <div class="flex-1">
+                                        <span class="font-medium" style="color: var(--primary-700);">{{ ingredient.food }}</span>
+                                        <div class="text-sm" style="color: var(--primary-400);">{{ ingredient.description }}</div>
+                                    </div>
+                                    <i class="ti ti-basket-check mr-4 text-xl text-green-500"></i>
+                                </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

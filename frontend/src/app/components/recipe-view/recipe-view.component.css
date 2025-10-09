@@ -1,0 +1,373 @@
+/* Recipe View Specific Styles */
+
+/* Hero image animations */
+.recipe-image {
+  transition: transform 0.3s ease;
+}
+
+.recipe-image:hover {
+  transform: scale(1.02);
+}
+
+/* Action button hover effects */
+.action-button {
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.action-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(79, 140, 255, 0.25);
+}
+
+.action-button.liked {
+  background: rgba(239, 68, 68, 0.9) !important;
+  color: white !important;
+}
+
+.action-button.saved {
+  background: rgba(34, 197, 94, 0.9) !important;
+  color: white !important;
+}
+
+/* Difficulty badge animations */
+.difficulty-badge {
+  animation: fadeInScale 0.6s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Stats grid hover effects */
+.stat-item {
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(79, 140, 255, 0.15);
+}
+
+/* Tag animations */
+.recipe-tag {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.recipe-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.recipe-tag:hover::before {
+  left: 100%;
+}
+
+.recipe-tag:hover {
+  transform: scale(1.05);
+}
+
+/* Ingredient checklist animations */
+.ingredient-item {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.ingredient-item:hover {
+  background: var(--primary-100-60) !important;
+  transform: translateX(5px);
+}
+
+.ingredient-item.checked {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.ingredient-item input[type="checkbox"] {
+  transform: scale(1.2);
+  transition: all 0.2s ease;
+}
+
+.ingredient-item input[type="checkbox"]:checked {
+  transform: scale(1.3);
+}
+
+/* Instruction step animations */
+.instruction-step {
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.instruction-step:hover {
+  transform: translateX(10px);
+}
+
+.instruction-step:nth-child(odd) {
+  animation-delay: 0.1s;
+}
+
+.instruction-step:nth-child(even) {
+  animation-delay: 0.2s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Step number enhancement */
+.step-number {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-400));
+  box-shadow: 0 4px 15px rgba(79, 140, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.instruction-step:hover .step-number {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(79, 140, 255, 0.4);
+}
+
+/* Tab system enhancements */
+.tabs {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.tab {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab:hover {
+  background: var(--primary-100-40) !important;
+  transform: translateY(-2px);
+}
+
+/* Timer component styling */
+.timer-helper {
+  background: linear-gradient(135deg, var(--primary-100-40), var(--primary-200-40));
+  border: 1px solid var(--primary-200);
+  animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(79, 140, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(79, 140, 255, 0);
+  }
+}
+
+/* Serving adjustment */
+.serving-selector {
+  transition: all 0.3s ease;
+}
+
+.serving-selector:hover {
+  background: var(--primary-200) !important;
+  transform: scale(1.05);
+}
+
+/* Shopping list button enhancement */
+.shopping-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.shopping-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.shopping-button:hover::before {
+  left: 100%;
+}
+
+/* Sticky ingredients panel */
+.sticky-ingredients {
+  position: sticky;
+  top: 2rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+.sticky-ingredients::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sticky-ingredients::-webkit-scrollbar-track {
+  background: var(--primary-100);
+  border-radius: 3px;
+}
+
+.sticky-ingredients::-webkit-scrollbar-thumb {
+  background: var(--primary-300);
+  border-radius: 3px;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Print styles */
+@media print {
+  .action-button,
+  .timer-helper button,
+  .shopping-button {
+    display: none !important;
+  }
+  
+  .glass {
+    background: white !important;
+    border: 1px solid #ccc !important;
+  }
+  
+  .recipe-image {
+    max-height: 300px;
+  }
+}
+
+/* Author info hover */
+.author-info {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.author-info:hover {
+  background: var(--primary-100-40) !important;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  transform: scale(1.02);
+}
+
+/* Rating stars */
+.rating-stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.rating-star {
+  color: #fbbf24;
+  transition: transform 0.2s ease;
+}
+
+.rating-star:hover {
+  transform: scale(1.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .sticky-ingredients {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .recipe-header {
+    grid-template-columns: 1fr;
+  }
+  
+  .recipe-stats {
+    grid-template-columns: 2fr 2fr;
+  }
+  
+  .instruction-step {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .instruction-step:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* Enhanced glass effect */
+.glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Nutrition info styling */
+.nutrition-info {
+  background: linear-gradient(135deg, var(--primary-100-40), var(--primary-200-40));
+}
+
+.nutrition-item {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--primary-100-40);
+  transition: all 0.3s ease;
+}
+
+.nutrition-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(79, 140, 255, 0.15);
+}
+
+/* Reviews preview */
+.reviews-preview {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.review-item {
+  transition: all 0.3s ease;
+}
+
+.review-item:hover {
+  background: var(--primary-100-60) !important;
+  transform: translateX(5px);
+}
+
+.selector > i {
+  transition: ease-in-out 0.2s transform;
+  transform: rotate(0deg);
+}
+
+#yield:checked + label > div > i {
+  transform: rotate(180deg);
+}

@@ -1,0 +1,453 @@
+<div class="flex min-h-screen w-full flex-col items-start justify-center">
+    <!-- Main Content -->
+    <div
+        class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 px-4 py-12 mt-32 overflow-auto">
+        <div class="flex w-full max-w-[1200px] min-h-full flex-col items-center gap-8">
+
+            <!-- Recipe Form -->
+            <form class="flex flex-col glass p-8">
+                <div class="flex flex-row w-full max-w-7xl gap-8">
+                    <!-- Col 1 -->
+                    <div class="flex flex-col gap-8 w-1/2">
+                        <!-- Basic Information -->
+                        <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                                <i class="ti ti-info-circle mr-2"></i>
+                                Basic Information
+                            </h3>
+
+                            <!-- Recipe Title -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                                    Recipe Title *
+                                </label>
+                                <div class="relative">
+                                    <input type="text"
+                                        class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                                        style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
+                                        placeholder="Your recipe title" required />
+                                    <i class="ti ti-edit absolute right-3 top-1/2 transform -translate-y-1/2"
+                                        style="color: var(--primary-400);"></i>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                                    Brief Description *
+                                </label>
+                                <div class="relative">
+                                    <textarea rows="3"
+                                        class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
+                                        style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
+                                        placeholder="Describe your recipe in a few words..." required></textarea>
+                                    <i class="ti ti-message absolute right-3 top-3"
+                                        style="color: var(--primary-400);"></i>
+                                </div>
+                            </div>
+
+                            <!-- Recipe Metadata -->
+                            <div class="flex flex-row md:grid-cols-3 gap-6 w-full">
+                                <!-- Prep Time -->
+                                <div class="flex flex-col gap-2 w-full">
+                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                                        Preparation Time
+                                    </label>
+                                    <div class="relative">
+                                        <div class="flex justify-between items-center w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+                                            30
+                                            <i class="absolute right-12 top-1/2 transform -translate-y-1/2 ti ti-clock"
+                                                style="color: var(--primary-400);"></i>
+                                            <i class="absolute right-4 top-1/2 transform -translate-y-1/2 ti ti-caret-up-down-filled"
+                                                style="color: var(--primary-700);"></i>
+                                        </div>
+                                        <span
+                                            class="flex items-center gap-2 absolute right-20 top-1/2 transform -translate-y-1/2 text-sm"
+                                            style="color: var(--primary-400);">min
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Servings -->
+                                <div class="flex flex-col gap-2 w-full">
+                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                                        Servings
+                                    </label>
+                                    <div class="relative">
+                                        <div class="flex justify-between items-center w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+                                            4
+                                            <i class="ti ti-caret-up-down-filled"
+                                                style="color: var(--primary-700);"></i>
+                                        </div>
+                                        <i class="absolute right-12 top-1/2 transform -translate-y-1/2 ti ti-users"
+                                            style="color: var(--primary-400);"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Difficulty & Category -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Difficulty -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                                        Difficulty
+                                    </label>
+                                    <div class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none flex justify-between items-center"
+                                        style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+                                        Easy
+                                        <i class="absolute right-80 -translate-x-[80%] ti ti-brand-speedtest"
+                                            style="color: var(--primary-400);"></i>
+                                        <i class="ti ti-caret-down-filled float-right mt-1"
+                                            style="color: var(--primary-700);"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Category -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                                        Category
+                                    </label>
+                                    <div class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none flex justify-between items-center"
+                                        style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+                                        Main Dish
+                                        <i class="absolute right-16 -translate-x-[90%] ti ti-sun-moon"
+                                            style="color: var(--primary-400);"></i>
+                                        <i class="ti ti-caret-down-filled float-right mt-1"
+                                            style="color: var(--primary-700);"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tags & Categories -->
+                        <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                                <i class="ti ti-tags mr-2"></i>
+                                Tags and Characteristics
+                            </h3>
+
+                            <div class="space-y-6">
+                                <!-- Dietary Tags -->
+                                <div class="flex flex-col gap-3">
+                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                                        Dietary Characteristics
+                                    </label>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span
+                                            class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
+                                            style="background: var(--primary-100); color: var(--primary-700);">
+                                            <i class="ti ti-leaf mr-1"></i>
+                                            Vegetarian
+                                        </span>
+                                        <span
+                                            class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
+                                            style="background: var(--primary-100); color: var(--primary-700);">
+                                            <i class="ti ti-plant mr-1"></i>
+                                            Vegan
+                                        </span>
+                                        <span
+                                            class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
+                                            style="background: var(--primary-100); color: var(--primary-700);">
+                                            <i class="ti ti-wheat-off mr-1"></i>
+                                            Gluten Free
+                                        </span>
+                                        <span
+                                            class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
+                                            style="background: var(--primary-100); color: var(--primary-700);">
+                                            <i class="ti ti-milk-off mr-1"></i>
+                                            Lactose Free
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Cuisine Type -->
+                                <div class="flex flex-col gap-3">
+                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                                        Cuisine Type
+                                    </label>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span
+                                            class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item selected"
+                                            style="background: var(--primary-500); color: white;">
+                                            <i class="ti ti-flag mr-1"></i>
+                                            Spanish
+                                        </span>
+                                        <span
+                                            class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
+                                            style="background: var(--primary-100); color: var(--primary-700);">
+                                            <i class="ti ti-flag mr-1"></i>
+                                            Italian
+                                        </span>
+                                        <span
+                                            class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
+                                            style="background: var(--primary-100); color: var(--primary-700);">
+                                            <i class="ti ti-flag mr-1"></i>
+                                            Asian
+                                        </span>
+                                        <span
+                                            class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
+                                            style="background: var(--primary-100); color: var(--primary-700);">
+                                            <i class="ti ti-flag mr-1"></i>
+                                            Mexican
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Col 2-->
+                    <div class="flex flex-col justify-between gap-8 w-1/2 h-full">
+                        <!-- Recipe Image -->
+                        <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                                <i class="ti ti-photo mr-2"></i>
+                                Recipe Image
+                            </h3>
+
+                            <div class="flex flex-col items-center gap-6">
+                                <!-- Image Preview -->
+                                <div class="w-full max-w-md h-64 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden drag-drop-area transition-all"
+                                    style="border-color: var(--primary-300); background: var(--primary-100-40);">
+                                    <div class="flex flex-col items-center text-center" id="image-placeholder">
+                                        <i class="ti ti-camera text-6xl mb-4" style="color: var(--primary-400);"></i>
+                                        <p class="text-lg font-medium" style="color: var(--primary-700);">Drag an image here
+                                        </p>
+                                        <div class="text-sm" style="color: var(--primary-400);">or
+
+                                            <!-- Upload Buttons -->
+                                            <div class="flex flex-wrap gap-3 pt-2">
+                                                <button type="button"
+                                                    class="px-6 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
+                                                    style="background: var(--gradient-primary); color: white;">
+                                                    <i class="ti ti-upload"></i>
+                                                    Upload Image
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex w-full">
+                            <div class="tabs glass text-nowrap w-full">
+                                <button class="tab active">
+                                    <i class="ti ti-basket text-2xl" aria-hidden="true"></i>
+                                    Ingredients
+                                </button>
+                                <button class="tab">
+                                    <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
+                                    Instructions
+                                </button>
+                                <button class="tab">
+                                    <i class="ti ti-report text-2xl" aria-hidden="true"></i>
+                                    Nutrition
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Ingredients -->
+                        <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                            <div class="flex justify-end">
+                                <button type="button"
+                                    class="px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
+                                    style="background: var(--gradient-primary); color: white;">
+                                    <i class="ti ti-plus"></i>
+                                    Add Ingredient
+                                </button>
+                            </div>
+
+                            <div class="space-y-4" id="ingredients-list">
+                                <!-- Ingredient Item 1 -->
+                                <div class="flex items-center gap-4 p-4 ingredient-item glass"
+                                    style="background: var(--primary-300-40);">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl"
+                                        style="background: var(--gradient-primary);">
+                                        <i class="ti ti-grip-vertical text-white"></i>
+                                    </div>
+                                    <div class="flex-1 flex flex-row items-center gap-4">
+                                        <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
+                                            style="background: var(--primary-100-40);">
+                                            <i class="ti ti-apple text-xl" style="color: var(--primary-700)"></i>
+                                        </div>
+                                        <input type="text" placeholder="Name"
+                                            class="px-3 py-2 w-11/12 rounded-xl border transition-all focus:outline-none"
+                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
+                                        <div class="rounded-xl w-full transition-all focus:outline-none">
+                                            <div type="text"
+                                                class="px-3 py-2 w-full h-full rounded-xl border transition-all focus:outline-none"
+                                                style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+                                                Quantity
+                                            </div>
+                                            <i class="ti ti-caret-up-down-filled fixed top-1/2 -translate-y-1/2 right-36 text-sm"
+                                                style="color: var(--primary-700);"></i>
+                                        </div>
+                                        <input type="text" placeholder="Unit"
+                                            class="px-3 py-3 w-1/3 rounded-xl border transition-all focus:outline-none text-xs"
+                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
+                                    </div>
+                                    <button type="button"
+                                        class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                        style="background: var(--primary-100); color: var(--primary-700);">
+                                        <i class="ti ti-trash text-red-500"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Ingredient Item 2 -->
+                                <div class="flex items-center gap-4 p-4 ingredient-item glass"
+                                    style="background: var(--primary-300-40);">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl"
+                                        style="background: var(--gradient-primary);">
+                                        <i class="ti ti-grip-vertical text-white"></i>
+                                    </div>
+                                    <div class="flex-1 flex flex-row items-center gap-4">
+                                        <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
+                                            style="background: var(--primary-100-40);">
+                                            <i class="ti ti-bottle text-xl" style="color: var(--primary-700)"></i>
+                                        </div>
+                                        <input type="text" placeholder="Name"
+                                            class="px-3 py-2 w-11/12 rounded-xl border transition-all focus:outline-none"
+                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
+                                        <div class="rounded-xl w-full transition-all focus:outline-none">
+                                            <div type="text"
+                                                class="px-3 py-2 w-full h-full rounded-xl border transition-all focus:outline-none"
+                                                style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+                                                Quantity
+                                            </div>
+                                            <i class="ti ti-caret-up-down-filled fixed top-1/2 -translate-y-1/2 right-36 text-sm"
+                                                style="color: var(--primary-700);"></i>
+                                        </div>
+                                        <input type="text" placeholder="Unit"
+                                            class="px-3 py-3 w-1/3 rounded-xl border transition-all focus:outline-none text-xs"
+                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
+                                    </div>
+                                    <button type="button"
+                                        class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                        style="background: var(--primary-100); color: var(--primary-700);">
+                                        <i class="ti ti-trash text-red-500"></i>
+                                    </button>
+                                </div>
+                                <!-- Ingredient Item 3 -->
+                                <div class="flex items-center gap-4 p-4 ingredient-item glass"
+                                    style="background: var(--primary-300-40);">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl"
+                                        style="background: var(--gradient-primary);">
+                                        <i class="ti ti-grip-vertical text-white"></i>
+                                    </div>
+                                    <div class="flex-1 flex flex-row items-center gap-4">
+                                        <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
+                                            style="background: var(--primary-100-40);">
+                                            <i class="ti ti-lemon-2 text-xl" style="color: var(--primary-700)"></i>
+                                        </div>
+                                        <input type="text" placeholder="Name"
+                                            class="px-3 py-2 w-11/12 rounded-xl border transition-all focus:outline-none"
+                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
+                                        <div class="rounded-xl w-full transition-all focus:outline-none">
+                                            <div type="text"
+                                                class="px-3 py-2 w-full h-full rounded-xl border transition-all focus:outline-none"
+                                                style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+                                                Quantity
+                                            </div>
+                                            <i class="ti ti-caret-up-down-filled fixed top-1/2 -translate-y-1/2 right-36 text-sm"
+                                                style="color: var(--primary-700);"></i>
+                                        </div>
+                                        <input type="text" placeholder="Unit"
+                                            class="px-3 py-3 w-1/3 rounded-xl border transition-all focus:outline-none text-xs"
+                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
+                                    </div>
+                                    <button type="button"
+                                        class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                        style="background: var(--primary-100); color: var(--primary-700);">
+                                        <i class="ti ti-trash text-red-500"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instructions -->
+                        <!--
+                        <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                                    <i class="ti ti-list-numbers mr-2"></i>
+                                    Instrucciones
+                                </h3>
+                                <button type="button"
+                                    class="px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
+                                    style="background: var(--gradient-primary); color: white;">
+                                    <i class="ti ti-plus"></i>
+                                    Agregar Paso
+                                </button>
+                            </div>
+
+                            <div class="space-y-4" id="instructions-list">
+                        -->
+                        <!-- Instruction Step 1 -->
+                        <!--
+                                <div class="flex gap-4 p-4 items-center rounded-2xl instruction-item"
+                                    style="background: var(--primary-100-40);">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
+                                        style="background: var(--primary-500); color: white;">
+                                        1
+                                    </div>
+                                    <div class="flex-1">
+                                        <textarea rows="3" placeholder="Describe este paso de la preparación..."
+                                            class="flex items-center w-full px-3 py-2 rounded-xl border transition-all focus:outline-none resize-none"
+                                            style="background: var(--primary-200-40); border-color: var(--primary-100); color: var(--primary-700); field-sizing: content;"></textarea>
+                                    </div>
+                                    <button type="button"
+                                        class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
+                                        style="background: var(--primary-100); color: var(--primary-700);">
+                                        <i class="ti ti-trash text-red-500"></i>
+                                    </button>
+                                </div>
+                                -->
+                        <!-- Instruction Step 2 -->
+                        <!--
+                                <div class="flex gap-4 p-4 items-center rounded-2xl instruction-item"
+                                    style="background: var(--primary-100-40);">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
+                                        style="background: var(--primary-500); color: white;">
+                                        2
+                                    </div>
+                                    <div class="flex-1">
+                                        <textarea rows="3" placeholder="Describe este paso de la preparación..."
+                                            class="flex items-center w-full px-3 py-2 rounded-xl border transition-all focus:outline-none resize-none"
+                                            style="background: var(--primary-200-40); border-color: var(--primary-100); color: var(--primary-700); field-sizing: content;"></textarea>
+                                    </div>
+                                    <button type="button"
+                                        class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
+                                        style="background: var(--primary-100); color: var(--primary-700);">
+                                        <i class="ti ti-trash text-red-500"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+
+                    </div>
+                </div>
+                <!-- Action Buttons -->
+                <div class="flex w-full justify-center gap-4 pt-8">
+                    <button type="button"
+                        class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+                        style="background: var(--gradient-primary); color: white;">
+                        <i class="ti ti-send"></i>
+                        Publish Recipe
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

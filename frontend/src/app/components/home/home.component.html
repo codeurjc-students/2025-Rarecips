@@ -1,0 +1,362 @@
+<div class="container content-layer min-w-fit">
+  <div class="space-y-8 ml-16 mr-16">
+    <!-- Header -->
+    <div class="mt-32">
+      <h1 class="text-4xl font-body text-primary">Welcome back, <b>Weasel</b>!</h1>
+      <p class="text-lg text-secondary">Ready to cook something amazing today?</p>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="flex flex-col gap-8 dashboard-container">
+      <!-- Main column -->
+      <div class="w-2/3 flex-1 space-y-8 main-column">
+        <!-- Recommended Actions -->
+        <div class="glass rounded-2xl p-6">
+          <h2 class="text-xl font-bold text-primary mb-4">What’s next?</h2>
+          <div class="actions flex gap-4">
+            <!-- Action Card 1 -->
+            <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-green-500 mb-3">
+                <i class="ti ti-replace-user text-white text-xl"></i>
+              </div>
+              <h3 class="font-semibold text-primary">Share your first recipe</h3>
+              <p class="text-xs text-secondary mt-1">Know of a great recipe? Share it with the community.</p>
+            </div>
+
+            <!-- Action Card 2 -->
+            <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 mb-3">
+                <i class="ti ti-user-edit text-white text-xl"></i>
+              </div>
+              <h3 class="font-semibold text-primary">Edit your profile</h3>
+              <p class="text-xs text-secondary mt-1">Customize your experience on the platform.</p>
+            </div>
+
+            <!-- Action Card 3 -->
+            <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-purple-500 mb-3">
+                <i class="ti ti-pencil-star text-white text-xl"></i>
+              </div>
+              <h3 class="font-semibold text-primary">Leave a review</h3>
+              <p class="text-xs text-secondary mt-1">Share your opinion about a recipe.</p>
+            </div>
+            <!-- Action Card 4 -->
+            <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-red-500 mb-3">
+                <i class="ti ti-basket-question text-white text-xl"></i>
+              </div>
+              <h3 class="font-semibold text-primary">Check your basket</h3>
+              <p class="text-xs text-secondary mt-1">Make sure you have all the necessary ingredients!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trending Recipes/based in your preferences -->
+        <div class="glass rounded-2xl p-6">
+          <div>
+            <h2 class="text-2xl font-bold text-primary mb-4">Based in your preferences</h2>
+            <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
+              <!-- Recipe Card -->
+               @for (recipe of recipeList; track recipe.id) {
+              <div class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
+                <!-- Glass Reflection Effect -->
+                <div
+                  class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
+                </div>
+
+                <!-- Image Container -->
+                <div class="relative aspect-43 overflow-hidden">
+                  <img
+                    src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
+                    alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;">
+
+                  <!-- Gradient Overlay -->
+                  <div class="absolute inset-0 gradient-overlay"></div>
+
+                  <!-- Top Right Actions -->
+                  <div class="absolute top-4 right-4 flex gap-2">
+                    <button class="btn btn-icon glass-strong text-primary">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path
+                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          fill="none" />
+                      </svg>
+                    </button>
+                    <button class="btn btn-icon glass-strong text-primary">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Category Badge -->
+                  <div class="absolute top-4 left-4">
+                    <span class="badge badge-dark text-xs px-3 py-1">{{recipe.mealTypes[0]}}</span>
+                  </div>
+
+                  <!-- Difficulty Badge -->
+                  <div class="absolute bottom-4 left-4">
+                      @if (recipe.difficulty < 3) {
+                        <div class="badge badge-green text-xs font-medium backdrop-blur-sm">
+                          <span>Easy</span>
+                        </div>
+                      } @else if (recipe.difficulty === 3) {
+                        <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">
+                          <span>Medium</span>
+                        </div>
+                      } @else {
+                        <div class="badge badge-red text-xs font-medium backdrop-blur-sm">
+                          <span>Hard</span>
+                        </div>
+                      }
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 space-y-4">
+                  <!-- Title and Rating -->
+                  <div class="space-y-2">
+                    <h3 class="text-xl font-bold text-primary line-clamp-2 recipe-title">{{recipe.title}}</h3>
+
+                    <div class="flex items-center justify-between">
+                      <div class="star-rating">
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                        </svg>
+                        <span class="text-secondary text-sm ml-2">{{recipe.rating}} ({{recipe.reviews.length}})</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Description -->
+                  <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
+                    {{recipe.description}}
+                  </p>
+
+                  <!-- Meta Information -->
+                  <div class="flex items-center gap-4 text-secondary text-sm">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+                        <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <span>{{recipe.totalTime}} min</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <span>{{recipe.people}} people</span>
+                    </div>
+                  </div>
+
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                      style="background-color: var(--primary-300);">{{recipe.dishTypes[0]}}</span>
+                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                      style="background-color: var(--primary-300);">{{recipe.dietLabels[0]}}</span>
+                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                      style="background-color: var(--primary-300);">{{recipe.healthLabels[0]}}</span>
+                  </div>
+
+                  <!-- View Button -->
+                  <div class="rounded flex" style="background: var(--gradient-primary);">
+                    <button class="btn btn-primary w-full view-recipe-btn" (click)="viewRecipe(recipe.id)">
+                      <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" />
+                      </svg>
+                      View recipe
+                    </button>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar column -->
+      <div class="w-1/3 space-y-8 sidebar-column">
+        <div class="glass rounded-2xl p-6">
+          <h2 class="text-xl font-bold text-primary mb-6">Revisit your collections</h2>
+
+          <div class="space-y-4">
+            <!-- First Collection Card -->
+            <div class="glass rounded-xl overflow-hidden">
+              <div class="flex w-full h-32 items-center gap-2">
+                <img class="w-1/3 h-full object-cover"
+                  src="https://res.cloudinary.com/subframe/image/upload/v1724705499/uploads/302/jh06ubduyciizexxi4ep.png"
+                  alt="Pizza Recipe" />
+                <img class="w-1/3 h-full object-cover"
+                  src="https://res.cloudinary.com/subframe/image/upload/v1724705689/uploads/302/wzbqe2n4hf3kwxr08izq.png"
+                  alt="Burger Recipe" />
+                <img class="w-1/3 h-full object-cover"
+                  src="https://res.cloudinary.com/subframe/image/upload/v1711417515/shared/cdnbniyuqjnplaj2zbjw.png"
+                  alt="Pancakes Recipe" />
+              </div>
+              <div class="flex items-center justify-between p-4">
+                <div>
+                  <h3 class="font-semibold text-primary">Mum's Recipes</h3>
+                  <p class="text-sm text-secondary">(20 recipes)</p>
+                </div>
+                <button class="btn btn-primary rounded flex" style="background: var(--gradient-primary);">
+                  View
+                </button>
+              </div>
+            </div>
+
+            <!-- Second Collection Card -->
+            <div class="glass rounded-xl overflow-hidden">
+              <div class="flex w-full h-32 items-center gap-2">
+                <img class="w-1/3 h-full object-cover"
+                  src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
+                  alt="Pasta Recipe" />
+                <img class="w-1/3 h-full object-cover"
+                  src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
+                  alt="Thai Food" />
+                <img class="w-1/3 h-full object-cover"
+                  src="https://res.cloudinary.com/subframe/image/upload/v1723780577/uploads/302/hhmv6ey0yajkadnmcp0a.png"
+                  alt="Salad Recipe" />
+              </div>
+              <div class="flex items-center justify-between p-4">
+                <div>
+                  <h3 class="font-semibold text-primary">Grannie's Recipes</h3>
+                  <p class="text-sm text-secondary">(22 recipes)</p>
+                </div>
+                <button class="btn btn-primary rounded flex" style="background: var(--gradient-primary);">
+                  Ver
+                </button>
+              </div>
+            </div>
+
+            <!-- Third Collection Card -->
+            <div class="glass rounded-xl overflow-hidden">
+              <div class="flex w-full h-32 items-center gap-2">
+                <img class="w-1/2 h-full object-cover"
+                  src="https://res.cloudinary.com/subframe/image/upload/v1724690133/uploads/302/tswlwr0qfwwhkgbjwplw.png"
+                  alt="Pasta Recipe" />
+                <img class="w-1/2 h-full object-cover"
+                  src="https://res.cloudinary.com/subframe/image/upload/v1724705396/uploads/302/wvpuc4kznngymxhsw1w5.png"
+                  alt="Thai Food" />
+              </div>
+              <div class="flex items-center justify-between p-4">
+                <div>
+                  <h3 class="font-semibold text-primary">My essentials</h3>
+                  <p class="text-sm text-secondary">(2 recipes)</p>
+                </div>
+                <button class="btn btn-primary rounded flex" style="background: var(--gradient-primary);">
+                  View
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar column -->
+      <div class="space-y-8 sidebar-column w-1/3">
+        <!-- My Lists Preview -->
+        <div class="glass rounded-2xl p-6">
+          <h2 class="text-xl font-bold text-primary mb-4">Latest activity</h2>
+          <div class="space-y-3">
+            <!-- List Card 1 -->
+            <div class="list-card glass rounded-xl p-4 flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white-50 rounded-lg flex items-center justify-center">
+                  <i class="ti ti-basket text-xl text-orange-400"></i>
+                </div>
+                <div>
+                  <p><b>Admin</b> added ingredient <b>Tomato</b></p>
+                </div>
+              </div>
+              <span class="text-xs font-medium text-brand">View</span>
+            </div>
+
+            <!-- List Card 2 -->
+            <div class="list-card glass rounded-xl p-4 flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white-50 rounded-lg flex items-center justify-center">
+                  <i class="ti ti-chef-hat text-xl text-blue-400"></i>
+                </div>
+                <div>
+                  <p><b>Mackerel</b> shared recipe <b>Garlic Rabbit</b></p>
+                </div>
+              </div>
+              <span class="text-xs font-medium text-brand">View</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Reviews -->
+        <div class="glass rounded-2xl p-6">
+          <h2 class="text-xl font-bold text-primary mb-4">Latest reviews</h2>
+          <div class="space-y-4">
+            <!-- Review Card 1 -->
+            <div class="glass rounded-xl p-4">
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-sm text-primary">
+                  <b>Zebra</b> rated
+                  <b>Vegetable Paella</b>
+                </p>
+                <div class="flex items-center gap-1">
+                  <span class="text-sm font-semibold text-yellow-600">5</span>
+                  <svg class="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
+                    <polygon
+                      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                  </svg>
+                </div>
+              </div>
+              <p class="text-sm text-secondary italic">"This is amazing! I will definitely repeat it."</p>
+            </div>
+
+            <!-- Review Card 2 -->
+            <div class="glass rounded-xl p-4">
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-sm text-primary">
+                  <span class="font-semibold">Fox</span> rated
+                  <b>Classic Caesar Salad</b>
+                </p>
+                <div class="flex items-center gap-1">
+                  <span class="text-sm font-semibold text-yellow-600">4</span>
+                  <svg class="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
+                    <polygon
+                      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                  </svg>
+                </div>
+              </div>
+              <p class="text-sm text-secondary italic">"This is a great recipe, very easy to follow!"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
