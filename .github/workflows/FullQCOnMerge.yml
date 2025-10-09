@@ -4,9 +4,10 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
+
+  # Backend
   backend-complete:
     name: Backend Complete Testing
     runs-on: ubuntu-latest
@@ -53,6 +54,7 @@ jobs:
             backend/target/surefire-reports/
             backend/target/test-classes/
 
+  # Frontend
   frontend-complete:
     name: Frontend Complete Testing
     runs-on: ubuntu-latest
