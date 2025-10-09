@@ -1,7 +1,7 @@
 name: Full Quality Control on Merge
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
