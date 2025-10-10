@@ -13,12 +13,23 @@ import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.service.RecipeService;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 public class LandingController {
 
     @Autowired
     private RecipeService recipeService;
 
+    @Operation(summary = "Get newest recipes")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found recipes", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class)) }),
+            @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content) })
     @JsonView(Recipe.BasicInfo.class)
     @GetMapping("/api/recipes")
     public ResponseEntity<?> getNewestRecipes(@RequestParam String order, @RequestParam int size, @RequestParam int page) {
