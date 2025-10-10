@@ -1,0 +1,100 @@
+openapi: 3.0.1
+
+info:
+  title: Rarecips API
+  description: API documentation for Rarecips, a recipe management application.
+  version: v0
+
+servers:
+  - url: http://localhost:8443/api
+
+paths:
+  
+  # Recipe requests
+  /recipes:
+    get:
+      summary: Retrieve a list of recipes
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          description: Page number for pagination
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [lastmod]
+            default: lastmod
+          description: Order by field
+
+      responses:
+        '200':
+          description: A paginated list of recipes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recipe'
+                  page:
+                    type: integer
+                  size:
+                    type: integer
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /recipes/{id}:
+    get:
+      summary: Retrieve a specific recipe by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the recipe to retrieve
+
+      responses:
+        '200':
+          description: A single recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

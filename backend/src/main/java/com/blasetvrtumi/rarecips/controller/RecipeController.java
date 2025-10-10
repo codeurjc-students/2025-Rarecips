@@ -2,6 +2,13 @@ package com.blasetvrtumi.rarecips.controller;
 
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.service.RecipeService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +20,15 @@ import java.util.Map;
 
 @RestController
 public class RecipeController {
-    
+
     @Autowired
     private RecipeService recipeService;
 
+    @Operation(summary = "Get recipe by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the recipe", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class)) }),
+            @ApiResponse(responseCode = "404", description = "Recipe not found", content = @Content) })
     @GetMapping("/api/recipes/{id}")
     public ResponseEntity<?> getRecipeById(@PathVariable Long id) {
         Recipe recipe = recipeService.findById(id);
