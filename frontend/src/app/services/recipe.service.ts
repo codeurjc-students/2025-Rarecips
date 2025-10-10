@@ -7,8 +7,9 @@ import { Recipe } from "../models/recipe.model";
 export class RecipeService {
     constructor() { }
 
-    async getRecipes(): Promise<Recipe[]> {
-        const response = await fetch("/api/recipes?order=lastmod&size=4&page=0");
+    async getRecipes(page: number): Promise<Recipe[]> {
+        const size = 3;
+        const response = await fetch(`/api/recipes?order=lastmod&size=${size}&page=${page}`);
         const data = await response.json();
         return data.recipes.map((recipe: any) => ({
             id: recipe.id,

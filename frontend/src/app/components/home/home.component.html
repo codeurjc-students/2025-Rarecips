@@ -54,11 +54,11 @@
         <!-- Trending Recipes/based in your preferences -->
         <div class="glass rounded-2xl p-6">
           <div>
-            <h2 class="text-2xl font-bold text-primary mb-4">Based in your preferences</h2>
+            <h2 class="text-xl font-bold text-primary mb-4">Based in your preferences</h2>
             <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
               <!-- Recipe Card -->
-               @for (recipe of recipeList; track recipe.id) {
-              <div class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
+              @for (recipe of recipeList; track recipe.id) {
+              <div class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
                 <!-- Glass Reflection Effect -->
                 <div
                   class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Content -->
-                <div class="p-6 space-y-4">
+                <div class="p-6 space-y-4 h-full flex flex-1 flex-col justify-between">
                   <!-- Title and Rating -->
                   <div class="space-y-2">
                     <h3 class="text-xl font-bold text-primary line-clamp-2 recipe-title">{{recipe.title}}</h3>
@@ -187,11 +187,7 @@
                   <!-- View Button -->
                   <div class="rounded flex" style="background: var(--gradient-primary);">
                     <button class="btn btn-primary w-full view-recipe-btn" (click)="viewRecipe(recipe.id)">
-                      <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" />
-                      </svg>
+                      <i class="ti ti-eye mr-2"></i>
                       View recipe
                     </button>
                   </div>
@@ -199,7 +195,18 @@
               </div>
               }
             </div>
+            @if (!isLoading && hasMore) {
+            <div class="text-center mt-6 rounded-2xl" style="background: var(--gradient-primary);">
+              <button class="btn btn-primary w-full" (click)="loadMoreRecipes()">
+                <i class="ti ti-refresh mr-2"></i>
+                Load more
+              </button>
+            </div>
+            }
           </div>
+          @if (isLoading) {
+            <img src="assets/logo/Rarecips_Spinner.svg" alt="Loading..." class="mx-auto my-8 max-w-20" />
+          }
         </div>
       </div>
 
