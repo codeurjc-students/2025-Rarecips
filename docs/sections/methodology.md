@@ -11,5 +11,5 @@ The project will follow an agile, iterative, and incremental development process
 - **Phase 7 (15/05/2026 - 15/06/2026):** Project presentation
 
 <p align="center">
-   <img src="../readme-resources/timeline-diagram.svg" width="80%"/>
+   <img src="../../readme-resources/Gantt.png" width="80%"/>
 </p>

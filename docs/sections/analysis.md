@@ -1,30 +1,30 @@
 # 🔍 Analysis
 
-- [Screens & Navigation](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#screens--navigation)
-    - [Landing Page](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#landing-page)
-    - [Authentication - Login](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#authentication---login)
-    - [Authentication - Signup](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#authentication---signup)
-    - [Explore](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#explore)
-    - [Recipe View](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#recipe-view)
-    - [Recipe Edit](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#recipe-edit)
-    - [Profile View](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#profile-view)
-    - [Profile Edit](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#profile-edit)
-    - [Ingredients](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#ingredients)
-    - [Health Reports](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#health-reports)
-    - [Admin Panel](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#admin-panel)
-    - [Error Page](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#error-page)
-- [Entities](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#entities)
-- [User Permissions](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#user-permissions)
-- [Images](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#images)
-- [Charts](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#charts)
-- [Complementary Technology](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#complementary-technology)
-- [Advanced Algorithm/Query](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#advanced-algorithmquery)
-- [Optional Addons](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#optional-addons)
+- [Screens & Navigation](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#screens--navigation)
+    - [Landing Page](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#landing-page)
+    - [Authentication - Login](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#authentication---login)
+    - [Authentication - Signup](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#authentication---signup)
+    - [Explore](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#explore)
+    - [Recipe View](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#recipe-view)
+    - [Recipe Edit](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#recipe-edit)
+    - [Profile View](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#profile-view)
+    - [Profile Edit](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#profile-edit)
+    - [Ingredients](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#ingredients)
+    - [Health Reports](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#health-reports)
+    - [Admin Panel](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#admin-panel)
+    - [Error Page](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#error-page)
+- [Entities](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#entities)
+- [User Permissions](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#user-permissions)
+- [Images](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#images)
+- [Charts](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#charts)
+- [Complementary Technology](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#complementary-technology)
+- [Advanced Algorithm/Query](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#advanced-algorithmquery)
+- [Optional Addons](https://github.com/codeurjc-students/2025-Rarecips/blob/main/docs/sections/analysis.md#optional-addons)
 
 ## Screens & Navigation
 
 <p align="center">
-   <img src="../readme-resources/NavDiagram.svg"/>
+   <img src="../../readme-resources/NavDiagram.svg"/>
 </p>
 
 ## Landing Page
@@ -33,7 +33,7 @@ The main entry point of the application, showcasing featured recipes, collection
 - Login, Signup, Admin, Ingredients, Health, Explore, Profile, Recipe
 
 <p>
-   <img src="../readme-resources/landing.jpg"/>
+   <img src="../../readme-resources/landing.jpg"/>
 </p>
 
 ## Authentication - Login
@@ -42,7 +42,7 @@ User login screen with email/username and password authentication.
 - Signup, Landing
 
 <p>
-   <img src="../readme-resources/login.jpg"/>
+   <img src="../../readme-resources/login.jpg"/>
 </p>
 
 ## Authentication - Signup
@@ -51,7 +51,7 @@ User registration screen for creating new accounts with profile information.
 - Login
 
 <p>
-   <img src="../readme-resources/signup.jpg"/>
+   <img src="../../readme-resources/signup.jpg"/>
 </p>
 
 ## Explore
@@ -60,7 +60,7 @@ Browse and search through all available recipes, users, ingredients and collecti
 - Landing, Login, Signup, Admin, Ingredients, Health, Profile, Recipe
 
 <p>
-   <img src="../readme-resources/explore.jpg"/>
+   <img src="../../readme-resources/explore.jpg"/>
 </p>
 
 ## Recipe View
@@ -69,7 +69,7 @@ Detailed view of individual recipes showing ingredients, instructions, and user 
 - Login, Signup, Admin, Ingredients, Health, Explore, Profile
 
 <p>
-   <img src="../readme-resources/recipe.jpg"/>
+   <img src="../../readme-resources/recipe.jpg"/>
 </p>
 
 ## Recipe Edit
@@ -78,7 +78,7 @@ Create and edit recipes with rich text formatting and media upload capabilities.
 - Login, Signup, Admin, Ingredients, Health, Explore, Profile
 
 <p>
-   <img src="../readme-resources/editRecipe.jpg"/>
+   <img src="../../readme-resources/editRecipe.jpg"/>
 </p>
 
 ## Profile View
@@ -87,7 +87,7 @@ Display user information, statistics, and personal recipe collections.
 - Login, Signup, Admin, Ingredients, Health, Explore, Recipe
 
 <p>
-   <img src="../readme-resources/profile.jpg"/>
+   <img src="../../readme-resources/profile.jpg"/>
 </p>
 
 ## Profile Edit
@@ -96,7 +96,7 @@ Edit user profile information, preferences, and account settings.
 - Login, Signup, Admin, Ingredients, Health, Explore, Profile
 
 <p>
-   <img src="../readme-resources/editProfile.jpg"/>
+   <img src="../../readme-resources/editProfile.jpg"/>
 </p>
 
 ## Ingredients
@@ -105,7 +105,7 @@ Manage and browse ingredient database with nutritional information.
 - Login, Signup, Admin, Health, Explore, Profile
 
 <p>
-   <img src="../readme-resources/ingredients.jpg"/>
+   <img src="../../readme-resources/ingredients.jpg"/>
 </p>
 
 ## Health Reports
@@ -114,7 +114,7 @@ View personalized health and nutrition reports based on recipe consumption.
 - Login, Signup, Admin, Ingredients, Explore, Profile
 
 <p>
-   <img src="../readme-resources/health.jpg"/>
+   <img src="../../readme-resources/health.jpg"/>
 </p>
 
 ## Admin Panel
@@ -123,7 +123,7 @@ Administrative dashboard for content moderation and system analytics (Admin user
 - Login, Signup, Admin, Ingredients, Health, Explore, Profile
 
 <p>
-   <img src="../readme-resources/admin.jpg"/>
+   <img src="../../readme-resources/admin.jpg"/>
 </p>
 
 ## Error Page
@@ -132,7 +132,7 @@ Custom error page for handling various application errors gracefully.
 - Login, Signup, Admin, Ingredients, Health, Explore, Profile
 
 <p>
-   <img src="../readme-resources/error.jpg"/>
+   <img src="../../readme-resources/error.jpg"/>
 </p>
 
 ## Entities
