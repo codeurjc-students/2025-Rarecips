@@ -33,6 +33,42 @@
    
 </p>
 
+## ✅ Table of Contents
+
+- [Summary](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#-summary)
+- [Mockup](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#%EF%B8%8F-mockup)
+- [Objectives](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#-objectives)
+   - [Functional Objectives](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#functional-objectives)
+   - [Technical Objectives](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#technical-objectives)
+- [Methodology](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#%EF%B8%8F-methodology)
+- [Detailed Features](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#-detailed-features)
+   - [Basic](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#basic)
+   - [Intermediate](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#intermediate)
+   - [Intricate](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#intricate)
+- [Analysis](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#-analysis)
+   - [Screens & Navigation](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#screens--navigation)
+      - [Landing Page](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#landing-page)
+      - [Authentication - Login](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#authentication---login)
+      - [Authentication - Signup](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#authentication---signup)
+      - [Explore](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#explore)
+      - [Recipe View](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#recipe-view)
+      - [Recipe Edit](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#recipe-edit)
+      - [Profile View](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#profile-view)
+      - [Profile Edit](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#profile-edit)
+      - [Ingredients](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#ingredients)
+      - [Health Reports](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#health-reports)
+      - [Admin Panel](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#admin-panel)
+      - [Error Page](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#error-page)
+   - [Entities](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#entities)
+   - [User Permissions](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#user-permissions)
+   - [Images](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#images)
+   - [Charts](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#charts)
+   - [Complementary Technology](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#complementary-technology)
+   - [Advanced Algorithm/Query](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#advanced-algorithmquery)
+   - [Optional Addons](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#optional-addons)
+- [Project Tracking](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#-project-tracking)
+- [Author](https://github.com/codeurjc-students/2025-Rarecips/tree/main?tab=readme-ov-file#-author)
+
 ## 📝 Summary
 
 Rarecips is a progressive web application designed to help users discover, share, and manage unique and rare recipes from around the world. The platform allows users to browse, upload, review, and save recipes, fostering a community of culinary enthusiasts.
@@ -148,7 +184,7 @@ User login screen with email/username and password authentication.
    <img src="readme-resources/login.jpg"/>
 </p>
 
-#### Authentication - Sign Up
+#### Authentication - Signup
 User registration screen for creating new accounts with profile information.
 ###### Pages that can be accessed from here:
 - Login
@@ -190,7 +226,7 @@ Detailed view of individual recipes showing ingredients, instructions, and user 
    <img src="readme-resources/recipe.jpg"/>
 </p>
 
-#### Recipe Editor
+#### Recipe Edit
 Create and edit recipes with rich text formatting and media upload capabilities.
 ###### Pages that can be accessed from here:
 - Login
@@ -206,7 +242,7 @@ Create and edit recipes with rich text formatting and media upload capabilities.
    <img src="readme-resources/editRecipe.jpg"/>
 </p>
 
-#### Profile
+#### Profile View
 Display user information, statistics, and personal recipe collections.
 ###### Pages that can be accessed from here:
 - Login
@@ -337,6 +373,14 @@ Custom error page for handling various application errors gracefully.
 
 ### Advanced Algorithm/Query
 - Personalized recipe recommendations based on user preferences and activity
+
+### Optional Addons
+- Automated testing
+- Native Image Packaging
+- Cloud Deployment (app, database)
+- Continuous Deployment
+- WebSockets as Rest-complementary communication technology
+- Responsive mobile design
 
 ## 📈 Project Tracking
 

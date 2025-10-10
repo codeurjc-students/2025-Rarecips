@@ -21,7 +21,6 @@ export class RecipeViewComponent {
 
   async ngOnInit() {
     this.recipe = await this.loadRecipe();
-    console.log(this.recipe);
   }
 
   async loadRecipe() {

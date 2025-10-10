@@ -41,7 +41,6 @@ export class RecipeService {
             return null;
         }
         const data = (await response.json()).recipe;
-        console.log(data)
         return {
             id: data.id,
             title: data.label,
