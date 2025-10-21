@@ -88,6 +88,17 @@ Distributed version control system used for tracking code changes and collaborat
 #### GitHub (https://github.com/)
 Cloud-based Git repository hosting service used for code storage, issue tracking, and project management.
 
+## AI Usage
+Generative AI tools have been used as a complementary material for tasks such as documentation, consulting, automation of processes, optimization, testing and feedback.
+
+#### Research and feedback:
+- Perplexity
+- Gemini
+- ChatGPT
+
+#### Autocompletion, prediction, optimization, testing and code generation
+- Github Copilot
+
 ## Architecture
 
 ### Deployment Architecture
@@ -123,6 +134,11 @@ The complete API documentation is available in OpenAPI format and can be viewed 
 - **Applies to:** Recipes
 
 #### Test Statistics
+
+- **Coverage**:
+
+    <img src="../../readme-resources/coverage.png"/>
+
 *Test metrics will be updated as development progresses*
 
 ## Development Process
@@ -162,10 +178,10 @@ cd 2025-Rarecips
 ### Execution
 
 #### Prerequisites
-- Java 17+
+- Java 21+
 - Node.js 18+
 - Docker and Docker Compose
-- MySQL 8.0+ (or use Docker)
+- MySQL 9.0+ (or use Docker)
 
 #### Database Setup
 ```bash
@@ -245,6 +261,6 @@ mvn clean package
 docker-compose build
 
 # Create release tag
-git tag -a v1.0.0 -m "Release name"
-git push origin v1.0.0
+git tag -a v0.1 -m "Release name"
+git push origin v0.1
 ```
