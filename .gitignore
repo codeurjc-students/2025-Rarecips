@@ -111,3 +111,6 @@ replay_pid*
 # System files
 */.DS_Store
 */Thumbs.db
+
+#OpenAPI
+docs/api/index.html

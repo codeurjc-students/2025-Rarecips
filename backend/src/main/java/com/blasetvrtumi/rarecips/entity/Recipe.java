@@ -1,6 +1,7 @@
 package com.blasetvrtumi.rarecips.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -278,6 +279,10 @@ public class Recipe {
         this.cautions = cautions;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public Float getTotalTime() {
         return totalTime;
     }
@@ -331,6 +336,9 @@ public class Recipe {
     }
 
     public String getAuthor() {
+        if (author == null) {
+            return null;
+        }
         return author.getUsername();
     }
 
@@ -365,6 +373,10 @@ public class Recipe {
             return;
         }
         this.rating = (Float) sum / reviews.size();
+    }
+
+    public List<String> getSteps() {
+        return steps;
     }
 
 }
