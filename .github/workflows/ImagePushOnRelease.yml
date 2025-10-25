@@ -29,6 +29,7 @@ jobs:
           DOCKERHUB_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
+          TERM: xterm
         run: |
           chmod +x ./create_image.sh
           ./create_image.sh release

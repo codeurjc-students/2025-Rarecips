@@ -8,16 +8,38 @@ import { RecipeService } from '../../services/recipe.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   newestRecipes: Recipe[] = [];
   recipeList: Recipe[] = [];
 
+  page = 0;
+  itemsPerPage = 10;
+
+  isLoading: boolean = true;
+  hasMore: boolean = true;
+
+
   constructor(private recipeService: RecipeService, private router: Router) {
+  }
+
+  ngOnInit(): void {
     this.fetchRecipes();
   }
 
   async fetchRecipes() {
-    this.recipeList = await this.recipeService.getRecipes();
+    this.isLoading = true;
+    this.page = 0; // Reset to first page on new fetch
+    this.recipeList = await this.recipeService.getRecipes(this.page);
+    this.isLoading = false;
+    this.hasMore = this.recipeList.length % this.itemsPerPage === 0;
+  }
+
+  async loadMoreRecipes() {
+    this.isLoading = true;
+    const moreRecipes = await this.recipeService.getRecipes(++this.page);
+    this.recipeList = [...this.recipeList, ...moreRecipes];
+    this.isLoading = false;
+    this.hasMore = moreRecipes.length % this.itemsPerPage > 0;
   }
 
   viewRecipe(id: number) {

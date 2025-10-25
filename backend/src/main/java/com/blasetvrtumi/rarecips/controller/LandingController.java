@@ -31,7 +31,7 @@ public class LandingController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class)) }),
             @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content) })
     @JsonView(Recipe.BasicInfo.class)
-    @GetMapping("/api/recipes")
+    @GetMapping("/api/v1/recipes")
     public ResponseEntity<?> getNewestRecipes(@RequestParam String order, @RequestParam int size, @RequestParam int page) {
         String sortBy = "";
         if (order.equals("lastmod")) {

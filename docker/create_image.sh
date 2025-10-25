@@ -9,7 +9,7 @@ DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-}
 RELEASE_TAG=${RELEASE_TAG:-}
 BRANCH_NAME=${BRANCH:-}
 DATETIME=${DATETIME:-$(date +%Y%m%d%H%M%S)}
-COMMIT=${COMMIT_SHA:-}
+COMMIT_SHA=${COMMIT_SHA:-}
 
 # Clear for better debugging of possible errors
 clear
@@ -49,8 +49,11 @@ else
     FILE="docker-compose-dev.yml"
 
     if [ "$MODE" == "build" ]; then
+        # Set commit hash
+        COMMIT_SHA=$(git rev-parse --short HEAD 2>/dev/null)
+
         # Set mode to datetime-commit
-        MODE="${BRANCH_NAME}-$DATETIME-${COMMIT}"
+        MODE="${BRANCH_NAME}-$DATETIME-${LAST_COMMIT_SHA:0:7}"
     fi
 
     # Build container
@@ -61,5 +64,9 @@ fi
 # Push main image
 docker push "$DOCKERHUB_USER/rarecips:$MODE"
 
-# Push OCI compose file
-docker compose -f $FILE -p rarecips publish "$DOCKERHUB_USER/rarecips:$MODE"
+if [ "$MODE" == "dev" ]; then
+    
+    # Push OCI compose file
+    docker compose -f $FILE -p rarecips publish --with-env "$DOCKERHUB_USER/rarecips:$MODE"
+
+fi

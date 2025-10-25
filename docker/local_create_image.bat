@@ -21,4 +21,4 @@ REM Push image to dev tag
 docker push blasetvrtumi/rarecips:dev
 
 REM Up compose
-docker compose -f docker-compose-dev.yml -p rarecips up -d
+docker compose --env-file .env -f docker-compose-dev.yml -p rarecips up -d

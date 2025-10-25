@@ -25,6 +25,7 @@ jobs:
         env:
           DOCKERHUB_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          TERM: xterm
         run: |
           chmod +x ./create_image.sh
           ./create_image.sh

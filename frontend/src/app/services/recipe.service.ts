@@ -11,8 +11,8 @@ export class RecipeService {
 
     constructor() { }
 
-    async getRecipes(size: number): Promise<Recipe[]> {
-        const response = await fetch(`${this.API_URL}?order=lastmod&size=${size}&page=0`);
+    async getRecipes(page: number): Promise<Recipe[]> {
+        const response = await fetch(`/api/v1/recipes?order=lastmod&size=${this.size}&page=${page}`);
         const data = await response.json();
         return data.recipes.map((recipe: any) => ({
             id: recipe.id,
