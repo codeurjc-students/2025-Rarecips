@@ -114,3 +114,4 @@ replay_pid*
 
 #OpenAPI
 docs/api/index.html
+docker/.env

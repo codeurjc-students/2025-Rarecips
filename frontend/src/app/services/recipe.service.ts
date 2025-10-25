@@ -5,10 +5,14 @@ import { Recipe } from "../models/recipe.model";
     providedIn: "root"
 })
 export class RecipeService {
+
+    API_URL = "/api/v1/recipes";
+    size = 10;
+
     constructor() { }
 
-    async getRecipes(): Promise<Recipe[]> {
-        const response = await fetch("/api/recipes?order=lastmod&size=4&page=0");
+    async getRecipes(size: number): Promise<Recipe[]> {
+        const response = await fetch(`${this.API_URL}?order=lastmod&size=${size}&page=0`);
         const data = await response.json();
         return data.recipes.map((recipe: any) => ({
             id: recipe.id,
@@ -36,7 +40,7 @@ export class RecipeService {
     }
 
     async getRecipeById(id: number): Promise<Recipe | null> {
-        const response = await fetch(`/api/recipes/${id}`);
+        const response = await fetch(`${this.API_URL}/${id}`);
         if (response.status === 404) {
             return null;
         }

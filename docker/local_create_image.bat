@@ -15,10 +15,10 @@ REM Move to docker folder
 cd "docker"
 
 REM Build container
-docker "build" "-t" "blasetvrtumi\rarecips" "-f" "Dockerfile" "../"
+docker build -t blasetvrtumi/rarecips:dev -f Dockerfile ../
 
-REM Push image
-docker "push" "blasetvrtumi\rarecips"
+REM Push image to dev tag
+docker push blasetvrtumi/rarecips:dev
 
 REM Up compose
-docker-compose "-p" "rarecips" "up"
+docker compose -f docker-compose-dev.yml -p rarecips up -d
