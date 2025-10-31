@@ -25,4 +25,4 @@ docker build -t blasetvrtumi/rarecips:dev -f Dockerfile ../
 docker push blasetvrtumi/rarecips:dev
 
 # Up compose
-docker compose --env-file .env -f docker-compose-dev.yml -p rarecips up -d
+docker compose -f docker-compose-dev.yml -p rarecips up -d

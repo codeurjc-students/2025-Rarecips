@@ -64,9 +64,12 @@ fi
 # Push main image
 docker push "$DOCKERHUB_USER/rarecips:$MODE"
 
-if [ "$MODE" == "dev" ]; then
+if [ "$MODE" != "build" ]; then
     
     # Push OCI compose file
-    docker compose -f $FILE -p rarecips publish --with-env "$DOCKERHUB_USER/rarecips:$MODE"
+    docker compose -f $FILE -p rarecips publish --with-env -y "$DOCKERHUB_USER/rarecips:$MODE-compose"
+
+    # OCI Compose up
+    docker compose -f oci://docker.io/$DOCKERHUB_USER/rarecips:$MODE-compose -p rarecips up
 
 fi
