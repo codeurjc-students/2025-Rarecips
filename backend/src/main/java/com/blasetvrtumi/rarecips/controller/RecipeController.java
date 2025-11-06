@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/v1")
 public class RecipeController {
 
     @Autowired
@@ -29,7 +30,7 @@ public class RecipeController {
             @ApiResponse(responseCode = "200", description = "Found the recipe", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class)) }),
             @ApiResponse(responseCode = "404", description = "Recipe not found", content = @Content) })
-    @GetMapping("/api/v1/recipes/{id}")
+    @GetMapping("/recipes/{id}")
     public ResponseEntity<?> getRecipeById(@PathVariable Long id) {
         Recipe recipe = recipeService.findById(id);
         HashMap<String, Object> response = new HashMap<>();

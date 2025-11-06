@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
+@RequestMapping("/api/v1")
 public class LandingController {
 
     @Autowired
@@ -31,7 +32,7 @@ public class LandingController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class)) }),
             @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content) })
     @JsonView(Recipe.BasicInfo.class)
-    @GetMapping("/api/v1/recipes")
+    @GetMapping("/recipes")
     public ResponseEntity<?> getNewestRecipes(@RequestParam String order, @RequestParam int size, @RequestParam int page) {
         String sortBy = "";
         if (order.equals("lastmod")) {
