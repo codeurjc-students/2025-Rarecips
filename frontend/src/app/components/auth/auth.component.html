@@ -187,25 +187,26 @@
                         </div>
 
                         <form class="form-content" (ngSubmit)="onSignup()">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="signup-firstname" class="form-label">Name</label>
-                                    <div class="input-wrapper">
-                                        <i class="ti ti-circle-number-1 text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
-                                        <input type="text" id="signup-firstname" class="form-input glass-input"
-                                            placeholder="Your name" [(ngModel)]="signupForm.firstName"
-                                            name="firstName" required>
-                                    </div>
+                            <div class="form-group">
+                                <label for="signup-username" class="form-label">Username</label>
+                                <div class="input-wrapper">
+                                    <i class="ti ti-at text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                    <input type="text" id="signup-username" class="form-input glass-input"
+                                        placeholder="Your username" [(ngModel)]="signupForm.username"
+                                        name="username" required
+                                        #signupUsernameInput
+                                        (input)="onUsernameInput(signupUsernameInput.value)">
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="signup-lastname" class="form-label">Surname</label>
-                                    <div class="input-wrapper">
-                                        <i class="ti ti-circle-number-2 text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
-                                        <input type="text" id="signup-lastname" class="form-input glass-input"
-                                            placeholder="Your surname" [(ngModel)]="signupForm.lastName"
-                                            name="lastName" required>
-                                    </div>
+                                <div class="username-status hidden absolute top-60 left-16">
+                                    @if (isUsernameAvailable != null) {
+                                        @if (isUsernameAvailable === true) {
+                                            <small class="text-success" style="color: green;">Nickname available ✓</small>
+                                        } @else {
+                                            <small class="text-danger" style="color: red;">Nickname already taken ✕</small>
+                                        }
+                                    } @else {
+                                        <small class="text-muted" style="color: gray;">Checking availability...</small>
+                                    }
                                 </div>
                             </div>
 
@@ -225,16 +226,38 @@
                                     <i class="ti ti-lock text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                     <input [type]="showSignupPassword ? 'text' : 'password'" id="signup-password"
                                         class="form-input glass-input" placeholder="Choose a secure password"
-                                        [(ngModel)]="signupForm.password" name="password" required>
+                                        [(ngModel)]="signupForm.password" (ngModelChange)="onPasswordInput($event)" name="password" required>
                                     <button type="button" class="password-toggle"
                                         (click)="showSignupPassword = !showSignupPassword">
                                         @if (!showSignupPassword) {
-                                        <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                            <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                         }
                                         @if (showSignupPassword) {
-                                        <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
+                                            <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                         }
                                     </button>
+                                </div>
+
+                                <div class="password-strength-wrapper top-[calc(61%)] left-16" (mouseenter)="showPasswordRequirements = true" (mouseleave)="showPasswordRequirements = false">
+                                    <div class="flex flex-row items-center gap-4">
+                                        <div class="strength-track !w-2/4">
+                                            <div class="strength-bar" [style.width.%]="strengthPercent" [style.background]="strengthColor"></div>
+                                        </div>
+                                        <div class="strength-info !w-1/4 flex items-center justify-center">
+                                            <span class="strength-label">{{ strengthLabel || "..." }}</span>
+                                            <i class="ti ti-info-circle password-info" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="password-requirements" [class.visible]="showPasswordRequirements" role="dialog">
+                                        <ul>
+                                            <li [class.ok]="strengthCriteria.length">Minimum 8 characters</li>
+                                            <li [class.ok]="strengthCriteria.lower">Lowercase letter</li>
+                                            <li [class.ok]="strengthCriteria.upper">Uppercase letter</li>
+                                            <li [class.ok]="strengthCriteria.number">Number (0-9)</li>
+                                            <li [class.ok]="strengthCriteria.special">Special character (e.g. !&commat;#$%)</li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
 
@@ -245,7 +268,7 @@
                                     <i class="ti ti-lock-check text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                     <input [type]="showConfirmPassword ? 'text' : 'password'"
                                         id="signup-confirm-password" class="form-input glass-input"
-                                        placeholder="Confirma tu contraseña" [(ngModel)]="signupForm.confirmPassword"
+                                        placeholder="Confirma tu contraseña" [(ngModel)]="signupForm.confirmPassword" (ngModelChange)="onConfirmPasswordInput($event)"
                                         name="confirmPassword" required>
                                     <button type="button" class="password-toggle"
                                         (click)="showConfirmPassword = !showConfirmPassword">
@@ -256,6 +279,9 @@
                                         <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                                         }
                                     </button>
+                                </div>
+                                <div class="password-status hidden absolute bottom-[calc(21%)] left-16">
+                                    <small class="text-danger" style="color: red;">Passwords do not match ✕</small>
                                 </div>
                             </div>
 
@@ -271,7 +297,7 @@
                                 </label>
                             </div>
 
-                            <button type="submit" class="form-submit glass-button">
+                            <button type="submit" [disabled]="isSignupDisabled()" class="disabled form-submit glass-button">
                                 <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
                                 Create Account
                             </button>

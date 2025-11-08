@@ -1,5 +1,6 @@
 package com.blasetvrtumi.rarecips.security;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +26,20 @@ public class RepositoryUserDetailService implements UserDetailsService{
         User user = userRepository.findByUsername(username);
 
         List<GrantedAuthority> roles = new ArrayList<>();
-
-        for(String role : user.getRole()) {
-            roles.add(new SimpleGrantedAuthority("ROLE_" + role));
-        }
+        roles.add(new SimpleGrantedAuthority("ROLE_USER"));
 
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
             user.getPassword(), roles);
 
+    }
+
+    public UserDetails createUser(String username, String password) {
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setPassword(password);
+        newUser.setCreatedAt(LocalDateTime.now());
+        userRepository.save(newUser);
+        return loadUserByUsername(username);
     }
     
 }

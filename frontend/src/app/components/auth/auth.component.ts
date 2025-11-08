@@ -1,7 +1,10 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { filter } from 'rxjs/operators';
+import { filter, map, take, debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, Subject, Subscription, of } from 'rxjs';
+import { SessionService } from '../../services/session.service';
 
 interface LoginForm {
   email: string;
@@ -10,8 +13,7 @@ interface LoginForm {
 }
 
 interface SignupForm {
-  firstName: string;
-  lastName: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -25,12 +27,26 @@ interface SignupForm {
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
 })
-export class AuthComponent implements AfterViewInit {
+export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   activeTab: 'login' | 'signup' = 'login';
   
   showLoginPassword = false;
   showSignupPassword = false;
   showConfirmPassword = false;
+
+  showPasswordRequirements = false;
+
+  strengthScore = 0;
+  strengthLabel = '';
+  strengthColor = '';
+  strengthPercent = 0;
+  strengthCriteria: { length: boolean; lower: boolean; upper: boolean; number: boolean; special: boolean } = {
+    length: false,
+    lower: false,
+    upper: false,
+    number: false,
+    special: false
+  };
   
   loginForm: LoginForm = {
     email: '',
@@ -39,8 +55,7 @@ export class AuthComponent implements AfterViewInit {
   };
   
   signupForm: SignupForm = {
-    firstName: '',
-    lastName: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -48,11 +63,124 @@ export class AuthComponent implements AfterViewInit {
   };
   
   isLoading = false;
+  private static cardsRandomized = false;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) { 
+  private usernameArray: string[] = [];
+  private emailArray: string[] = [];
+  private usernameArrayLoaded = false;
+
+  private passwordMatch: boolean = false;
+  private passwordStrong: boolean = false;
+
+  private usernameInput$ = new Subject<string>();
+  private usernameStatus: HTMLCollectionOf<HTMLElement> | null = null;
+  private usernameInput: HTMLInputElement | null = null;
+
+  private usernameSub: Subscription | null = null;
+  isUsernameAvailable: boolean | null = null;
+
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private http: HttpClient, private sessionService: SessionService) {
+    this.switchTab(this.activatedRoute.snapshot.routeConfig?.path === 'signup' ? 'signup' : 'login');
+  }
+
+  ngOnInit(): void {
+
+    this.usernameInput = document.getElementById('signup-username') as HTMLInputElement | null;
+    this.usernameStatus = document.getElementsByClassName('username-status') as HTMLCollectionOf<HTMLElement> | null;
+
+    this.http.get<string[]>('/api/v1/auth/usernames').pipe(
+      take(1),
+      catchError(() => of([]))
+    ).subscribe(list => {
+      this.usernameArray = list || [];
+      this.usernameArrayLoaded = true;
+    });
+
+    this.http.get<string[]>('/api/v1/auth/emails').pipe(
+      take(1),
+      catchError(() => of([]))
+    ).subscribe(list => {
+      this.emailArray = list || [];
+    });
+
+    this.usernameSub = this.usernameInput$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      map(s => (s && s.trim().length ? s.trim() : null)),
+      switchMap((username: string | null) => {
+        if (!username) {
+          this.isUsernameAvailable = null;
+          return of(null);
+        }
+
+        if (this.usernameStatus && this.usernameStatus[0]) this.usernameStatus[0].style.display = 'block';
+
+        if (!this.usernameArrayLoaded) {
+          return of(null);
+        }
+
+        const found = this.usernameArray.includes(username);
+        return of({ available: !found });
+      })
+    ).subscribe((res) => {
+      if (res === null) {
+        this.isUsernameAvailable = null;
+        this.updateUsernameStyles(null);
+      } else {
+        this.isUsernameAvailable = !!res.available;
+        this.updateUsernameStyles(this.isUsernameAvailable);
+      }
+    });
+
+    this.usernameInput?.addEventListener('input', (event) => {
+      if (this.usernameStatus && this.usernameStatus[0]) this.usernameStatus[0].style.display = 'block';
+      const value = (event.target as HTMLInputElement).value;
+      this.usernameInput$.next(value);
+    });
+
+  }
+
+  private updateUsernameStyles(available: boolean | null) {
+    if (!this.usernameInput) return;
+    const input = this.usernameInput;
+    if (available === null) {
+      input.style.background = '';
+      input.style.borderColor = '';
+      return;
+    }
+    if (available) {
+      input.style.background = '';
+      input.style.borderColor = '';
+    } else {
+      input.style.background = 'rgba(255, 0, 0, 0.1)';
+      input.style.borderColor = 'red';
+    }
+  }
+  
+  ngAfterViewInit(): void {
+    if (AuthComponent.cardsRandomized) {
+      this.restoreCardPositions();
+      return;
+    }
+
+    const isAuthUrl = (url: string) => url.includes('/login') || url.includes('/signup');
+
+    if (isAuthUrl(this.router.url)) {
+      this.randomizeCardPositions();
+      AuthComponent.cardsRandomized = true;
+      return;
+    }
+
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {});
+      filter(event => event instanceof NavigationEnd),
+      take(1)
+    ).subscribe((e: NavigationEnd) => {
+      const url = (e as any).urlAfterRedirects || (e as any).url;
+      if (isAuthUrl(url)) {
+        this.randomizeCardPositions();
+        AuthComponent.cardsRandomized = true;
+      }
+    });
   }
   
   switchTab(tab: 'login' | 'signup'): void {
@@ -71,38 +199,63 @@ export class AuthComponent implements AfterViewInit {
   onSignup(): void {
     if (this.validateSignupForm()) {
       this.isLoading = true;
+
+      // API Call
+      this.sessionService.signup({
+        username: this.signupForm.username,
+        email: this.signupForm.email,
+        password: this.signupForm.password
+      }).pipe(take(1)).subscribe({
+        next: () => {
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.isLoading = false;
+          alert('Error en el registro: ' + error.message);
+        }
+      });
+
       setTimeout(() => {
-        console.log('Registration attempt:', this.signupForm);
         this.isLoading = false;
         alert('¡Registro exitoso! Bienvenido a Rarecips.');
         this.switchTab('login');
       }, 2000);
     }
   }
+
+  validateEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  checkEmailExists(email: string): boolean {
+    return this.emailArray.includes(email);
+  }
   
   private validateLoginForm(): boolean {
     if (!this.loginForm.email || !this.loginForm.password) {
-      alert('Por favor, completa todos los campos requeridos.');
       return false;
     }
     return true;
   }
   
   private validateSignupForm(): boolean {
-    const { firstName, lastName, email, password, confirmPassword, acceptTerms } = this.signupForm;
-    
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      alert('Por favor, completa todos los campos requeridos.');
+    const { username, email, password, confirmPassword, acceptTerms } = this.signupForm;
+
+    if (!username || !email || !password || !confirmPassword) {
       return false;
     }
     
     if (password !== confirmPassword) {
-      alert('Las contraseñas no coinciden.');
       return false;
     }
     
     if (!acceptTerms) {
-      alert('Debes aceptar los términos y condiciones.');
+      return false;
+    }
+
+    if (this.checkEmailExists(email)) {
+      alert('El correo electrónico ya está registrado.');
       return false;
     }
     
@@ -111,15 +264,170 @@ export class AuthComponent implements AfterViewInit {
   
   private resetForms(): void {
     this.loginForm = { email: '', password: '', rememberMe: false };
-    this.signupForm = { firstName: '', lastName: '', email: '', password: '', confirmPassword: '', acceptTerms: false };
+    this.signupForm = { username: '', email: '', password: '', confirmPassword: '', acceptTerms: false };
     this.showLoginPassword = false;
     this.showSignupPassword = false;
     this.showConfirmPassword = false;
   }
+
+  private restoreCardPositions(): void {
+    const saved = sessionStorage.getItem('authCardPositions');
+    if (!saved) return;
+    const positions = JSON.parse(saved) as Array<{ left: string; top: string; rotate: number }>;
+    const cards = document.querySelectorAll('.preview-card');
+    cards.forEach((card, i) => {
+      const el = card as HTMLElement;
+      const pos = positions[i];
+      if (!pos) return;
+      el.style.left = pos.left;
+      el.style.top = pos.top;
+      el.style.transform = `rotate(${pos.rotate}deg)`;
+      el.classList.add('positioned');
+    });
+  }
+
+  private randomizeCardPositions(): void {
+    const storageKey = 'authCardPositions';
+    setTimeout(() => {
+      const cards = document.querySelectorAll('.preview-card');
+      const container = document.querySelector('.floating-preview-cards') as HTMLElement;
+      if (!container || cards.length === 0) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const used: Array<{ x: number; y: number }> = [];
+      const out: Array<{ left: string; top: string; rotate: number }> = [];
+      const cardWidth = 150;
+      const cardHeight = 120;
+      const minDistance = 80;
+
+      cards.forEach((card, index) => {
+        let attempts = 0;
+        let newPos = { x: 0, y: 0 };
+        let valid = false;
+        const margin = 40;
+
+        while (!valid && attempts < 50) {
+          newPos = {
+            x: margin + Math.random() * Math.max(0, containerRect.width - cardWidth - margin),
+            y: margin + Math.random() * Math.max(0, containerRect.height - cardHeight - margin)
+          };
+          valid = used.every(p => Math.hypot(newPos.x - p.x, newPos.y - p.y) >= minDistance);
+          attempts++;
+        }
+
+        if (!valid) {
+          const cols = Math.max(1, Math.ceil(cards.length / 2));
+          const row = Math.floor(index / cols);
+          const col = index % cols;
+          newPos = {
+            x: (containerRect.width / cols) * col + (containerRect.width / cols / 2) - cardWidth / 2,
+            y: (containerRect.height / 2) * row + (containerRect.height / 4) - cardHeight / 2
+          };
+        }
+
+        used.push(newPos);
+
+        const leftPerc = ((newPos.x / containerRect.width) * 100).toFixed(4) + '%';
+        const topPerc = ((newPos.y / containerRect.height) * 100).toFixed(4) + '%';
+        const rotate = (Math.random() - 0.5) * 6;
+
+        const el = card as HTMLElement;
+        el.style.left = leftPerc;
+        el.style.top = topPerc;
+        el.style.transform = `rotate(${rotate}deg)`;
+        el.style.animationDelay = (Math.random() * 3) + 's';
+
+        setTimeout(() => el.classList.add('positioned'), 50 + index * 100);
+
+        out.push({ left: leftPerc, top: topPerc, rotate });
+      });
+
+      sessionStorage.setItem(storageKey, JSON.stringify(out));
+    }, 100);
+  }
   
   onForgotPassword(event?: Event): void {
     if (event) event.preventDefault();
-    console.log('Forgot password clicked');
     alert('Funcionalidad de recuperación de contraseña no implementada aún');
+  }
+
+  onUsernameInput(value: string) {
+    this.signupForm.username = value;
+    this.usernameInput$.next(value);
+  }
+
+  onPasswordInput(value: string) {
+    this.onConfirmPasswordInput(this.signupForm.confirmPassword);
+    this.signupForm.password = value;
+    this.evaluatePassword(value || '');
+  }
+
+  onConfirmPasswordInput(value: string) {
+    const passwordStatus = document.getElementsByClassName('password-status') as HTMLCollectionOf<HTMLElement>;
+    const signupPasswordInput = document.getElementById('signup-password') as HTMLInputElement;
+    const signupConfirmPasswordInput = document.getElementById('signup-confirm-password') as HTMLInputElement;
+    if (value !== this.signupForm.password) {
+      passwordStatus[0].classList.remove('hidden');
+      signupConfirmPasswordInput.style.borderColor = 'red';  
+      signupConfirmPasswordInput.style.background = 'rgba(255, 0, 0, 0.1)';
+      signupPasswordInput.style.borderColor = 'red';  
+      signupPasswordInput.style.background = 'rgba(255, 0, 0, 0.1)';
+      this.passwordMatch = false;
+    } else {
+      passwordStatus[0].classList.add('hidden');
+      signupConfirmPasswordInput.style.borderColor = '';
+      signupConfirmPasswordInput.style.background = '';
+      signupPasswordInput.style.borderColor = '';
+      signupPasswordInput.style.background = '';
+      this.passwordMatch = true;
+    }
+  }
+
+  evaluatePassword(password: string) {
+    const criteria = {
+      length: password.length >= 8,
+      lower: /[a-z]/.test(password),
+      upper: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[^A-Za-z0-9]/.test(password)
+    };
+
+    this.strengthCriteria = criteria;
+    const score = Object.values(criteria).filter(Boolean).length;
+    this.strengthScore = score;
+    this.strengthPercent = Math.round((score / 5) * 100);
+
+    if (score <= 2) {
+      this.strengthLabel = 'Weak';
+      this.strengthColor = '#ef4444'; // red
+    } else if (score === 3) {
+      this.strengthLabel = 'Fair';
+      this.strengthColor = '#fb923c'; // orange
+    } else if (score === 4) {
+      this.strengthLabel = 'Good';
+      this.strengthColor = '#f59e0b'; // amber
+    } else {
+      this.strengthLabel = 'Strong';
+      this.strengthColor = '#10b981'; // green
+    }
+
+    this.passwordStrong = score >= 4;
+   }
+
+  isSignupDisabled(): boolean {
+    if (this.isUsernameAvailable !== true) return true;
+    if (!this.signupForm.acceptTerms) return true;
+    if (!this.signupForm.username || !this.signupForm.password || !this.signupForm.confirmPassword) return true;
+    if (!this.validateEmail(this.signupForm.email)) return true;
+    if (!this.passwordMatch) return true;
+    if (!this.passwordStrong) return true;
+    return false;
+  }
+
+  ngOnDestroy(): void {
+    if (this.usernameSub) {
+      this.usernameSub.unsubscribe();
+      this.usernameSub = null;
+    }
   }
 }

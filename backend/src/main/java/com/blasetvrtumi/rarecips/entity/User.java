@@ -31,6 +31,7 @@ public class User {
 
     @JsonView({BasicInfo.class, Username.class})
     @Id
+    @Column(unique = true, nullable = false)
     private String username;
 
     @JsonView(BasicInfo.class)
@@ -104,24 +105,32 @@ public class User {
         return username;
     }
 
-    public void setEmail(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setEmail'");
+    public String getEmail() {
+        return email;
     }
 
-    public void setBio(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setBio'");
+    public String getPassword() {
+        return password;
     }
 
-    public void setUsername(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUsername'");
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setPassword(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPassword'");
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 }

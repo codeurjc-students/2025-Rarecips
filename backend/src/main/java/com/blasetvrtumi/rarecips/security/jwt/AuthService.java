@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import com.blasetvrtumi.rarecips.security.RepositoryUserDetailService;
 
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@Service
 public class AuthService {
 
     @Autowired
@@ -77,6 +79,22 @@ public class AuthService {
 			AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
 					"Invalid credentials !");
 			return ResponseEntity.status(400).body(loginResponse);
+		}
+	}
+
+	public ResponseEntity<AuthResponse> signup(AuthRequest signupRequest) {
+
+		try {
+			userDetailsService.createUser(signupRequest.getUsername(),
+					signupRequest.getPassword());
+
+			AuthResponse signupResponse = new AuthResponse(AuthResponse.Status.SUCCESS,
+					"User registered successfully. You can now log in.");
+			return ResponseEntity.ok().body(signupResponse);
+		} catch (Exception e) {
+			AuthResponse signupResponse = new AuthResponse(AuthResponse.Status.FAILURE,
+					"Registration failed: " + e.getMessage());
+			return ResponseEntity.status(400).body(signupResponse);
 		}
 	}
 

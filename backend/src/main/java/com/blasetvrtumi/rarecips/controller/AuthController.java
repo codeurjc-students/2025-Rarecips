@@ -3,15 +3,17 @@ package com.blasetvrtumi.rarecips.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.blasetvrtumi.rarecips.security.jwt.AuthResponse;
 import com.blasetvrtumi.rarecips.security.jwt.AuthService;
+import com.blasetvrtumi.rarecips.service.UserService;
 import com.blasetvrtumi.rarecips.security.jwt.AuthRequest;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -24,6 +26,9 @@ public class AuthController {
 
         @Autowired
         private AuthService authService;
+
+        @Autowired
+        private UserService userService;
 
     @Operation(summary = "User login endpoint")
     @ApiResponses(value = {
@@ -42,6 +47,20 @@ public class AuthController {
         return authService.login(loginRequest, accessToken, refreshToken);
     }
 
+    @Operation(summary = "User registration endpoint")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Registration successful", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid registration data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
+        @PostMapping("/signup")
+    public ResponseEntity<AuthResponse> signup(@RequestBody AuthRequest signupRequest) {
+
+        return authService.signup(signupRequest);
+    }
+
     @Operation(summary = "Refresh token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Token refreshed", content = {
@@ -55,6 +74,30 @@ public class AuthController {
             @CookieValue(name = "refreshToken", required = false) String refreshToken) {
 
         return authService.refresh(refreshToken);
+    }
+
+    @Operation(summary = "Index all users' usernames for validation")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usernames retrieved successfully", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
+        })
+    })
+    @GetMapping("/usernames")
+    public ResponseEntity<String[]> getAllUsernames() {
+        String[] usernames =  userService.getAllUsernames();
+        return ResponseEntity.ok(usernames);
+    }
+
+    @Operation(summary = "Index all users' emails for validation")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Emails retrieved successfully", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
+        })
+    })
+    @GetMapping("/emails")
+    public ResponseEntity<String[]> getAllEmails() {
+        String[] emails = userService.getAllEmails();
+        return ResponseEntity.ok(emails);
     }
 
     @Operation(summary = "Logout")

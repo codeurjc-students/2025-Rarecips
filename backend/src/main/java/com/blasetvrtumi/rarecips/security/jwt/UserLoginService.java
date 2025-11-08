@@ -33,8 +33,8 @@ public class UserLoginService {
 	@Autowired
 	private JwtCookieManager cookieUtil;
 
-	public ResponseEntity<AuthResponse> login(LoginRequest loginRequest, String encryptedAccessToken, String 
-			encryptedRefreshToken) {
+    public ResponseEntity<AuthResponse> login(AuthRequest loginRequest, String encryptedAccessToken, String 
+	    encryptedRefreshToken) {
 
 		try {
 		Authentication authentication = authenticationManager.authenticate(

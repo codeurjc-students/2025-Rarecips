@@ -19,4 +19,16 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public String[] getAllUsernames() {
+        return userRepository.findAll().stream()
+                .map(User::getUsername)
+                .toArray(String[]::new);
+    }
+
+    public String[] getAllEmails() {
+        return userRepository.findAll().stream()
+                .map(User::getEmail)
+                .toArray(String[]::new);
+    }
+
 }
