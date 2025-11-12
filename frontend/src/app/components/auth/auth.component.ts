@@ -7,7 +7,7 @@ import { Observable, Subject, Subscription, of } from 'rxjs';
 import { SessionService } from '../../services/session.service';
 
 interface LoginForm {
-  email: string;
+  username: string;
   password: string;
   rememberMe: boolean;
 }
@@ -49,7 +49,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   };
   
   loginForm: LoginForm = {
-    email: '',
+    username: '',
     password: '',
     rememberMe: false
   };
@@ -192,7 +192,41 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   onLogin(): void {
     if (this.validateLoginForm()) {
       this.isLoading = true;
-      // TODO
+
+      // API Call
+      this.sessionService.login({
+        username: this.loginForm.username,
+        password: this.loginForm.password,
+        rememberMe: this.loginForm.rememberMe
+      }).pipe(take(1)).subscribe({
+        next: () => { // Successful login
+          this.isLoading = false;
+
+          const loginBut = document.getElementById('loginBut') as HTMLButtonElement;
+          const loginIcon = loginBut.querySelector('i') as HTMLElement;
+          loginBut.innerHTML = "";
+
+          
+          const spinner = document.createElement('img');
+          spinner.src = '/assets/logo/Rarecips_Spinner.svg';
+          spinner.style.width = '28px';
+          spinner.style.height = '28px';
+          loginBut.appendChild(spinner);
+          setTimeout(() => {
+            loginBut.innerHTML = "";
+            loginBut.appendChild(loginIcon);
+            loginIcon.className = 'ti ti-check text-xl';
+            setTimeout(() => {
+              this.router.navigate(['/']);
+            }, 1200);
+          }, 2000);
+          
+        },
+        error: (error) => {
+          this.isLoading = false;
+          alert('Error en el inicio de sesión: ' + error.message);
+        }
+      });
     }
   }
   
@@ -211,13 +245,13 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         error: (error) => {
           this.isLoading = false;
-          alert('Error en el registro: ' + error.message);
+          alert('Registration failed: ' + error.message);
         }
       });
 
       setTimeout(() => {
         this.isLoading = false;
-        alert('¡Registro exitoso! Bienvenido a Rarecips.');
+        alert("Registration successful, welcome to Rarecips! You can now log in.");
         this.switchTab('login');
       }, 2000);
     }
@@ -233,7 +267,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   
   private validateLoginForm(): boolean {
-    if (!this.loginForm.email || !this.loginForm.password) {
+    if (!this.loginForm.username || !this.loginForm.password) {
       return false;
     }
     return true;
@@ -263,7 +297,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   
   private resetForms(): void {
-    this.loginForm = { email: '', password: '', rememberMe: false };
+    this.loginForm = { username: '', password: '', rememberMe: false };
     this.signupForm = { username: '', email: '', password: '', confirmPassword: '', acceptTerms: false };
     this.showLoginPassword = false;
     this.showSignupPassword = false;

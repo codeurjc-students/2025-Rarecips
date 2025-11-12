@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.blasetvrtumi.rarecips.security.jwt.AuthResponse;
@@ -38,7 +38,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid credentials"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
-    @PostMapping("/login")
+    @PutMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @CookieValue(name = "accessToken", required = false) String accessToken,
             @CookieValue(name = "refreshToken", required = false) String refreshToken,
@@ -55,7 +55,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid registration data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
-        @PostMapping("/signup")
+        @PutMapping("/signup")
     public ResponseEntity<AuthResponse> signup(@RequestBody AuthRequest signupRequest) {
 
         return authService.signup(signupRequest);
@@ -69,7 +69,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid token"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
-    @PostMapping("/refresh")
+    @PutMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(
             @CookieValue(name = "refreshToken", required = false) String refreshToken) {
 
@@ -108,7 +108,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid token"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
-    @PostMapping("/logout")
+    @PutMapping("/logout")
     public ResponseEntity<AuthResponse> logOut(HttpServletRequest request, HttpServletResponse response) {
 
         return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS, authService.logout(request, response)));

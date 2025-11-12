@@ -113,6 +113,14 @@ public class User {
         return password;
     }
 
+    public String getRole() {
+        return role.name();
+    }
+
+    public void setRole(String role) {
+        this.role = Role.valueOf(role);
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -127,6 +135,10 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public void setPassword(String password) {

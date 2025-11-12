@@ -33,20 +33,20 @@ export class SessionService {
         );
     }
 
-    login(user: {email: string, password: string, rememberMe: boolean}): Observable<any> {
-        return this.httpClient.post(this.baseUrl + "login", user, {withCredentials: true}).pipe(
+    login(user: {username: string, password: string, rememberMe: boolean}): Observable<any> {
+        return this.httpClient.put(this.baseUrl + "login", user, {withCredentials: true}).pipe(
             catchError(error => this.handleError(error))
         );
     }
 
     signup(user: {username: string, email: string, password: string}): Observable<any> {
-        return this.httpClient.post(this.baseUrl + "signup", user, {withCredentials: true}).pipe(
+        return this.httpClient.put(this.baseUrl + "signup", user, {withCredentials: true}).pipe(
             catchError(error => this.handleError(error))
         );
     }
 
     logout(): Observable<any> {
-        return this.httpClient.post(this.baseUrl + "logout", {}, {withCredentials: true}).pipe(
+        return this.httpClient.put(this.baseUrl + "logout", {}, {withCredentials: true}).pipe(
             catchError(error => this.handleError(error))
         );
     }

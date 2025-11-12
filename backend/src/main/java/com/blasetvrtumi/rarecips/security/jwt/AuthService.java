@@ -2,12 +2,15 @@ package com.blasetvrtumi.rarecips.security.jwt;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.blasetvrtumi.rarecips.security.RepositoryUserDetailService;
@@ -20,8 +23,15 @@ import jakarta.servlet.http.HttpSession;
 @Service
 public class AuthService {
 
+	// QUITAR
+	private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
+
     @Autowired
 	private AuthenticationManager authenticationManager;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	private RepositoryUserDetailService userDetailsService;
@@ -85,7 +95,7 @@ public class AuthService {
 	public ResponseEntity<AuthResponse> signup(AuthRequest signupRequest) {
 
 		try {
-			userDetailsService.createUser(signupRequest.getUsername(),
+			userDetailsService.createUser(signupRequest.getUsername(), signupRequest.getEmail(),
 					signupRequest.getPassword());
 
 			AuthResponse signupResponse = new AuthResponse(AuthResponse.Status.SUCCESS,
