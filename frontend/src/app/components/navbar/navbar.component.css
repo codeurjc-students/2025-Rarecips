@@ -155,6 +155,7 @@ button:focus {
   background-color: var(--primary-300);
   color: var(--primary-text);
 }
+
 .nav-item i {
   width: 20px;
   height: 20px;
@@ -299,6 +300,7 @@ button:focus {
   position: relative;
   overflow: hidden;
 }
+
 .theme-colors {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -310,6 +312,7 @@ button:focus {
   align-content: center;
   gap: 0px;
 }
+
 .theme-color {
   width: 22px;
   height: 22px;
@@ -402,18 +405,18 @@ button:focus {
   .nav-item span {
     display: none;
   }
-  
+
   .nav-item {
     width: 44px;
     height: 44px;
     padding: 12px;
     justify-content: center;
   }
-  
+
   .auth-btn span {
     display: none;
   }
-  
+
   .auth-btn {
     width: 36px;
     height: 36px;

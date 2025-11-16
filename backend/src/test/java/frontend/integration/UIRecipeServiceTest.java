@@ -39,5 +39,5 @@ public class UIRecipeServiceTest {
         assertThat(recipes.isArray()).isTrue();
         assertThat(recipes.size()).isGreaterThan(0);
     }
-    
+
 }

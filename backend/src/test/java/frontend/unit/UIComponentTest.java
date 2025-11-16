@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = LandingController.class, excludeAutoConfiguration = {
-    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class // Temporary sexurity disable
+        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class // Temporary sexurity disable
 })
 @ContextConfiguration(classes = RarecipsApplication.class)
 public class UIComponentTest {
@@ -40,10 +40,10 @@ public class UIComponentTest {
     void shouldReturnRecipesForUIConsumption() throws Exception {
         List<Recipe> mockRecipes = new ArrayList<>();
         Recipe mockRecipe = new Recipe(
-            "UI Test Recipe", "Description", new ArrayList<>(), 
-            new ArrayList<>(), new ArrayList<>(), 4, new ArrayList<>(), 
-            1, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
-            30.0f, 500.0f, 400.0f, null, new ArrayList<>()
+                "UI Test Recipe", "Description", new ArrayList<>(),
+                new ArrayList<>(), new ArrayList<>(), 4, new ArrayList<>(),
+                1, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+                30.0f, 500.0f, 400.0f, null, new ArrayList<>()
         );
         mockRecipes.add(mockRecipe);
 
@@ -52,10 +52,10 @@ public class UIComponentTest {
         when(recipeService.getRecipes(anyString(), anyInt(), anyInt())).thenReturn(mockPage);
 
         mockMvc.perform(get("/api/recipes")
-                .param("order", "lastmod")
-                .param("page", "0")
-                .param("size", "4")
-                .accept(MediaType.APPLICATION_JSON))
+                        .param("order", "lastmod")
+                        .param("page", "0")
+                        .param("size", "4")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.recipes").isArray())

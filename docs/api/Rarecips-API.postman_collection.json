@@ -1,95 +1,106 @@
 {
-    "info": {
-        "name": "Rarecips API",
-        "description": "Complete API collection for Rarecips application with examples",
-        "version": "1.0.0",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
-    "variable": [
+  "info": {
+    "name": "Rarecips API",
+    "description": "Complete API collection for Rarecips application with examples",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8443/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Recipes",
+      "item": [
         {
-            "key": "base_url",
-            "value": "http://localhost:8443/api",
-            "type": "string"
-        }
-    ],
-    "item": [
-        {
-            "name": "Recipes",
-            "item": [
+          "name": "Get All Recipes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}{{api_path}}/recipes?order=lastmod&size=10&page=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "{{api_path}}",
+                "recipes"
+              ],
+              "query": [
                 {
-                    "name": "Get All Recipes",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}{{api_path}}/recipes?order=lastmod&size=10&page=0",
-                            "host": ["{{base_url}}"],
-                            "path": ["{{api_path}}", "recipes"],
-                            "query": [
-                                {
-                                    "key": "order",
-                                    "value": "lastmod",
-                                    "description": "Sort order: lastmod, created, popular"
-                                },
-                                {
-                                    "key": "size",
-                                    "value": "10",
-                                    "description": "Number of recipes per page (1-100)"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "0",
-                                    "description": "Page number (0-based)"
-                                }
-                            ]
-                        }
-                    },
-                    "response": [
-                        {
-                            "name": "Success Response",
-                            "status": "OK",
-                            "code": 200,
-                            "body": "[\n    {\n        \"id\": 1,\n        \"title\": \"Delicious Pasta Carbonara\",\n        \"description\": \"A classic Italian pasta dish with eggs, cheese, and pancetta\",\n        \"imageUrl\": \"https://example.com/images/pasta-carbonara.jpg\",\n        \"prepTime\": 30,\n        \"cookTime\": 15,\n        \"servings\": 4,\n        \"difficulty\": \"Medium\",\n        \"rating\": 4.5,\n        \"createdAt\": \"2025-01-15T10:30:00Z\"\n    }\n]"
-                        }
-                    ]
+                  "key": "order",
+                  "value": "lastmod",
+                  "description": "Sort order: lastmod, created, popular"
                 },
                 {
-                    "name": "Get Recipe by ID",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}{{api_path}}/recipes/1",
-                            "host": ["{{base_url}}"],
-                            "path": ["{{api_path}}", "recipes", "1"]
-                        }
-                    },
-                    "response": [
-                        {
-                            "name": "Success Response",
-                            "status": "OK",
-                            "code": 200,
-                            "body": "{\n    \"id\": 1,\n    \"title\": \"Delicious Pasta Carbonara\",\n    \"description\": \"A classic Italian pasta dish with eggs, cheese, and pancetta\",\n    \"imageUrl\": \"https://example.com/images/pasta-carbonara.jpg\",\n    \"prepTime\": 30,\n    \"cookTime\": 15,\n    \"servings\": 4,\n    \"difficulty\": \"Medium\",\n    \"rating\": 4.5,\n    \"ingredients\": [\n        {\n            \"id\": 1,\n            \"name\": \"Spaghetti\",\n            \"amount\": \"400g\",\n            \"unit\": \"grams\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Pancetta\",\n            \"amount\": \"150g\",\n            \"unit\": \"grams\"\n        }\n    ],\n    \"tags\": [\"Italian\", \"Pasta\", \"Dinner\"],\n    \"createdAt\": \"2025-01-15T10:30:00Z\",\n    \"updatedAt\": \"2025-01-20T14:45:00Z\"\n}"
-                        },
-                        {
-                            "name": "Recipe Not Found",
-                            "status": "Not Found",
-                            "code": 404,
-                            "body": "{\n    \"error\": \"NOT_FOUND\",\n    \"message\": \"Recipe not found\",\n    \"timestamp\": \"2025-01-15T10:30:00Z\",\n    \"path\": \"/api/recipes/999\"\n}"
-                        }
-                    ]
+                  "key": "size",
+                  "value": "10",
+                  "description": "Number of recipes per page (1-100)"
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Page number (0-based)"
                 }
-            ]
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n    {\n        \"id\": 1,\n        \"title\": \"Delicious Pasta Carbonara\",\n        \"description\": \"A classic Italian pasta dish with eggs, cheese, and pancetta\",\n        \"imageUrl\": \"https://example.com/images/pasta-carbonara.jpg\",\n        \"prepTime\": 30,\n        \"cookTime\": 15,\n        \"servings\": 4,\n        \"difficulty\": \"Medium\",\n        \"rating\": 4.5,\n        \"createdAt\": \"2025-01-15T10:30:00Z\"\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Recipe by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}{{api_path}}/recipes/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "{{api_path}}",
+                "recipes",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"id\": 1,\n    \"title\": \"Delicious Pasta Carbonara\",\n    \"description\": \"A classic Italian pasta dish with eggs, cheese, and pancetta\",\n    \"imageUrl\": \"https://example.com/images/pasta-carbonara.jpg\",\n    \"prepTime\": 30,\n    \"cookTime\": 15,\n    \"servings\": 4,\n    \"difficulty\": \"Medium\",\n    \"rating\": 4.5,\n    \"ingredients\": [\n        {\n            \"id\": 1,\n            \"name\": \"Spaghetti\",\n            \"amount\": \"400g\",\n            \"unit\": \"grams\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Pancetta\",\n            \"amount\": \"150g\",\n            \"unit\": \"grams\"\n        }\n    ],\n    \"tags\": [\"Italian\", \"Pasta\", \"Dinner\"],\n    \"createdAt\": \"2025-01-15T10:30:00Z\",\n    \"updatedAt\": \"2025-01-20T14:45:00Z\"\n}"
+            },
+            {
+              "name": "Recipe Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n    \"error\": \"NOT_FOUND\",\n    \"message\": \"Recipe not found\",\n    \"timestamp\": \"2025-01-15T10:30:00Z\",\n    \"path\": \"/api/recipes/999\"\n}"
+            }
+          ]
         }
-    ]
+      ]
+    }
+  ]
 }

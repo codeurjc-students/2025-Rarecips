@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import {Component} from '@angular/core';
+import {Router, ActivatedRoute} from '@angular/router';
 
 interface Recipe {
   id: string;
@@ -80,5 +80,6 @@ export class ExploreComponent {
   constructor(
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) {
+  }
 }

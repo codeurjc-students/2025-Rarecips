@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class ReviewService {
-    
+
     @Autowired
     private ReviewRepository reviewRepository;
-    
+
     @Autowired
     private RecipeRepository recipeRepository;
 }

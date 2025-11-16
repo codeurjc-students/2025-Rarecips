@@ -173,10 +173,12 @@ input[type="text"]:focus, textarea:focus {
     padding: 1.2rem 0.5rem;
     max-width: 98vw;
   }
+
   .profile-header {
     flex-direction: column;
     gap: 0.7rem;
   }
+
   .profile-avatar {
     width: 72px;
     height: 72px;

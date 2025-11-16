@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy, ElementRef, Renderer2 } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { Recipe } from '../../models/recipe.model';
-import { RecipeService } from '../../services/recipe.service';
+import {Component, OnInit, OnDestroy, ElementRef, Renderer2} from '@angular/core';
+import {Router, RouterModule} from '@angular/router';
+import {Recipe} from '../../models/recipe.model';
+import {RecipeService} from '../../services/recipe.service';
 
 @Component({
   selector: 'app-home',

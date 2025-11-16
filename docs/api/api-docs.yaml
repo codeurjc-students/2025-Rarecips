@@ -31,7 +31,7 @@ paths:
           name: order
           schema:
             type: string
-            enum: [lastmod]
+            enum: [ lastmod ]
             default: lastmod
           description: Order by field
 

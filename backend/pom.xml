@@ -102,14 +102,14 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.8.5</version>
         </dependency>
-        
+
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>5.3.2</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>json-path</artifactId>
@@ -128,7 +128,7 @@
             <version>1.3</version>
         </dependency>
 
-         <dependency>
+        <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>4.16.0</version>
@@ -140,7 +140,7 @@
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
         </dependency>
-        
+
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -221,7 +221,7 @@
                             <inputSpec>${project.basedir}/../docs/api/api-docs.yaml</inputSpec>
                             <generatorName>html2</generatorName>
                             <output>${project.basedir}/../docs/api</output>
-                            
+
                             <configOptions>
                                 <appName>Rarecips API</appName>
                                 <appDescription>Complete API documentation for Rarecips application</appDescription>
@@ -247,9 +247,9 @@
                         </goals>
                         <configuration>
                             <target>
-                                <move file="${project.basedir}/../docs/api/index.html" 
-                                    tofile="${project.basedir}/../docs/api/api-docs.html" 
-                                    failonerror="false"/>
+                                <move file="${project.basedir}/../docs/api/index.html"
+                                      tofile="${project.basedir}/../docs/api/api-docs.html"
+                                      failonerror="false"/>
                             </target>
                         </configuration>
                     </execution>

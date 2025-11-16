@@ -462,17 +462,17 @@
   .ingredients-container {
     padding: 1rem;
   }
-  
+
   .header {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
   }
-  
+
   .filters {
     flex-direction: column;
   }
-  
+
   .search-wrapper {
     max-width: none;
   }

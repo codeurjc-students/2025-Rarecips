@@ -24,11 +24,11 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-        @Autowired
-        private AuthService authService;
+    @Autowired
+    private AuthService authService;
 
-        @Autowired
-        private UserService userService;
+    @Autowired
+    private UserService userService;
 
     @Operation(summary = "User login endpoint")
     @ApiResponses(value = {
@@ -55,8 +55,37 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid registration data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
-        @PutMapping("/signup")
+    @PutMapping("/signup")
     public ResponseEntity<AuthResponse> signup(@RequestBody AuthRequest signupRequest) {
+        if (signupRequest.getUsername() == null || signupRequest.getEmail() == null ||
+                signupRequest.getPassword() == null) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE, "Invalid registration data"));
+        } else if (userService.existsByUsername(signupRequest.getUsername())) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE, "Username already taken"));
+        } else if (userService.existsByEmail(signupRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE, "Email already in use"));
+        } else if (signupRequest.getPassword().length() < 8 || signupRequest.getPassword().length() > 64) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE, "Password must be between 8 and 64 characters"));
+        }
+
+        String password = signupRequest.getPassword();
+        int strengthScore = 0;
+
+        if (password.matches(".*[a-z].*")) strengthScore++;
+        if (password.matches(".*[A-Z].*")) strengthScore++;
+        if (password.matches(".*\\d.*")) strengthScore++;
+        if (password.matches(".*[@$!%*?&#_\\-].*")) strengthScore++;
+        if (password.length() >= 6) strengthScore++;
+
+        if (strengthScore < 4) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE,
+                            "Password must meet at least 4 of these criteria: lowercase letter, uppercase letter, number, special character (@$!%*?&#), or be 6+ characters long"));
+        }
 
         return authService.signup(signupRequest);
     }
@@ -78,21 +107,21 @@ public class AuthController {
 
     @Operation(summary = "Index all users' usernames for validation")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Usernames retrieved successfully", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
-        })
+            @ApiResponse(responseCode = "200", description = "Usernames retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
+            })
     })
     @GetMapping("/usernames")
     public ResponseEntity<String[]> getAllUsernames() {
-        String[] usernames =  userService.getAllUsernames();
+        String[] usernames = userService.getAllUsernames();
         return ResponseEntity.ok(usernames);
     }
 
     @Operation(summary = "Index all users' emails for validation")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Emails retrieved successfully", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
-        })
+            @ApiResponse(responseCode = "200", description = "Emails retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
+            })
     })
     @GetMapping("/emails")
     public ResponseEntity<String[]> getAllEmails() {

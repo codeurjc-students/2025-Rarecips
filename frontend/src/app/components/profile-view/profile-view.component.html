@@ -1,251 +1,259 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
-    <!-- Main Content -->
-    <div
-        class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
-        <div class="flex w-full min-h-full flex-wrap items-start gap-8">
-            <!-- Sidebar/Profile Card -->
-            <div class="flex min-w-[240px] max-w-[448px] w-screen grow shrink-0 basis-0 flex-col items-center justify-center gap-6 rounded-md border border-solid px-8 pt-12 pb-8 shadow-sm relative glass"
-                style="border-color: var(--primary-200-40); background: var(--primary-200-40)">
-                <div class="flex w-full flex-col items-center gap-12">
-                    <button
-                        class="absolute top-7 right-7 w-12 h-12 flex items-center justify-center rounded-xl"
-                        style="background: var(--gradient-primary); color: white;">
-                        <i class="ti ti-user-edit text-primary-700 text-xl"></i>
-                    </button>
-                    <div class="flex flex-col items-center gap-6 relative">
-                        <div class="flex h-36 w-36 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative"
-                            style="background: var(--primary-100);">
-                            <img class="h-36 w-36 flex-none object-cover absolute"
-                                src="https://avatar.iran.liara.run/public/33"
-                                alt="Profile" />
-                        </div>
-                        <span
-                            class="absolute -bottom-4 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                            style="background: var(--primary-400); color: var(--primary-700);">
-                            <i class="ti ti-user-shield font-extrabold text-xl"></i>
-                            Admin
-                        </span>
-                    </div>
-                    <div class="flex w-full flex-col items-center gap-6">
-                        <div class="flex flex-col">
-                            <span class="w-full text-3xl font-bold text-center" style="color: var(--primary-700);">John
-                                Doe</span>
-                            <span class="w-full text-base text-center"
-                                style="color: var(--primary-400);">&commat;john_doe</span>
-                        </div>
-                        <!--
-                        <button
-                            class="h-10 w-auto flex-none px-5 py-2 rounded-md text-white font-semibold transition flex items-center gap-2"
-                            style="background: var(--primary-500);">
-                            <i class="ti ti-pencil"></i>
-                            Edit
-                        </button>
-                        -->
-                    </div>
-                </div>
-                <div class="flex w-full flex-col items-center gap-10 mt-4">
-                    <!-- Stats -->
-                    <div class="flex w-full flex-row items-start gap-4 align-middle justify-evenly">
-                        <div class="flex flex-col items-center">
-                            <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Recipes</span>
-                            <div class="flex flex-col items-start gap-4">
+  <!-- Main Content -->
+  <div
+    class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
+    <div class="flex w-full min-h-full flex-wrap items-start gap-8">
+      <!-- Sidebar/Profile Card -->
+      <div
+        class="flex min-w-[240px] max-w-[448px] w-screen grow shrink-0 basis-0 flex-col items-center justify-center gap-6 rounded-md border border-solid px-8 pt-12 pb-8 shadow-sm relative glass"
+        style="border-color: var(--primary-200-40); background: var(--primary-200-40)">
+        <div class="flex w-full flex-col items-center gap-12">
+          <button
+            class="absolute top-7 right-7 w-12 h-12 flex items-center justify-center rounded-xl"
+            style="background: var(--gradient-primary); color: white;">
+            <i class="ti ti-user-edit text-primary-700 text-xl"></i>
+          </button>
+          <div class="flex flex-col items-center gap-6 relative">
+            <div
+              class="flex h-36 w-36 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative"
+              style="background: var(--primary-100);">
+              <img class="h-36 w-36 flex-none object-cover absolute"
+                   src="data:image/jpeg;base64,{{user?.profileImageString}}"
+                   alt="Profile"/>
+            </div>
+            @if (isAdmin) {
+              <span
+                class="absolute -bottom-4 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                style="background: var(--primary-400); color: var(--primary-700);">
+                                <i class="ti ti-user-shield font-extrabold text-xl"></i>
+                                Admin
+                            </span>
+            }
+          </div>
+          <div class="flex w-full flex-col items-center gap-6">
+            <div class="flex flex-col">
+              <span class="w-full text-3xl font-bold text-center"
+                    style="color: var(--primary-700);">{{ user?.displayName }}</span>
+              <span class="w-full text-base text-center"
+                    style="color: var(--primary-400);">&commat;{{ user?.username }}</span>
+            </div>
+            @if (isOwnProfile) {
+              <button
+                class="h-10 w-auto flex-none px-5 py-2 rounded-md text-white font-semibold transition flex items-center gap-2"
+                style="background: var(--primary-500);">
+                <i class="ti ti-pencil"></i>
+                Edit
+              </button>
+            }
+          </div>
+        </div>
+        <div class="flex w-full flex-col items-center gap-10 mt-4">
+          <!-- Stats -->
+          <div class="flex w-full flex-row items-start gap-4 align-middle justify-evenly">
+            <div class="flex flex-col items-center">
+              <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Recipes</span>
+              <div class="flex flex-col items-start gap-4">
                                 <span class="text-base" style="color: var(--primary-700);">
                                     5
                                 </span>
-                            </div>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Reviews</span>
-                            <div class="flex flex-col items-start gap-4">
+              </div>
+            </div>
+            <div class="flex flex-col items-center">
+              <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Reviews</span>
+              <div class="flex flex-col items-start gap-4">
                                 <span class="text-base" style="color: var(--primary-700);">
                                     120
                                 </span>
-                            </div>
-                        </div>
-                        <div class="flex flex-col items-center">
+              </div>
+            </div>
+            <div class="flex flex-col items-center">
                             <span class="w-full text-xs font-semibold"
-                                style="color: var(--primary-400);">Collections</span>
-                            <div class="flex flex-col items-start gap-4">
+                                  style="color: var(--primary-400);">Collections</span>
+              <div class="flex flex-col items-start gap-4">
                                 <span class="text-base" style="color: var(--primary-700);">
                                     80
                                 </span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Bio -->
-                    <div class="flex w-full flex-col items-start gap-4">
-                        <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Bio</span>
-                        <div class="flex flex-col items-start gap-4">
+              </div>
+            </div>
+          </div>
+          <!-- Bio -->
+          <div class="flex w-full flex-col items-start gap-4">
+            <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Bio</span>
+            <div class="flex flex-col items-start gap-4">
                             <span class="text-base" style="color: var(--primary-700);">
                                 Co-founder. Designer &amp; advisor helping start-ups and scale-ups bring
                                 their best ideas
                                 to life.
                             </span>
-                        </div>
-                    </div>
-                    <!-- Activity info -->
-                    <div class="flex w-full flex-row items-start gap-4 align-middle justify-evenly">
-                        <div class="flex flex-col items-center">
-                            <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Joined</span>
-                            <div class="flex flex-col items-start gap-4">
-                                <span class="text-base" style="color: var(--primary-700);">
-                                    Date
-                                </span>
-                            </div>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Last seen</span>
-                            <div class="flex flex-col items-start gap-4">
-                                <span class="text-base" style="color: var(--primary-700);">
-                                    Date
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-            <!-- Main Content Area -->
-            <div class="flex grow shrink-0 basis-0 flex-col items-center gap-8 min-h-full">
-                <!-- Design 2 <div class="flex grow shrink-0 basis-0 flex-col items-start gap-8 min-w-full rounded-md border border-solid px-8 pt-12 pb-8 shadow-sm relative glass"
-                    style="background: var(--primary-200-40);">-->
-                    <div class="flex min-w-full align-middle justify-center">
-                        <div class="tabs glass text-nowrap w-full">
-                            <button class="tab active">
-                                <i class="ti ti-chef-hat text-xl" aria-hidden="true"></i>
-                                Recipes
-                            </button>
-                            <button class="tab">
-                                <i class="ti ti-stars text-xl" aria-hidden="true"></i>
-                                Reviews
-                            </button>
-                            <button class="tab">
-                                <i class="ti ti-cards text-xl" aria-hidden="true"></i>
-                                Collections
-                            </button>
-                            <button class="tab">
-                                <i class="ti ti-basket text-xl" aria-hidden="true"></i>
-                                Ingredients
-                            </button>
-                        </div>
-                    </div>
-                    <!-- List -->
-                    <div class="flex w-full h-full flex-col items-start gap-8 p-8 glass rounded-3xl"
-                        style="background: var(--primary-200-40);">
-                        <!-- Card -->
-                        <div class="flex w-full flex-col flex-wrap items-start gap-6 glass rounded-3xl p-8" style="background: var(--primary-200-40);">
-                            <div class="flex w-full flex-wrap items-start gap-6">
-                                <img class="h-44 w-64 flex-none rounded-md object-cover"
-                                    src="https://res.cloudinary.com/subframe/image/upload/v1724690099/uploads/302/zxrsheptnqfesqupssbb.png"
-                                    alt="Recipe 1" />
-                                <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
-                                    <span class="text-2xl font-semibold" style="color: var(--primary-700);">Recipe 1</span>
-                                    <span class="text-base" style="color: var(--primary-400);">
-                                        Description
-                                    </span>
-                                    <div class="flex w-full items-center gap-2">
-                                        <div class="flex grow shrink-0 basis-0 flex-wrap items-start gap-2">
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Soup</span>
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Vegetable</span>
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Low calorie</span>
-                                        </div>
-                                        <button
-                                            class="w-10 h-10 rounded-full flex items-center justify-center transition"
-                                            style="background: var(--primary-100);">
-                                            <i class="ti ti-arrow-right font-extrabold" style="color: var(--primary-400);"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex w-full flex-col flex-wrap items-start gap-6 glass rounded-3xl p-8" style="background: var(--primary-200-40);">
-                            <div class="flex w-full flex-wrap items-start gap-6">
-                                <img class="h-44 w-64 flex-none rounded-md object-cover"
-                                    src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
-                                    alt="Recipe 2" />
-                                <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
-                                    <span class="text-2xl font-semibold" style="color: var(--primary-700);">Recipe 2</span>
-                                    <span class="text-base" style="color: var(--primary-400);">
-                                        Description
-                                    </span>
-                                    <div class="flex w-full items-center gap-2">
-                                        <div class="flex grow shrink-0 basis-0 flex-wrap items-start gap-2">
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Soup</span>
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Vegetable</span>
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Low calorie</span>
-                                        </div>
-                                        <button
-                                            class="w-10 h-10 rounded-full flex items-center justify-center transition"
-                                            style="background: var(--primary-100);">
-                                            <i class="ti ti-arrow-right font-extrabold" style="color: var(--primary-400);"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex w-full flex-col flex-wrap items-start gap-6 glass rounded-3xl p-8" style="background: var(--primary-200-40);">
-                            <div class="flex w-full flex-wrap items-start gap-6">
-                                <img class="h-44 w-64 flex-none rounded-md object-cover"
-                                    src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
-                                    alt="Recipe 3" />
-                                <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
-                                    <span class="text-2xl font-semibold" style="color: var(--primary-700);">Recipe 3</span>
-                                    <span class="text-base" style="color: var(--primary-400);">
-                                        Description
-                                    </span>
-                                    <div class="flex w-full items-center gap-2">
-                                        <div class="flex grow shrink-0 basis-0 flex-wrap items-start gap-2">
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Soup</span>
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Vegetable</span>
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Low calorie</span>
-                                        </div>
-                                        <button
-                                            class="w-10 h-10 rounded-full flex items-center justify-center transition"
-                                            style="background: var(--primary-100);">
-                                            <i class="ti ti-arrow-right font-extrabold" style="color: var(--primary-400);"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex w-full flex-col flex-wrap items-start gap-6 glass rounded-3xl p-8" style="background: var(--primary-200-40);">
-                            <div class="flex w-full flex-wrap items-start gap-6">
-                                <img class="h-44 w-64 flex-none rounded-md object-cover"
-                                    src="https://res.cloudinary.com/subframe/image/upload/v1724705689/uploads/302/wzbqe2n4hf3kwxr08izq.png"
-                                    alt="Recipe 4" />
-                                <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
-                                    <span class="text-2xl font-semibold" style="color: var(--primary-700);">Recipe 4</span>
-                                    <span class="text-base" style="color: var(--primary-400);">
-                                        Description
-                                    </span>
-                                    <div class="flex w-full items-center gap-2">
-                                        <div class="flex grow shrink-0 basis-0 flex-wrap items-start gap-2">
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Soup</span>
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Vegetable</span>
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                                style="background: var(--primary-100); color: var(--primary-700);">Low calorie</span>
-                                        </div>
-                                        <button
-                                            class="w-10 h-10 rounded-full flex items-center justify-center transition"
-                                            style="background: var(--primary-100);">
-                                            <i class="ti ti-arrow-right font-extrabold" style="color: var(--primary-400);"></i>
-                                        </button>
-                                    </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <!-- Activity info -->
+          <div class="flex w-full flex-row items-start gap-4 align-middle justify-evenly">
+            <div class="flex flex-col items-center">
+              <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Joined</span>
+              <div class="flex flex-col items-start gap-4">
+                                <span class="text-base" style="color: var(--primary-700);">
+                                    {{ user?.createdAt }}
+                                </span>
+              </div>
             </div>
+            <div class="flex flex-col items-center">
+              <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Last seen</span>
+              <div class="flex flex-col items-start gap-4">
+                                <span class="text-base" style="color: var(--primary-700);">
+                                    {{ user?.lastOnline }}
+                                </span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <!-- Main Content Area -->
+      <div class="flex grow shrink-0 basis-0 flex-col items-center gap-8 min-h-full">
+        <!-- Design 2 <div class="flex grow shrink-0 basis-0 flex-col items-start gap-8 min-w-full rounded-md border border-solid px-8 pt-12 pb-8 shadow-sm relative glass"
+            style="background: var(--primary-200-40);">-->
+        <div class="flex min-w-full align-middle justify-center">
+          <div class="tabs glass text-nowrap w-full">
+            <button class="tab active">
+              <i class="ti ti-chef-hat text-xl" aria-hidden="true"></i>
+              Recipes
+            </button>
+            <button class="tab">
+              <i class="ti ti-stars text-xl" aria-hidden="true"></i>
+              Reviews
+            </button>
+            <button class="tab">
+              <i class="ti ti-cards text-xl" aria-hidden="true"></i>
+              Collections
+            </button>
+            <button class="tab">
+              <i class="ti ti-basket text-xl" aria-hidden="true"></i>
+              Ingredients
+            </button>
+          </div>
+        </div>
+        <!-- List -->
+        <div class="flex w-full h-full flex-col items-start gap-8 p-8 glass rounded-3xl"
+             style="background: var(--primary-200-40);">
+          <!-- Card -->
+          <div class="flex w-full flex-col flex-wrap items-start gap-6 glass rounded-3xl p-8"
+               style="background: var(--primary-200-40);">
+            <div class="flex w-full flex-wrap items-start gap-6">
+              <img class="h-44 w-64 flex-none rounded-md object-cover"
+                   src="https://res.cloudinary.com/subframe/image/upload/v1724690099/uploads/302/zxrsheptnqfesqupssbb.png"
+                   alt="Recipe 1"/>
+              <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
+                <span class="text-2xl font-semibold" style="color: var(--primary-700);">Recipe 1</span>
+                <span class="text-base" style="color: var(--primary-400);">
+                                        Description
+                                    </span>
+                <div class="flex w-full items-center gap-2">
+                  <div class="flex grow shrink-0 basis-0 flex-wrap items-start gap-2">
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                                                  style="background: var(--primary-100); color: var(--primary-700);">Soup</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          style="background: var(--primary-100); color: var(--primary-700);">Vegetable</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          style="background: var(--primary-100); color: var(--primary-700);">Low calorie</span>
+                  </div>
+                  <button
+                    class="w-10 h-10 rounded-full flex items-center justify-center transition"
+                    style="background: var(--primary-100);">
+                    <i class="ti ti-arrow-right font-extrabold" style="color: var(--primary-400);"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex w-full flex-col flex-wrap items-start gap-6 glass rounded-3xl p-8"
+               style="background: var(--primary-200-40);">
+            <div class="flex w-full flex-wrap items-start gap-6">
+              <img class="h-44 w-64 flex-none rounded-md object-cover"
+                   src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
+                   alt="Recipe 2"/>
+              <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
+                <span class="text-2xl font-semibold" style="color: var(--primary-700);">Recipe 2</span>
+                <span class="text-base" style="color: var(--primary-400);">
+                                        Description
+                                    </span>
+                <div class="flex w-full items-center gap-2">
+                  <div class="flex grow shrink-0 basis-0 flex-wrap items-start gap-2">
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                                                  style="background: var(--primary-100); color: var(--primary-700);">Soup</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          style="background: var(--primary-100); color: var(--primary-700);">Vegetable</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          style="background: var(--primary-100); color: var(--primary-700);">Low calorie</span>
+                  </div>
+                  <button
+                    class="w-10 h-10 rounded-full flex items-center justify-center transition"
+                    style="background: var(--primary-100);">
+                    <i class="ti ti-arrow-right font-extrabold" style="color: var(--primary-400);"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex w-full flex-col flex-wrap items-start gap-6 glass rounded-3xl p-8"
+               style="background: var(--primary-200-40);">
+            <div class="flex w-full flex-wrap items-start gap-6">
+              <img class="h-44 w-64 flex-none rounded-md object-cover"
+                   src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
+                   alt="Recipe 3"/>
+              <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
+                <span class="text-2xl font-semibold" style="color: var(--primary-700);">Recipe 3</span>
+                <span class="text-base" style="color: var(--primary-400);">
+                                        Description
+                                    </span>
+                <div class="flex w-full items-center gap-2">
+                  <div class="flex grow shrink-0 basis-0 flex-wrap items-start gap-2">
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                                                  style="background: var(--primary-100); color: var(--primary-700);">Soup</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          style="background: var(--primary-100); color: var(--primary-700);">Vegetable</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          style="background: var(--primary-100); color: var(--primary-700);">Low calorie</span>
+                  </div>
+                  <button
+                    class="w-10 h-10 rounded-full flex items-center justify-center transition"
+                    style="background: var(--primary-100);">
+                    <i class="ti ti-arrow-right font-extrabold" style="color: var(--primary-400);"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex w-full flex-col flex-wrap items-start gap-6 glass rounded-3xl p-8"
+               style="background: var(--primary-200-40);">
+            <div class="flex w-full flex-wrap items-start gap-6">
+              <img class="h-44 w-64 flex-none rounded-md object-cover"
+                   src="https://res.cloudinary.com/subframe/image/upload/v1724705689/uploads/302/wzbqe2n4hf3kwxr08izq.png"
+                   alt="Recipe 4"/>
+              <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
+                <span class="text-2xl font-semibold" style="color: var(--primary-700);">Recipe 4</span>
+                <span class="text-base" style="color: var(--primary-400);">
+                                        Description
+                                    </span>
+                <div class="flex w-full items-center gap-2">
+                  <div class="flex grow shrink-0 basis-0 flex-wrap items-start gap-2">
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                                                  style="background: var(--primary-100); color: var(--primary-700);">Soup</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          style="background: var(--primary-100); color: var(--primary-700);">Vegetable</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          style="background: var(--primary-100); color: var(--primary-700);">Low calorie</span>
+                  </div>
+                  <button
+                    class="w-10 h-10 rounded-full flex items-center justify-center transition"
+                    style="background: var(--primary-100);">
+                    <i class="ti ti-arrow-right font-extrabold" style="color: var(--primary-400);"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

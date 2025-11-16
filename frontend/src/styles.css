@@ -313,8 +313,8 @@ body {
 
 .btn
 
-/* Primary button for generic purpose */
-  {
+  /* Primary button for generic purpose */
+{
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -404,12 +404,12 @@ body {
   transition: all 0.3s ease;
 }
 
-.form-checkbox:checked+.checkbox-custom {
+.form-checkbox:checked + .checkbox-custom {
   background: var(--gradient-primary);
   border-color: var(--primary-500);
 }
 
-.form-checkbox:checked+.checkbox-custom::after {
+.form-checkbox:checked + .checkbox-custom::after {
   content: '✓';
   position: absolute;
   top: 50%;
@@ -570,10 +570,10 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, 
-    transparent 30%, 
-    rgba(79, 140, 255, 0.1) 50%, 
-    transparent 70%);
+  background: linear-gradient(45deg,
+  transparent 30%,
+  rgba(79, 140, 255, 0.1) 50%,
+  transparent 70%);
   animation: shimmer 2s infinite;
   pointer-events: none;
 }
@@ -637,11 +637,11 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   .drag-drop-area {
     padding: 1.5rem;
   }
-  
+
   .drag-drop-area h4 {
     font-size: 1rem;
   }
-  
+
   .drag-drop-area .ti-cloud-upload {
     font-size: 1.5rem;
   }

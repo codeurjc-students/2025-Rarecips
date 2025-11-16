@@ -10,6 +10,6 @@ import java.util.List;
 @RequestMapping("/api/reviews")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class ReviewController {
-    
-    
+
+
 }

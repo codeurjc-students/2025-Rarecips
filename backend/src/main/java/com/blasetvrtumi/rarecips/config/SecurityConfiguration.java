@@ -28,7 +28,7 @@ public class SecurityConfiguration {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider(RepositoryUserDetailService userDetailService,
-            org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
+                                                            org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailService);
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
@@ -42,14 +42,14 @@ public class SecurityConfiguration {
     @Bean
     // Registered users security filter chain
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtRequestFilter jwtRequestFilter,
-        RepositoryUserDetailService userDetailService,
-        org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) throws Exception {
-    http
-        .authenticationProvider(authenticationProvider(userDetailService, passwordEncoder))
+                                                   RepositoryUserDetailService userDetailService,
+                                                   org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) throws Exception {
+        http
+                .authenticationProvider(authenticationProvider(userDetailService, passwordEncoder))
                 .formLogin(formLogin -> formLogin.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .securityMatcher("/api/**")
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

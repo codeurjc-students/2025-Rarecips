@@ -124,9 +124,9 @@ public class Recipe {
     }
 
     public Recipe(String label, String description, List<String> dietLabels, List<String> healthLabels, List<String> cautions,
-            Integer people, List<Ingredient> ingredients,
-            int difficulty, List<String> dishTypes, List<String> mealTypes, List<String> cuisineType,
-            Float totalTime, Float totalWeight, Float calories, User author, List<String> steps) {
+                  Integer people, List<Ingredient> ingredients,
+                  int difficulty, List<String> dishTypes, List<String> mealTypes, List<String> cuisineType,
+                  Float totalTime, Float totalWeight, Float calories, User author, List<String> steps) {
         this.label = label;
         this.description = description;
         this.dietLabels = dietLabels;
@@ -143,44 +143,6 @@ public class Recipe {
         this.calories = calories;
         this.author = author;
         this.steps = steps;
-    }
-
-    public Blob localImageToBlob(String imagePath) throws IOException, SQLException {
-        try {
-            ClassPathResource imageResource = new ClassPathResource(imagePath);
-            if (imageResource.exists()) {
-                InputStream imageStream = imageResource.getInputStream();
-
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int bytesRead;
-                byte[] data = new byte[8192];
-
-                while ((bytesRead = imageStream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, bytesRead);
-                }
-
-                byte[] imageBytes = buffer.toByteArray();
-                Blob imageBlob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-
-                imageStream.close();
-                buffer.close();
-                return imageBlob;
-            } else {
-                System.out.println("Image not found: " + imagePath);
-            }
-        } catch (IOException | SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String blobToString(Blob blob) throws SQLException {
-        if (blob == null) {
-            return null;
-        }
-        byte[] bytes = blob.getBytes(1, (int) blob.length());
-        String userImage = Base64.getEncoder().encodeToString(bytes);
-        return userImage;
     }
 
     public Long getId() {

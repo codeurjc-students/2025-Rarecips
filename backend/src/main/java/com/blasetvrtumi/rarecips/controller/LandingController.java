@@ -29,8 +29,8 @@ public class LandingController {
     @Operation(summary = "Get newest recipes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found recipes", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class)) }),
-            @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content) })
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class))}),
+            @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content)})
     @JsonView(Recipe.BasicInfo.class)
     @GetMapping("/recipes")
     public ResponseEntity<?> getNewestRecipes(@RequestParam String order, @RequestParam int size, @RequestParam int page) {

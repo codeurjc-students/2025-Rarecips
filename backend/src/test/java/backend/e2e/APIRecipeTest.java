@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.sql.Blob;
 import java.util.ArrayList;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
@@ -141,20 +142,20 @@ public class APIRecipeTest {
 
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(testRecipe1.getLabel(), response1.getString("recipe.label")),
-            () -> Assertions.assertEquals(testRecipe1.getDescription(), response1.getString("recipe.description")),
-            () -> Assertions.assertEquals(testRecipe1.getPeople(), response1.getInt("recipe.people")),
-            () -> Assertions.assertEquals(testRecipe1.getTotalTime(), response1.getFloat("recipe.totalTime")),
-            () -> Assertions.assertEquals(testRecipe1.getTotalWeight(), response1.getFloat("recipe.totalWeight")),
-            () -> Assertions.assertEquals(testUser.getUsername(), response1.getString("recipe.author")),
-            () -> Assertions.assertEquals(testRecipe1.getCalories(), response1.getFloat("recipe.calories")),
-            () -> Assertions.assertEquals(testRecipe2.getLabel(), response2.getString("recipe.label")),
-            () -> Assertions.assertEquals(testRecipe2.getDescription(), response2.getString("recipe.description")),
-            () -> Assertions.assertEquals(testRecipe2.getPeople(), response2.getInt("recipe.people")),
-            () -> Assertions.assertEquals(testRecipe2.getTotalTime(), response2.getFloat("recipe.totalTime")),
-            () -> Assertions.assertEquals(testRecipe2.getTotalWeight(), response2.getFloat("recipe.totalWeight")),
-            () -> Assertions.assertEquals(testUser.getUsername(), response2.getString("recipe.author")),
-            () -> Assertions.assertEquals(testRecipe2.getCalories(), response2.getFloat("recipe.calories"))
+                () -> Assertions.assertEquals(testRecipe1.getLabel(), response1.getString("recipe.label")),
+                () -> Assertions.assertEquals(testRecipe1.getDescription(), response1.getString("recipe.description")),
+                () -> Assertions.assertEquals(testRecipe1.getPeople(), response1.getInt("recipe.people")),
+                () -> Assertions.assertEquals(testRecipe1.getTotalTime(), response1.getFloat("recipe.totalTime")),
+                () -> Assertions.assertEquals(testRecipe1.getTotalWeight(), response1.getFloat("recipe.totalWeight")),
+                () -> Assertions.assertEquals(testUser.getUsername(), response1.getString("recipe.author")),
+                () -> Assertions.assertEquals(testRecipe1.getCalories(), response1.getFloat("recipe.calories")),
+                () -> Assertions.assertEquals(testRecipe2.getLabel(), response2.getString("recipe.label")),
+                () -> Assertions.assertEquals(testRecipe2.getDescription(), response2.getString("recipe.description")),
+                () -> Assertions.assertEquals(testRecipe2.getPeople(), response2.getInt("recipe.people")),
+                () -> Assertions.assertEquals(testRecipe2.getTotalTime(), response2.getFloat("recipe.totalTime")),
+                () -> Assertions.assertEquals(testRecipe2.getTotalWeight(), response2.getFloat("recipe.totalWeight")),
+                () -> Assertions.assertEquals(testUser.getUsername(), response2.getString("recipe.author")),
+                () -> Assertions.assertEquals(testRecipe2.getCalories(), response2.getFloat("recipe.calories"))
         );
 
     }

@@ -6,7 +6,7 @@
   <!-- Left side - Logo -->
   <div class="flex items-center mt-2 min-w-fit">
     <a (click)="logoClicked($event)" href="#" class="flex flex-col items-center">
-      <img class="h-16 object-cover transition-transform hover:scale-105" [src]="logoSrc" alt="Logo" />
+      <img class="h-16 object-cover transition-transform hover:scale-105" [src]="logoSrc" alt="Logo"/>
     </a>
   </div>
 
@@ -18,10 +18,10 @@
         <span class="text-lg font-semibold">Home</span>
       </div>
       @if (isAdmin) {
-      <div class="nav-item px-3 py-4" (click)="navigateTo('admin-panel', $event)">
-        <i class="flex items-center ti ti-shield-lock w-4 h-4 text-xl"></i>
-        <span class="text-lg">Admin</span>
-      </div>
+        <div class="nav-item px-3 py-4" (click)="navigateTo('admin-panel', $event)">
+          <i class="flex items-center ti ti-shield-lock w-4 h-4 text-xl"></i>
+          <span class="text-lg">Admin</span>
+        </div>
       }
       <div class="nav-item px-3 py-4" (click)="navigateTo('explore', $event)">
         <i class="flex items-center ti ti-compass w-4 h-4 text-xl"></i>
@@ -54,61 +54,79 @@
     <!-- Theme Selector -->
     <!-- Theme Dropdown -->
     <div class="dropdown-container py-2" id="themeDropdown">
-      <input type="checkbox" id="dropdownCheckbox" class="hidden" />
+      <input type="checkbox" id="dropdownCheckbox" class="hidden"/>
       <label class="dropdown-trigger" id="dropdownTrigger" for="dropdownCheckbox">
-        <i class="flex items-center justify-center ti ti-palette w-8 h-[2.75rem] text-default-font text-body-bold text-xl" style="color: var(--primary-700);"></i>
+        <i
+          class="flex items-center justify-center ti ti-palette w-8 h-[2.75rem] text-default-font text-body-bold text-xl"
+          style="color: var(--primary-700);"></i>
         <i id="dropdownIcon" class="flex items-center ti ti-caret-down-filled" style="color: var(--primary-700);"></i>
       </label>
 
       <div (click)="selectItem($event)" class="dropdown-menu mt-2 right-56" id="dropdownMenu"
-        style="background-color: var(--primary-50); transform: translateX(-1rem);">
+           style="background-color: var(--primary-50); transform: translateX(-1rem);">
         @for (color of themes; track color) {
-        <button class="dropdown-item" data-value="favorite" [id]="'theme-' + color">
-          <div class="theme-circle flex items-center justify-center" [class]="'theme-' + color">
-            <div class="theme-colors flex gap-0.5">
-              <span class="theme-color" style="background-color: var(--primary-100)"></span>
-              <span class="theme-color" style="background-color: var(--primary-500)"></span>
-              <span class="theme-color" style="background-color: var(--primary-600)"></span>
-              <span class="theme-color" style="background-color: var(--primary-700)"></span>
+          <button class="dropdown-item" data-value="favorite" [id]="'theme-' + color">
+            <div class="theme-circle flex items-center justify-center" [class]="'theme-' + color">
+              <div class="theme-colors flex gap-0.5">
+                <span class="theme-color" style="background-color: var(--primary-100)"></span>
+                <span class="theme-color" style="background-color: var(--primary-500)"></span>
+                <span class="theme-color" style="background-color: var(--primary-600)"></span>
+                <span class="theme-color" style="background-color: var(--primary-700)"></span>
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
         }
       </div>
     </div>
 
     <!-- Language Selector -->
     <div class="dropdown-container py-2">
-      <input type="checkbox" class="hidden" />
+      <input type="checkbox" class="hidden"/>
       <label class="dropdown-trigger">
-        <i class="flex items-center justify-center ti ti-language w-8 h-[2.75rem] text-default-font text-body-bold text-xl" style="color: var(--primary-700);"></i>
+        <i
+          class="flex items-center justify-center ti ti-language w-8 h-[2.75rem] text-default-font text-body-bold text-xl"
+          style="color: var(--primary-700);"></i>
         <i class="flex items-center ti ti-caret-down-filled" style="color: var(--primary-700);"></i>
       </label>
 
       <div class="dropdown-menu mt-2 right-44" id="dropdownMenu"
-        style="background-color: var(--primary-50); transform: translateX(-1rem);">
+           style="background-color: var(--primary-50); transform: translateX(-1rem);">
       </div>
     </div>
 
-    @if (isAuthenticated) {
-    <!-- Login/Register Button -->
-    <button class="auth-btn !rounded-2xl !py-4 h-full" (click)="navigateTo('login', $event)" style="background: var(--gradient-primary);">
-      <i class="flex items-center justify-center ti ti-login text-xl"></i>
-      <span>Login</span>
-    </button>
+    @if (!isAuthenticated) {
+
+      <!-- Login/Register Button -->
+      <button class="auth-btn !rounded-2xl !py-4 h-full" (click)="navigateTo('login', $event)"
+              style="background: var(--gradient-primary);">
+        <i class="flex items-center justify-center ti ti-login text-xl"></i>
+        <span>Login</span>
+      </button>
+
+    } @else {
+
+      <!-- Logout -->
+      <button class="auth-btn !rounded-2xl !py-4 h-full" (click)="onLogout()"
+              style="background: var(--gradient-primary);">
+        <i class="flex items-center justify-center ti ti-logout-2 text-xl"></i>
+        <span>Logout</span>
+      </button>
+
+      <!-- Notifications Button -->
+      <button class="icon-btn p-6" title="Notifications">
+        <i class="ti ti-bell text-xl"></i>
+      </button>
+
+      <div class="flex items-center">
+        <button id="userMenuButton"
+                class="relative inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-100"
+                (click)="navigateTo('profile', $event)" title="User menu">
+          <img class="aspect-square h-full w-full object-cover" src="data:image/jpeg;base64,{{user.profileImageString}}"
+               alt="User avatar"/>
+        </button>
+      </div>
+
     }
 
-    <!-- Notifications Button -->
-    <button class="icon-btn p-6" title="Notificaciones">
-      <i class="ti ti-bell text-xl"></i>
-    </button>
-
-    <div class="flex items-center">
-      <button id="userMenuButton"
-        class="relative inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-100"
-        (click)="navigateTo('me', $event)" title="User menu">
-        <img class="aspect-square h-full w-full object-cover" src="/assets/img/user.png" alt="User avatar" />
-      </button>
-    </div>
   </div>
 </nav>

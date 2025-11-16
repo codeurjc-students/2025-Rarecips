@@ -1,259 +1,263 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
-    <!-- Main Content -->
-    <div
-        class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
-        <div class="flex max-w-7xl w-[70rem] min-h-full flex-col items-center gap-8">
+  <!-- Main Content -->
+  <div
+    class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
+    <div class="flex max-w-7xl w-[70rem] min-h-full flex-col items-center gap-8">
 
-            <!-- Edit Profile Form -->
-            <div class="gap-8 max-w-7xl w-full glass p-8">
-                <div class="flex justify-between gap-8">
-                    <div class="flex flex-col gap-8 w-1/2">
-                        <!-- Profile Picture Section -->
-                        <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+      <!-- Edit Profile Form -->
+      <div class="gap-8 max-w-7xl w-full glass p-8">
+        <div class="flex justify-between gap-8">
+          <div class="flex flex-col gap-8 w-1/2">
+            <!-- Profile Picture Section -->
+            <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
-                            <div class="flex flex-col items-center gap-6 w-full">
-                                <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                                    <i class="ti ti-photo mr-2"></i>
-                                    Profile Picture
-                                </h3>
+              <div class="flex flex-col items-center gap-6 w-full">
+                <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                  <i class="ti ti-photo mr-2"></i>
+                  Profile Picture
+                </h3>
 
-                                <div class="flex flex-col items-center gap-4 w-full">
-                                    <!-- Current Profile Picture -->
-                                    <div class="relative">
-                                        <div class="flex h-32 w-32 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative">
-                                            <img class="h-32 w-32 flex-none object-cover absolute"
-                                                src="assets/img/user.png" alt="Profile" />
-                                        </div>
-                                        <!-- Edit overlay -->
-                                        <button
-                                            class="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50 opacity-0 transition-opacity">
-                                            <i class="ti ti-camera text-white text-2xl"></i>
-                                        </button>
-                                    </div>
-
-                                    <!-- Drag & Drop Area -->
-                                    <div class="w-full">
-                                        <div class="drag-drop-area border-2 border-dashed rounded-2xl p-6 text-center transition-all hover:border-primary-400 hover:bg-primary-50"
-                                            style="border-color: var(--primary-300); background: var(--primary-50-40);">
-                                            <div class="flex flex-col items-center gap-4">
-                                                <div class="w-16 h-16 rounded-full flex items-center justify-center"
-                                                    style="background: var(--primary-100);">
-                                                    <i class="ti ti-cloud-upload text-2xl"
-                                                        style="color: var(--primary-500);"></i>
-                                                </div>
-
-                                                <div class="flex flex-col gap-2">
-                                                    <h4 class="font-semibold text-lg"
-                                                        style="color: var(--primary-700);">
-                                                        Drag your image here
-                                                    </h4>
-                                                    <p class="flex flex-row items-center justify-center text-sm gap-2"
-                                                        style="color: var(--primary-500);">
-                                                        or <button
-                                                            class="px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2"
-                                                            style="background: var(--gradient-primary); color: white;">
-                                                            <i class="ti ti-photo"></i>
-                                                            Select
-                                                        </button>
-                                                    </p>
-                                                </div>
-
-                                                <!-- Image Requirements -->
-                                                <div class="w-full text-left">
-                                                    <div class="text-xs font-medium mb-2"
-                                                        style="color: var(--primary-600);">
-                                                        Image requirements:
-                                                    </div>
-                                                    <ul class="text-xs space-y-1" style="color: var(--primary-400);">
-                                                        <li class="flex items-center gap-2">
-                                                            <i class="ti ti-check text-green-500"></i>
-                                                            Formats: JPG, PNG, WEBP
-                                                        </li>
-                                                        <li class="flex items-center gap-2">
-                                                            <i class="ti ti-check text-green-500"></i>
-                                                            Maximum size: 5MB
-                                                        </li>
-                                                        <li class="flex items-center gap-2">
-                                                            <i class="ti ti-check text-green-500"></i>
-                                                            Minimum resolution: 200x200px
-                                                        </li>
-                                                        <li class="flex items-center gap-2">
-                                                            <i class="ti ti-info-circle text-blue-500"></i>
-                                                            Recommended: square image
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- Hidden file input -->
-                                                <input type="file" class="hidden"
-                                                    accept="image/jpeg,image/png,image/webp" multiple="false">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Personal Information Section -->
-                        <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                                <i class="ti ti-user mr-2"></i>
-                                Personal Information
-                            </h3>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Display Name -->
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                                        Full Name
-                                    </label>
-                                    <div class="relative">
-                                        <input type="text" value="John Doe"
-                                            class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
-                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                                            placeholder="Enter your full name" />
-                                        <i class="ti ti-user absolute right-3 top-1/2 transform -translate-y-1/2"
-                                            style="color: var(--primary-400);"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Username -->
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                                        Username
-                                    </label>
-                                    <div class="relative">
-                                        <input type="text" value="john_doe"
-                                            class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
-                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                                            placeholder="@your_username" />
-                                        <i class="ti ti-at absolute right-3 top-1/2 transform -translate-y-1/2"
-                                            style="color: var(--primary-400);"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Email -->
-                                <div class="flex flex-col gap-2 md:col-span-2">
-                                    <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                                        Email Address
-                                    </label>
-                                    <div class="relative">
-                                        <input type="email" value="john.doe@example.com"
-                                            class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
-                                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                                            placeholder="your@email.com" />
-                                        <i class="ti ti-mail absolute right-3 top-1/2 transform -translate-y-1/2"
-                                            style="color: var(--primary-400);"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="flex flex-col items-center gap-4 w-full">
+                  <!-- Current Profile Picture -->
+                  <div class="relative">
+                    <div
+                      class="flex h-32 w-32 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative">
+                      <img class="h-32 w-32 flex-none object-cover absolute"
+                           src="assets/img/user.png" alt="Profile"/>
                     </div>
-                    <div class="flex flex-col w-1/2 gap-8">
-                        <!-- Bio Section -->
-                        <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+                    <!-- Edit overlay -->
+                    <button
+                      class="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50 opacity-0 transition-opacity">
+                      <i class="ti ti-camera text-white text-2xl"></i>
+                    </button>
+                  </div>
 
-                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                                <i class="ti ti-edit mr-2"></i>
-                                Biography
-                            </h3>
+                  <!-- Drag & Drop Area -->
+                  <div class="w-full">
+                    <div
+                      class="drag-drop-area border-2 border-dashed rounded-2xl p-6 text-center transition-all hover:border-primary-400 hover:bg-primary-50"
+                      style="border-color: var(--primary-300); background: var(--primary-50-40);">
+                      <div class="flex flex-col items-center gap-4">
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center"
+                             style="background: var(--primary-100);">
+                          <i class="ti ti-cloud-upload text-2xl"
+                             style="color: var(--primary-500);"></i>
+                        </div>
 
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                                    Tell us about yourself
-                                </label>
-                                <div class="relative">
+                        <div class="flex flex-col gap-2">
+                          <h4 class="font-semibold text-lg"
+                              style="color: var(--primary-700);">
+                            Drag your image here
+                          </h4>
+                          <p class="flex flex-row items-center justify-center text-sm gap-2"
+                             style="color: var(--primary-500);">
+                            or
+                            <button
+                              class="px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2"
+                              style="background: var(--gradient-primary); color: white;">
+                              <i class="ti ti-photo"></i>
+                              Select
+                            </button>
+                          </p>
+                        </div>
+
+                        <!-- Image Requirements -->
+                        <div class="w-full text-left">
+                          <div class="text-xs font-medium mb-2"
+                               style="color: var(--primary-600);">
+                            Image requirements:
+                          </div>
+                          <ul class="text-xs space-y-1" style="color: var(--primary-400);">
+                            <li class="flex items-center gap-2">
+                              <i class="ti ti-check text-green-500"></i>
+                              Formats: JPG, PNG, WEBP
+                            </li>
+                            <li class="flex items-center gap-2">
+                              <i class="ti ti-check text-green-500"></i>
+                              Maximum size: 5MB
+                            </li>
+                            <li class="flex items-center gap-2">
+                              <i class="ti ti-check text-green-500"></i>
+                              Minimum resolution: 200x200px
+                            </li>
+                            <li class="flex items-center gap-2">
+                              <i class="ti ti-info-circle text-blue-500"></i>
+                              Recommended: square image
+                            </li>
+                          </ul>
+                        </div>
+
+                        <!-- Hidden file input -->
+                        <input type="file" class="hidden"
+                               accept="image/jpeg,image/png,image/webp" multiple="false">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Personal Information Section -->
+            <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+              <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                <i class="ti ti-user mr-2"></i>
+                Personal Information
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Display Name -->
+                <div class="flex flex-col gap-2">
+                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                    Full Name
+                  </label>
+                  <div class="relative">
+                    <input type="text" value="John Doe"
+                           class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
+                           placeholder="Enter your full name"/>
+                    <i class="ti ti-user absolute right-3 top-1/2 transform -translate-y-1/2"
+                       style="color: var(--primary-400);"></i>
+                  </div>
+                </div>
+
+                <!-- Username -->
+                <div class="flex flex-col gap-2">
+                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                    Username
+                  </label>
+                  <div class="relative">
+                    <input type="text" value="john_doe"
+                           class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
+                           placeholder="@your_username"/>
+                    <i class="ti ti-at absolute right-3 top-1/2 transform -translate-y-1/2"
+                       style="color: var(--primary-400);"></i>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="flex flex-col gap-2 md:col-span-2">
+                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                    Email Address
+                  </label>
+                  <div class="relative">
+                    <input type="email" value="john.doe@example.com"
+                           class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
+                           placeholder="your@email.com"/>
+                    <i class="ti ti-mail absolute right-3 top-1/2 transform -translate-y-1/2"
+                       style="color: var(--primary-400);"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col w-1/2 gap-8">
+            <!-- Bio Section -->
+            <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+              <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                <i class="ti ti-edit mr-2"></i>
+                Biography
+              </h3>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                  Tell us about yourself
+                </label>
+                <div class="relative">
                                     <textarea rows="4"
-                                        class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
-                                        style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700); field-sizing: content;"
-                                        placeholder="Write something about yourself, your culinary tastes, specialties...">Co-founder. Designer & advisor helping start-ups and scale-ups bring their best ideas to life.</textarea>
-                                    <i class="ti ti-message absolute right-3 top-7"
-                                        style="color: var(--primary-400);"></i>
-                                </div>
-                                <div class="flex justify-between items-center">
+                                              class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
+                                              style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700); field-sizing: content;"
+                                              placeholder="Write something about yourself, your culinary tastes, specialties...">Co-founder. Designer & advisor helping start-ups and scale-ups bring their best ideas to life.</textarea>
+                  <i class="ti ti-message absolute right-3 top-7"
+                     style="color: var(--primary-400);"></i>
+                </div>
+                <div class="flex justify-between items-center">
                                     <span class="text-xs" style="color: var(--primary-400);">
                                         Maximum 500 characters
                                     </span>
-                                    <span class="text-xs" style="color: var(--primary-400);">
+                  <span class="text-xs" style="color: var(--primary-400);">
                                         124/500
                                     </span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Privacy & Security Section -->
-                        <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                                <i class="ti ti-shield-lock mr-2"></i>
-                                Privacy & Security
-                            </h3>
-
-                            <div class="flex flex-col gap-4">
-                                <!-- Privacy Settings -->
-                                <div class="flex items-center justify-between p-4 rounded-2xl"
-                                    style="background: var(--primary-100-40);">
-                                    <div class="flex items-center gap-3">
-                                        <i class="ti ti-eye text-xl" style="color: var(--primary-500);"></i>
-                                        <div>
-                                            <p class="font-semibold" style="color: var(--primary-700);">Public Profile
-                                            </p>
-                                            <p class="text-sm" style="color: var(--primary-400);">Allow other users to see your profile</p>
-                                        </div>
-                                    </div>
-                                    <label class="switch">
-                                        <input type="checkbox" checked>
-                                        <span class="slider round"></span>
-                                    </label>
-                                </div>
-
-                                <div class="flex items-center justify-between p-4 rounded-2xl"
-                                    style="background: var(--primary-100-40);">
-                                    <div class="flex items-center gap-3 max-w-72 w-full">
-                                        <i class="ti ti-mail text-xl" style="color: var(--primary-500);"></i>
-                                        <div>
-                                            <p class="font-semibold" style="color: var(--primary-700);">Email Notifications</p>
-                                            <p class="text-sm" style="color: var(--primary-400);">Receive notifications about new recipes and comments</p>
-                                        </div>
-                                    </div>
-                                    <label class="switch">
-                                        <input type="checkbox" checked>
-                                        <span class="slider round"></span>
-                                    </label>
-                                </div>
-
-                                <!-- Change Password Button -->
-                                <button
-                                    class="flex items-center justify-center gap-3 p-4 rounded-2xl transition-all hover:scale-[1.02]"
-                                    style="background: var(--primary-100-40); color: var(--primary-700);">
-                                    <i class="ti ti-key text-xl"></i>
-                                    <span class="font-semibold">Change Password</span>
-                                    <i class="ti ti-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-                <!-- Action Buttons -->
-                <div class="flex z-0 w-full justify-center gap-4 pt-8">
-                    <button
-                        class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <i class="ti ti-x mt-[1px]"></i>
-                        Cancel
-                    </button>
-                    <button
-                        class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
-                        style="background: var(--gradient-primary); color: white;">
-                        <i class="ti ti-device-floppy"></i>
-                        Save Changes
-                    </button>
-                </div>
+              </div>
             </div>
+            <!-- Privacy & Security Section -->
+            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+              <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                <i class="ti ti-shield-lock mr-2"></i>
+                Privacy & Security
+              </h3>
+
+              <div class="flex flex-col gap-4">
+                <!-- Privacy Settings -->
+                <div class="flex items-center justify-between p-4 rounded-2xl"
+                     style="background: var(--primary-100-40);">
+                  <div class="flex items-center gap-3">
+                    <i class="ti ti-eye text-xl" style="color: var(--primary-500);"></i>
+                    <div>
+                      <p class="font-semibold" style="color: var(--primary-700);">Public Profile
+                      </p>
+                      <p class="text-sm" style="color: var(--primary-400);">Allow other users to see your profile</p>
+                    </div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="flex items-center justify-between p-4 rounded-2xl"
+                     style="background: var(--primary-100-40);">
+                  <div class="flex items-center gap-3 max-w-72 w-full">
+                    <i class="ti ti-mail text-xl" style="color: var(--primary-500);"></i>
+                    <div>
+                      <p class="font-semibold" style="color: var(--primary-700);">Email Notifications</p>
+                      <p class="text-sm" style="color: var(--primary-400);">Receive notifications about new recipes and
+                        comments</p>
+                    </div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <!-- Change Password Button -->
+                <button
+                  class="flex items-center justify-center gap-3 p-4 rounded-2xl transition-all hover:scale-[1.02]"
+                  style="background: var(--primary-100-40); color: var(--primary-700);">
+                  <i class="ti ti-key text-xl"></i>
+                  <span class="font-semibold">Change Password</span>
+                  <i class="ti ti-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+        <!-- Action Buttons -->
+        <div class="flex z-0 w-full justify-center gap-4 pt-8">
+          <button
+            class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+            style="background: var(--primary-300-40); color: var(--primary-700);">
+            <i class="ti ti-x mt-[1px]"></i>
+            Cancel
+          </button>
+          <button
+            class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+            style="background: var(--gradient-primary); color: white;">
+            <i class="ti ti-device-floppy"></i>
+            Save Changes
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

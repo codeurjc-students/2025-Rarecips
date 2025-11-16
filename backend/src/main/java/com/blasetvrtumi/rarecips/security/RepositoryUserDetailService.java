@@ -16,9 +16,10 @@ import org.springframework.stereotype.Service;
 
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
+import com.blasetvrtumi.rarecips.service.ImageService;
 
 @Service
-public class RepositoryUserDetailService implements UserDetailsService{
+public class RepositoryUserDetailService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -27,9 +28,12 @@ public class RepositoryUserDetailService implements UserDetailsService{
     @Lazy
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ImageService imageService;
+
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
-        
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
@@ -53,8 +57,10 @@ public class RepositoryUserDetailService implements UserDetailsService{
         newUser.setEmail(email);
         newUser.setPassword(passwordEncoder.encode(password));
         newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setProfileImageFile(imageService.localImageToBlob("static/assets/img/user.png"));
+        newUser.setProfileImageString(imageService.blobToString(newUser.getProfileImageFile()));
         userRepository.save(newUser);
         return loadUserByUsername(username);
     }
-    
+
 }

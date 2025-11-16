@@ -1,10 +1,10 @@
-import { Component, AfterViewInit, OnInit, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { filter, map, take, debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, Subject, Subscription, of } from 'rxjs';
-import { SessionService } from '../../services/session.service';
+import {Component, AfterViewInit, OnInit, OnDestroy} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {filter, map, take, debounceTime, distinctUntilChanged, switchMap, catchError} from 'rxjs/operators';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {Observable, Subject, Subscription, of} from 'rxjs';
+import {SessionService} from '../../services/session.service';
 
 interface LoginForm {
   username: string;
@@ -29,7 +29,7 @@ interface SignupForm {
 })
 export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   activeTab: 'login' | 'signup' = 'login';
-  
+
   showLoginPassword = false;
   showSignupPassword = false;
   showConfirmPassword = false;
@@ -47,13 +47,13 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     number: false,
     special: false
   };
-  
+
   loginForm: LoginForm = {
     username: '',
     password: '',
     rememberMe: false
   };
-  
+
   signupForm: SignupForm = {
     username: '',
     email: '',
@@ -61,11 +61,11 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     confirmPassword: '',
     acceptTerms: false
   };
-  
+
   isLoading = false;
   private static cardsRandomized = false;
 
-  private usernameArray: string[] = [];
+  private usernameArray: string[] = ["me"];
   private emailArray: string[] = [];
   private usernameArrayLoaded = false;
 
@@ -79,6 +79,8 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   private usernameSub: Subscription | null = null;
   isUsernameAvailable: boolean | null = null;
 
+  API_URL = "/api/v1/auth";
+
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private http: HttpClient, private sessionService: SessionService) {
     this.switchTab(this.activatedRoute.snapshot.routeConfig?.path === 'signup' ? 'signup' : 'login');
   }
@@ -88,15 +90,15 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     this.usernameInput = document.getElementById('signup-username') as HTMLInputElement | null;
     this.usernameStatus = document.getElementsByClassName('username-status') as HTMLCollectionOf<HTMLElement> | null;
 
-    this.http.get<string[]>('/api/v1/auth/usernames').pipe(
+    this.http.get<string[]>(this.API_URL + '/usernames').pipe(
       take(1),
       catchError(() => of([]))
     ).subscribe(list => {
-      this.usernameArray = list || [];
+      this.usernameArray = this.usernameArray.concat(list || []);
       this.usernameArrayLoaded = true;
     });
 
-    this.http.get<string[]>('/api/v1/auth/emails').pipe(
+    this.http.get<string[]>(this.API_URL + '/emails').pipe(
       take(1),
       catchError(() => of([]))
     ).subscribe(list => {
@@ -120,7 +122,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         const found = this.usernameArray.includes(username);
-        return of({ available: !found });
+        return of({available: !found});
       })
     ).subscribe((res) => {
       if (res === null) {
@@ -156,7 +158,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
       input.style.borderColor = 'red';
     }
   }
-  
+
   ngAfterViewInit(): void {
     if (AuthComponent.cardsRandomized) {
       this.restoreCardPositions();
@@ -182,16 +184,28 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-  
+
   switchTab(tab: 'login' | 'signup'): void {
     this.activeTab = tab;
     this.router.navigate([`/${tab}`]);
     this.resetForms();
   }
-  
+
   onLogin(): void {
     if (this.validateLoginForm()) {
       this.isLoading = true;
+
+      const loginBut = document.getElementById('loginBut') as HTMLButtonElement;
+      const loginIcon = loginBut.querySelector('i') as HTMLElement;
+      const buttontext = loginBut.innerHTML;
+      loginBut.innerHTML = "";
+
+
+      const spinner = document.createElement('img');
+      spinner.src = '/assets/logo/Rarecips_Spinner.svg';
+      spinner.style.width = '28px';
+      spinner.style.height = '28px';
+      loginBut.appendChild(spinner);
 
       // API Call
       this.sessionService.login({
@@ -202,16 +216,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         next: () => { // Successful login
           this.isLoading = false;
 
-          const loginBut = document.getElementById('loginBut') as HTMLButtonElement;
-          const loginIcon = loginBut.querySelector('i') as HTMLElement;
-          loginBut.innerHTML = "";
-
-          
-          const spinner = document.createElement('img');
-          spinner.src = '/assets/logo/Rarecips_Spinner.svg';
-          spinner.style.width = '28px';
-          spinner.style.height = '28px';
-          loginBut.appendChild(spinner);
           setTimeout(() => {
             loginBut.innerHTML = "";
             loginBut.appendChild(loginIcon);
@@ -220,16 +224,41 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
               this.router.navigate(['/']);
             }, 1200);
           }, 2000);
-          
+
         },
         error: (error) => {
-          this.isLoading = false;
-          alert('Error en el inicio de sesión: ' + error.message);
+          if (error.message.includes('400')) {
+            const usernameInput = document.getElementById('login-username') as HTMLInputElement;
+            const passwordInput = document.getElementById('login-password') as HTMLInputElement;
+
+            const credErrorMsg = document.querySelector('.credErrorMsg') as HTMLElement;
+            credErrorMsg.innerText = 'Invalid username or password.';
+            credErrorMsg.classList.remove('hidden');
+
+            usernameInput.style.borderColor = 'red';
+            usernameInput.style.background = 'rgba(255, 0, 0, 0.1)';
+
+            passwordInput.style.borderColor = 'red';
+            passwordInput.style.background = 'rgba(255, 0, 0, 0.1)';
+
+            usernameInput.onkeydown = () => {
+              credErrorMsg.classList.add('hidden');
+              usernameInput.style.borderColor = '';
+              usernameInput.style.background = '';
+            }
+
+            passwordInput.onkeydown = () => {
+              credErrorMsg.classList.add('hidden');
+              passwordInput.style.borderColor = '';
+              passwordInput.style.background = '';
+            }
+          }
+          loginBut.innerHTML = buttontext;
         }
       });
     }
   }
-  
+
   onSignup(): void {
     if (this.validateSignupForm()) {
       this.isLoading = true;
@@ -265,40 +294,51 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   checkEmailExists(email: string): boolean {
     return this.emailArray.includes(email);
   }
-  
+
   private validateLoginForm(): boolean {
     if (!this.loginForm.username || !this.loginForm.password) {
       return false;
     }
     return true;
   }
-  
+
   private validateSignupForm(): boolean {
-    const { username, email, password, confirmPassword, acceptTerms } = this.signupForm;
+    const {username, email, password, confirmPassword, acceptTerms} = this.signupForm;
 
     if (!username || !email || !password || !confirmPassword) {
       return false;
     }
-    
+
     if (password !== confirmPassword) {
       return false;
     }
-    
+
     if (!acceptTerms) {
       return false;
     }
 
     if (this.checkEmailExists(email)) {
-      alert('El correo electrónico ya está registrado.');
+      const emailInput = document.getElementById('signup-email') as HTMLInputElement;
+      const emailErrorMsg = document.querySelector('.emailErrorMsg') as HTMLElement;
+      emailErrorMsg.innerText = 'Email is already registered.';
+      emailErrorMsg.classList.remove('hidden');
+      emailInput.style.borderColor = 'red';
+      emailInput.style.background = 'rgba(255, 0, 0, 0.1)';
+
+      emailInput.onkeydown = () => {
+        emailErrorMsg.classList.add('hidden');
+        emailInput.style.borderColor = '';
+        emailInput.style.background = '';
+      }
       return false;
     }
-    
+
     return true;
   }
-  
+
   private resetForms(): void {
-    this.loginForm = { username: '', password: '', rememberMe: false };
-    this.signupForm = { username: '', email: '', password: '', confirmPassword: '', acceptTerms: false };
+    this.loginForm = {username: '', password: '', rememberMe: false};
+    this.signupForm = {username: '', email: '', password: '', confirmPassword: '', acceptTerms: false};
     this.showLoginPassword = false;
     this.showSignupPassword = false;
     this.showConfirmPassword = false;
@@ -336,7 +376,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
       cards.forEach((card, index) => {
         let attempts = 0;
-        let newPos = { x: 0, y: 0 };
+        let newPos = {x: 0, y: 0};
         let valid = false;
         const margin = 40;
 
@@ -371,18 +411,16 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         el.style.transform = `rotate(${rotate}deg)`;
         el.style.animationDelay = (Math.random() * 3) + 's';
 
-        setTimeout(() => el.classList.add('positioned'), 50 + index * 100);
 
-        out.push({ left: leftPerc, top: topPerc, rotate });
+        out.push({left: leftPerc, top: topPerc, rotate});
       });
 
       sessionStorage.setItem(storageKey, JSON.stringify(out));
     }, 100);
   }
-  
+
   onForgotPassword(event?: Event): void {
     if (event) event.preventDefault();
-    alert('Funcionalidad de recuperación de contraseña no implementada aún');
   }
 
   onUsernameInput(value: string) {
@@ -402,9 +440,9 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     const signupConfirmPasswordInput = document.getElementById('signup-confirm-password') as HTMLInputElement;
     if (value !== this.signupForm.password) {
       passwordStatus[0].classList.remove('hidden');
-      signupConfirmPasswordInput.style.borderColor = 'red';  
+      signupConfirmPasswordInput.style.borderColor = 'red';
       signupConfirmPasswordInput.style.background = 'rgba(255, 0, 0, 0.1)';
-      signupPasswordInput.style.borderColor = 'red';  
+      signupPasswordInput.style.borderColor = 'red';
       signupPasswordInput.style.background = 'rgba(255, 0, 0, 0.1)';
       this.passwordMatch = false;
     } else {
@@ -446,7 +484,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.passwordStrong = score >= 4;
-   }
+  }
 
   isSignupDisabled(): boolean {
     if (this.isUsernameAvailable !== true) return true;

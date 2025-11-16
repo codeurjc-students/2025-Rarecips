@@ -35,9 +35,8 @@
   transition: opacity 1.2s ease-in-out;
   background: var(--primary-500);
   filter: blur(1px);
-  box-shadow: 
-    0 0 30px var(--primary-100-40),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 30px var(--primary-100-40),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .kitchen-tile.visible {
@@ -47,48 +46,42 @@
 .kitchen-tile:nth-child(2n) {
   background: var(--primary-600);
   filter: blur(1px);
-  box-shadow: 
-    0 0 30px var(--primary-100-40),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 30px var(--primary-100-40),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .kitchen-tile:nth-child(3n) {
   background: var(--primary-700);
   filter: blur(1px);
-  box-shadow: 
-    0 0 30px var(--primary-100-40),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 30px var(--primary-100-40),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .kitchen-tile:nth-child(4n) {
   background: var(--primary-500);
   filter: blur(1px);
-  box-shadow: 
-    0 0 30px var(--primary-100-40),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 30px var(--primary-100-40),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .kitchen-tile:nth-child(5n) {
   background: var(--primary-600);
   filter: blur(1px);
-  box-shadow: 
-    0 0 30px var(--primary-100-40),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 30px var(--primary-100-40),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 @keyframes tileGlow {
-  0%, 100% { 
-    box-shadow: 
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1),
-      0 2px 4px rgba(0, 0, 0, 0.1);
+  0%, 100% {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  50% { 
-    box-shadow: 
-      inset 0 1px 0 rgba(255, 255, 255, 0.5),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1),
-      0 4px 8px var(--primary-100-40),
-      0 0 20px var(--primary-200);
+  50% {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 4px 8px var(--primary-100-40),
+    0 0 20px var(--primary-200);
   }
 }
 

@@ -13,7 +13,7 @@ services:
       - "8443:8443"
     depends_on:
       - rarecips-DB
-    command: ["/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 -- && java -jar /app/rarecips-0.0.1-SNAPSHOT.jar"]
+    command: [ "/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 -- && java -jar /app/rarecips-0.0.1-SNAPSHOT.jar" ]
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-DB:3306/rarecips
       - SPRING_DATASOURCE_USERNAME=root

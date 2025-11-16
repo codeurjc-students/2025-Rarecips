@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { RecipeService } from '../../services/recipe.service';
-import { ActivatedRoute } from '@angular/router';
-import { Recipe } from '../../models/recipe.model';
+import {Component} from '@angular/core';
+import {RecipeService} from '../../services/recipe.service';
+import {ActivatedRoute} from '@angular/router';
+import {Recipe} from '../../models/recipe.model';
 
 
 @Component({
@@ -10,14 +10,15 @@ import { Recipe } from '../../models/recipe.model';
   styleUrls: ['./recipe-view.component.css']
 })
 export class RecipeViewComponent {
-  
+
   // User interactions
   isLiked = false;
   isSaved = false;
   userRating = 0;
   recipe: Recipe | null = null;
 
-  constructor(private recipeService: RecipeService, private activatedRoute: ActivatedRoute) {}
+  constructor(private recipeService: RecipeService, private activatedRoute: ActivatedRoute) {
+  }
 
   async ngOnInit() {
     this.recipe = await this.loadRecipe();

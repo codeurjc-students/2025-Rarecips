@@ -58,46 +58,47 @@
             <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
               <!-- Recipe Card -->
               @for (recipe of recipeList; track recipe.id) {
-              <div class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                <!-- Glass Reflection Effect -->
                 <div
-                  class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                </div>
-
-                <!-- Image Container -->
-                <div class="relative aspect-43 overflow-hidden">
-                  <img
-                    src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
-                    alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;">
-
-                  <!-- Gradient Overlay -->
-                  <div class="absolute inset-0 gradient-overlay"></div>
-
-                  <!-- Top Right Actions -->
-                  <div class="absolute top-4 right-4 flex gap-2">
-                    <button class="btn btn-icon glass-strong text-primary">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path
-                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                          fill="none" />
-                      </svg>
-                    </button>
-                    <button class="btn btn-icon glass-strong text-primary">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor"
-                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                      </svg>
-                    </button>
+                  class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
+                  <!-- Glass Reflection Effect -->
+                  <div
+                    class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
                   </div>
 
-                  <!-- Category Badge -->
-                  <div class="absolute top-4 left-4">
-                    <span class="badge badge-dark text-xs px-3 py-1">{{recipe.mealTypes[0]}}</span>
-                  </div>
+                  <!-- Image Container -->
+                  <div class="relative aspect-43 overflow-hidden">
+                    <img
+                      src="data:image/png;base64,{{recipe.imageUrl}}"
+                      alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;">
 
-                  <!-- Difficulty Badge -->
-                  <div class="absolute bottom-4 left-4">
+                    <!-- Gradient Overlay -->
+                    <div class="absolute inset-0 gradient-overlay"></div>
+
+                    <!-- Top Right Actions -->
+                    <div class="absolute top-4 right-4 flex gap-2">
+                      <button class="btn btn-icon glass-strong text-primary">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24">
+                          <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            fill="none"/>
+                        </svg>
+                      </button>
+                      <button class="btn btn-icon glass-strong text-primary">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24">
+                          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Category Badge -->
+                    <div class="absolute top-4 left-4">
+                      <span class="badge badge-dark text-xs px-3 py-1">{{ recipe.mealTypes[0] }}</span>
+                    </div>
+
+                    <!-- Difficulty Badge -->
+                    <div class="absolute bottom-4 left-4">
                       @if (recipe.difficulty < 3) {
                         <div class="badge badge-green text-xs font-medium backdrop-blur-sm">
                           <span>Easy</span>
@@ -111,101 +112,102 @@
                           <span>Hard</span>
                         </div>
                       }
+                    </div>
                   </div>
-                </div>
 
-                <!-- Content -->
-                <div class="p-6 space-y-4 h-full flex flex-1 flex-col justify-between">
-                  <!-- Title and Rating -->
-                  <div class="space-y-2">
-                    <h3 class="text-xl font-bold text-primary line-clamp-2 recipe-title">{{recipe.title}}</h3>
+                  <!-- Content -->
+                  <div class="p-6 space-y-4 h-full flex flex-1 flex-col justify-between">
+                    <!-- Title and Rating -->
+                    <div class="space-y-2">
+                      <h3 class="text-xl font-bold text-primary line-clamp-2 recipe-title">{{ recipe.title }}</h3>
 
-                    <div class="flex items-center justify-between">
-                      <div class="star-rating">
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <svg class="star star-filled" viewBox="0 0 24 24">
-                          <polygon
-                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                        <span class="text-secondary text-sm ml-2">{{recipe.rating}} ({{recipe.reviews.length}})</span>
+                      <div class="flex items-center justify-between">
+                        <div class="star-rating">
+                          <svg class="star star-filled" viewBox="0 0 24 24">
+                            <polygon
+                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                          </svg>
+                          <svg class="star star-filled" viewBox="0 0 24 24">
+                            <polygon
+                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                          </svg>
+                          <svg class="star star-filled" viewBox="0 0 24 24">
+                            <polygon
+                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                          </svg>
+                          <svg class="star star-filled" viewBox="0 0 24 24">
+                            <polygon
+                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                          </svg>
+                          <svg class="star star-filled" viewBox="0 0 24 24">
+                            <polygon
+                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                          </svg>
+                          <span class="text-secondary text-sm ml-2">{{ recipe.rating }} ({{ recipe.reviews.length }}
+                            )</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <!-- Description -->
-                  <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                    {{recipe.description}}
-                  </p>
+                    <!-- Description -->
+                    <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
+                      {{ recipe.description }}
+                    </p>
 
-                  <!-- Meta Information -->
-                  <div class="flex items-center gap-4 text-secondary text-sm">
-                    <div class="flex items-center gap-1">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
-                        <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                      <span>{{recipe.totalTime}} min</span>
+                    <!-- Meta Information -->
+                    <div class="flex items-center gap-4 text-secondary text-sm">
+                      <div class="flex items-center gap-1">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                          <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{{ recipe.totalTime }} min</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24">
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                          <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+                          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{{ recipe.people }} people</span>
+                      </div>
                     </div>
-                    <div class="flex items-center gap-1">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none" />
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor"
-                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                      <span>{{recipe.people}} people</span>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                          style="background-color: var(--primary-300);">{{ recipe.dishTypes[0] }}</span>
+                      <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                            style="background-color: var(--primary-300);">{{ recipe.dietLabels[0] }}</span>
+                      <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                            style="background-color: var(--primary-300);">{{ recipe.healthLabels[0] }}</span>
                     </div>
-                  </div>
 
-                  <!-- Tags -->
-                  <div class="flex flex-wrap gap-2">
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">{{recipe.dishTypes[0]}}</span>
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">{{recipe.dietLabels[0]}}</span>
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                      style="background-color: var(--primary-300);">{{recipe.healthLabels[0]}}</span>
-                  </div>
-
-                  <!-- View Button -->
-                  <div class="rounded flex" style="background: var(--gradient-primary);">
-                    <button class="btn btn-primary w-full view-recipe-btn" (click)="viewRecipe(recipe.id)">
-                      <i class="ti ti-eye mr-2"></i>
-                      View recipe
-                    </button>
+                    <!-- View Button -->
+                    <div class="rounded flex" style="background: var(--gradient-primary);">
+                      <button class="btn btn-primary w-full view-recipe-btn" (click)="viewRecipe(recipe.id)">
+                        <i class="ti ti-eye mr-2"></i>
+                        View recipe
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
               }
             </div>
             @if (!isLoading && hasMore) {
-            <div class="text-center mt-6 rounded-2xl" style="background: var(--gradient-primary);">
-              <button class="btn btn-primary w-full" (click)="loadMoreRecipes()">
-                <i class="ti ti-refresh mr-2"></i>
-                Load more
-              </button>
-            </div>
+              <div class="text-center mt-6 rounded-2xl" style="background: var(--gradient-primary);">
+                <button class="btn btn-primary w-full" (click)="loadMoreRecipes()">
+                  <i class="ti ti-refresh mr-2"></i>
+                  Load more
+                </button>
+              </div>
             }
           </div>
           @if (isLoading) {
-            <img src="assets/logo/Rarecips_Spinner.svg" alt="Loading..." class="mx-auto my-8 max-w-20" />
+            <img src="assets/logo/Rarecips_Spinner.svg" alt="Loading..." class="mx-auto my-8 max-w-20"/>
           }
         </div>
       </div>
@@ -220,14 +222,14 @@
             <div class="glass rounded-xl overflow-hidden">
               <div class="flex w-full h-32 items-center gap-2">
                 <img class="w-1/3 h-full object-cover"
-                  src="https://res.cloudinary.com/subframe/image/upload/v1724705499/uploads/302/jh06ubduyciizexxi4ep.png"
-                  alt="Pizza Recipe" />
+                     src="https://res.cloudinary.com/subframe/image/upload/v1724705499/uploads/302/jh06ubduyciizexxi4ep.png"
+                     alt="Pizza Recipe"/>
                 <img class="w-1/3 h-full object-cover"
-                  src="https://res.cloudinary.com/subframe/image/upload/v1724705689/uploads/302/wzbqe2n4hf3kwxr08izq.png"
-                  alt="Burger Recipe" />
+                     src="https://res.cloudinary.com/subframe/image/upload/v1724705689/uploads/302/wzbqe2n4hf3kwxr08izq.png"
+                     alt="Burger Recipe"/>
                 <img class="w-1/3 h-full object-cover"
-                  src="https://res.cloudinary.com/subframe/image/upload/v1711417515/shared/cdnbniyuqjnplaj2zbjw.png"
-                  alt="Pancakes Recipe" />
+                     src="https://res.cloudinary.com/subframe/image/upload/v1711417515/shared/cdnbniyuqjnplaj2zbjw.png"
+                     alt="Pancakes Recipe"/>
               </div>
               <div class="flex items-center justify-between p-4">
                 <div>
@@ -244,14 +246,14 @@
             <div class="glass rounded-xl overflow-hidden">
               <div class="flex w-full h-32 items-center gap-2">
                 <img class="w-1/3 h-full object-cover"
-                  src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
-                  alt="Pasta Recipe" />
+                     src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
+                     alt="Pasta Recipe"/>
                 <img class="w-1/3 h-full object-cover"
-                  src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
-                  alt="Thai Food" />
+                     src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
+                     alt="Thai Food"/>
                 <img class="w-1/3 h-full object-cover"
-                  src="https://res.cloudinary.com/subframe/image/upload/v1723780577/uploads/302/hhmv6ey0yajkadnmcp0a.png"
-                  alt="Salad Recipe" />
+                     src="https://res.cloudinary.com/subframe/image/upload/v1723780577/uploads/302/hhmv6ey0yajkadnmcp0a.png"
+                     alt="Salad Recipe"/>
               </div>
               <div class="flex items-center justify-between p-4">
                 <div>
@@ -268,11 +270,11 @@
             <div class="glass rounded-xl overflow-hidden">
               <div class="flex w-full h-32 items-center gap-2">
                 <img class="w-1/2 h-full object-cover"
-                  src="https://res.cloudinary.com/subframe/image/upload/v1724690133/uploads/302/tswlwr0qfwwhkgbjwplw.png"
-                  alt="Pasta Recipe" />
+                     src="https://res.cloudinary.com/subframe/image/upload/v1724690133/uploads/302/tswlwr0qfwwhkgbjwplw.png"
+                     alt="Pasta Recipe"/>
                 <img class="w-1/2 h-full object-cover"
-                  src="https://res.cloudinary.com/subframe/image/upload/v1724705396/uploads/302/wvpuc4kznngymxhsw1w5.png"
-                  alt="Thai Food" />
+                     src="https://res.cloudinary.com/subframe/image/upload/v1724705396/uploads/302/wvpuc4kznngymxhsw1w5.png"
+                     alt="Thai Food"/>
               </div>
               <div class="flex items-center justify-between p-4">
                 <div>
@@ -337,7 +339,7 @@
                   <span class="text-sm font-semibold text-yellow-600">5</span>
                   <svg class="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
                     <polygon
-                      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
                   </svg>
                 </div>
               </div>
@@ -355,7 +357,7 @@
                   <span class="text-sm font-semibold text-yellow-600">4</span>
                   <svg class="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
                     <polygon
-                      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
                   </svg>
                 </div>
               </div>

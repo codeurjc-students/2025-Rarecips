@@ -19,6 +19,10 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     public String[] getAllUsernames() {
         return userRepository.findAll().stream()
                 .map(User::getUsername)
@@ -29,6 +33,14 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(User::getEmail)
                 .toArray(String[]::new);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
 }

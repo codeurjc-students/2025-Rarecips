@@ -35,7 +35,7 @@ public class RecipeServiceTest {
         // Given
         User author = createMockUser();
         Recipe recipe = createMockRecipe(author);
-        
+
         when(userRepository.findByUsername(author.getUsername())).thenReturn(author);
         when(recipeRepository.save(any(Recipe.class))).thenReturn(recipe);
 
@@ -51,35 +51,35 @@ public class RecipeServiceTest {
     private User createMockUser() {
         // USAR EL CONSTRUCTOR EN LUGAR DE SETTERS
         User user = new User(
-            "testuser",           // username
-            "password",           // password
-            "test@example.com",   // email
-            null,                 // profilePicture (Blob)
-            "Test User",          // displayName
-            "Test description",   // description
-            "Test Bio"            // bio
+                "testuser",           // username
+                "password",           // password
+                "test@example.com",   // email
+                null,                 // profilePicture (Blob)
+                "Test User",          // displayName
+                "Test description",   // description
+                "Test Bio"            // bio
         );
         return user;
     }
 
     private Recipe createMockRecipe(User author) {
         Recipe recipe = new Recipe(
-            "Test Recipe",        // label
-            "Test Description",   // description
-            new ArrayList<>(),    // ingredients
-            new ArrayList<>(),    // steps
-            new ArrayList<>(),    // dietLabels
-            4,                    // people
-            new ArrayList<>(),    // healthLabels
-            1,                    // difficulty
-            new ArrayList<>(),    // cautions
-            new ArrayList<>(),    // dishTypes
-            new ArrayList<>(),    // mealTypes
-            30.0f,               // totalTime
-            500.0f,              // totalWeight
-            400.0f,              // calories
-            author,              // author
-            new ArrayList<>()    // cuisineType
+                "Test Recipe",        // label
+                "Test Description",   // description
+                new ArrayList<>(),    // ingredients
+                new ArrayList<>(),    // steps
+                new ArrayList<>(),    // dietLabels
+                4,                    // people
+                new ArrayList<>(),    // healthLabels
+                1,                    // difficulty
+                new ArrayList<>(),    // cautions
+                new ArrayList<>(),    // dishTypes
+                new ArrayList<>(),    // mealTypes
+                30.0f,               // totalTime
+                500.0f,              // totalWeight
+                400.0f,              // calories
+                author,              // author
+                new ArrayList<>()    // cuisineType
         );
         recipe.setId(1L);
         return recipe;

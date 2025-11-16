@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 interface Ingredient {
   name: string;
@@ -33,7 +33,6 @@ interface RecipeData {
 })
 export class RecipeEditComponent {
 
-  constructor(
-  ) {
+  constructor() {
   }
 }

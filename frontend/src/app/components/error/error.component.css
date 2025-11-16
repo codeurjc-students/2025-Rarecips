@@ -1,44 +1,44 @@
 .egg {
-    animation: egg 0.6s ease forwards;
+  animation: egg 0.6s ease forwards;
 }
 
 .egg-cr {
-    animation: egg-cr 0.6s ease forwards;
+  animation: egg-cr 0.6s ease forwards;
 }
 
 @keyframes egg {
-    0% {
-        transform: translateY(-60px);
-    }
-    29% {
-        opacity: 1;
-    }
-    30% {
-        transform: translateY(0px);
-        opacity: 0;
-    }
-    100% {
-        opacity: 0;
-    }
+  0% {
+    transform: translateY(-60px);
+  }
+  29% {
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(0px);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes egg-cr {
-    0% {
-        opacity: 0;
-        transform: scaleY(0%);
-    }
-    29% {
-        opacity: 0;
-        transform: scaleY(100%);
-    }
-    30% {
-        opacity: 1;
-    }
-    90% {
-        transform: rotate(-90deg) translateY(-40px);
-    }
-    100% {
-        opacity: 1;
-        transform: rotate(-90deg) translateY(-40px);
-    }
+  0% {
+    opacity: 0;
+    transform: scaleY(0%);
+  }
+  29% {
+    opacity: 0;
+    transform: scaleY(100%);
+  }
+  30% {
+    opacity: 1;
+  }
+  90% {
+    transform: rotate(-90deg) translateY(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-90deg) translateY(-40px);
+  }
 }

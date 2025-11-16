@@ -1,205 +1,206 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
-    <!-- Main Content -->
-    <div
-        class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
-        <div class="glass p-8 flex w-full max-w-7xl min-h-fit flex-col items-center gap-8">
+  <!-- Main Content -->
+  <div
+    class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
+    <div class="glass p-8 flex w-full max-w-7xl min-h-fit flex-col items-center gap-8">
 
-            <!-- Health Score Overview -->
-            <div class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+      <!-- Health Score Overview -->
+      <div class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+           style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
-                <div class="text-center">
-                    <h2 class="text-2xl font-bold mb-6" style="color: var(--primary-700);">
-                        Your Health Score
-                    </h2>
+        <div class="text-center">
+          <h2 class="text-2xl font-bold mb-6" style="color: var(--primary-700);">
+            Your Health Score
+          </h2>
 
-                    <!-- Circular Progress -->
-                    <div class="relative w-48 h-48 mx-auto mb-6">
-                        <div class="w-48 h-48 rounded-full flex items-center justify-center relative"
-                            style="background: conic-gradient(var(--primary-500) 0deg 252deg, var(--primary-100) 252deg 360deg);">
-                            <div class="w-36 h-36 rounded-full flex flex-col items-center justify-center"
-                                style="background: var(--primary-200-40);">
-                                <span class="text-4xl font-bold" style="color: var(--primary-700);">85</span>
-                                <span class="text-sm font-medium" style="color: var(--primary-600);">/ 100</span>
-                            </div>
-                        </div>
-                        <div class="absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center"
-                            style="background: var(--primary-700);">
-                            <i class="ti ti-trophy text-white text-xl"></i>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center gap-8">
-                        <div class="text-center">
-                            <p class="text-sm font-semibold" style="color: var(--primary-400);">Status</p>
-                            <p class="text-lg font-bold text-green-600">Excellent</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-sm font-semibold" style="color: var(--primary-400);">Trend</p>
-                            <div class="flex flex-row items-center justify-center gap-2 text-lg font-bold text-green-600">
-                                <div class="flex items-center">
-                                    <i class="ti ti-circle-arrow-up-right"></i>
-                                </div>
-                                +5 pts</div>
-                        </div>
-                    </div>
-                </div>
+          <!-- Circular Progress -->
+          <div class="relative w-48 h-48 mx-auto mb-6">
+            <div class="w-48 h-48 rounded-full flex items-center justify-center relative"
+                 style="background: conic-gradient(var(--primary-500) 0deg 252deg, var(--primary-100) 252deg 360deg);">
+              <div class="w-36 h-36 rounded-full flex flex-col items-center justify-center"
+                   style="background: var(--primary-200-40);">
+                <span class="text-4xl font-bold" style="color: var(--primary-700);">85</span>
+                <span class="text-sm font-medium" style="color: var(--primary-600);">/ 100</span>
+              </div>
             </div>
-
-            <div class="tabs glass text-nowrap w-full">
-                <button class="tab active">
-                    <i class="ti ti-pyramid text-xl" aria-hidden="true"></i>
-                    Nutritional Information
-                </button>
-                <button class="tab">
-                    <i class="ti ti-scale-outline text-xl" aria-hidden="true"></i>
-                    Analysis
-                </button>
-                <button class="tab">
-                    <i class="ti ti-bulb text-xl" aria-hidden="true"></i>
-                    Recommendations
-                </button>
+            <div class="absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center"
+                 style="background: var(--primary-700);">
+              <i class="ti ti-trophy text-white text-xl"></i>
             </div>
+          </div>
 
-            <!-- Nutrition Breakdown -->
-            <div class="flex justify-between md:grid-cols-3 gap-6 w-full">
-                <!-- Macronutrients -->
-                <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
-                    style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-                    <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                        <i class="ti ti-chart-pie mr-2"></i>
-                        Macronutrients
-                    </h3>
-
-                    <div class="space-y-4">
-                        <!-- Carbohydrates -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-4 h-4 rounded-full bg-blue-500"></div>
-                                <span class="font-medium" style="color: var(--primary-700);">Carbohydrates</span>
-                            </div>
-                            <span class="font-bold" style="color: var(--primary-700);">45%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-                            <div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div>
-                        </div>
-
-                        <!-- Proteins -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-4 h-4 rounded-full bg-green-500"></div>
-                                <span class="font-medium" style="color: var(--primary-700);">Proteins</span>
-                            </div>
-                            <span class="font-bold" style="color: var(--primary-700);">30%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
-                        </div>
-
-                        <!-- Fats -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-4 h-4 rounded-full bg-yellow-500"></div>
-                                <span class="font-medium" style="color: var(--primary-700);">Fats</span>
-                            </div>
-                            <span class="font-bold" style="color: var(--primary-700);">25%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 25%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Vitamins & Minerals -->
-                <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
-                    style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-                    <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                        <i class="ti ti-pill mr-2"></i>
-                        Vitamins and Minerals
-                    </h3>
-
-                    <div class="flex flex-col justify-center h-full space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium" style="color: var(--primary-700);">Vitamin C</span>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-green-600">120%</span>
-                                <i class="ti ti-check text-green-600"></i>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium" style="color: var(--primary-700);">Iron</span>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-green-600">95%</span>
-                                <i class="ti ti-check text-green-600"></i>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium" style="color: var(--primary-700);">Calcium</span>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-yellow-600">68%</span>
-                                <i class="ti ti-alert-triangle text-yellow-600"></i>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium" style="color: var(--primary-700);">Vitamin D</span>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-red-600">45%</span>
-                                <i class="ti ti-x text-red-600"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Calories -->
-                <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
-                    style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-                    <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                        <i class="ti ti-flame mr-2"></i>
-                        Caloric Balance
-                    </h3>
-
-                    <div class="flex flex-row h-full text-center items-center justify-center space-y-4">
-                        <div class="relative w-1/2 h-32 mx-auto">
-                            <div class="w-32 h-32 rounded-full flex items-center justify-center"
-                                style="background: conic-gradient(var(--primary-500) 0deg 288deg, var(--primary-100) 288deg 360deg);">
-                                <div class="w-24 h-24 rounded-full flex flex-col items-center justify-center"
-                                    style="background: var(--primary-200-40);">
-                                    <span class="text-lg font-bold" style="color: var(--primary-700);">1,850</span>
-                                    <span class="text-xs" style="color: var(--primary-600);">kcal</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2 w-1/2">
-                            <div class="flex justify-between text-sm">
-                                <span style="color: var(--primary-400);">Consumed</span>
-                                <span class="font-semibold" style="color: var(--primary-700);">1,850</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span style="color: var(--primary-400);">Goal</span>
-                                <span class="font-semibold" style="color: var(--primary-700);">2,100</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span style="color: var(--primary-400);">Remaining</span>
-                                <span class="font-semibold text-green-600">250</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div class="flex justify-center gap-8">
+            <div class="text-center">
+              <p class="text-sm font-semibold" style="color: var(--primary-400);">Status</p>
+              <p class="text-lg font-bold text-green-600">Excellent</p>
             </div>
-
-            <!-- Action Buttons -->
-            <div class="flex w-full justify-center gap-4">
-                <button
-                    class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
-                    style="background: var(--gradient-primary); color: white;">
-                    <i class="ti ti-download"></i>
-                    Download Report
-                </button>
+            <div class="text-center">
+              <p class="text-sm font-semibold" style="color: var(--primary-400);">Trend</p>
+              <div class="flex flex-row items-center justify-center gap-2 text-lg font-bold text-green-600">
+                <div class="flex items-center">
+                  <i class="ti ti-circle-arrow-up-right"></i>
+                </div>
+                +5 pts
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+
+      <div class="tabs glass text-nowrap w-full">
+        <button class="tab active">
+          <i class="ti ti-pyramid text-xl" aria-hidden="true"></i>
+          Nutritional Information
+        </button>
+        <button class="tab">
+          <i class="ti ti-scale-outline text-xl" aria-hidden="true"></i>
+          Analysis
+        </button>
+        <button class="tab">
+          <i class="ti ti-bulb text-xl" aria-hidden="true"></i>
+          Recommendations
+        </button>
+      </div>
+
+      <!-- Nutrition Breakdown -->
+      <div class="flex justify-between md:grid-cols-3 gap-6 w-full">
+        <!-- Macronutrients -->
+        <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+             style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+          <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+            <i class="ti ti-chart-pie mr-2"></i>
+            Macronutrients
+          </h3>
+
+          <div class="space-y-4">
+            <!-- Carbohydrates -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-4 h-4 rounded-full bg-blue-500"></div>
+                <span class="font-medium" style="color: var(--primary-700);">Carbohydrates</span>
+              </div>
+              <span class="font-bold" style="color: var(--primary-700);">45%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
+              <div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div>
+            </div>
+
+            <!-- Proteins -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-4 h-4 rounded-full bg-green-500"></div>
+                <span class="font-medium" style="color: var(--primary-700);">Proteins</span>
+              </div>
+              <span class="font-bold" style="color: var(--primary-700);">30%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
+              <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
+            </div>
+
+            <!-- Fats -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-4 h-4 rounded-full bg-yellow-500"></div>
+                <span class="font-medium" style="color: var(--primary-700);">Fats</span>
+              </div>
+              <span class="font-bold" style="color: var(--primary-700);">25%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
+              <div class="bg-yellow-500 h-2 rounded-full" style="width: 25%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vitamins & Minerals -->
+        <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+             style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+          <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+            <i class="ti ti-pill mr-2"></i>
+            Vitamins and Minerals
+          </h3>
+
+          <div class="flex flex-col justify-center h-full space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="font-medium" style="color: var(--primary-700);">Vitamin C</span>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-green-600">120%</span>
+                <i class="ti ti-check text-green-600"></i>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="font-medium" style="color: var(--primary-700);">Iron</span>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-green-600">95%</span>
+                <i class="ti ti-check text-green-600"></i>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="font-medium" style="color: var(--primary-700);">Calcium</span>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-yellow-600">68%</span>
+                <i class="ti ti-alert-triangle text-yellow-600"></i>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="font-medium" style="color: var(--primary-700);">Vitamin D</span>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-red-600">45%</span>
+                <i class="ti ti-x text-red-600"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calories -->
+        <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+             style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+          <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+            <i class="ti ti-flame mr-2"></i>
+            Caloric Balance
+          </h3>
+
+          <div class="flex flex-row h-full text-center items-center justify-center space-y-4">
+            <div class="relative w-1/2 h-32 mx-auto">
+              <div class="w-32 h-32 rounded-full flex items-center justify-center"
+                   style="background: conic-gradient(var(--primary-500) 0deg 288deg, var(--primary-100) 288deg 360deg);">
+                <div class="w-24 h-24 rounded-full flex flex-col items-center justify-center"
+                     style="background: var(--primary-200-40);">
+                  <span class="text-lg font-bold" style="color: var(--primary-700);">1,850</span>
+                  <span class="text-xs" style="color: var(--primary-600);">kcal</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2 w-1/2">
+              <div class="flex justify-between text-sm">
+                <span style="color: var(--primary-400);">Consumed</span>
+                <span class="font-semibold" style="color: var(--primary-700);">1,850</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span style="color: var(--primary-400);">Goal</span>
+                <span class="font-semibold" style="color: var(--primary-700);">2,100</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span style="color: var(--primary-400);">Remaining</span>
+                <span class="font-semibold text-green-600">250</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex w-full justify-center gap-4">
+        <button
+          class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+          style="background: var(--gradient-primary); color: white;">
+          <i class="ti ti-download"></i>
+          Download Report
+        </button>
+      </div>
     </div>
+  </div>
 </div>

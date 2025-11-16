@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {Component} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-profile-edit',
@@ -10,6 +10,6 @@ import { FormsModule } from '@angular/forms';
 export class ProfileEditComponent {
 
 
-  constructor(
-  ) {}
+  constructor() {
+  }
 }

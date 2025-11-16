@@ -12,13 +12,13 @@ import java.util.List;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    
+
     List<Review> findByRecipe(Recipe recipe);
-    
+
     List<Review> findByAuthor(User author);
-    
+
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.recipe.id = :recipe")
     Double findAverageRatingByRecipe(@Param("recipe") Long recipe);
-    
+
     Long countByRecipe(Recipe recipe);
 }

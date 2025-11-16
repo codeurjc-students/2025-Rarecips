@@ -1,174 +1,178 @@
 /* Tab styles */
 .border-b-3 {
-    border-bottom-width: 3px;
+  border-bottom-width: 3px;
 }
 
 .border-primary-500 {
-    border-color: var(--primary-500);
+  border-color: var(--primary-500);
 }
 
 .text-primary-600 {
-    color: var(--primary-600);
+  color: var(--primary-600);
 }
 
 .text-primary-700 {
-    color: var(--primary-700);
+  color: var(--primary-700);
 }
 
 .text-primary-500 {
-    color: var(--primary-500);
+  color: var(--primary-500);
 }
 
 /* Glass effect for tab container */
 .glass-subtle {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* User card enhancements */
 .user-card {
-    transition: all 0.3s ease-in-out;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+  transition: all 0.3s ease-in-out;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .user-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 }
 
 /* Recipe card enhancements */
 .recipe-card {
-    transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 .recipe-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 /* Follow button animations */
 .follow-btn {
-    transition: all 0.2s ease-in-out;
-    position: relative;
-    overflow: hidden;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
 }
 
 .follow-btn:hover {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .follow-btn:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
 /* Specialty tags */
 .specialty-tag {
-    transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .specialty-tag:hover {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 /* Filter options */
 .filter-option {
-    transition: all 0.2s ease-in-out;
-    padding: 8px;
-    border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  padding: 8px;
+  border-radius: 8px;
 }
 
 .filter-option:hover {
-    background: var(--primary-50);
+  background: var(--primary-50);
 }
 
 /* Quick filter buttons */
 .quick-filter {
-    transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .quick-filter.selected {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Verified badge pulse */
 .verified-badge {
-    animation: pulse 2s infinite;
+  animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.7;
-    }
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 /* Rating stars */
 .rating-star {
-    color: #fbbf24;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  color: #fbbf24;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 /* Pagination buttons */
 .pagination-btn {
-    transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .pagination-btn:hover:not(:disabled) {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .pagination-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Search bar enhancements */
 .search-bar {
-    transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 .search-bar:focus {
-    transform: scale(1.02);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .user-card {
-        margin-bottom: 1rem;
-    }
-    
-    .glass {
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
+  .user-card {
+    margin-bottom: 1rem;
+  }
+
+  .glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }
 
 /* Loading states */
 .loading {
-    opacity: 0.7;
-    pointer-events: none;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 24px;
-    height: 24px;
-    margin: -12px 0 0 -12px;
-    border: 2px solid var(--primary-200);
-    border-top: 2px solid var(--primary-500);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border: 2px solid var(--primary-200);
+  border-top: 2px solid var(--primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

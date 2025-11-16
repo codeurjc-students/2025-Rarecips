@@ -20,130 +20,130 @@ import jakarta.servlet.http.HttpSession;
 
 @Service
 public class UserLoginService {
-	
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
-	@Autowired
-	private RepositoryUserDetailService userDetailsService;
 
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-	@Autowired
-	private JwtCookieManager cookieUtil;
+    @Autowired
+    private RepositoryUserDetailService userDetailsService;
 
-    public ResponseEntity<AuthResponse> login(AuthRequest loginRequest, String encryptedAccessToken, String 
-	    encryptedRefreshToken) {
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
-		try {
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+    @Autowired
+    private JwtCookieManager cookieUtil;
 
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+    public ResponseEntity<AuthResponse> login(AuthRequest loginRequest, String encryptedAccessToken, String
+            encryptedRefreshToken) {
 
-		String accessToken = SecurityCipher.decrypt(encryptedAccessToken);
-		String refreshToken = SecurityCipher.decrypt(encryptedRefreshToken);
-		
-		String username = loginRequest.getUsername();
-		UserDetails user = userDetailsService.loadUserByUsername(username);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-		Boolean accessTokenValid = jwtTokenProvider.validateToken(accessToken);
-		Boolean refreshTokenValid = jwtTokenProvider.validateToken(refreshToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		HttpHeaders responseHeaders = new HttpHeaders();
-		Token newAccessToken;
-		Token newRefreshToken;
-		if (!accessTokenValid && !refreshTokenValid) {
-			newAccessToken = jwtTokenProvider.generateToken(user);
-			newRefreshToken = jwtTokenProvider.generateRefreshToken(user);
-			addAccessTokenCookie(responseHeaders, newAccessToken);
-			addRefreshTokenCookie(responseHeaders, newRefreshToken);
-		}
+            String accessToken = SecurityCipher.decrypt(encryptedAccessToken);
+            String refreshToken = SecurityCipher.decrypt(encryptedRefreshToken);
 
-		if (!accessTokenValid && refreshTokenValid) {
-			newAccessToken = jwtTokenProvider.generateToken(user);
-			addAccessTokenCookie(responseHeaders, newAccessToken);
-		}
+            String username = loginRequest.getUsername();
+            UserDetails user = userDetailsService.loadUserByUsername(username);
 
-		if (accessTokenValid && refreshTokenValid) {
-			newAccessToken = jwtTokenProvider.generateToken(user);
-			newRefreshToken = jwtTokenProvider.generateRefreshToken(user);
-			addAccessTokenCookie(responseHeaders, newAccessToken);
-			addRefreshTokenCookie(responseHeaders, newRefreshToken);
-		}
+            Boolean accessTokenValid = jwtTokenProvider.validateToken(accessToken);
+            Boolean refreshTokenValid = jwtTokenProvider.validateToken(refreshToken);
 
-		AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.SUCCESS,
-				"Auth successful. Tokens are created in cookie.");
-		return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
-		} catch (Exception e) {
-			AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
-					"Invalid credentials !");
-			return ResponseEntity.status(400).body(loginResponse);
-		}
-	}
+            HttpHeaders responseHeaders = new HttpHeaders();
+            Token newAccessToken;
+            Token newRefreshToken;
+            if (!accessTokenValid && !refreshTokenValid) {
+                newAccessToken = jwtTokenProvider.generateToken(user);
+                newRefreshToken = jwtTokenProvider.generateRefreshToken(user);
+                addAccessTokenCookie(responseHeaders, newAccessToken);
+                addRefreshTokenCookie(responseHeaders, newRefreshToken);
+            }
 
-	public ResponseEntity<AuthResponse> refresh(String encryptedRefreshToken) {
-		
-		String refreshToken = SecurityCipher.decrypt(encryptedRefreshToken);
-		
-		Boolean refreshTokenValid = jwtTokenProvider.validateToken(refreshToken);
-		
-		if (!refreshTokenValid) {
-			AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
-					"Invalid refresh token !");
-			return ResponseEntity.status(400).body(loginResponse);
-		}
+            if (!accessTokenValid && refreshTokenValid) {
+                newAccessToken = jwtTokenProvider.generateToken(user);
+                addAccessTokenCookie(responseHeaders, newAccessToken);
+            }
 
-		String username = jwtTokenProvider.getUsername(refreshToken);
-		UserDetails user = userDetailsService.loadUserByUsername(username);
-				
-		Token newAccessToken = jwtTokenProvider.generateToken(user);
-		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.add(HttpHeaders.SET_COOKIE, cookieUtil
-				.createAccessTokenCookie(newAccessToken.getTokenValue(), newAccessToken.getDuration()).toString());
+            if (accessTokenValid && refreshTokenValid) {
+                newAccessToken = jwtTokenProvider.generateToken(user);
+                newRefreshToken = jwtTokenProvider.generateRefreshToken(user);
+                addAccessTokenCookie(responseHeaders, newAccessToken);
+                addRefreshTokenCookie(responseHeaders, newRefreshToken);
+            }
 
-		AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.SUCCESS,
-				"Auth successful. Tokens are created in cookie.");
-		return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
-	}
+            AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.SUCCESS,
+                    "Auth successful. Tokens are created in cookie.");
+            return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
+        } catch (Exception e) {
+            AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
+                    "Invalid credentials !");
+            return ResponseEntity.status(400).body(loginResponse);
+        }
+    }
 
-	public String getUserName() {
-		
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<AuthResponse> refresh(String encryptedRefreshToken) {
 
-		return authentication.getName();
-	}
+        String refreshToken = SecurityCipher.decrypt(encryptedRefreshToken);
 
-	public String logout(HttpServletRequest request, HttpServletResponse response) {
+        Boolean refreshTokenValid = jwtTokenProvider.validateToken(refreshToken);
 
-		HttpSession session = request.getSession(false);
-		SecurityContextHolder.clearContext();
-		session = request.getSession(false);
-		if (session != null) {
-			session.invalidate();
-		}
+        if (!refreshTokenValid) {
+            AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
+                    "Invalid refresh token !");
+            return ResponseEntity.status(400).body(loginResponse);
+        }
 
-		if (request.getCookies() != null) {
-			for (Cookie cookie : request.getCookies()) {
-				cookie.setMaxAge(0);
-				cookie.setValue("");
-				cookie.setHttpOnly(true);
-				cookie.setPath("/");
-				response.addCookie(cookie);
-			}
-		}
+        String username = jwtTokenProvider.getUsername(refreshToken);
+        UserDetails user = userDetailsService.loadUserByUsername(username);
 
-		return "logout successfully";
-	}
+        Token newAccessToken = jwtTokenProvider.generateToken(user);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add(HttpHeaders.SET_COOKIE, cookieUtil
+                .createAccessTokenCookie(newAccessToken.getTokenValue(), newAccessToken.getDuration()).toString());
 
-	private void addAccessTokenCookie(HttpHeaders httpHeaders, Token token) {
-		httpHeaders.add(HttpHeaders.SET_COOKIE,
-				cookieUtil.createAccessTokenCookie(token.getTokenValue(), token.getDuration()).toString());
-	}
+        AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.SUCCESS,
+                "Auth successful. Tokens are created in cookie.");
+        return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
+    }
 
-	private void addRefreshTokenCookie(HttpHeaders httpHeaders, Token token) {
-		httpHeaders.add(HttpHeaders.SET_COOKIE,
-				cookieUtil.createRefreshTokenCookie(token.getTokenValue(), token.getDuration()).toString());
-	}
+    public String getUserName() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return authentication.getName();
+    }
+
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+
+        HttpSession session = request.getSession(false);
+        SecurityContextHolder.clearContext();
+        session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                cookie.setMaxAge(0);
+                cookie.setValue("");
+                cookie.setHttpOnly(true);
+                cookie.setPath("/");
+                response.addCookie(cookie);
+            }
+        }
+
+        return "logout successfully";
+    }
+
+    private void addAccessTokenCookie(HttpHeaders httpHeaders, Token token) {
+        httpHeaders.add(HttpHeaders.SET_COOKIE,
+                cookieUtil.createAccessTokenCookie(token.getTokenValue(), token.getDuration()).toString());
+    }
+
+    private void addRefreshTokenCookie(HttpHeaders httpHeaders, Token token) {
+        httpHeaders.add(HttpHeaders.SET_COOKIE,
+                cookieUtil.createRefreshTokenCookie(token.getTokenValue(), token.getDuration()).toString());
+    }
 }

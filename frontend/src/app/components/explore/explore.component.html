@@ -1,946 +1,952 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
-    <!-- Main Content -->
-    <div
-        class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-8 py-12 mt-32">
-
-        <!-- Search Tabs -->
-        <div class="flex w-full max-w-7xl align-middle justify-center">
-            <div class="tabs glass text-nowrap w-full">
-                <button class="tab active">
-                    <i class="ti ti-chef-hat text-xl" aria-hidden="true"></i>
-                    Recipes
-                </button>
-                <button class="tab">
-                    <i class="ti ti-basket text-xl" aria-hidden="true"></i>
-                    Ingredients
-                </button>
-                <button class="tab">
-                    <i class="ti ti-cards text-xl" aria-hidden="true"></i>
-                    Collections
-                </button>
-                <button class="tab">
-                    <i class="ti ti-users text-xl" aria-hidden="true"></i>
-                    Users
-                </button>
-            </div>
-        </div>
-
-        <div id="search-results" class="flex w-full max-w-7xl flex-col items-start gap-8 glass p-8">
-
-            <!-- Search Header -->
-            <div class="flex w-full flex-col items-center gap-6 mb-8">
-
-                <!-- Search Bar -->
-                <div class="flex flex-row w-full max-w-3xl relative gap-4 items-center">
-                    <div class="w-full">
-                        <input type="text" placeholder="Search recipes..."
-                            class="w-full px-6 py-4 pl-14 pr-20 rounded-3xl border-2 transition-all focus:outline-none text-lg border-solid"
-                            style="background: var(--primary-300-40); border-color: var(--primary-100); color: var(--primary-700);" />
-                        <i class="ti ti-search absolute left-5 top-1/2 transform -translate-y-1/2 text-xl"
-                            style="color: var(--primary-400);"></i>
-                    </div>
-                    <div class="flex h-min align-middle justify-center">
-                        <button
-                            class="flex items-center right-3 top-1/2 px-4 py-2 text-sm font-semibold transition-all hover:scale-105 rounded-3xl whitespace-nowrap"
-                            style="background: var(--gradient-primary); color: white;">
-                            Search
-                            <i class="ti ti-arrow-right ml-2"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Quick Filters -->
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter selected"
-                        style="background: var(--gradient-primary); color: white;">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-star mr-1 text-xl"></i>
-                        </div>
-                        Popular
-                    </button>
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-brand-speedtest mr-1 text-xl"></i>
-                        </div>
-                        Quick
-                    </button>
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-leaf mr-1 text-xl"></i>
-                        </div>
-                        Healthy
-                    </button>
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-ladle mr-1 text-xl"></i>
-                        </div>
-                        Traditional
-                    </button>
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-heart mr-1 text-xl"></i>
-                        </div>
-                        Favorites
-                    </button>
-                </div>
-            </div>
-
-            <!-- Content Based on Active Tab -->
-            <!-- Filters & Results Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
-
-                <!-- Filters Sidebar -->
-                <div class="lg:col-span-1">
-                    <div class="flex flex-col gap-6 rounded-3xl border border-solid px-6 py-8 shadow-sm glass sticky top-8"
-                        style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                                <i class="ti ti-adjustments mr-2"></i>
-                                Filters
-                            </h3>
-                            <button class="text-sm font-medium transition-all hover:scale-105"
-                                style="color: var(--primary-500);">
-                                Clear
-                            </button>
-                        </div>
-
-                        <!-- Category Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Category</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Main Dishes</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full"
-                                        style="background: var(--primary-100); color: var(--primary-700);">245</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Appetizers</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full"
-                                        style="background: var(--primary-100); color: var(--primary-700);">156</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Desserts</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full"
-                                        style="background: var(--primary-100); color: var(--primary-700);">89</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Beverages</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full"
-                                        style="background: var(--primary-100); color: var(--primary-700);">34</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Difficulty Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Difficulty</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Easy</span>
-                                    <div class="ml-auto flex">
-                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                                    </div>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Medium</span>
-                                    <div class="ml-auto flex gap-1">
-                                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                    </div>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Hard</span>
-                                    <div class="ml-auto flex gap-1">
-                                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Time Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Preparation Time</h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <input type="range" min="0" max="180" value="60"
-                                        class="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style="background: var(--primary-100); accent-color: var(--primary-500);">
-                                    <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
-                                        <span>0 min</span>
-                                        <span class="font-semibold" style="color: var(--primary-700);">60 min</span>
-                                        <span>180 min</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Dietary Restrictions -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Dietary Restrictions</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <i class="ti ti-leaf text-green-600"></i>
-                                    <span style="color: var(--primary-600);">Vegetarian</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <i class="ti ti-plant text-green-600"></i>
-                                    <span style="color: var(--primary-600);">Vegan</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <i class="ti ti-wheat-off text-orange-600"></i>
-                                    <span style="color: var(--primary-600);">Gluten Free</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <i class="ti ti-milk-off text-blue-600"></i>
-                                    <span style="color: var(--primary-600);">Lactose Free</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Cuisine Type -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Cuisine Type</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter selected"
-                                    style="background: var(--primary-500); color: white;">
-                                    Spanish
-                                </button>
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    Italian
-                                </button>
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    Asian
-                                </button>
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    Mexican
-                                </button>
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    French
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Rating Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Minimum Rating</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="radio" name="rating" class="w-4 h-4"
-                                        style="accent-color: var(--primary-500);">
-                                    <div class="flex">
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                    </div>
-                                    <span class="text-sm" style="color: var(--primary-600);">5 stars</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="radio" name="rating" class="w-4 h-4"
-                                        style="accent-color: var(--primary-500);">
-                                    <div class="flex">
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star text-gray-300"></i>
-                                    </div>
-                                    <span class="text-sm" style="color: var(--primary-600);">4+ stars</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="radio" name="rating" class="w-4 h-4"
-                                        style="accent-color: var(--primary-500);">
-                                    <div class="flex">
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star text-gray-300"></i>
-                                        <i class="ti ti-star text-gray-300"></i>
-                                    </div>
-                                    <span class="text-sm" style="color: var(--primary-600);">3+ stars</span>
-                                </label>
-                            </div>
-                        </div>
-                        <!-- End Dietary Restrictions, Cuisine Type, and Rating Filter -->
-                    </div>
-                </div>
-
-                <!-- Results Section -->
-                <div class="lg:col-span-3">
-                    <div class="flex flex-col gap-6">
-
-                        <!-- Results Header -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <h2 class="text-xl font-bold" style="color: var(--primary-700);">
-                                    1,247 matching results
-                                </h2>
-                            </div>
-
-                            <div class="flex items-center gap-4">
-                                <!-- Sort Options -->
-                                <div class="flex gap-2 px-4 py-2 rounded-xl text-sm font-medium border-none items-center justify-around"
-                                    style="background: var(--primary-300-40); color: var(--primary-700);">
-                                    Order
-                                    <i class="ti ti-caret-down-filled"></i>
-                                </div>
-
-                                <!-- View Toggle -->
-                                <div class="flex rounded-xl overflow-hidden" style="background: var(--primary-300-40);">
-                                    <button class="p-2 transition-all view-toggle active"
-                                        style="background: var(--primary-500); color: white;">
-                                        <i class="ti ti-grid-3x3"></i>
-                                    </button>
-                                    <button class="p-2 transition-all view-toggle" style="color: var(--primary-700);">
-                                        <i class="ti ti-list"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Recipe Grid -->
-                        <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
-                            <!-- Recipe Card 1 -->
-                            <div
-                                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                                <!-- Glass Reflection Effect -->
-                                <div
-                                    class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                                </div>
-
-                                <!-- Image Container -->
-                                <div class="relative aspect-[4/3] overflow-hidden">
-                                    <img src="https://res.cloudinary.com/subframe/image/upload/v1724705396/uploads/302/wvpuc4kznngymxhsw1w5.png"
-                                        alt="Spicy Thai Basil Chicken" class="recipe-image"
-                                        style="height: -webkit-fill-available;">
-
-                                    <!-- Gradient Overlay -->
-                                    <div class="absolute inset-0 gradient-overlay"></div>
-
-                                    <!-- Top Right Actions -->
-                                    <div class="absolute top-4 right-4 flex gap-2">
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4 fill-orange-500 text-orange-500" viewBox="0 0 24 24">
-                                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Category Badge -->
-                                    <div class="absolute top-4 left-4">
-                                        <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
-                                    </div>
-
-                                    <!-- Difficulty Badge -->
-                                    <div class="absolute bottom-4 left-4">
-                                        <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌
-                                            ‌ ‌ ‌ </div>
-                                    </div>
-                                </div>
-
-                                <!-- Content -->
-                                <div class="p-6 space-y-4">
-                                    <!-- Title and Rating -->
-                                    <div class="space-y-2">
-                                        <h3 class="text-xl font-bold text-primary line-clamp-2">Spicy Thai Basil Chicken
-                                        </h3>
-
-                                        <div class="flex items-center justify-between">
-                                            <div class="star-rating">
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <span class="text-secondary text-sm ml-2">4.8 (34)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Description -->
-                                    <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                                        A delicious and aromatic Thai dish with fresh basil and perfectly balanced
-                                        spices that will transport you straight to Bangkok.
-                                    </p>
-
-                                    <!-- Meta Information -->
-                                    <div class="flex items-center gap-4 text-secondary text-sm">
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <polyline points="12,6 12,12 16,14" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                            <span>35 min</span>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                            <span>4 people</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tags -->
-                                    <div class="flex flex-wrap gap-2">
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Spicy</span>
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Asian</span>
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Quick</span>
-                                    </div>
-
-                                    <!-- View Button -->
-                                    <div class="glass rounded flex" style="background: var(--gradient-primary);">
-                                        <button class="btn btn-primary w-full">
-                                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                            </svg>
-                                            View Recipe
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Recipe Card 2 -->
-                            <div
-                                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                                <!-- Glass Reflection Effect -->
-                                <div
-                                    class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                                </div>
-
-                                <!-- Image Container -->
-                                <div class="relative aspect-[4/3] overflow-hidden">
-                                    <img src="https://res.cloudinary.com/subframe/image/upload/v1723780577/uploads/302/hhmv6ey0yajkadnmcp0a.png"
-                                        alt="Classic Caesar Salad" class="recipe-image"
-                                        style="height: -webkit-fill-available;">
-
-                                    <!-- Gradient Overlay -->
-                                    <div class="absolute inset-0 gradient-overlay"></div>
-
-                                    <!-- Top Right Actions -->
-                                    <div class="absolute top-4 right-4 flex gap-2">
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Category Badge -->
-                                    <div class="absolute top-4 left-4">
-                                        <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
-                                    </div>
-
-                                    <!-- Difficulty Badge -->
-                                    <div class="absolute bottom-4 left-4">
-                                        <div class="badge badge-green text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌ ‌
-                                            ‌ ‌ </div>
-                                    </div>
-                                </div>
-
-                                <!-- Content -->
-                                <div class="p-6 space-y-4">
-                                    <!-- Title and Rating -->
-                                    <div class="space-y-2">
-                                        <h3 class="text-xl font-bold text-primary line-clamp-2">Classic Caesar Salad
-                                        </h3>
-
-                                        <div class="flex items-center justify-between">
-                                            <div class="star-rating">
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <span class="text-secondary text-sm ml-2">4.5 (28)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Description -->
-                                    <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                                        Fresh romaine lettuce with homemade Caesar dressing, parmesan cheese, and crispy
-                                        croutons.
-                                    </p>
-
-                                    <!-- Meta Information -->
-                                    <div class="flex items-center gap-4 text-secondary text-sm">
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <polyline points="12,6 12,12 16,14" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                            <span>15 min</span>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                            <span>2 people</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tags -->
-                                    <div class="flex flex-wrap gap-2">
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Classic</span>
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Salad</span>
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Vegetarian</span>
-                                    </div>
-
-                                    <!-- View Button -->
-                                    <div class="glass rounded flex" style="background: var(--gradient-primary);">
-                                        <button class="btn btn-primary w-full">
-                                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                            </svg>
-                                            View Recipe
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Recipe Card 1 -->
-                            <div
-                                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                                <!-- Glass Reflection Effect -->
-                                <div
-                                    class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                                </div>
-
-                                <!-- Image Container -->
-                                <div class="relative aspect-[4/3] overflow-hidden">
-                                    <img src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
-                                        alt="Spicy Thai Basil Chicken" class="recipe-image"
-                                        style="height: -webkit-fill-available;">
-
-                                    <!-- Gradient Overlay -->
-                                    <div class="absolute inset-0 gradient-overlay"></div>
-
-                                    <!-- Top Right Actions -->
-                                    <div class="absolute top-4 right-4 flex gap-2">
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Category Badge -->
-                                    <div class="absolute top-4 left-4">
-                                        <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
-                                    </div>
-
-                                    <!-- Difficulty Badge -->
-                                    <div class="absolute bottom-4 left-4">
-                                        <div class="badge badge-red text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌ ‌ ‌
-                                            ‌ </div>
-                                    </div>
-                                </div>
-
-                                <!-- Content -->
-                                <div class="p-6 space-y-4">
-                                    <!-- Title and Rating -->
-                                    <div class="space-y-2">
-                                        <h3 class="text-xl font-bold text-primary line-clamp-2">Oatmeal Banana Pancakes
-                                        </h3>
-
-                                        <div class="flex items-center justify-between">
-                                            <div class="star-rating">
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <span class="text-secondary text-sm ml-2">4.8 (34)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Description -->
-                                    <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                                        Fluffy oat and banana pancakes, perfect
-                                        for a healthy and delicious breakfast.
-                                    </p>
-
-                                    <!-- Meta Information -->
-                                    <div class="flex items-center gap-4 text-secondary text-sm">
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <polyline points="12,6 12,12 16,14" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                            <span>15 min</span>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                            <span>2 people</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tags -->
-                                    <div class="flex flex-wrap gap-2">
-                                        <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Classic</span>
-                                        <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Dessert</span>
-                                        <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Vegetarian</span>
-                                    </div>
-
-                                    <!-- View Button -->
-                                    <div class="glass rounded flex" style="background: var(--gradient-primary);">
-                                        <button class="btn btn-primary w-full">
-                                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                            </svg>
-                                            View Recipe
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div class="flex justify-center items-center gap-4 mt-8">
-                            <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                style="background: var(--primary-300-40); color: var(--primary-700);">
-                                <i class="ti ti-chevron-left mr-1"></i>
-                                Previous
-                            </button>
-
-                            <div class="flex gap-2">
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                    style="background: var(--primary-300-40); color: white;">
-                                    1
-                                </button>
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                    style="background: var(--primary-300-40); color: var(--primary-700);">
-                                    2
-                                </button>
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                    style="background: var(--primary-300-40); color: var(--primary-700);">
-                                    3
-                                </button>
-                                <span class="w-10 h-10 flex items-center justify-center"
-                                    style="color: var(--primary-400);">...</span>
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                    style="background: var(--primary-300-40); color: var(--primary-700);">
-                                    25
-                                </button>
-                            </div>
-
-                            <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                style="background: var(--primary-300-40); color: var(--primary-700);">
-                                Next
-                                <i class="ti ti-chevron-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
-
-                <!-- User Filters Sidebar -->
-                <div class="lg:col-span-1">
-                    <div class="flex flex-col gap-6 rounded-3xl border border-solid px-6 py-8 shadow-sm glass sticky top-8"
-                        style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                                <i class="ti ti-adjustments mr-2"></i>
-                                User Filters
-                            </h3>
-                            <button class="text-sm font-medium transition-all hover:scale-105"
-                                style="color: var(--primary-500);">
-                                Clear
-                            </button>
-                        </div>
-
-                        <!-- Verified Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Status</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Verified</span>
-                                    <i class="ti ti-badge-filled text-primary-500 ml-auto" title="Verified user"></i>
-                                </label>
-                            </div>
-                        </div>
-
-
-                        <!-- Followers Range -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Followers</h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <input type="range" min="0" max="50000"
-                                        class="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style="background: var(--primary-100); accent-color: var(--primary-500);">
-                                    <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
-                                        <span>0</span>
-                                        <span class="font-semibold" style="color: var(--primary-700);">0+</span>
-                                        <span>50k+</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Recipe Count Range -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Published Recipes</h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <input type="range" min="0" max="200"
-                                        class="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style="background: var(--primary-100); accent-color: var(--primary-500);">
-                                    <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
-                                        <span>0</span>
-                                        <span class="font-semibold" style="color: var(--primary-700);">0+</span>
-                                        <span>200+</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Rating Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Minimum Rating</h4>
-                            <div class="flex gap-2">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Users Results -->
-                <div class="lg:col-span-3">
-                    <div class="flex flex-col gap-6">
-
-                        <!-- Results Header -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <h2 class="text-xl font-bold" style="color: var(--primary-700);">
-                                    Users Found
-                                </h2>
-                            </div>
-
-                            <div class="flex items-center gap-4">
-                                <select class="px-4 py-2 rounded-xl border-0 text-sm font-medium"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    <option>Sort Option</option>
-                                </select>
-
-                                <div class="flex border rounded-xl overflow-hidden" style="border-color: var(--primary-200);">
-                                    <button class="p-2 transition-all hover:scale-105">
-                                        <i class="ti ti-grid-dots text-lg"></i>
-                                    </button>
-                                    <button class="p-2 transition-all hover:scale-105">
-                                        <i class="ti ti-list text-lg"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Users Grid -->
-                        <div class="grid gap-6">
-                        </div>
-
-                        <!-- User Pagination -->
-                        <div class="flex justify-center items-center gap-4 mt-8">
-                            <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                style="background: var(--primary-100); color: var(--primary-700);">
-                                <i class="ti ti-chevron-left mr-1"></i>
-                                Previous
-                            </button>
-                            <div class="flex gap-2">
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105">
-                                </button>
-                            </div>
-                            <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                style="background: var(--primary-100); color: var(--primary-700);">
-                                Next
-                                <i class="ti ti-chevron-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Main Content -->
+  <div
+    class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-8 py-12 mt-32">
+
+    <!-- Search Tabs -->
+    <div class="flex w-full max-w-7xl align-middle justify-center">
+      <div class="tabs glass text-nowrap w-full">
+        <button class="tab active">
+          <i class="ti ti-chef-hat text-xl" aria-hidden="true"></i>
+          Recipes
+        </button>
+        <button class="tab">
+          <i class="ti ti-basket text-xl" aria-hidden="true"></i>
+          Ingredients
+        </button>
+        <button class="tab">
+          <i class="ti ti-cards text-xl" aria-hidden="true"></i>
+          Collections
+        </button>
+        <button class="tab">
+          <i class="ti ti-users text-xl" aria-hidden="true"></i>
+          Users
+        </button>
+      </div>
     </div>
+
+    <div id="search-results" class="flex w-full max-w-7xl flex-col items-start gap-8 glass p-8">
+
+      <!-- Search Header -->
+      <div class="flex w-full flex-col items-center gap-6 mb-8">
+
+        <!-- Search Bar -->
+        <div class="flex flex-row w-full max-w-3xl relative gap-4 items-center">
+          <div class="w-full">
+            <input type="text" placeholder="Search recipes..."
+                   class="w-full px-6 py-4 pl-14 pr-20 rounded-3xl border-2 transition-all focus:outline-none text-lg border-solid"
+                   style="background: var(--primary-300-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+            <i class="ti ti-search absolute left-5 top-1/2 transform -translate-y-1/2 text-xl"
+               style="color: var(--primary-400);"></i>
+          </div>
+          <div class="flex h-min align-middle justify-center">
+            <button
+              class="flex items-center right-3 top-1/2 px-4 py-2 text-sm font-semibold transition-all hover:scale-105 rounded-3xl whitespace-nowrap"
+              style="background: var(--gradient-primary); color: white;">
+              Search
+              <i class="ti ti-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Filters -->
+        <div class="flex flex-wrap gap-3 justify-center">
+          <button
+            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter selected"
+            style="background: var(--gradient-primary); color: white;">
+            <div class="flex flex-rows items-center min-w-[2rem]">
+              <i class="absolute ti ti-star mr-1 text-xl"></i>
+            </div>
+            Popular
+          </button>
+          <button
+            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+            style="background: var(--primary-300-40); color: var(--primary-700);">
+            <div class="flex flex-rows items-center min-w-[2rem]">
+              <i class="absolute ti ti-brand-speedtest mr-1 text-xl"></i>
+            </div>
+            Quick
+          </button>
+          <button
+            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+            style="background: var(--primary-300-40); color: var(--primary-700);">
+            <div class="flex flex-rows items-center min-w-[2rem]">
+              <i class="absolute ti ti-leaf mr-1 text-xl"></i>
+            </div>
+            Healthy
+          </button>
+          <button
+            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+            style="background: var(--primary-300-40); color: var(--primary-700);">
+            <div class="flex flex-rows items-center min-w-[2rem]">
+              <i class="absolute ti ti-ladle mr-1 text-xl"></i>
+            </div>
+            Traditional
+          </button>
+          <button
+            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+            style="background: var(--primary-300-40); color: var(--primary-700);">
+            <div class="flex flex-rows items-center min-w-[2rem]">
+              <i class="absolute ti ti-heart mr-1 text-xl"></i>
+            </div>
+            Favorites
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Based on Active Tab -->
+      <!-- Filters & Results Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
+
+        <!-- Filters Sidebar -->
+        <div class="lg:col-span-1">
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-6 py-8 shadow-sm glass sticky top-8"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                <i class="ti ti-adjustments mr-2"></i>
+                Filters
+              </h3>
+              <button class="text-sm font-medium transition-all hover:scale-105"
+                      style="color: var(--primary-500);">
+                Clear
+              </button>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Category</h4>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <span style="color: var(--primary-600);">Main Dishes</span>
+                  <span class="ml-auto text-xs px-2 py-1 rounded-full"
+                        style="background: var(--primary-100); color: var(--primary-700);">245</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <span style="color: var(--primary-600);">Appetizers</span>
+                  <span class="ml-auto text-xs px-2 py-1 rounded-full"
+                        style="background: var(--primary-100); color: var(--primary-700);">156</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <span style="color: var(--primary-600);">Desserts</span>
+                  <span class="ml-auto text-xs px-2 py-1 rounded-full"
+                        style="background: var(--primary-100); color: var(--primary-700);">89</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <span style="color: var(--primary-600);">Beverages</span>
+                  <span class="ml-auto text-xs px-2 py-1 rounded-full"
+                        style="background: var(--primary-100); color: var(--primary-700);">34</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Difficulty Filter -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Difficulty</h4>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <span style="color: var(--primary-600);">Easy</span>
+                  <div class="ml-auto flex">
+                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                  </div>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <span style="color: var(--primary-600);">Medium</span>
+                  <div class="ml-auto flex gap-1">
+                    <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                    <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                  </div>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <span style="color: var(--primary-600);">Hard</span>
+                  <div class="ml-auto flex gap-1">
+                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Time Filter -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Preparation Time</h4>
+              <div class="space-y-4">
+                <div>
+                  <input type="range" min="0" max="180" value="60"
+                         class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                         style="background: var(--primary-100); accent-color: var(--primary-500);">
+                  <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
+                    <span>0 min</span>
+                    <span class="font-semibold" style="color: var(--primary-700);">60 min</span>
+                    <span>180 min</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dietary Restrictions -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Dietary Restrictions</h4>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <i class="ti ti-leaf text-green-600"></i>
+                  <span style="color: var(--primary-600);">Vegetarian</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <i class="ti ti-plant text-green-600"></i>
+                  <span style="color: var(--primary-600);">Vegan</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <i class="ti ti-wheat-off text-orange-600"></i>
+                  <span style="color: var(--primary-600);">Gluten Free</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <i class="ti ti-milk-off text-blue-600"></i>
+                  <span style="color: var(--primary-600);">Lactose Free</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Cuisine Type -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Cuisine Type</h4>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter selected"
+                  style="background: var(--primary-500); color: white;">
+                  Spanish
+                </button>
+                <button
+                  class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
+                  style="background: var(--primary-100); color: var(--primary-700);">
+                  Italian
+                </button>
+                <button
+                  class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
+                  style="background: var(--primary-100); color: var(--primary-700);">
+                  Asian
+                </button>
+                <button
+                  class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
+                  style="background: var(--primary-100); color: var(--primary-700);">
+                  Mexican
+                </button>
+                <button
+                  class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
+                  style="background: var(--primary-100); color: var(--primary-700);">
+                  French
+                </button>
+              </div>
+            </div>
+
+            <!-- Rating Filter -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Minimum Rating</h4>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="radio" name="rating" class="w-4 h-4"
+                         style="accent-color: var(--primary-500);">
+                  <div class="flex">
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                  </div>
+                  <span class="text-sm" style="color: var(--primary-600);">5 stars</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="radio" name="rating" class="w-4 h-4"
+                         style="accent-color: var(--primary-500);">
+                  <div class="flex">
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star text-gray-300"></i>
+                  </div>
+                  <span class="text-sm" style="color: var(--primary-600);">4+ stars</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="radio" name="rating" class="w-4 h-4"
+                         style="accent-color: var(--primary-500);">
+                  <div class="flex">
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star-filled text-yellow-500"></i>
+                    <i class="ti ti-star text-gray-300"></i>
+                    <i class="ti ti-star text-gray-300"></i>
+                  </div>
+                  <span class="text-sm" style="color: var(--primary-600);">3+ stars</span>
+                </label>
+              </div>
+            </div>
+            <!-- End Dietary Restrictions, Cuisine Type, and Rating Filter -->
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="lg:col-span-3">
+          <div class="flex flex-col gap-6">
+
+            <!-- Results Header -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <h2 class="text-xl font-bold" style="color: var(--primary-700);">
+                  1,247 matching results
+                </h2>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <!-- Sort Options -->
+                <div class="flex gap-2 px-4 py-2 rounded-xl text-sm font-medium border-none items-center justify-around"
+                     style="background: var(--primary-300-40); color: var(--primary-700);">
+                  Order
+                  <i class="ti ti-caret-down-filled"></i>
+                </div>
+
+                <!-- View Toggle -->
+                <div class="flex rounded-xl overflow-hidden" style="background: var(--primary-300-40);">
+                  <button class="p-2 transition-all view-toggle active"
+                          style="background: var(--primary-500); color: white;">
+                    <i class="ti ti-grid-3x3"></i>
+                  </button>
+                  <button class="p-2 transition-all view-toggle" style="color: var(--primary-700);">
+                    <i class="ti ti-list"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recipe Grid -->
+            <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
+              <!-- Recipe Card 1 -->
+              <div
+                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
+                <!-- Glass Reflection Effect -->
+                <div
+                  class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
+                </div>
+
+                <!-- Image Container -->
+                <div class="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src="https://res.cloudinary.com/subframe/image/upload/v1724705396/uploads/302/wvpuc4kznngymxhsw1w5.png"
+                    alt="Spicy Thai Basil Chicken" class="recipe-image"
+                    style="height: -webkit-fill-available;">
+
+                  <!-- Gradient Overlay -->
+                  <div class="absolute inset-0 gradient-overlay"></div>
+
+                  <!-- Top Right Actions -->
+                  <div class="absolute top-4 right-4 flex gap-2">
+                    <button class="btn btn-ghost btn-icon glass-strong text-primary">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path
+                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" fill="none"/>
+                      </svg>
+                    </button>
+                    <button class="btn btn-ghost btn-icon glass-strong text-primary">
+                      <svg class="w-4 h-4 fill-orange-500 text-orange-500" viewBox="0 0 24 24">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Category Badge -->
+                  <div class="absolute top-4 left-4">
+                    <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
+                  </div>
+
+                  <!-- Difficulty Badge -->
+                  <div class="absolute bottom-4 left-4">
+                    <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌
+                      ‌ ‌ ‌
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 space-y-4">
+                  <!-- Title and Rating -->
+                  <div class="space-y-2">
+                    <h3 class="text-xl font-bold text-primary line-clamp-2">Spicy Thai Basil Chicken
+                    </h3>
+
+                    <div class="flex items-center justify-between">
+                      <div class="star-rating">
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <span class="text-secondary text-sm ml-2">4.8 (34)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Description -->
+                  <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
+                    A delicious and aromatic Thai dish with fresh basil and perfectly balanced
+                    spices that will transport you straight to Bangkok.
+                  </p>
+
+                  <!-- Meta Information -->
+                  <div class="flex items-center gap-4 text-secondary text-sm">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                        <polyline points="12,6 12,12 16,14" stroke="currentColor"
+                                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span>35 min</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" fill="none"/>
+                        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round"/>
+                      </svg>
+                      <span>4 people</span>
+                    </div>
+                  </div>
+
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-2">
+                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                                              style="background-color: var(--primary-300);">#Spicy</span>
+                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                          style="background-color: var(--primary-300);">#Asian</span>
+                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                          style="background-color: var(--primary-300);">#Quick</span>
+                  </div>
+
+                  <!-- View Button -->
+                  <div class="glass rounded flex" style="background: var(--gradient-primary);">
+                    <button class="btn btn-primary w-full">
+                      <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" fill="none"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                      </svg>
+                      View Recipe
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recipe Card 2 -->
+              <div
+                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
+                <!-- Glass Reflection Effect -->
+                <div
+                  class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
+                </div>
+
+                <!-- Image Container -->
+                <div class="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src="https://res.cloudinary.com/subframe/image/upload/v1723780577/uploads/302/hhmv6ey0yajkadnmcp0a.png"
+                    alt="Classic Caesar Salad" class="recipe-image"
+                    style="height: -webkit-fill-available;">
+
+                  <!-- Gradient Overlay -->
+                  <div class="absolute inset-0 gradient-overlay"></div>
+
+                  <!-- Top Right Actions -->
+                  <div class="absolute top-4 right-4 flex gap-2">
+                    <button class="btn btn-ghost btn-icon glass-strong text-primary">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path
+                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" fill="none"/>
+                      </svg>
+                    </button>
+                    <button class="btn btn-ghost btn-icon glass-strong text-primary">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" fill="none"/>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Category Badge -->
+                  <div class="absolute top-4 left-4">
+                    <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
+                  </div>
+
+                  <!-- Difficulty Badge -->
+                  <div class="absolute bottom-4 left-4">
+                    <div class="badge badge-green text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌ ‌
+                      ‌ ‌
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 space-y-4">
+                  <!-- Title and Rating -->
+                  <div class="space-y-2">
+                    <h3 class="text-xl font-bold text-primary line-clamp-2">Classic Caesar Salad
+                    </h3>
+
+                    <div class="flex items-center justify-between">
+                      <div class="star-rating">
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <span class="text-secondary text-sm ml-2">4.5 (28)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Description -->
+                  <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
+                    Fresh romaine lettuce with homemade Caesar dressing, parmesan cheese, and crispy
+                    croutons.
+                  </p>
+
+                  <!-- Meta Information -->
+                  <div class="flex items-center gap-4 text-secondary text-sm">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                        <polyline points="12,6 12,12 16,14" stroke="currentColor"
+                                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span>15 min</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" fill="none"/>
+                        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round"/>
+                      </svg>
+                      <span>2 people</span>
+                    </div>
+                  </div>
+
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-2">
+                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                                              style="background-color: var(--primary-300);">#Classic</span>
+                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                          style="background-color: var(--primary-300);">#Salad</span>
+                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                          style="background-color: var(--primary-300);">#Vegetarian</span>
+                  </div>
+
+                  <!-- View Button -->
+                  <div class="glass rounded flex" style="background: var(--gradient-primary);">
+                    <button class="btn btn-primary w-full">
+                      <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" fill="none"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                      </svg>
+                      View Recipe
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Recipe Card 1 -->
+              <div
+                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
+                <!-- Glass Reflection Effect -->
+                <div
+                  class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
+                </div>
+
+                <!-- Image Container -->
+                <div class="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
+                    alt="Spicy Thai Basil Chicken" class="recipe-image"
+                    style="height: -webkit-fill-available;">
+
+                  <!-- Gradient Overlay -->
+                  <div class="absolute inset-0 gradient-overlay"></div>
+
+                  <!-- Top Right Actions -->
+                  <div class="absolute top-4 right-4 flex gap-2">
+                    <button class="btn btn-ghost btn-icon glass-strong text-primary">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path
+                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" fill="none"/>
+                      </svg>
+                    </button>
+                    <button class="btn btn-ghost btn-icon glass-strong text-primary">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" fill="none"/>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Category Badge -->
+                  <div class="absolute top-4 left-4">
+                    <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
+                  </div>
+
+                  <!-- Difficulty Badge -->
+                  <div class="absolute bottom-4 left-4">
+                    <div class="badge badge-red text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌ ‌ ‌
+                      ‌
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 space-y-4">
+                  <!-- Title and Rating -->
+                  <div class="space-y-2">
+                    <h3 class="text-xl font-bold text-primary line-clamp-2">Oatmeal Banana Pancakes
+                    </h3>
+
+                    <div class="flex items-center justify-between">
+                      <div class="star-rating">
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <svg class="star star-filled" viewBox="0 0 24 24">
+                          <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <span class="text-secondary text-sm ml-2">4.8 (34)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Description -->
+                  <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
+                    Fluffy oat and banana pancakes, perfect
+                    for a healthy and delicious breakfast.
+                  </p>
+
+                  <!-- Meta Information -->
+                  <div class="flex items-center gap-4 text-secondary text-sm">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                        <polyline points="12,6 12,12 16,14" stroke="currentColor"
+                                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span>15 min</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" fill="none"/>
+                        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round"/>
+                      </svg>
+                      <span>2 people</span>
+                    </div>
+                  </div>
+
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-2">
+                                        <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
+                                              style="background-color: var(--primary-300);">#Classic</span>
+                    <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
+                          style="background-color: var(--primary-300);">#Dessert</span>
+                    <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
+                          style="background-color: var(--primary-300);">#Vegetarian</span>
+                  </div>
+
+                  <!-- View Button -->
+                  <div class="glass rounded flex" style="background: var(--gradient-primary);">
+                    <button class="btn btn-primary w-full">
+                      <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" fill="none"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
+                                fill="none"/>
+                      </svg>
+                      View Recipe
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center items-center gap-4 mt-8">
+              <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                      style="background: var(--primary-300-40); color: var(--primary-700);">
+                <i class="ti ti-chevron-left mr-1"></i>
+                Previous
+              </button>
+
+              <div class="flex gap-2">
+                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                        style="background: var(--primary-300-40); color: white;">
+                  1
+                </button>
+                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                        style="background: var(--primary-300-40); color: var(--primary-700);">
+                  2
+                </button>
+                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                        style="background: var(--primary-300-40); color: var(--primary-700);">
+                  3
+                </button>
+                <span class="w-10 h-10 flex items-center justify-center"
+                      style="color: var(--primary-400);">...</span>
+                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                        style="background: var(--primary-300-40); color: var(--primary-700);">
+                  25
+                </button>
+              </div>
+
+              <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                      style="background: var(--primary-300-40); color: var(--primary-700);">
+                Next
+                <i class="ti ti-chevron-right ml-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
+
+        <!-- User Filters Sidebar -->
+        <div class="lg:col-span-1">
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-6 py-8 shadow-sm glass sticky top-8"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                <i class="ti ti-adjustments mr-2"></i>
+                User Filters
+              </h3>
+              <button class="text-sm font-medium transition-all hover:scale-105"
+                      style="color: var(--primary-500);">
+                Clear
+              </button>
+            </div>
+
+            <!-- Verified Filter -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Status</h4>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 cursor-pointer filter-option">
+                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                         style="accent-color: var(--primary-500);">
+                  <span class="checkbox-custom glass-input"></span>
+                  <span style="color: var(--primary-600);">Verified</span>
+                  <i class="ti ti-badge-filled text-primary-500 ml-auto" title="Verified user"></i>
+                </label>
+              </div>
+            </div>
+
+
+            <!-- Followers Range -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Followers</h4>
+              <div class="space-y-4">
+                <div>
+                  <input type="range" min="0" max="50000"
+                         class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                         style="background: var(--primary-100); accent-color: var(--primary-500);">
+                  <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
+                    <span>0</span>
+                    <span class="font-semibold" style="color: var(--primary-700);">0+</span>
+                    <span>50k+</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recipe Count Range -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Published Recipes</h4>
+              <div class="space-y-4">
+                <div>
+                  <input type="range" min="0" max="200"
+                         class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                         style="background: var(--primary-100); accent-color: var(--primary-500);">
+                  <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
+                    <span>0</span>
+                    <span class="font-semibold" style="color: var(--primary-700);">0+</span>
+                    <span>200+</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rating Filter -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Minimum Rating</h4>
+              <div class="flex gap-2">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Results -->
+        <div class="lg:col-span-3">
+          <div class="flex flex-col gap-6">
+
+            <!-- Results Header -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <h2 class="text-xl font-bold" style="color: var(--primary-700);">
+                  Users Found
+                </h2>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <select class="px-4 py-2 rounded-xl border-0 text-sm font-medium"
+                        style="background: var(--primary-100); color: var(--primary-700);">
+                  <option>Sort Option</option>
+                </select>
+
+                <div class="flex border rounded-xl overflow-hidden" style="border-color: var(--primary-200);">
+                  <button class="p-2 transition-all hover:scale-105">
+                    <i class="ti ti-grid-dots text-lg"></i>
+                  </button>
+                  <button class="p-2 transition-all hover:scale-105">
+                    <i class="ti ti-list text-lg"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Users Grid -->
+            <div class="grid gap-6">
+            </div>
+
+            <!-- User Pagination -->
+            <div class="flex justify-center items-center gap-4 mt-8">
+              <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                      style="background: var(--primary-100); color: var(--primary-700);">
+                <i class="ti ti-chevron-left mr-1"></i>
+                Previous
+              </button>
+              <div class="flex gap-2">
+                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105">
+                </button>
+              </div>
+              <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                      style="background: var(--primary-100); color: var(--primary-700);">
+                Next
+                <i class="ti ti-chevron-right ml-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

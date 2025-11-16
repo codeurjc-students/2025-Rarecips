@@ -1,5 +1,5 @@
-import { Recipe } from "./recipe.model";
-import { Review } from "./review.model";
+import {Recipe} from "./recipe.model";
+import {Review} from "./review.model";
 
 export interface User {
   username: string;
@@ -12,8 +12,8 @@ export interface User {
   role: string;
   createdAt: Date;
   lastOnline: Date;
-  recipes : Recipe[];
-  reviews : Review[];
-  savedRecipes : string[];
+  recipes: Recipe[];
+  reviews: Review[];
+  savedRecipes: string[];
 
 }

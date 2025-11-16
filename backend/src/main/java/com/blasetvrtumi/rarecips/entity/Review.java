@@ -15,7 +15,7 @@ public class Review {
 
     public interface BasicInfo {
     }
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,18 +24,18 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
-    
+
     @JsonView(BasicInfo.class)
     private Float rating;
-    
+
     @JsonView(BasicInfo.class)
     private String comment;
-    
+
     @ManyToOne
     @JsonView(BasicInfo.class)
     @JoinColumn(name = "user_id")
     private User author;
-    
+
     @CreationTimestamp
     @JsonView(BasicInfo.class)
     @Column(name = "created_at", updatable = false)
