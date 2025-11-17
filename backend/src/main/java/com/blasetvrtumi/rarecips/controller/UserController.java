@@ -7,12 +7,10 @@ import com.blasetvrtumi.rarecips.service.UserService;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -51,25 +49,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @Operation(summary = "Update own's last online timestamp")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Last online timestamp updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
-            @ApiResponse(responseCode = "403", description = "Forbidden access")
-    })
-    @PutMapping("/me/last-online")
-    public ResponseEntity<Void> updateLastOnline(HttpServletRequest request) {
-        Principal principal = request.getUserPrincipal();
-        if (principal == null) {
-            return ResponseEntity.status(400).build();
-        }
-
-        User user = userService.findByUsername(principal.getName());
-        user.setLastOnline(java.time.LocalDateTime.now());
-        return ResponseEntity.ok().build();
-    }
-
     @Operation(summary = "Get user info by username")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User info retrieved successfully", content = {
@@ -89,4 +68,57 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @Operation(summary = "Update user info by username")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User info updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden access"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PutMapping("/{username}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable String username,
+            @RequestBody User updatedUser,
+            Authentication authentication) {
+        // Update user parameters
+        User currentUser = userService.findByUsername(username);
+        currentUser.setProfileImageFile(updatedUser.getProfileImageFile());
+        currentUser.setProfileImageString(updatedUser.getProfileImageString());
+        currentUser.setUsername(updatedUser.getUsername());
+        currentUser.setDisplayName(updatedUser.getDisplayName());
+        currentUser.setEmail(updatedUser.getEmail());
+        currentUser.setBio(updatedUser.getBio());
+        userService.save(currentUser);
+
+        String currentUsername = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!currentUsername.equals(username) && !isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You are not authorized to update this user's information.");
+        }
+
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Update own's last online timestamp")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Last online timestamp updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden access")
+    })
+    @PutMapping("/{username}/checkin")
+    public ResponseEntity<Void> updateLastOnline(HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(400).build();
+        }
+
+        User user = userService.findByUsername(principal.getName());
+        user.setLastOnline(java.time.LocalDateTime.now());
+        userService.save(user);
+        return ResponseEntity.ok().build();
+    }
 }

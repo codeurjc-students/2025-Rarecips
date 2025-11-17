@@ -32,9 +32,6 @@ export class SessionService {
     // Update last seen before logging out
     this.httpClient.put(this.userUrl + "me/last-online", {}, {withCredentials: true}).subscribe();
     return this.httpClient.put(this.baseUrl + "logout", {}, {withCredentials: true}).pipe(
-      tap(() => {
-        window.location.reload();
-      }),
       catchError(error => this.handleError(error))
     );
   }
@@ -49,6 +46,18 @@ export class SessionService {
     return this.httpClient.get<User>(this.userUrl + "me", {withCredentials: true}).pipe(
       map(user => user.role === "admin"),
       catchError(error => this.handleError(error))
+    );
+  }
+
+  getUsernameList(): Observable<string[]> {
+    return this.httpClient.get<string[]>(this.baseUrl + "usernames").pipe(
+      catchError(() => of([]))
+    );
+  }
+
+  getEmailList(): Observable<string[]> {
+    return this.httpClient.get<string[]>(this.baseUrl + "emails").pipe(
+      catchError(() => of([]))
     );
   }
 

@@ -325,6 +325,14 @@ body {
   border: none;
 }
 
+button:disabled,
+button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+
 .btn-primary {
   background-color: var(--brand-color);
   color: white;
@@ -548,43 +556,34 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .drag-drop-area:hover {
+  border-color: var(--primary-400);
+  transform: scale(1.01);
+}
+
+.drag-drop-area.dragging {
   border-color: var(--primary-500) !important;
-  background: var(--primary-100-40) !important;
+  background: var(--primary-100) !important;
   transform: scale(1.02);
 }
 
-.drag-drop-area.drag-over {
-  border-color: var(--primary-500) !important;
+.drag-drop-area.dragging:hover {
+  border-color: var(--primary-600) !important;
   background: var(--primary-200-40) !important;
-  box-shadow: 0 0 20px rgba(79, 140, 255, 0.3);
-  animation: pulse-border 1.5s infinite;
-}
-
-.drag-drop-area.drag-over::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg,
-  transparent 30%,
-  rgba(79, 140, 255, 0.1) 50%,
-  transparent 70%);
-  animation: shimmer 2s infinite;
-  pointer-events: none;
+  box-shadow: 0 0 20px rgba(255, 104, 14, 0.3);
+  transform: scale(1.03);
 }
 
 /* Animated border for drag over state */
 @keyframes pulse-border {
   0%, 100% {
-    border-color: var(--primary-500);
+    border-color: var(--primary-600);
   }
   50% {
-    border-color: var(--primary-300);
+    border-color: var(--primary-400);
   }
 }
 
@@ -597,8 +596,7 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   }
 }
 
-/* Upload icon animation */
-.drag-drop-area:hover .ti-cloud-upload {
+.drag-drop-area.dragging .ti-cloud-upload {
   animation: bounce-upload 0.6s ease;
 }
 
@@ -607,7 +605,7 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-10px);
   }
 }
 

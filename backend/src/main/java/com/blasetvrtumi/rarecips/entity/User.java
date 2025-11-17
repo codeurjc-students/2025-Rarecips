@@ -157,6 +157,14 @@ public class User {
         return password;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
     public String getRole() {
         return role.name();
     }
@@ -203,6 +211,10 @@ public class User {
 
     public Blob getProfileImageFile() {
         return profileImageFile;
+    }
+
+    public String getProfileImageString() {
+        return profileImageString;
     }
 
 }

@@ -8,11 +8,14 @@
         class="flex min-w-[240px] max-w-[448px] w-screen grow shrink-0 basis-0 flex-col items-center justify-center gap-6 rounded-md border border-solid px-8 pt-12 pb-8 shadow-sm relative glass"
         style="border-color: var(--primary-200-40); background: var(--primary-200-40)">
         <div class="flex w-full flex-col items-center gap-12">
-          <button
-            class="absolute top-7 right-7 w-12 h-12 flex items-center justify-center rounded-xl"
-            style="background: var(--gradient-primary); color: white;">
-            <i class="ti ti-user-edit text-primary-700 text-xl"></i>
-          </button>
+          @if (isOwnProfile) {
+            <button
+              class="absolute top-7 right-7 w-12 h-12 flex items-center justify-center rounded-xl"
+              style="background: var(--gradient-primary); color: white;"
+              (click)="navigateToEditProfile()">
+              <i class="ti ti-user-edit text-primary-700 text-xl"></i>
+            </button>
+          }
           <div class="flex flex-col items-center gap-6 relative">
             <div
               class="flex h-36 w-36 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative"
@@ -37,14 +40,6 @@
               <span class="w-full text-base text-center"
                     style="color: var(--primary-400);">&commat;{{ user?.username }}</span>
             </div>
-            @if (isOwnProfile) {
-              <button
-                class="h-10 w-auto flex-none px-5 py-2 rounded-md text-white font-semibold transition flex items-center gap-2"
-                style="background: var(--primary-500);">
-                <i class="ti ti-pencil"></i>
-                Edit
-              </button>
-            }
           </div>
         </div>
         <div class="flex w-full flex-col items-center gap-10 mt-4">
@@ -90,7 +85,8 @@
           <!-- Activity info -->
           <div class="flex w-full flex-row items-start gap-4 align-middle justify-evenly">
             <div class="flex flex-col items-center">
-              <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Joined</span>
+              <span class="w-full text-xs font-semibold flex justify-center"
+                    style="color: var(--primary-400);">Joined</span>
               <div class="flex flex-col items-start gap-4">
                                 <span class="text-base" style="color: var(--primary-700);">
                                     {{ user?.createdAt }}
@@ -98,7 +94,7 @@
               </div>
             </div>
             <div class="flex flex-col items-center">
-              <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">Last seen</span>
+              <span class="w-full text-xs font-semibold flex justify-center" style="color: var(--primary-400);">Last seen</span>
               <div class="flex flex-col items-start gap-4">
                                 <span class="text-base" style="color: var(--primary-700);">
                                     {{ user?.lastOnline }}

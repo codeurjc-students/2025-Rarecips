@@ -5,6 +5,8 @@ import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable, Subject, Subscription, of} from 'rxjs';
 import {SessionService} from '../../services/session.service';
+import {UserService} from '../../services/user.service';
+import {UsernameValidationService} from '../../services/username-validation.service';
 
 interface LoginForm {
   username: string;
@@ -76,34 +78,36 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   private usernameStatus: HTMLCollectionOf<HTMLElement> | null = null;
   private usernameInput: HTMLInputElement | null = null;
 
+  private user: any = null;
+
   private usernameSub: Subscription | null = null;
   isUsernameAvailable: boolean | null = null;
 
   API_URL = "/api/v1/auth";
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private http: HttpClient, private sessionService: SessionService) {
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private http: HttpClient,
+    private sessionService: SessionService,
+    private userService: UserService,
+    private usernameValidationService: UsernameValidationService
+  ) {
     this.switchTab(this.activatedRoute.snapshot.routeConfig?.path === 'signup' ? 'signup' : 'login');
   }
 
   ngOnInit(): void {
+    this.restoreCardPositions();
+
+    // Redirect to home if already logged in
+    this.sessionService.getLoggedUser().pipe(take(1)).subscribe(user => {
+      if (user) {
+        this.router.navigate(['/']);
+      }
+    });
 
     this.usernameInput = document.getElementById('signup-username') as HTMLInputElement | null;
     this.usernameStatus = document.getElementsByClassName('username-status') as HTMLCollectionOf<HTMLElement> | null;
-
-    this.http.get<string[]>(this.API_URL + '/usernames').pipe(
-      take(1),
-      catchError(() => of([]))
-    ).subscribe(list => {
-      this.usernameArray = this.usernameArray.concat(list || []);
-      this.usernameArrayLoaded = true;
-    });
-
-    this.http.get<string[]>(this.API_URL + '/emails').pipe(
-      take(1),
-      catchError(() => of([]))
-    ).subscribe(list => {
-      this.emailArray = list || [];
-    });
 
     this.usernameSub = this.usernameInput$.pipe(
       debounceTime(500),
@@ -127,36 +131,27 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     ).subscribe((res) => {
       if (res === null) {
         this.isUsernameAvailable = null;
-        this.updateUsernameStyles(null);
+        this.usernameValidationService.updateUsernameStyles(this.usernameInput, null);
       } else {
         this.isUsernameAvailable = !!res.available;
-        this.updateUsernameStyles(this.isUsernameAvailable);
+        this.usernameValidationService.updateUsernameStyles(this.usernameInput, this.isUsernameAvailable);
       }
     });
 
     this.usernameInput?.addEventListener('input', (event) => {
+      // Check username and email availability ON EACH INPUT CHANGE
+      this.sessionService.getUsernameList().pipe(
+        take(1)
+      ).subscribe(list => {
+        this.usernameArray = this.usernameArray.concat(list || []);
+        this.usernameArrayLoaded = true;
+      });
+
       if (this.usernameStatus && this.usernameStatus[0]) this.usernameStatus[0].style.display = 'block';
       const value = (event.target as HTMLInputElement).value;
       this.usernameInput$.next(value);
     });
 
-  }
-
-  private updateUsernameStyles(available: boolean | null) {
-    if (!this.usernameInput) return;
-    const input = this.usernameInput;
-    if (available === null) {
-      input.style.background = '';
-      input.style.borderColor = '';
-      return;
-    }
-    if (available) {
-      input.style.background = '';
-      input.style.borderColor = '';
-    } else {
-      input.style.background = 'rgba(255, 0, 0, 0.1)';
-      input.style.borderColor = 'red';
-    }
   }
 
   ngAfterViewInit(): void {
@@ -225,6 +220,12 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
             }, 1200);
           }, 2000);
 
+          // Update last login time
+          this.userService.getUserByUsername(this.loginForm.username).subscribe((res) => {
+            this.user = res.data;
+            this.http.put(`/api/v1/users/${this.loginForm.username}/checkin`, {}).pipe(take(1)).subscribe();
+          });
+
         },
         error: (error) => {
           if (error.message.includes('400')) {
@@ -260,7 +261,28 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSignup(): void {
-    if (this.validateSignupForm()) {
+    if (!this.validateSignupForm()) {
+      return;
+    }
+
+    // Validate email asynchronously before signup
+    this.checkEmailExists(this.signupForm.email).pipe(take(1)).subscribe(exists => {
+      if (exists) {
+        const emailInput = document.getElementById('signup-email') as HTMLInputElement;
+        const emailErrorMsg = document.querySelector('.emailErrorMsg') as HTMLElement;
+        emailErrorMsg.innerText = 'Email is already registered.';
+        emailErrorMsg.classList.remove('hidden');
+        emailInput.style.borderColor = 'red';
+        emailInput.style.background = 'rgba(255, 0, 0, 0.1)';
+
+        emailInput.onkeydown = () => {
+          emailErrorMsg.classList.add('hidden');
+          emailInput.style.borderColor = '';
+          emailInput.style.background = '';
+        }
+        return;
+      }
+
       this.isLoading = true;
 
       // API Call
@@ -271,19 +293,18 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
       }).pipe(take(1)).subscribe({
         next: () => {
           this.isLoading = false;
+          setTimeout(() => {
+            this.isLoading = false;
+            alert("Registration successful, welcome to Rarecips! You can now log in.");
+            this.switchTab('login');
+          }, 2000);
         },
         error: (error) => {
           this.isLoading = false;
           alert('Registration failed: ' + error.message);
         }
       });
-
-      setTimeout(() => {
-        this.isLoading = false;
-        alert("Registration successful, welcome to Rarecips! You can now log in.");
-        this.switchTab('login');
-      }, 2000);
-    }
+    });
   }
 
   validateEmail(email: string): boolean {
@@ -291,8 +312,11 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     return emailRegex.test(email);
   }
 
-  checkEmailExists(email: string): boolean {
-    return this.emailArray.includes(email);
+  checkEmailExists(email: string): Observable<boolean> {
+    return this.sessionService.getEmailList().pipe(
+      take(1),
+      map(list => (list || []).includes(email))
+    );
   }
 
   private validateLoginForm(): boolean {
@@ -314,22 +338,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (!acceptTerms) {
-      return false;
-    }
-
-    if (this.checkEmailExists(email)) {
-      const emailInput = document.getElementById('signup-email') as HTMLInputElement;
-      const emailErrorMsg = document.querySelector('.emailErrorMsg') as HTMLElement;
-      emailErrorMsg.innerText = 'Email is already registered.';
-      emailErrorMsg.classList.remove('hidden');
-      emailInput.style.borderColor = 'red';
-      emailInput.style.background = 'rgba(255, 0, 0, 0.1)';
-
-      emailInput.onkeydown = () => {
-        emailErrorMsg.classList.add('hidden');
-        emailInput.style.borderColor = '';
-        emailInput.style.background = '';
-      }
       return false;
     }
 

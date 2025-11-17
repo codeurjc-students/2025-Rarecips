@@ -47,6 +47,12 @@ export class NavbarComponent implements OnInit {
       takeUntil(new Subject<void>())
     ).subscribe({
       next: user => {
+        if (!user) {
+          this.isAuthenticated = false;
+          this.isAdmin = false;
+          return;
+        }
+
         this.isAuthenticated = true;
         this.user = user;
         this.isAdmin = user.role === 'ADMIN';
@@ -176,7 +182,9 @@ export class NavbarComponent implements OnInit {
   onLogout(): void {
     this.sessionService.logout().subscribe({
       next: () => {
-        console.log('Logout successful');
+        this.router.navigate(['/']).then(() => {
+          window.location.reload();
+        })
       },
       error: (err) => {
         console.error('Logout error:', err);
