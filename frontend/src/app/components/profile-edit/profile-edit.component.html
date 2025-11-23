@@ -120,40 +120,14 @@
                 <!-- Display Name -->
                 <div class="flex flex-col gap-2">
                   <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Full Name
+                    Display Name
                   </label>
                   <div class="relative">
                     <input type="text" value="{{user?.displayName}}"
-                           class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                           class="displayNameInput w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                           placeholder="Enter your full name"/>
+                           placeholder="Enter your display name"/>
                     <i class="ti ti-user absolute right-3 top-1/2 transform -translate-y-1/2"
-                       style="color: var(--primary-400);"></i>
-                  </div>
-                </div>
-
-                <!-- Username -->
-                <div class="flex flex-col gap-2">
-                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Username
-                  </label>
-                  <div class="relative">
-                    <input type="text" value="{{user?.username}}"
-                           class="usernameInput w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                           placeholder="@your_username"/>
-                    <div class="username-status absolute top-[3.2rem] left-4">
-                      @if (isUsernameAvailable != null) {
-                        @if (isUsernameAvailable === true) {
-                          <small class="text-success" style="color: green;">Nickname available ✓</small>
-                        } @else {
-                          <small class="text-danger" style="color: red;">Nickname not available ✕</small>
-                        }
-                      } @else {
-                        <small class="text-muted" style="color: gray;">Checking availability...</small>
-                      }
-                    </div>
-                    <i class="ti ti-at absolute right-3 top-1/2 transform -translate-y-1/2"
                        style="color: var(--primary-400);"></i>
                   </div>
                 </div>
@@ -164,16 +138,19 @@
                     Email Address
                   </label>
                   <div class="relative">
-                    <input type="email" value="john.doe@example.com"
+                    <input type="email" value="{{user?.email}}"
                            class="emailInput w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
                            placeholder="{{user?.email}}"/>
                     <div class="email-status absolute top-[3.2rem] left-4">
                       @if (isEmailAvailable != null) {
-                        @if (isEmailAvailable === true) {
+                        @if (isEmailAvailable === true && isEmailValid) {
                           <small class="text-success" style="color: green;">Email available ✓</small>
-                        } @else {
+                        } @else if (isEmailAvailable === false && isEmailValid) {
                           <small class="text-danger" style="color: red;">Email not available ✕</small>
+                        }
+                        @if (!isEmailValid) {
+                          <small class="text-danger" style="color: red;">Invalid email format ✕</small>
                         }
                       } @else {
                         <small class="text-muted" style="color: gray;">Checking availability...</small>
@@ -202,7 +179,7 @@
                 </label>
                 <div class="relative">
                                     <textarea rows="4"
-                                              class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
+                                              class="bioInput w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
                                               style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700); field-sizing: content;"
                                               placeholder="Write something about yourself, your culinary tastes, specialties...">{{ user?.description }}</textarea>
                   <i class="ti ti-message absolute right-3 top-7"

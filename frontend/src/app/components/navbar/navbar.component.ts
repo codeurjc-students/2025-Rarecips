@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit, Host, NgModule} from '@angular/core';
 import {Router, RouterModule} from '@angular/router';
 import {Subject, takeUntil} from 'rxjs';
-import {CommonModule} from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {SessionService} from '../../services/session.service';
 
 @Component({
@@ -26,7 +26,8 @@ export class NavbarComponent implements OnInit {
     "neutral-dark"
   ];
 
-  logoSrc = "assets/logo/Rarecips_Isotipo.svg";
+  logoSrc = "assets/icons/Rarecips_Isotipo.svg";
+  bowlIcon: string = "../../../assets/icons/bowl-spoon.svg";
 
   currentLanguage = 'es';
   isAuthenticated = false;
@@ -38,7 +39,8 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     const body = document.querySelector('body');
-    const navbar = document.getElementById('navbar');
+    const navbar = document.getElementById('navbar');;
+
     const selectedTheme = localStorage.getItem('selectedTheme') || "theme-tangerine-light";
     body?.classList.add(selectedTheme);
     navbar?.classList.add(selectedTheme);
@@ -71,10 +73,14 @@ export class NavbarComponent implements OnInit {
       behavior: 'smooth' // Smooth scroll to top
     });
     // Logo change
-    this.logoSrc = "assets/logo/Rarecips_Stir.svg";
+    this.logoSrc = "assets/icons/Rarecips_Stir.svg";
     setTimeout(() => {
-      this.logoSrc = "assets/logo/Rarecips_Isotipo.svg"; // Reset after 1 second
+      this.logoSrc = "assets/icons/Rarecips_Isotipo.svg"; // Reset after 1 second
     }, 1000);
+  }
+
+  onHover(isHovering: boolean): void {
+    this.bowlIcon = isHovering ? "assets/icons/bowl-spoon-stir.svg" : "assets/icons/bowl-spoon-withdraw.svg";
   }
 
   openSearchDialog(): void {

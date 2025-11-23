@@ -217,4 +217,17 @@ public class User {
         return profileImageString;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", bio='" + bio + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                ", createdAt=" + createdAt +
+                ", lastOnline=" + lastOnline +
+                '}';
+    }
+
 }

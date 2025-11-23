@@ -40,6 +40,18 @@
 
   <!-- Right side - Actions -->
   <div class="flex items-center gap-4">
+    @if (isAuthenticated) {
+      <!-- Create recipe button -->
+      <div class="create-recipe-container">
+        <button  (mouseenter)="onHover(true)" (mouseleave)="onHover(false)" class="w-max flex whitespace-nowrap gap-2 items-center create-recipe-btn px-6 py-2 rounded-full font-semibold text-[14px] text-white"
+                style="background: var(--gradient-primary)"
+                (click)="navigateTo('recipes/create', $event)">
+          <img [src]="bowlIcon" alt="Create Recipe Icon" class="bowlIcon w-max h-max"/>
+          <span>Create Recipe</span>
+        </button>
+      </div>
+    }
+
     <!-- Search Bar -->
     <div class="search-container">
       <div class="flex gap-4 search-input-wrapper !py-4">

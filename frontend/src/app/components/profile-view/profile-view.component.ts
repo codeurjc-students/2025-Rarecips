@@ -63,7 +63,7 @@ export class ProfileViewComponent implements OnInit {
     this.isAdmin = this.user?.roles?.includes('ADMIN');
 
     this.sessionService.getLoggedUser().subscribe(loggedUser => {
-      this.isOwnProfile = loggedUser.username === this.username;
+      this.isOwnProfile = loggedUser?.username === this.username;
     });
   }
 

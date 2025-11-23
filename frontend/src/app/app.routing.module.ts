@@ -23,6 +23,7 @@ export const routes: Routes = [
   {path: "users/:id", component: ProfileViewComponent},
   {path: "users/:id/edit", component: ProfileEditComponent},
   {path: "explore", component: ExploreComponent},
+  {path: "recipes/create", component: RecipeEditComponent},
   {path: "recipes/:id", component: RecipeViewComponent},
   {path: "recipes/:id/edit", component: RecipeEditComponent},
   {path: "ingredients", component: IngredientsComponent},

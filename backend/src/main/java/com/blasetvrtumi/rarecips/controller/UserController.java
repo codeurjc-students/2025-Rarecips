@@ -84,10 +84,10 @@ public class UserController {
         User currentUser = userService.findByUsername(username);
         currentUser.setProfileImageFile(updatedUser.getProfileImageFile());
         currentUser.setProfileImageString(updatedUser.getProfileImageString());
-        currentUser.setUsername(updatedUser.getUsername());
         currentUser.setDisplayName(updatedUser.getDisplayName());
         currentUser.setEmail(updatedUser.getEmail());
         currentUser.setBio(updatedUser.getBio());
+        System.out.println(currentUser);
         userService.save(currentUser);
 
         String currentUsername = authentication.getName();

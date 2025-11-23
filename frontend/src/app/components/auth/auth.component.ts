@@ -197,7 +197,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
       const spinner = document.createElement('img');
-      spinner.src = '/assets/logo/Rarecips_Spinner.svg';
+      spinner.src = '/assets/icons/Rarecips_Spinner.svg';
       spinner.style.width = '28px';
       spinner.style.height = '28px';
       loginBut.appendChild(spinner);

@@ -6,11 +6,11 @@ import {App} from './app';
 import {NavbarComponent} from './components/navbar/navbar.component';
 import {HomeComponent} from './components/home/home.component';
 import {FormsModule} from '@angular/forms';
-import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 
 @NgModule({
   declarations: [
-    App,
+    App
   ],
   imports: [
     BrowserModule,

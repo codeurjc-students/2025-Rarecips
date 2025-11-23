@@ -1,17 +1,17 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
   <!-- Main Content -->
   <div
-    class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 px-4 py-12 mt-32 overflow-auto">
+    class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 px-4 py-12 mt-24" style="overflow: visible;">
     <div class="flex w-full max-w-[1200px] min-h-full flex-col items-center gap-8">
 
       <!-- Recipe Form -->
-      <form class="flex flex-col glass p-8">
-        <div class="flex flex-row w-full max-w-7xl gap-8">
+      <form class="flex flex-col glass p-8" style="overflow: visible;">
+        <div class="flex flex-row w-full max-w-7xl gap-8" style="overflow: visible;">
           <!-- Col 1 -->
-          <div class="flex flex-col gap-8 w-1/2">
+          <div class="flex flex-col gap-8 w-1/2" style="overflow: visible;">
             <!-- Basic Information -->
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass z-[1]"
+                 style="border-color: var(--primary-100-40); background: var(--primary-200-40); overflow: visible; position: relative;">
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-info-circle mr-2"></i>
@@ -59,16 +59,32 @@
                     <div
                       class="flex justify-between items-center w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
                       style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
-                      30
+                      <input type="number" min="0" [(ngModel)]="prepTime" name="prepTime"
+                             class="w-full h-full bg-transparent focus:outline-none"
+                             style="color: var(--primary-700);"/>
                       <i class="absolute right-12 top-1/2 transform -translate-y-1/2 ti ti-clock"
                          style="color: var(--primary-400);"></i>
-                      <i class="absolute right-4 top-1/2 transform -translate-y-1/2 ti ti-caret-up-down-filled"
-                         style="color: var(--primary-700);"></i>
+                      <div class="flex flex-col gap-0">
+                        <button type="button"
+                                (click)="incrementValue('prepTime')"
+                                (mousedown)="startIncrement('prepTime')"
+                                (mouseup)="stopChange()"
+                                (mouseleave)="stopChange()"
+                                class="ti ti-caret-up-filled cursor-pointer hover:opacity-70 text-xs leading-none"
+                                style="color: var(--primary-700);"></button>
+                        <button type="button"
+                                (click)="decrementValue('prepTime')"
+                                (mousedown)="startDecrement('prepTime')"
+                                (mouseup)="stopChange()"
+                                (mouseleave)="stopChange()"
+                                class="ti ti-caret-down-filled cursor-pointer hover:opacity-70 text-xs leading-none"
+                                style="color: var(--primary-700);"></button>
+                      </div>
                     </div>
                     <span
                       class="flex items-center gap-2 absolute right-20 top-1/2 transform -translate-y-1/2 text-sm"
                       style="color: var(--primary-400);">min
-                                        </span>
+                    </span>
                   </div>
                 </div>
 
@@ -81,9 +97,25 @@
                     <div
                       class="flex justify-between items-center w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
                       style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
-                      4
-                      <i class="ti ti-caret-up-down-filled"
-                         style="color: var(--primary-700);"></i>
+                      <input type="number" min="1" [(ngModel)]="servings" name="servings"
+                             class="w-full h-full bg-transparent focus:outline-none"
+                             style="color: var(--primary-700);"/>
+                      <div class="flex flex-col gap-0">
+                        <button type="button"
+                                (click)="incrementValue('servings')"
+                                (mousedown)="startIncrement('servings')"
+                                (mouseup)="stopChange()"
+                                (mouseleave)="stopChange()"
+                                class="ti ti-caret-up-filled cursor-pointer hover:opacity-70 text-xs leading-none"
+                                style="color: var(--primary-700);"></button>
+                        <button type="button"
+                                (click)="decrementValue('servings')"
+                                (mousedown)="startDecrement('servings')"
+                                (mouseup)="stopChange()"
+                                (mouseleave)="stopChange()"
+                                class="ti ti-caret-down-filled cursor-pointer hover:opacity-70 text-xs leading-none"
+                                style="color: var(--primary-700);"></button>
+                      </div>
                     </div>
                     <i class="absolute right-12 top-1/2 transform -translate-y-1/2 ti ti-users"
                        style="color: var(--primary-400);"></i>
@@ -94,118 +126,417 @@
               <!-- Difficulty & Category -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Difficulty -->
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2 relative difficulty-dropdown-container">
                   <label class="text-sm font-semibold" style="color: var(--primary-400);">
                     Difficulty
                   </label>
                   <div
-                    class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none flex justify-between items-center"
-                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
-                    Easy
-                    <i class="absolute right-80 -translate-x-[80%] ti ti-brand-speedtest"
+                    class="w-full px-4 py-3 rounded-2xl border-2 focus-within:border-primary-500 flex justify-between items-center relative"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700); transition: border-color 0.2s;">
+                    <input type="text"
+                           [(ngModel)]="difficulty"
+                           name="difficulty"
+                           (input)="onDifficultyInput($event)"
+                           (focus)="showDifficultyDropdown = true"
+                           placeholder="Select difficulty..."
+                           class="bg-transparent w-full focus:outline-none"
+                           style="color: var(--primary-700);"/>
+                    <i class="ti ti-brand-speedtest mr-2"
                        style="color: var(--primary-400);"></i>
-                    <i class="ti ti-caret-down-filled float-right mt-1"
-                       style="color: var(--primary-700);"></i>
+                    <button type="button"
+                            (click)="toggleDifficultyDropdown()"
+                            class="ti ti-caret-down-filled cursor-pointer hover:opacity-70"
+                            [class.rotate-180]="showDifficultyDropdown"
+                            style="color: var(--primary-700); transition: transform 0.2s;"></button>
                   </div>
+
+                  <!-- Dropdown menu -->
+                  @if (showDifficultyDropdown && filteredDifficultyOptions.length > 0) {
+                    <div class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden"
+                         style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (option of filteredDifficultyOptions; track option) {
+                        <div (click)="selectDifficulty(option)"
+                             class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100"
+                             [class.bg-primary-200]="option === difficulty"
+                             style="color: var(--primary-700);">
+                          {{ option }}
+                        </div>
+                      }
+                    </div>
+                  }
                 </div>
 
                 <!-- Category -->
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2 relative category-dropdown-container">
                   <label class="text-sm font-semibold" style="color: var(--primary-400);">
                     Category
                   </label>
                   <div
-                    class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none flex justify-between items-center"
-                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
-                    Main Dish
-                    <i class="absolute right-16 -translate-x-[90%] ti ti-sun-moon"
+                    class="w-full px-4 py-3 rounded-2xl border-2 focus-within:border-primary-500 flex justify-between items-center relative"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700); transition: border-color 0.2s;">
+                    <input type="text"
+                           [(ngModel)]="category"
+                           name="category"
+                           (input)="onCategoryInput($event)"
+                           (focus)="showCategoryDropdown = true"
+                           placeholder="Select category..."
+                           class="bg-transparent w-full focus:outline-none"
+                           style="color: var(--primary-700);"/>
+                    <i class="ti ti-category mr-2"
                        style="color: var(--primary-400);"></i>
-                    <i class="ti ti-caret-down-filled float-right mt-1"
-                       style="color: var(--primary-700);"></i>
+                    <button type="button"
+                            (click)="toggleCategoryDropdown()"
+                            class="ti ti-caret-down-filled cursor-pointer hover:opacity-70"
+                            [class.rotate-180]="showCategoryDropdown"
+                            style="color: var(--primary-700); transition: transform 0.2s;"></button>
                   </div>
+
+                  <!-- Dropdown menu -->
+                  @if (showCategoryDropdown && filteredCategoryOptions.length > 0) {
+                    <div class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                         style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (option of filteredCategoryOptions; track option) {
+                        <div (click)="selectCategory(option)"
+                             class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100"
+                             [class.bg-primary-200]="option === category"
+                             style="color: var(--primary-700);">
+                          {{ option }}
+                        </div>
+                      }
+                    </div>
+                  }
                 </div>
               </div>
             </div>
             <!-- Tags & Categories -->
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass z-0"
+                 style="border-color: var(--primary-100-40); background: var(--primary-200-40); overflow: visible; position: relative;">
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-tags mr-2"></i>
                 Tags and Characteristics
               </h3>
 
-              <div class="space-y-6">
-                <!-- Dietary Tags -->
-                <div class="flex flex-col gap-3">
-                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Dietary Characteristics
+              <!-- Multi-select Dropdowns Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <!-- Dietary Characteristics Dropdown -->
+                <div class="relative multiselect-dropdown-container z-[5]">
+                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                    <i class="ti ti-leaf mr-1"></i>
+                    Dietary
                   </label>
-                  <div class="flex flex-wrap gap-2">
-                                        <span
-                                          class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
-                                          style="background: var(--primary-100); color: var(--primary-700);">
-                                            <i class="ti ti-leaf mr-1"></i>
-                                            Vegetarian
-                                        </span>
-                    <span
-                      class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
-                      style="background: var(--primary-100); color: var(--primary-700);">
-                                            <i class="ti ti-plant mr-1"></i>
-                                            Vegan
-                                        </span>
-                    <span
-                      class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
-                      style="background: var(--primary-100); color: var(--primary-700);">
-                                            <i class="ti ti-wheat-off mr-1"></i>
-                                            Gluten Free
-                                        </span>
-                    <span
-                      class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
-                      style="background: var(--primary-100); color: var(--primary-700);">
-                                            <i class="ti ti-milk-off mr-1"></i>
-                                            Lactose Free
-                                        </span>
+                  <div class="relative">
+                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text"
+                             [(ngModel)]="dietarySearchTerm"
+                             name="dietarySearch"
+                             placeholder="Search or select..."
+                             (click)="toggleDietaryDropdown()"
+                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                             style="color: var(--primary-700);">
+                      @if (dietaryCharacteristics.length > 0) {
+                        <div class="flex flex-wrap gap-1">
+                          @for (item of dietaryCharacteristics; track item) {
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                                  style="background: var(--primary-500); color: white;">
+                              {{ item }}
+                              <i (click)="removeDietary(item); $event.stopPropagation()"
+                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                         [class.rotate-180]="showDietaryDropdown"
+                         (click)="toggleDietaryDropdown()"
+                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showDietaryDropdown) {
+                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-[1]"
+                           style="background: var(--primary-50); border-color: var(--primary-100);">
+                        @for (option of getFilteredDietaryOptions(); track option) {
+                          <div (click)="toggleDietary(option)"
+                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                               [class.bg-primary-200]="isDietarySelected(option)"
+                               style="color: var(--primary-700);">
+                            <span>{{ option }}</span>
+                            @if (isDietarySelected(option)) {
+                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
                   </div>
                 </div>
 
-                <!-- Cuisine Type -->
-                <div class="flex flex-col gap-3">
-                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Cuisine Type
+                <!-- Cuisine Type Dropdown -->
+                <div class="relative multiselect-dropdown-container z-[3]">
+                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                    <i class="ti ti-flag mr-1"></i>
+                    Cuisine
                   </label>
-                  <div class="flex flex-wrap gap-2">
-                                        <span
-                                          class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item selected"
-                                          style="background: var(--primary-500); color: white;">
-                                            <i class="ti ti-flag mr-1"></i>
-                                            Spanish
-                                        </span>
-                    <span
-                      class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
-                      style="background: var(--primary-100); color: var(--primary-700);">
-                                            <i class="ti ti-flag mr-1"></i>
-                                            Italian
-                                        </span>
-                    <span
-                      class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
-                      style="background: var(--primary-100); color: var(--primary-700);">
-                                            <i class="ti ti-flag mr-1"></i>
-                                            Asian
-                                        </span>
-                    <span
-                      class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-all hover:scale-105 tag-item"
-                      style="background: var(--primary-100); color: var(--primary-700);">
-                                            <i class="ti ti-flag mr-1"></i>
-                                            Mexican
-                                        </span>
+                  <div class="relative">
+                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text"
+                             [(ngModel)]="cuisineSearchTerm"
+                             name="cuisineSearch"
+                             placeholder="Search or select..."
+                             (click)="toggleCuisineDropdown()"
+                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                             style="color: var(--primary-700);">
+                      @if (cuisineTypes.length > 0) {
+                        <div class="flex flex-wrap gap-1">
+                          @for (item of cuisineTypes; track item) {
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                                  style="background: var(--primary-500); color: white;">
+                              {{ item }}
+                              <i (click)="removeCuisine(item); $event.stopPropagation()"
+                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                         [class.rotate-180]="showCuisineDropdown"
+                         (click)="toggleCuisineDropdown()"
+                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showCuisineDropdown) {
+                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                           style="background: var(--primary-50); border-color: var(--primary-100);">
+                        @for (option of getFilteredCuisineOptions(); track option) {
+                          <div (click)="toggleCuisineType(option)"
+                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                               [class.bg-primary-200]="isCuisineTypeSelected(option)"
+                               style="color: var(--primary-700);">
+                            <span>{{ option }}</span>
+                            @if (isCuisineTypeSelected(option)) {
+                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
                   </div>
                 </div>
+
+                <!-- Cautions Dropdown -->
+                <div class="relative multiselect-dropdown-container z-[4]">
+                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                    <i class="ti ti-alert-triangle mr-1"></i>
+                    Allergens
+                  </label>
+                  <div class="relative">
+                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text"
+                             [(ngModel)]="cautionsSearchTerm"
+                             name="cautionsSearch"
+                             placeholder="Search or select..."
+                             (click)="toggleCautionsDropdown()"
+                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                             style="color: var(--primary-700);">
+                      @if (cautions.length > 0) {
+                        <div class="flex flex-wrap gap-1">
+                          @for (item of cautions; track item) {
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                                  style="background: var(--primary-500); color: white;">
+                              {{ item }}
+                              <i (click)="removeCaution(item); $event.stopPropagation()"
+                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                         [class.rotate-180]="showCautionsDropdown"
+                         (click)="toggleCautionsDropdown()"
+                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showCautionsDropdown) {
+                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                           style="background: var(--primary-50); border-color: var(--primary-100);">
+                        @for (option of getFilteredCautionOptions(); track option) {
+                          <div (click)="toggleCaution(option)"
+                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                               [class.bg-primary-200]="isCautionSelected(option)"
+                               style="color: var(--primary-700);">
+                            <span>{{ option }}</span>
+                            @if (isCautionSelected(option)) {
+                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Diet Labels Dropdown -->
+                <div class="relative multiselect-dropdown-container z-[2]">
+                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                    <i class="ti ti-apple mr-1"></i>
+                    Diet Labels
+                  </label>
+                  <div class="relative">
+                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text"
+                             [(ngModel)]="dietLabelsSearchTerm"
+                             name="dietLabelsSearch"
+                             placeholder="Search or select..."
+                             (click)="toggleDietLabelsDropdown()"
+                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                             style="color: var(--primary-700);">
+                      @if (dietLabels.length > 0) {
+                        <div class="flex flex-wrap gap-1">
+                          @for (item of dietLabels; track item) {
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                                  style="background: var(--primary-500); color: white;">
+                              {{ item }}
+                              <i (click)="removeDietLabel(item); $event.stopPropagation()"
+                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                         [class.rotate-180]="showDietLabelsDropdown"
+                         (click)="toggleDietLabelsDropdown()"
+                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showDietLabelsDropdown) {
+                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                           style="background: var(--primary-50); border-color: var(--primary-100);">
+                        @for (option of getFilteredDietLabelOptions(); track option) {
+                          <div (click)="toggleDietLabel(option)"
+                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                               [class.bg-primary-200]="isDietLabelSelected(option)"
+                               style="color: var(--primary-700);">
+                            <span>{{ option }}</span>
+                            @if (isDietLabelSelected(option)) {
+                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Dish Types Dropdown -->
+                <div class="relative multiselect-dropdown-container z-[1]">
+                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                    <i class="ti ti-tools-kitchen-2 mr-1"></i>
+                    Dish Type
+                  </label>
+                  <div class="relative">
+                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text"
+                             [(ngModel)]="dishTypesSearchTerm"
+                             name="dishTypesSearch"
+                             placeholder="Search or select..."
+                             (click)="toggleDishTypesDropdown()"
+                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                             style="color: var(--primary-700);">
+                      @if (dishTypes.length > 0) {
+                        <div class="flex flex-wrap gap-1">
+                          @for (item of dishTypes; track item) {
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                                  style="background: var(--primary-500); color: white;">
+                              {{ item }}
+                              <i (click)="removeDishType(item); $event.stopPropagation()"
+                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                         [class.rotate-180]="showDishTypesDropdown"
+                         (click)="toggleDishTypesDropdown()"
+                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showDishTypesDropdown) {
+                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                           style="background: var(--primary-50); border-color: var(--primary-100);">
+                        @for (option of getFilteredDishTypeOptions(); track option) {
+                          <div (click)="toggleDishType(option)"
+                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                               [class.bg-primary-200]="isDishTypeSelected(option)"
+                               style="color: var(--primary-700);">
+                            <span>{{ option }}</span>
+                            @if (isDishTypeSelected(option)) {
+                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Health Labels Dropdown -->
+                <div class="relative multiselect-dropdown-container z-[0]">
+                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                    <i class="ti ti-heart-plus mr-1"></i>
+                    Health Labels
+                  </label>
+                  <div class="relative">
+                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text"
+                             [(ngModel)]="healthLabelsSearchTerm"
+                             name="healthLabelsSearch"
+                             placeholder="Search or select..."
+                             (click)="toggleHealthLabelsDropdown()"
+                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                             style="color: var(--primary-700);">
+                      @if (healthLabels.length > 0) {
+                        <div class="flex flex-wrap gap-1">
+                          @for (item of healthLabels; track item) {
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                                  style="background: var(--primary-500); color: white;">
+                              {{ item }}
+                              <i (click)="removeHealthLabel(item); $event.stopPropagation()"
+                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                            </span>
+                          }
+                        </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                         [class.rotate-180]="showHealthLabelsDropdown"
+                         (click)="toggleHealthLabelsDropdown()"
+                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showHealthLabelsDropdown) {
+                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                           style="background: var(--primary-50); border-color: var(--primary-100);">
+                        @for (option of getFilteredHealthLabelOptions(); track option) {
+                          <div (click)="toggleHealthLabel(option)"
+                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                               [class.bg-primary-200]="isHealthLabelSelected(option)"
+                               style="color: var(--primary-700);">
+                            <span>{{ option }}</span>
+                            @if (isHealthLabelSelected(option)) {
+                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
           <!-- Col 2-->
-          <div class="flex flex-col justify-between gap-8 w-1/2 h-full">
+          <div class="flex flex-col justify-start gap-8 w-1/2 h-full">
             <!-- Recipe Image -->
             <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
                  style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
@@ -215,17 +546,32 @@
                 Recipe Image
               </h3>
 
-              <div class="flex flex-col items-center gap-6">
-                <!-- Image Preview -->
+              <div class="flex flex-col items-center gap-2 w-full">
+                @if (imagePreviewUrl) {
+                  <img [src]="imagePreviewUrl" alt="Recipe preview" class="h-[10.5rem] w-[10.5rem] flex-none object-cover rounded-xl">
+                  <button type="button"
+                          (click)="removeImage()"
+                          class="absolute mt-4 px-3 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex gap-2 ml-24"
+                          style="background: var(--primary-500); color: white;">
+                    <i class="ti ti-trash"></i>
+                  </button>
+                } @else {
+                  <img alt="Recipe" class="h-[10.5rem] w-[10.5rem] flex-none object-cover rounded-xl" src="/assets/img/recipe.png">
+                }
+              </div>
+              <div class="flex flex-col items-center">
                 <div
-                  class="w-full max-w-md h-64 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden drag-drop-area transition-all"
-                  style="border-color: var(--primary-300); background: var(--primary-100-40);">
+                  class="w-full max-w-md h-64 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden drag-drop-area transition-all cursor-pointer"
+                  style="border-color: var(--primary-300); background: var(--primary-100-40);"
+                  [class.dragging]="isDragging"
+                  (dragover)="onDragOver($event)"
+                  (dragleave)="onDragLeave($event)"
+                  (drop)="onDrop($event)"
+                  (click)="fileInput.click()">
                   <div class="flex flex-col items-center text-center" id="image-placeholder">
                     <i class="ti ti-camera text-6xl mb-4" style="color: var(--primary-400);"></i>
-                    <p class="text-lg font-medium" style="color: var(--primary-700);">Drag an image here
-                    </p>
+                    <p class="text-lg font-medium" style="color: var(--primary-700);">Drag an image here</p>
                     <div class="text-sm" style="color: var(--primary-400);">or
-
                       <!-- Upload Buttons -->
                       <div class="flex flex-wrap gap-3 pt-2">
                         <button type="button"
@@ -238,142 +584,116 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- Hidden file input -->
+                <input
+                  #fileInput
+                  type="file"
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                  class="hidden">
+
               </div>
+
             </div>
 
-            <div class="flex w-full">
-              <div class="tabs glass text-nowrap w-full">
-                <button class="tab active">
-                  <i class="ti ti-basket text-2xl" aria-hidden="true"></i>
-                  Ingredients
-                </button>
-                <button class="tab">
-                  <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
-                  Instructions
-                </button>
-                <button class="tab">
-                  <i class="ti ti-report text-2xl" aria-hidden="true"></i>
-                  Nutrition
-                </button>
-              </div>
-            </div>
-
-            <!-- Ingredients -->
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-              <div class="flex justify-end">
-                <button type="button"
-                        class="px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
-                        style="background: var(--gradient-primary); color: white;">
-                  <i class="ti ti-plus"></i>
-                  Add Ingredient
-                </button>
+            <div class="flex flex-col w-full h-full gap-8">
+              <div class="flex w-full">
+                <div class="tabs glass text-nowrap w-full">
+                  <button class="tab active">
+                    <i class="ti ti-basket text-2xl" aria-hidden="true"></i>
+                    Ingredients
+                  </button>
+                  <button class="tab">
+                    <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
+                    Instructions
+                  </button>
+                  <button class="tab">
+                    <i class="ti ti-report text-2xl" aria-hidden="true"></i>
+                    Nutrition
+                  </button>
+                </div>
               </div>
 
-              <div class="space-y-4" id="ingredients-list">
-                <!-- Ingredient Item 1 -->
-                <div class="flex items-center gap-4 p-4 ingredient-item glass"
-                     style="background: var(--primary-300-40);">
-                  <div class="flex h-10 w-10 items-center justify-center rounded-xl"
-                       style="background: var(--gradient-primary);">
-                    <i class="ti ti-grip-vertical text-white"></i>
-                  </div>
-                  <div class="flex-1 flex flex-row items-center gap-4">
-                    <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
-                         style="background: var(--primary-100-40);">
-                      <i class="ti ti-apple text-xl" style="color: var(--primary-700)"></i>
-                    </div>
-                    <input type="text" placeholder="Name"
-                           class="px-3 py-2 w-11/12 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
-                    <div class="rounded-xl w-full transition-all focus:outline-none">
-                      <div type="text"
-                           class="px-3 py-2 w-full h-full rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
-                        Quantity
-                      </div>
-                      <i class="ti ti-caret-up-down-filled fixed top-1/2 -translate-y-1/2 right-36 text-sm"
-                         style="color: var(--primary-700);"></i>
-                    </div>
-                    <input type="text" placeholder="Unit"
-                           class="px-3 py-3 w-1/3 rounded-xl border transition-all focus:outline-none text-xs"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
-                  </div>
+              <!-- Ingredients -->
+              <div class="flex w-full h-full justify-around flex-col gap-1 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                   style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
+
+                <div class="flex justify-between items-center">
+                  <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                    <i class="ti ti-basket mr-2"></i>
+                    Ingredients
+                  </h3>
+                </div>
+
+                <!-- Add new ingredient form -->
+                <div class="flex items-center gap-4 p-4 glass rounded-2xl"
+                     style="background: var(--primary-100-40);">
+                  <input type="text"
+                         [(ngModel)]="newIngredient.name"
+                         name="newIngredientName"
+                         placeholder="Ingredient name"
+                         class="px-3 py-2 flex-1 rounded-xl border transition-all focus:outline-none"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  <input type="text"
+                         [(ngModel)]="newIngredient.quantity"
+                         name="newIngredientQuantity"
+                         placeholder="Qty"
+                         class="px-3 py-2 w-24 rounded-xl border transition-all focus:outline-none"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  <input type="text"
+                         [(ngModel)]="newIngredient.unit"
+                         name="newIngredientUnit"
+                         placeholder="Unit"
+                         class="px-3 py-2 w-24 rounded-xl border transition-all focus:outline-none"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
                   <button type="button"
-                          class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style="background: var(--primary-100); color: var(--primary-700);">
-                    <i class="ti ti-trash text-red-500"></i>
+                          (click)="addIngredient()"
+                          class="px-2 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
+                          style="background: var(--gradient-primary); color: white;">
+                    <i class="ti ti-plus"></i>
                   </button>
                 </div>
 
-                <!-- Ingredient Item 2 -->
-                <div class="flex items-center gap-4 p-4 ingredient-item glass"
-                     style="background: var(--primary-300-40);">
-                  <div class="flex h-10 w-10 items-center justify-center rounded-xl"
-                       style="background: var(--gradient-primary);">
-                    <i class="ti ti-grip-vertical text-white"></i>
-                  </div>
-                  <div class="flex-1 flex flex-row items-center gap-4">
-                    <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
-                         style="background: var(--primary-100-40);">
-                      <i class="ti ti-bottle text-xl" style="color: var(--primary-700)"></i>
+                <!-- Ingredients list with drag and drop -->
+                <div class="flex flex-col gap-4 mt-3" id="ingredients-list">
+                  @if (ingredients.length === 0) {
+                    <div class="text-center py-2" style="color: var(--primary-400);">
+                      <i class="ti ti-basket-off text-4xl mb-2"></i>
+                      <p>No ingredients added yet</p>
                     </div>
-                    <input type="text" placeholder="Name"
-                           class="px-3 py-2 w-11/12 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
-                    <div class="rounded-xl w-full transition-all focus:outline-none">
-                      <div type="text"
-                           class="px-3 py-2 w-full h-full rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
-                        Quantity
+                  }
+                  @for (ingredient of ingredients; track $index; let i = $index) {
+                    <div class="flex items-center gap-4 p-4 ingredient-item glass rounded-2xl cursor-move"
+                         style="background: var(--primary-300-40);"
+                         draggable="true"
+                         (dragstart)="onIngredientDragStart(i)"
+                         (dragover)="onIngredientDragOver($event)"
+                         (drop)="onIngredientDrop(i)">
+                      <div class="flex h-10 w-10 items-center justify-center rounded-xl grip-handle"
+                           style="background: var(--gradient-primary); cursor: grab;">
+                        <i class="ti ti-grip-vertical text-white"></i>
                       </div>
-                      <i class="ti ti-caret-up-down-filled fixed top-1/2 -translate-y-1/2 right-36 text-sm"
-                         style="color: var(--primary-700);"></i>
-                    </div>
-                    <input type="text" placeholder="Unit"
-                           class="px-3 py-3 w-1/3 rounded-xl border transition-all focus:outline-none text-xs"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
-                  </div>
-                  <button type="button"
-                          class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style="background: var(--primary-100); color: var(--primary-700);">
-                    <i class="ti ti-trash text-red-500"></i>
-                  </button>
-                </div>
-                <!-- Ingredient Item 3 -->
-                <div class="flex items-center gap-4 p-4 ingredient-item glass"
-                     style="background: var(--primary-300-40);">
-                  <div class="flex h-10 w-10 items-center justify-center rounded-xl"
-                       style="background: var(--gradient-primary);">
-                    <i class="ti ti-grip-vertical text-white"></i>
-                  </div>
-                  <div class="flex-1 flex flex-row items-center gap-4">
-                    <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
-                         style="background: var(--primary-100-40);">
-                      <i class="ti ti-lemon-2 text-xl" style="color: var(--primary-700)"></i>
-                    </div>
-                    <input type="text" placeholder="Name"
-                           class="px-3 py-2 w-11/12 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
-                    <div class="rounded-xl w-full transition-all focus:outline-none">
-                      <div type="text"
-                           class="px-3 py-2 w-full h-full rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
-                        Quantity
+                      <div class="flex-1 flex flex-row items-center gap-4">
+                        <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
+                             style="background: var(--primary-100-40);">
+                          <i class="ti ti-apple text-xl" style="color: var(--primary-700)"></i>
+                        </div>
+                        <span class="flex-1 font-medium" style="color: var(--primary-700);">
+                          {{ ingredient.name }}
+                        </span>
+                        <span class="px-3 py-1 rounded-xl" style="background: var(--primary-100-40); color: var(--primary-700);">
+                          {{ ingredient.quantity }} {{ ingredient.unit }}
+                        </span>
                       </div>
-                      <i class="ti ti-caret-up-down-filled fixed top-1/2 -translate-y-1/2 right-36 text-sm"
-                         style="color: var(--primary-700);"></i>
+                      <button type="button"
+                              (click)="removeIngredient(i)"
+                              class="delete-button w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style="background: var(--primary-100);">
+                        <i class="ti ti-trash text-red-500"></i>
+                      </button>
                     </div>
-                    <input type="text" placeholder="Unit"
-                           class="px-3 py-3 w-1/3 rounded-xl border transition-all focus:outline-none text-xs"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
-                  </div>
-                  <button type="button"
-                          class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style="background: var(--primary-100); color: var(--primary-700);">
-                    <i class="ti ti-trash text-red-500"></i>
-                  </button>
+                  }
                 </div>
               </div>
             </div>

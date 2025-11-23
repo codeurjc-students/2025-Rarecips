@@ -5,17 +5,6 @@ import {SessionService} from '../../services/session.service';
 import {UsernameValidationService} from '../../services/username-validation.service';
 import {OnInit} from '@angular/core';
 
-interface Ingredient {
-  name: string;
-  quantity: string;
-  unit: string;
-}
-
-interface Instruction {
-  step: number;
-  description: string;
-}
-
 @Component({
   selector: 'app-profile-edit',
   templateUrl: './profile-edit.component.html',
@@ -29,14 +18,14 @@ export class ProfileEditComponent implements OnInit {
 
   isDragging: boolean = false;
 
-  usernameInput: HTMLInputElement = null as any;
   emailInput: HTMLInputElement = null as any;
+  displaynameInput: HTMLInputElement = null as any;
+  bioInput: HTMLInputElement = null as any;
 
-  usernameList: string[] = [];
   emailList: string[] = [];
 
-  isUsernameAvailable: boolean = null as any;
   isEmailAvailable: boolean = null as any;
+  isEmailValid: boolean = null as any;
 
   constructor(
     private router: Router,
@@ -71,32 +60,15 @@ export class ProfileEditComponent implements OnInit {
         });
     });
 
-    this.usernameInput = document.getElementsByClassName('usernameInput')[0] as HTMLInputElement;
+    this.displaynameInput = document.getElementsByClassName("displayNameInput")[0] as HTMLInputElement;
+    this.bioInput = document.getElementsByClassName("bioInput")[0] as HTMLInputElement;
     this.emailInput = document.getElementsByClassName("emailInput")[0] as HTMLInputElement;
 
-    this.usernameInput.oninput = (ev) => {
-      if (this.usernameInput.value === this.user.username) {
-        this.isUsernameAvailable = null as any;
-        this.usernameValidationService.updateUsernameStyles(this.usernameInput, true);
-        this.usernameInput.setCustomValidity('');
-        return;
-      }
-
-      this.sessionService.getUsernameList().subscribe(usernames => {
-        this.usernameList = usernames;
-        if (this.usernameList.includes(this.usernameInput.value)) {
-          this.isUsernameAvailable = false;
-          this.usernameValidationService.updateUsernameStyles(this.usernameInput, false);
-          this.usernameInput.setCustomValidity('Username is already taken.');
-        } else {
-          this.isUsernameAvailable = true;
-          this.usernameValidationService.updateUsernameStyles(this.usernameInput, true);
-          this.usernameInput.setCustomValidity('');
-        }
-      })
-    }
-
     this.emailInput.oninput = (ev) => {
+      this.isEmailValid = (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.emailInput.value));
+
+      this.usernameValidationService.updateEmailStyles(this.emailInput, this.isEmailValid);
+
       if (this.emailInput.value === this.user.email) {
         this.isEmailAvailable = null as any;
         this.usernameValidationService.updateEmailStyles(this.emailInput, true);
@@ -110,7 +82,7 @@ export class ProfileEditComponent implements OnInit {
           this.isEmailAvailable = false;
           this.usernameValidationService.updateEmailStyles(this.emailInput, false);
           this.emailInput.setCustomValidity('Email is already taken.');
-        } else {
+        } else if (!this.emailList.includes(this.emailInput.value) && this.isEmailValid) {
           this.isEmailAvailable = true;
           this.usernameValidationService.updateEmailStyles(this.emailInput, true);
           this.emailInput.setCustomValidity('');
@@ -177,14 +149,17 @@ export class ProfileEditComponent implements OnInit {
 
   formValid(): boolean {
     // Basic validation
-    return (this.isUsernameAvailable == false || this.isEmailAvailable == false || !this.usernameInput.value || !this.emailInput.value);
+    return (this.isEmailAvailable == false || !this.emailInput.value || this.isEmailValid == false);
   }
 
   saveChanges(): void {
-    console.log(this.formValid());
     //More conditions in the future
     //if...
     // Prepare updated user data
+    this.user.displayName = this.displaynameInput.value;
+    this.user.email = this.emailInput.value;
+    this.user.bio = this.bioInput.value;
+
     const userData = {
       username: this.user.username,
       displayName: this.user.displayName,
@@ -193,10 +168,11 @@ export class ProfileEditComponent implements OnInit {
       profileImageString: this.user.profileImageString
     };
 
-    this.userService.updateUser(this.user.username, userData).subscribe({
+    this.userService.updateUser(this.usernamePath, userData).subscribe({
       next: (response) => {
-        console.log('User updated successfully', response);
-        this.router.navigate(['/users', this.user.username]);
+        this.router.navigate(['/users', this.usernamePath]).then(() => {
+          window.location.reload();
+        });
       },
       error: (error) => {
         console.error('Error updating user data:', error);

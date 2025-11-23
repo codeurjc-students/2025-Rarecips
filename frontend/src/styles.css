@@ -2,9 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-100);
+  border-radius: 10px;
+  margin: 8px 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-400);
+  border-radius: 10px;
+  border: 2px solid var(--primary-50);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-500);
+}
+
 body {
   font-family: 'Fredoka', sans-serif;
-  color: var(--primary-text)
+  color: var(--primary-text);
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.container {
+  overflow: visible !important;
 }
 
 .line-clamp-2 {

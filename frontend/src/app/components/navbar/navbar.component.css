@@ -204,7 +204,9 @@ button:focus {
 
 .auth-btn:hover {
   background-color: var(--primary-600);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: scale(1.04);
+  transition: all 0.2s ease-in-out;
 }
 
 /* User Avatar */
@@ -318,6 +320,19 @@ button:focus {
   height: 22px;
   background: #fff;
 }
+
+.create-recipe-btn:hover {
+  border-color: var(--primary-400);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: scale(1.04);
+  transition: all 0.2s ease-in-out;
+}
+
+.create-recipe-btn {
+  transform: scale(1);
+  transition: all 0.2s ease;
+}
+
 
 #dropdownIcon {
   transition: transform 0.2s ease-in-out;
@@ -506,4 +521,5 @@ button:focus {
     display: none;
   }
 }
+
 
