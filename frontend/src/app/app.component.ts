@@ -1,6 +1,6 @@
 import {ActivatedRoute, NavigationEnd, Router, RouterOutlet, RoutesRecognized} from '@angular/router';
 import {filter} from 'rxjs';
-import {Component, ElementRef, Renderer2} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {NavbarComponent} from './components/navbar/navbar.component';
 
 @Component({
@@ -12,15 +12,14 @@ import {NavbarComponent} from './components/navbar/navbar.component';
   ],
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'Rarecips';
+export class AppComponent implements OnInit, OnDestroy {
+  title = 'rarecips';
 
   showNavbarFooter: boolean = true;
   backButton: boolean = false;
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private elementRef: ElementRef,
               private renderer: Renderer2) {
-
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd || event instanceof RoutesRecognized)

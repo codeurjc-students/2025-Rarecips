@@ -13,7 +13,6 @@ interface Recipe {
   };
   stats: {
     prepTime: number;
-    cookTime: number;
     servings: number;
     rating: number;
     reviews: number;

@@ -93,6 +93,10 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     private userService: UserService,
     private usernameValidationService: UsernameValidationService
   ) {
+    setTimeout(() => {
+      this.restoreCardPositions();
+    }, 1000);
+
     this.switchTab(this.activatedRoute.snapshot.routeConfig?.path === 'signup' ? 'signup' : 'login');
   }
 

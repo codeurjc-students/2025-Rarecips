@@ -27,12 +27,16 @@ export class NavbarComponent implements OnInit {
   ];
 
   logoSrc = "assets/icons/Rarecips_Isotipo.svg";
-  bowlIcon: string = "../../../assets/icons/bowl-spoon.svg";
+  logoCont: HTMLImageElement = null as any;
+  bowlIcon: string = "assets/icons/bowl-spoon.svg";
 
   currentLanguage = 'es';
   isAuthenticated = false;
   isAdmin = false;
   user: any = null;
+  private isLogoClicked: boolean = false;
+  private animatingWithdraw: boolean = false;
+  private animatingStir: boolean = false;
 
   constructor(private router: Router, private sessionService: SessionService) {
   }
@@ -73,14 +77,24 @@ export class NavbarComponent implements OnInit {
       behavior: 'smooth' // Smooth scroll to top
     });
     // Logo change
-    this.logoSrc = "assets/icons/Rarecips_Stir.svg";
-    setTimeout(() => {
-      this.logoSrc = "assets/icons/Rarecips_Isotipo.svg"; // Reset after 1 second
-    }, 1000);
+    this.logoCont = document.getElementsByClassName("logoImg")[0] as HTMLImageElement;
+    if (!this.isLogoClicked) {
+      this.logoCont.src = "assets/icons/Rarecips_Stir.svg";
+      this.isLogoClicked = true;
+
+      setTimeout(() => {
+        this.logoCont.src = "assets/icons/Rarecips_Isotipo.svg"; // Reset after 0.8 seconds
+        this.isLogoClicked = false;
+      }, 800);
+    }
+    //dismiss any clicks on the logo during the timeout
   }
 
   onHover(isHovering: boolean): void {
+    const bowlImg = document.getElementsByClassName("bowlIcon")[0] as HTMLImageElement;
     this.bowlIcon = isHovering ? "assets/icons/bowl-spoon-stir.svg" : "assets/icons/bowl-spoon-withdraw.svg";
+
+
   }
 
   openSearchDialog(): void {

@@ -33,6 +33,7 @@ body {
 
 .container {
   overflow: visible !important;
+  width: 100vh;
 }
 
 .line-clamp-2 {

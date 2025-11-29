@@ -1,5 +1,45 @@
 /* Recipe Editor Specific Styles */
 
+.container {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  max-height: calc(100vh - 6rem);
+}
+
+form {
+  overflow: visible !important;
+  position: relative;
+}
+
+.dropdown-container {
+  position: relative;
+  z-index: 10;
+}
+
+.dropdown-menu {
+  position: absolute;
+}
+
+.container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: var(--primary-100);
+  border-radius: 10px;
+  margin: 8px 4px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: var(--primary-400);
+  border-radius: 10px;
+  border: 2px solid var(--primary-50);
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-500);
+}
+
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -361,6 +401,12 @@ select {
 .dropdown-force-top {
 }
 
+.dropdown-up {
+  margin-bottom: 8px;
+  position: absolute;
+  top: -16rem;
+}
+
 .difficulty-dropdown-container .dropdown-menu::-webkit-scrollbar,
 .category-dropdown-container .dropdown-menu::-webkit-scrollbar {
   width: 8px;
@@ -413,3 +459,8 @@ select {
 .multiselect-dropdown-container .dropdown-menu > div {
   padding-right: 12px;
 }
+
+.publishBut:hover {
+  z-index: -1;
+}
+

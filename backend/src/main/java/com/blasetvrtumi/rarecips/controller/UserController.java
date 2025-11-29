@@ -87,7 +87,6 @@ public class UserController {
         currentUser.setDisplayName(updatedUser.getDisplayName());
         currentUser.setEmail(updatedUser.getEmail());
         currentUser.setBio(updatedUser.getBio());
-        System.out.println(currentUser);
         userService.save(currentUser);
 
         String currentUsername = authentication.getName();

@@ -67,4 +67,7 @@ public class ImageService {
         return null;
     }
 
+    public String localImageToString(String s) {
+        return blobToString(localImageToBlob(s));
+    }
 }

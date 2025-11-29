@@ -18,13 +18,13 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByAuthor(User author);
 
-    @Query("SELECT DISTINCT r.cuisineType FROM Recipe r WHERE r.cuisineType IS NOT NULL")
+    @Query("SELECT DISTINCT ct FROM Recipe r JOIN r.cuisineType ct WHERE ct IS NOT NULL")
     List<String> findDistinctCuisineTypes();
 
-    @Query("SELECT DISTINCT r.dishTypes FROM Recipe r WHERE r.dishTypes IS NOT NULL")
+    @Query("SELECT DISTINCT dt FROM Recipe r JOIN r.dishTypes dt WHERE dt IS NOT NULL")
     List<String> findDistinctDishTypes();
 
-    @Query("SELECT DISTINCT r.mealTypes FROM Recipe r WHERE r.mealTypes IS NOT NULL")
+    @Query("SELECT DISTINCT mt FROM Recipe r JOIN r.mealTypes mt WHERE mt IS NOT NULL")
     List<String> findDistinctMealTypes();
 
     @Query("SELECT MIN(r.totalTime), MAX(r.totalTime) FROM Recipe r WHERE r.totalTime IS NOT NULL")
@@ -74,6 +74,42 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             @Param("cuisineType") String cuisineType,
             @Param("dishType") String dishType,
             @Param("mealType") String mealType,
+            Pageable pageable
+    );
+
+    // Query methods for tags
+    @Query("SELECT r FROM Recipe r JOIN r.dietLabels dl WHERE dl = :dietLabel")
+    List<Recipe> findByDietLabel(@Param("dietLabel") String dietLabel);
+
+    @Query("SELECT r FROM Recipe r JOIN r.healthLabels hl WHERE hl = :healthLabel")
+    List<Recipe> findByHealthLabel(@Param("healthLabel") String healthLabel);
+
+    @Query("SELECT r FROM Recipe r JOIN r.cautions c WHERE c = :caution")
+    List<Recipe> findByCaution(@Param("caution") String caution);
+
+    @Query("SELECT r FROM Recipe r JOIN r.cuisineType ct WHERE ct = :cuisineType")
+    List<Recipe> findByCuisineType(@Param("cuisineType") String cuisineType);
+
+    @Query("SELECT r FROM Recipe r JOIN r.dishTypes dt WHERE dt = :dishType")
+    List<Recipe> findByDishType(@Param("dishType") String dishType);
+
+    @Query("SELECT r FROM Recipe r JOIN r.mealTypes mt WHERE mt = :mealType")
+    List<Recipe> findByMealType(@Param("mealType") String mealType);
+
+    @Query("SELECT r FROM Recipe r WHERE " +
+            "(:dietLabels IS NULL OR EXISTS (SELECT dl FROM r.dietLabels dl WHERE dl IN :dietLabels)) AND " +
+            "(:healthLabels IS NULL OR EXISTS (SELECT hl FROM r.healthLabels hl WHERE hl IN :healthLabels)) AND " +
+            "(:cautions IS NULL OR NOT EXISTS (SELECT c FROM r.cautions c WHERE c IN :cautions)) AND " +
+            "(:cuisineTypes IS NULL OR EXISTS (SELECT ct FROM r.cuisineType ct WHERE ct IN :cuisineTypes)) AND " +
+            "(:dishTypes IS NULL OR EXISTS (SELECT dt FROM r.dishTypes dt WHERE dt IN :dishTypes)) AND " +
+            "(:mealTypes IS NULL OR EXISTS (SELECT mt FROM r.mealTypes mt WHERE mt IN :mealTypes))")
+    Page<Recipe> findByTags(
+            @Param("dietLabels") List<String> dietLabels,
+            @Param("healthLabels") List<String> healthLabels,
+            @Param("cautions") List<String> cautions,
+            @Param("cuisineTypes") List<String> cuisineTypes,
+            @Param("dishTypes") List<String> dishTypes,
+            @Param("mealTypes") List<String> mealTypes,
             Pageable pageable
     );
 }

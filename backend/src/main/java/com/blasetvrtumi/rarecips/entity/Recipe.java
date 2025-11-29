@@ -1,6 +1,7 @@
 package com.blasetvrtumi.rarecips.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
@@ -57,6 +58,7 @@ public class Recipe {
 
     @JsonView(BasicInfo.class)
     @ManyToMany
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Ingredient> ingredients = new ArrayList<>();
 
     @JsonView(BasicInfo.class)
@@ -98,8 +100,9 @@ public class Recipe {
     @JsonView(BasicInfo.class)
     private Float rating;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonView(BasicInfo.class)
+    @JsonIgnoreProperties({"recipes", "reviews", "savedRecipes", "hibernateLazyInitializer", "handler"})
     @JoinColumn(name = "author_username", referencedColumnName = "username")
     private User author;
 
@@ -109,6 +112,7 @@ public class Recipe {
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
     @JsonView(BasicInfo.class)
+    @JsonIgnoreProperties({"recipe", "user", "hibernateLazyInitializer", "handler"})
     private List<Review> reviews = new ArrayList<>();
 
     @CreationTimestamp
@@ -245,6 +249,10 @@ public class Recipe {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Float getTotalTime() {
         return totalTime;
     }
@@ -279,6 +287,10 @@ public class Recipe {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public User getAuthorUser() {
+        return author;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -339,6 +351,10 @@ public class Recipe {
 
     public List<String> getSteps() {
         return steps;
+    }
+
+    public void setSteps(List<String> steps) {
+        this.steps = steps;
     }
 
 }

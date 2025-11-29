@@ -1,9 +1,12 @@
 package com.blasetvrtumi.rarecips.service;
 
+import com.blasetvrtumi.rarecips.entity.Ingredient;
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.User;
+import com.blasetvrtumi.rarecips.repository.IngredientRepository;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
+import com.blasetvrtumi.rarecips.util.EnumValidator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,9 @@ public class RecipeService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private IngredientRepository ingredientRepository;
 
     public Recipe findById(Long id) {
         return recipeRepository.findById(id)
@@ -47,6 +54,88 @@ public class RecipeService {
         User author = userRepository.findByUsername(username);
         recipe.setAuthor(author);
         return recipeRepository.save(recipe);
+    }
+
+    public Recipe updateRecipe(Long id, Recipe recipeDetails, String username) {
+        Recipe existingRecipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
+
+        User recipeAuthor = existingRecipe.getAuthorUser();
+        if (recipeAuthor == null || !recipeAuthor.getUsername().equals(username)) {
+            User user = userRepository.findByUsername(username);
+            if (user == null || !user.getRole().equals("ADMIN")) {
+                throw new SecurityException("You are not authorized to update this recipe");
+            }
+        }
+
+        EnumValidator.validateDifficulty(recipeDetails.getDifficulty());
+        EnumValidator.validateCuisineTypes(recipeDetails.getCuisineType());
+        EnumValidator.validateCautions(recipeDetails.getCautions());
+        EnumValidator.validateDietLabels(recipeDetails.getDietLabels());
+        EnumValidator.validateDishTypes(recipeDetails.getDishTypes());
+        EnumValidator.validateMealTypes(recipeDetails.getMealTypes());
+        EnumValidator.validateHealthLabels(recipeDetails.getHealthLabels());
+
+        if (recipeDetails.getLabel() != null) {
+            existingRecipe.setLabel(recipeDetails.getLabel());
+        }
+        if (recipeDetails.getDescription() != null) {
+            existingRecipe.setDescription(recipeDetails.getDescription());
+        }
+        if (recipeDetails.getPeople() != null) {
+            existingRecipe.setPeople(recipeDetails.getPeople());
+        }
+        if (recipeDetails.getIngredients() != null) {
+            existingRecipe.setIngredients(recipeDetails.getIngredients());
+        }
+        existingRecipe.setDifficulty(recipeDetails.getDifficulty());
+        if (recipeDetails.getDishTypes() != null) {
+            existingRecipe.setDishTypes(recipeDetails.getDishTypes());
+        }
+        if (recipeDetails.getMealTypes() != null) {
+            existingRecipe.setMealTypes(recipeDetails.getMealTypes());
+        }
+        if (recipeDetails.getCuisineType() != null) {
+            existingRecipe.setCuisineType(recipeDetails.getCuisineType());
+        }
+        if (recipeDetails.getDietLabels() != null) {
+            existingRecipe.setDietLabels(recipeDetails.getDietLabels());
+        }
+        if (recipeDetails.getHealthLabels() != null) {
+            existingRecipe.setHealthLabels(recipeDetails.getHealthLabels());
+        }
+        if (recipeDetails.getCautions() != null) {
+            existingRecipe.setCautions(recipeDetails.getCautions());
+        }
+        if (recipeDetails.getTotalTime() != null) {
+            existingRecipe.setTotalTime(recipeDetails.getTotalTime());
+        }
+        if (recipeDetails.getCalories() != null) {
+            existingRecipe.setCalories(recipeDetails.getCalories());
+        }
+        if (recipeDetails.getSteps() != null) {
+            existingRecipe.setSteps(recipeDetails.getSteps());
+        }
+        if (recipeDetails.getImageString() != null) {
+            existingRecipe.setImageString(recipeDetails.getImageString());
+        }
+
+        return recipeRepository.save(existingRecipe);
+    }
+
+    public void deleteRecipe(Long id, String username) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
+
+        User recipeAuthor = recipe.getAuthorUser();
+        if (recipeAuthor == null || !recipeAuthor.getUsername().equals(username)) {
+            User user = userRepository.findByUsername(username);
+            if (user == null || !user.getRole().equals("ADMIN")) {
+                throw new SecurityException("You are not authorized to delete this recipe");
+            }
+        }
+
+        recipeRepository.delete(recipe);
     }
 
     public Object findAll() {

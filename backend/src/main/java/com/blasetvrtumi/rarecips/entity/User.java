@@ -73,7 +73,7 @@ public class User {
     // Different lists of elements that the user has
 
     // Recipes a user has created
-    @JsonView(Recipes.class)
+    @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Recipe> recipes = new ArrayList<>();
 

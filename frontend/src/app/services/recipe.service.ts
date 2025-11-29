@@ -1,7 +1,8 @@
 import {Injectable} from "@angular/core";
 import {Recipe} from "../models/recipe.model";
 import {Router} from "@angular/router";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse, HttpHeaders} from "@angular/common/http";
+import {catchError, Observable, throwError} from "rxjs";
 
 @Injectable({
   providedIn: "root"
@@ -25,12 +26,13 @@ export class RecipeService {
     const data = await response.json();
     return data.recipes.map((recipe: any) => ({
       id: recipe.id,
+      label: recipe.label,
       title: recipe.label,
       description: recipe.description || "No description available.",
       imageUrl: recipe.imageString,
       imageString: recipe.imageString,
       people: recipe.people || 4,
-      difficulty: recipe.difficulty || "Medium",
+      difficulty: recipe.difficulty || 1,
       ingredients: recipe.ingredients || [],
       dishTypes: recipe.dishTypes || [],
       mealTypes: recipe.mealTypes || [],
@@ -44,6 +46,7 @@ export class RecipeService {
       rating: recipe.rating || 0,
       author: recipe.author || "",
       reviews: recipe.reviews || [],
+      steps: recipe.steps || [],
       createdAt: new Date(recipe.createdAt) || new Date(),
       updatedAt: new Date(recipe.updatedAt) || new Date()
     }));
@@ -57,6 +60,7 @@ export class RecipeService {
     const data = (await response.json()).recipe;
     return {
       id: data.id,
+      label: data.label,
       title: data.label,
       description: data.description || "No description available.",
       imageUrl: data.imageString,
@@ -80,5 +84,36 @@ export class RecipeService {
       createdAt: new Date(data.createdAt) || new Date(),
       updatedAt: new Date(data.updatedAt) || new Date()
     };
+  }
+
+  createRecipe(recipeData: any): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}`, recipeData).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  updateRecipe(id: number, recipeData: any): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${id}`, recipeData).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  deleteRecipe(id: number): Observable<any> {
+    return this.httpClient.delete(`${this.API_URL}/${id}`).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  private handleError = (error: HttpErrorResponse): Observable<never> => {
+    let errorMessage = 'Unknown error occurred';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 }

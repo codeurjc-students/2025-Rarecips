@@ -1,6 +1,10 @@
-import {Component, HostListener} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
+import {HttpClientModule} from '@angular/common/http';
+import {ActivatedRoute, Router} from '@angular/router';
+import {RecipeService} from '../../services/recipe.service';
+import {EnumService} from '../../services/enum.service';
 
 interface Ingredient {
   name: string;
@@ -17,9 +21,8 @@ interface RecipeData {
   title: string;
   description: string;
   prepTime: number;
-  cookTime: number;
   servings: number;
-  difficulty: string;
+  difficulty: number;
   category: string;
   image: string;
   ingredients: Ingredient[];
@@ -34,25 +37,32 @@ interface RecipeData {
   standalone: true,
   imports: [
     FormsModule,
-    CommonModule
+    CommonModule,
+    HttpClientModule
   ],
   styleUrls: ['./recipe-edit.component.css']
 })
-export class RecipeEditComponent {
+export class RecipeEditComponent implements OnInit {
 
+  // Recipe ID (null for new recipe)
+  recipeId: number | null = null;
+  isEditMode: boolean = false;
+
+  title: string = '';
+  description: string = '';
   prepTime: number = 0;
   servings: number = 1;
 
   // Difficulty dropdown
-  difficulty: string = '';
-  difficultyOptions: string[] = ['Easy', 'Medium', 'Hard'];
-  filteredDifficultyOptions: string[] = [...this.difficultyOptions];
+  difficulty: number = 1;
+  difficultyOptions: number[] = [];
+  filteredDifficultyOptions: number[] = [];
   showDifficultyDropdown: boolean = false;
 
   // Category dropdown
   category: string = '';
-  categoryOptions: string[] = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snack', 'Appetizer', 'Beverage'];
-  filteredCategoryOptions: string[] = [...this.categoryOptions];
+  categoryOptions: string[] = [];
+  filteredCategoryOptions: string[] = [];
   showCategoryDropdown: boolean = false;
 
   // Tags and Characteristics - Multi-select dropdowns
@@ -64,31 +74,31 @@ export class RecipeEditComponent {
 
   // Cuisine
   cuisineTypes: string[] = [];
-  cuisineTypeOptions: string[] = ['Spanish', 'Italian', 'Asian', 'Mexican', 'American', 'French', 'Mediterranean', 'Middle Eastern', 'Latin American', 'Indian'];
+  cuisineTypeOptions: string[] = [];
   showCuisineDropdown: boolean = false;
   cuisineSearchTerm: string = '';
 
   // Cautions
   cautions: string[] = [];
-  cautionOptions: string[] = ['Sulfites', 'Tree-Nuts', 'Shellfish', 'Peanuts', 'Gluten', 'Dairy', 'Eggs', 'Soy', 'Wheat', 'Fish'];
+  cautionOptions: string[] = [];
   showCautionsDropdown: boolean = false;
   cautionsSearchTerm: string = '';
 
   // Diet Labels
   dietLabels: string[] = [];
-  dietLabelOptions: string[] = ['Balanced', 'High-Fiber', 'High-Protein', 'Low-Carb', 'Low-Fat', 'Low-Sodium'];
+  dietLabelOptions: string[] = [];
   showDietLabelsDropdown: boolean = false;
   dietLabelsSearchTerm: string = '';
 
   // Dish Types
   dishTypes: string[] = [];
-  dishTypeOptions: string[] = ['Starter', 'Main course', 'Side dish', 'Soup', 'Salad', 'Bread', 'Dessert', 'Drinks', 'Biscuits and cookies', 'Condiments and sauces'];
+  dishTypeOptions: string[] = [];
   showDishTypesDropdown: boolean = false;
   dishTypesSearchTerm: string = '';
 
   // Health Labels
   healthLabels: string[] = [];
-  healthLabelOptions: string[] = ['Vegan', 'Vegetarian', 'Paleo', 'Dairy-Free', 'Gluten-Free', 'Wheat-Free', 'Egg-Free', 'Peanut-Free', 'Tree-Nut-Free', 'Soy-Free', 'Fish-Free', 'Shellfish-Free', 'Pork-Free', 'Red-Meat-Free', 'Crustacean-Free', 'Celery-Free', 'Mustard-Free', 'Sesame-Free', 'Lupine-Free', 'Mollusk-Free', 'Alcohol-Free', 'No oil added', 'Sulfite-Free', 'FODMAP-Free', 'Kosher', 'Immuno-Supportive'];
+  healthLabelOptions: string[] = [];
   showHealthLabelsDropdown: boolean = false;
   healthLabelsSearchTerm: string = '';
 
@@ -109,7 +119,128 @@ export class RecipeEditComponent {
   imagePreviewUrl: string = '';
   isDragging: boolean = false;
 
-  constructor() {
+  // Tabs
+  activeTab: 'ingredients' | 'instructions' | 'nutrition' = 'ingredients';
+
+  // Nutrition
+  calories: number = 0;
+  protein: number = 0;
+  carbs: number = 0;
+  fat: number = 0;
+  fiber: number = 0;
+  sugar: number = 0;
+  sodium: number = 0;
+  totalWeight: number = 0;
+
+  constructor(private route: ActivatedRoute, private router: Router, private recipeService: RecipeService, private enumService: EnumService) {
+  }
+
+  ngOnInit(): void {
+    // Load enum values from backend
+    this.loadEnumValues();
+
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      this.recipeId = id ? +id : null;
+      this.isEditMode = this.recipeId !== null;
+
+      if (this.isEditMode) {
+        this.loadRecipe();
+      }
+    });
+  }
+
+  loadEnumValues(): void {
+    this.enumService.getDifficultyLevels().subscribe({
+      next: (levels) => {
+        this.difficultyOptions = levels;
+        this.filteredDifficultyOptions = [...levels];
+      },
+      error: (err) => console.error('Error loading difficulty levels:', err)
+    });
+
+    this.enumService.getMealTypes().subscribe({
+      next: (types) => {
+        this.categoryOptions = types;
+        this.filteredCategoryOptions = [...types];
+      },
+      error: (err) => console.error('Error loading meal types:', err)
+    });
+
+    this.enumService.getCuisineTypes().subscribe({
+      next: (types) => {
+        this.cuisineTypeOptions = types;
+      },
+      error: (err) => console.error('Error loading cuisine types:', err)
+    });
+
+    this.enumService.getCautions().subscribe({
+      next: (cautions) => {
+        this.cautionOptions = cautions;
+      },
+      error: (err) => console.error('Error loading cautions:', err)
+    });
+
+    this.enumService.getDietLabels().subscribe({
+      next: (labels) => {
+        this.dietLabelOptions = labels;
+      },
+      error: (err) => console.error('Error loading diet labels:', err)
+    });
+
+    this.enumService.getDishTypes().subscribe({
+      next: (types) => {
+        this.dishTypeOptions = types;
+      },
+      error: (err) => console.error('Error loading dish types:', err)
+    });
+
+    this.enumService.getHealthLabels().subscribe({
+      next: (labels) => {
+        this.healthLabelOptions = labels;
+      },
+      error: (err) => console.error('Error loading health labels:', err)
+    });
+  }
+
+  async loadRecipe(): Promise<void> {
+    if (this.recipeId !== null) {
+      const recipe = await this.recipeService.getRecipeById(this.recipeId);
+      if (recipe) {
+        this.title = recipe.title;
+        this.description = recipe.description;
+        this.servings = recipe.people;
+
+        this.difficulty = recipe.difficulty || 1;
+
+        this.imagePreviewUrl = recipe.imageString;
+
+        // Convert ingredients
+        this.ingredients = recipe.ingredients.map(ing => ({
+          name: ing.food,
+          quantity: ing.quantity.toString(),
+          unit: ing.measure
+        }));
+
+        // Load instructions
+        this.instructions = recipe.steps.map((step, index) => ({
+          step: index + 1,
+          description: step
+        }));
+
+        this.cuisineTypes = recipe.cuisineType;
+        this.cautions = recipe.cautions;
+        this.dietLabels = recipe.dietLabels;
+        this.dishTypes = recipe.dishTypes;
+        this.healthLabels = recipe.healthLabels;
+        this.calories = recipe.calories;
+        this.totalWeight = recipe.totalWeight || 0;
+      }
+    }
+  }
+
+  setActiveTab(tab: 'ingredients' | 'instructions' | 'nutrition'): void {
+    this.activeTab = tab;
   }
 
   incrementValue(field: 'prepTime' | 'servings'): void {
@@ -152,15 +283,15 @@ export class RecipeEditComponent {
 
   // Difficulty methods
   onDifficultyInput(event: Event): void {
-    const input = (event.target as HTMLInputElement).value;
+    const input = parseInt((event.target as HTMLInputElement).value);
     this.difficulty = input;
     this.filteredDifficultyOptions = this.difficultyOptions.filter(option =>
-      option.toLowerCase().includes(input.toLowerCase())
+      option === input
     );
     this.showDifficultyDropdown = true;
   }
 
-  selectDifficulty(option: string): void {
+  selectDifficulty(option: number): void {
     this.difficulty = option;
     this.showDifficultyDropdown = false;
   }
@@ -170,6 +301,12 @@ export class RecipeEditComponent {
     if (this.showDifficultyDropdown) {
       this.filteredDifficultyOptions = [...this.difficultyOptions];
     }
+  }
+
+  checkFields(): boolean {
+    const recipeLabel = document.getElementById('recipeLabel') as HTMLInputElement;
+    const recipeDescription = document.getElementById('recipeDesc') as HTMLInputElement;
+    return recipeLabel.value.trim() === '' || recipeDescription.value.trim() === '';
   }
 
   // Category methods
@@ -509,5 +646,78 @@ export class RecipeEditComponent {
   removeImage(): void {
     this.selectedImageFile = null;
     this.imagePreviewUrl = '';
+  }
+
+  saveRecipe(): void {
+    const difficultyMap: {[key: string]: number} = {
+      'Easy': 1,
+      'Medium': 2,
+      'Hard': 3
+    };
+
+    let cleanImageString = '';
+    if (this.imagePreviewUrl) {
+      const base64Index = this.imagePreviewUrl.indexOf('base64,');
+      if (base64Index !== -1) {
+        cleanImageString = this.imagePreviewUrl.substring(base64Index + 7);
+      } else {
+        cleanImageString = this.imagePreviewUrl;
+      }
+    }
+
+    const recipeData = {
+      label: this.title || '',
+      description: this.description || '',
+      people: this.servings || 1,
+      difficulty: difficultyMap[this.difficulty] || 2,
+      imageString: cleanImageString,
+      ingredients: this.ingredients.map(ing => ({
+        food: ing.name,
+        quantity: parseFloat(ing.quantity) || 0,
+        measure: ing.unit,
+        description: `${ing.quantity} ${ing.unit} ${ing.name}`,
+        weight: 0
+      })),
+      steps: this.instructions.map(inst => inst.description),
+      cuisineType: this.cuisineTypes,
+      cautions: this.cautions,
+      dietLabels: this.dietLabels,
+      dishTypes: this.dishTypes,
+      mealTypes: [this.category],
+      healthLabels: this.healthLabels,
+      totalTime: (this.prepTime || 0),
+      calories: this.calories || 0,
+      totalWeight: this.totalWeight || 0,
+      rating: 0
+    };
+
+    if (this.isEditMode && this.recipeId !== null) {
+      // Update existing recipe
+      this.recipeService.updateRecipe(this.recipeId, recipeData).subscribe({
+        next: (response) => {
+          this.router.navigate(['/recipes', this.recipeId]);
+        },
+        error: (error) => {
+          console.error('Error updating recipe:', error);
+          alert('Error updating recipe: ' + error.message);
+        }
+      });
+    } else {
+      // Create new recipe
+      this.recipeService.createRecipe(recipeData).subscribe({
+        next: (response) => {
+          const newRecipeId = response.recipe?.id;
+          if (newRecipeId) {
+            this.router.navigate(['/recipes', newRecipeId]);
+          } else {
+            this.router.navigate(['/explore']);
+          }
+        },
+        error: (error) => {
+          console.error('Error creating recipe:', error);
+          alert('Error creating recipe: ' + error.message);
+        }
+      });
+    }
   }
 }

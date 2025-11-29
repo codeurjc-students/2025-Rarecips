@@ -1,17 +1,16 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
   <!-- Main Content -->
-  <div
-    class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 px-4 py-12 mt-24" style="overflow: visible;">
-    <div class="flex w-full max-w-[1200px] min-h-full flex-col items-center gap-8">
+  <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 px-4 py-12 mt-24">
+    <div class="flex w-full min-h-full flex-col items-center gap-8">
 
       <!-- Recipe Form -->
-      <form class="flex flex-col glass p-8" style="overflow: visible;">
-        <div class="flex flex-row w-full max-w-7xl gap-8" style="overflow: visible;">
+      <form class="flex flex-col glass p-8 min-w-[100vh]">
+        <div class="flex flex-row w-full max-w-7xl gap-8">
           <!-- Col 1 -->
-          <div class="flex flex-col gap-8 w-1/2" style="overflow: visible;">
+          <div class="flex flex-col gap-8 w-1/2">
             <!-- Basic Information -->
             <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass z-[1]"
-                 style="border-color: var(--primary-100-40); background: var(--primary-200-40); overflow: visible; position: relative;">
+                 style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-info-circle mr-2"></i>
@@ -25,7 +24,10 @@
                 </label>
                 <div class="relative">
                   <input type="text"
+                         [(ngModel)]="title"
+                         name="title"
                          class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                         id="recipeLabel"
                          style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
                          placeholder="Your recipe title" required/>
                   <i class="ti ti-edit absolute right-3 top-1/2 transform -translate-y-1/2"
@@ -39,10 +41,13 @@
                   Brief Description *
                 </label>
                 <div class="relative">
-                                    <textarea rows="3"
-                                              class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
-                                              style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                                              placeholder="Describe your recipe in a few words..." required></textarea>
+                  <textarea rows="3"
+                            [(ngModel)]="description"
+                            name="description"
+                            class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
+                            id="recipeDesc"
+                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
+                            placeholder="Describe your recipe in a few words..." required></textarea>
                   <i class="ti ti-message absolute right-3 top-3"
                      style="color: var(--primary-400);"></i>
                 </div>
@@ -152,7 +157,7 @@
 
                   <!-- Dropdown menu -->
                   @if (showDifficultyDropdown && filteredDifficultyOptions.length > 0) {
-                    <div class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden"
+                    <div [style.z-index]="showDifficultyDropdown ? 200 : 0" class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden z-0"
                          style="background: var(--primary-50); border-color: var(--primary-100);">
                       @for (option of filteredDifficultyOptions; track option) {
                         <div (click)="selectDifficulty(option)"
@@ -193,7 +198,7 @@
 
                   <!-- Dropdown menu -->
                   @if (showCategoryDropdown && filteredCategoryOptions.length > 0) {
-                    <div class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                    <div [style.z-index]="showCategoryDropdown ? 1 : 0" class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-0"
                          style="background: var(--primary-50); border-color: var(--primary-100);">
                       @for (option of filteredCategoryOptions; track option) {
                         <div (click)="selectCategory(option)"
@@ -208,9 +213,9 @@
                 </div>
               </div>
             </div>
-            <!-- Tags & Categories -->
+            <!-- Tags and Characteristics -->
             <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass z-0"
-                 style="border-color: var(--primary-100-40); background: var(--primary-200-40); overflow: visible; position: relative;">
+                 style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-tags mr-2"></i>
@@ -221,7 +226,7 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 <!-- Dietary Characteristics Dropdown -->
-                <div class="relative multiselect-dropdown-container z-[5]">
+                <div [style.z-index]="showDietaryDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-leaf mr-1"></i>
                     Dietary
@@ -273,7 +278,7 @@
                 </div>
 
                 <!-- Cuisine Type Dropdown -->
-                <div class="relative multiselect-dropdown-container z-[3]">
+                <div [style.z-index]="showCuisineDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-flag mr-1"></i>
                     Cuisine
@@ -325,7 +330,7 @@
                 </div>
 
                 <!-- Cautions Dropdown -->
-                <div class="relative multiselect-dropdown-container z-[4]">
+                <div [style.z-index]="showCautionsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-alert-triangle mr-1"></i>
                     Allergens
@@ -377,7 +382,7 @@
                 </div>
 
                 <!-- Diet Labels Dropdown -->
-                <div class="relative multiselect-dropdown-container z-[2]">
+                <div [style.z-index]="showDietLabelsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-apple mr-1"></i>
                     Diet Labels
@@ -429,7 +434,7 @@
                 </div>
 
                 <!-- Dish Types Dropdown -->
-                <div class="relative multiselect-dropdown-container z-[1]">
+                <div [style.z-index]="showDishTypesDropdown ? 1 : 0"class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-tools-kitchen-2 mr-1"></i>
                     Dish Type
@@ -462,7 +467,7 @@
                          style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
                     </div>
                     @if (showDishTypesDropdown) {
-                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                      <div class="dropdown-menu dropdown-force-top dropdown-up absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
                            style="background: var(--primary-50); border-color: var(--primary-100);">
                         @for (option of getFilteredDishTypeOptions(); track option) {
                           <div (click)="toggleDishType(option)"
@@ -481,7 +486,7 @@
                 </div>
 
                 <!-- Health Labels Dropdown -->
-                <div class="relative multiselect-dropdown-container z-[0]">
+                <div [style.z-index]="showHealthLabelsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-heart-plus mr-1"></i>
                     Health Labels
@@ -514,7 +519,7 @@
                          style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
                     </div>
                     @if (showHealthLabelsDropdown) {
-                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                      <div class="dropdown-menu dropdown-force-top dropdown-up absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
                            style="background: var(--primary-50); border-color: var(--primary-100);">
                         @for (option of getFilteredHealthLabelOptions(); track option) {
                           <div (click)="toggleHealthLabel(option)"
@@ -600,15 +605,15 @@
             <div class="flex flex-col w-full h-full gap-8">
               <div class="flex w-full">
                 <div class="tabs glass text-nowrap w-full">
-                  <button class="tab active">
+                  <button type="button" class="tab" [class.active]="activeTab === 'ingredients'" (click)="setActiveTab('ingredients')">
                     <i class="ti ti-basket text-2xl" aria-hidden="true"></i>
                     Ingredients
                   </button>
-                  <button class="tab">
+                  <button type="button" class="tab" [class.active]="activeTab === 'instructions'" (click)="setActiveTab('instructions')">
                     <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
                     Instructions
                   </button>
-                  <button class="tab">
+                  <button type="button" class="tab" [class.active]="activeTab === 'nutrition'" (click)="setActiveTab('nutrition')">
                     <i class="ti ti-report text-2xl" aria-hidden="true"></i>
                     Nutrition
                   </button>
@@ -616,6 +621,7 @@
               </div>
 
               <!-- Ingredients -->
+              @if (activeTab === 'ingredients') {
               <div class="flex w-full h-full justify-around flex-col gap-1 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
                    style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
 
@@ -696,80 +702,221 @@
                   }
                 </div>
               </div>
-            </div>
+              }
 
             <!-- Instructions -->
-            <!--
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+            @if (activeTab === 'instructions') {
+            <div class="flex w-full h-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
                 <div class="flex items-center justify-between">
                     <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                         <i class="ti ti-list-numbers mr-2"></i>
-                        Instrucciones
+                        Instructions
                     </h3>
-                    <button type="button"
-                        class="px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
-                        style="background: var(--gradient-primary); color: white;">
-                        <i class="ti ti-plus"></i>
-                        Agregar Paso
-                    </button>
                 </div>
 
+                <!-- Add new instruction form -->
+                <div class="flex items-center gap-4 p-4 glass rounded-2xl"
+                     style="background: var(--primary-100-40);">
+                  <textarea rows="2"
+                         [(ngModel)]="newInstruction"
+                         name="newInstruction"
+                         placeholder="Describe this preparation step..."
+                         maxlength="500"
+                         class="px-3 py-2 flex-1 rounded-xl border transition-all focus:outline-none resize-none"
+                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"></textarea>
+                  <button type="button"
+                          (click)="addInstruction()"
+                          class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
+                          style="background: var(--gradient-primary); color: white;">
+                    <i class="ti ti-plus"></i>
+                  </button>
+                </div>
+
+                <!-- Instructions List -->
                 <div class="space-y-4" id="instructions-list">
-            -->
-            <!-- Instruction Step 1 -->
-            <!--
-                    <div class="flex gap-4 p-4 items-center rounded-2xl instruction-item"
+                  @for (instruction of instructions; track instruction.step; let i = $index) {
+                    <div class="flex gap-4 p-4 items-start rounded-2xl instruction-item"
                         style="background: var(--primary-100-40);">
                         <div class="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
                             style="background: var(--primary-500); color: white;">
-                            1
+                            {{ instruction.step }}
                         </div>
-                        <div class="flex-1">
-                            <textarea rows="3" placeholder="Describe este paso de la preparación..."
-                                class="flex items-center w-full px-3 py-2 rounded-xl border transition-all focus:outline-none resize-none"
-                                style="background: var(--primary-200-40); border-color: var(--primary-100); color: var(--primary-700); field-sizing: content;"></textarea>
+                        <div class="flex-1 min-w-0">
+                            <p class="px-3 py-2 break-words whitespace-pre-wrap" style="color: var(--primary-700); word-break: break-word; overflow-wrap: break-word;">
+                              {{ instruction.description }}
+                            </p>
                         </div>
                         <button type="button"
+                            (click)="removeInstruction(i)"
                             class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
                             style="background: var(--primary-100); color: var(--primary-700);">
                             <i class="ti ti-trash text-red-500"></i>
                         </button>
                     </div>
-                    -->
-            <!-- Instruction Step 2 -->
-            <!--
-                    <div class="flex gap-4 p-4 items-center rounded-2xl instruction-item"
-                        style="background: var(--primary-100-40);">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
-                            style="background: var(--primary-500); color: white;">
-                            2
-                        </div>
-                        <div class="flex-1">
-                            <textarea rows="3" placeholder="Describe este paso de la preparación..."
-                                class="flex items-center w-full px-3 py-2 rounded-xl border transition-all focus:outline-none resize-none"
-                                style="background: var(--primary-200-40); border-color: var(--primary-100); color: var(--primary-700); field-sizing: content;"></textarea>
-                        </div>
-                        <button type="button"
-                            class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
-                            style="background: var(--primary-100); color: var(--primary-700);">
-                            <i class="ti ti-trash text-red-500"></i>
-                        </button>
-                    </div>
+                  }
                 </div>
             </div>
-            -->
+            }
+
+            <!-- Nutrition -->
+            @if (activeTab === 'nutrition') {
+            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                        <i class="ti ti-report mr-2"></i>
+                        Nutritional Information
+                    </h3>
+                    <span class="text-sm" style="color: var(--primary-600);">Per serving</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <!-- Total Weight -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium" style="color: var(--primary-700);">
+                      <i class="ti ti-weight mr-1"></i>
+                      Total Weight (g)
+                    </label>
+                    <input type="number"
+                           [(ngModel)]="totalWeight"
+                           name="totalWeight"
+                           min="0"
+                           step="1"
+                           placeholder="0"
+                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  </div>
+
+                  <!-- Calories -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium" style="color: var(--primary-700);">
+                      <i class="ti ti-flame mr-1"></i>
+                      Calories (kcal)
+                    </label>
+                    <input type="number"
+                           [(ngModel)]="calories"
+                           name="calories"
+                           min="0"
+                           placeholder="0"
+                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  </div>
+
+                  <!-- Protein -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium" style="color: var(--primary-700);">
+                      <i class="ti ti-meat mr-1"></i>
+                      Protein (g)
+                    </label>
+                    <input type="number"
+                           [(ngModel)]="protein"
+                           name="protein"
+                           min="0"
+                           step="0.1"
+                           placeholder="0"
+                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  </div>
+
+                  <!-- Carbs -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium" style="color: var(--primary-700);">
+                      <i class="ti ti-bread mr-1"></i>
+                      Carbohydrates (g)
+                    </label>
+                    <input type="number"
+                           [(ngModel)]="carbs"
+                           name="carbs"
+                           min="0"
+                           step="0.1"
+                           placeholder="0"
+                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  </div>
+
+                  <!-- Fat -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium" style="color: var(--primary-700);">
+                      <i class="ti ti-droplet mr-1"></i>
+                      Fat (g)
+                    </label>
+                    <input type="number"
+                           [(ngModel)]="fat"
+                           name="fat"
+                           min="0"
+                           step="0.1"
+                           placeholder="0"
+                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  </div>
+
+                  <!-- Fiber -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium" style="color: var(--primary-700);">
+                      <i class="ti ti-plant mr-1"></i>
+                      Fiber (g)
+                    </label>
+                    <input type="number"
+                           [(ngModel)]="fiber"
+                           name="fiber"
+                           min="0"
+                           step="0.1"
+                           placeholder="0"
+                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  </div>
+
+                  <!-- Sugar -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium" style="color: var(--primary-700);">
+                      <i class="ti ti-candy mr-1"></i>
+                      Sugar (g)
+                    </label>
+                    <input type="number"
+                           [(ngModel)]="sugar"
+                           name="sugar"
+                           min="0"
+                           step="0.1"
+                           placeholder="0"
+                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  </div>
+
+                  <!-- Sodium -->
+                  <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium" style="color: var(--primary-700);">
+                      <i class="ti ti-salt mr-1"></i>
+                      Sodium (mg)
+                    </label>
+                    <input type="number"
+                           [(ngModel)]="sodium"
+                           name="sodium"
+                           min="0"
+                           step="1"
+                           placeholder="0"
+                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  </div>
+                </div>
+            </div>
+            }
+
+            </div>
 
           </div>
         </div>
         <!-- Action Buttons -->
-        <div class="flex w-full justify-center gap-4 pt-8">
+        <div class="publishBut flex w-full justify-center gap-4 pt-8">
           <button type="button"
-                  class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+                  (click)="saveRecipe()"
+                  [class.disabled]="checkFields()"
+                  class="disabled px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
                   style="background: var(--gradient-primary); color: white;">
             <i class="ti ti-send"></i>
-            Publish Recipe
+            {{ isEditMode ? 'Update Recipe' : 'Publish Recipe' }}
           </button>
         </div>
       </form>

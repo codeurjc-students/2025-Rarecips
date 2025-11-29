@@ -23,6 +23,10 @@ body {
   padding-bottom: 5rem;
 }
 
+.imageCont {
+  block-size: 20rem;
+}
+
 .dashboard-container {
   display: flex !important;
   flex-direction: row !important;
