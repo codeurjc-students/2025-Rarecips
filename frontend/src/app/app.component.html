@@ -10,11 +10,13 @@
   @if (backButton) {
     <div class="fixed left-40 flex items-center justify-center mt-[11.4rem] w-fit h-fit p-4 gap-2">
       <div
-        class="flex items-center justify-center !rounded-t-2xl !rounded-b-2xl !rounded-l-2xl !rounded-r-sm glass w-12 h-14 cursor-pointer">
+        class="flex items-center justify-center !rounded-t-2xl !rounded-b-2xl !rounded-l-2xl !rounded-r-sm glass w-12 h-14 cursor-pointer"
+        (click)="goBack()">
         <i class="ti ti-chevron-left text-xl" title="Go back"></i>
       </div>
       <div
-        class="flex items-center justify-center !rounded-t-2xl !rounded-b-2xl !rounded-l-sm !rounded-r-2xl glass w-12 h-14 cursor-pointer">
+        class="flex items-center justify-center !rounded-t-2xl !rounded-b-2xl !rounded-l-sm !rounded-r-2xl glass w-12 h-14 cursor-pointer"
+        (click)="goForward()">
         <i class="ti ti-chevron-right text-xl" title="Go forth"></i>
       </div>
     </div>

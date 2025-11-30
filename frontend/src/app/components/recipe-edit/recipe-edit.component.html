@@ -131,44 +131,27 @@
               <!-- Difficulty & Category -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Difficulty -->
-                <div class="flex flex-col gap-2 relative difficulty-dropdown-container">
-                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Difficulty
+                <div class="flex flex-col gap-2">
+                  <label class="text-sm font-semibold flex items-center gap-2" style="color: var(--primary-400);">
+                    <i class="ti ti-brand-speedtest"></i>
+                    Difficulty: <span style="color: var(--primary-700);">{{ getDifficultyLabel() }}</span>
                   </label>
-                  <div
-                    class="w-full px-4 py-3 rounded-2xl border-2 focus-within:border-primary-500 flex justify-between items-center relative"
-                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700); transition: border-color 0.2s;">
-                    <input type="text"
+                  <div class="difficulty-slider-container px-4 py-4 rounded-2xl border-2"
+                       style="background: var(--primary-100-40); border-color: var(--primary-100);">
+                    <input type="range"
                            [(ngModel)]="difficulty"
                            name="difficulty"
-                           (input)="onDifficultyInput($event)"
-                           (focus)="showDifficultyDropdown = true"
-                           placeholder="Select difficulty..."
-                           class="bg-transparent w-full focus:outline-none"
-                           style="color: var(--primary-700);"/>
-                    <i class="ti ti-brand-speedtest mr-2"
-                       style="color: var(--primary-400);"></i>
-                    <button type="button"
-                            (click)="toggleDifficultyDropdown()"
-                            class="ti ti-caret-down-filled cursor-pointer hover:opacity-70"
-                            [class.rotate-180]="showDifficultyDropdown"
-                            style="color: var(--primary-700); transition: transform 0.2s;"></button>
-                  </div>
-
-                  <!-- Dropdown menu -->
-                  @if (showDifficultyDropdown && filteredDifficultyOptions.length > 0) {
-                    <div [style.z-index]="showDifficultyDropdown ? 200 : 0" class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden z-0"
-                         style="background: var(--primary-50); border-color: var(--primary-100);">
-                      @for (option of filteredDifficultyOptions; track option) {
-                        <div (click)="selectDifficulty(option)"
-                             class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100"
-                             [class.bg-primary-200]="option === difficulty"
-                             style="color: var(--primary-700);">
-                          {{ option }}
-                        </div>
-                      }
+                           min="1"
+                           max="5"
+                           step="1"
+                           class="difficulty-slider w-full"
+                           [attr.data-difficulty]="difficulty"/>
+                    <div class="flex justify-between mt-2 text-xs" style="color: var(--primary-400);">
+                      <span>Easy</span>
+                      <span>Medium</span>
+                      <span>Hard</span>
                     </div>
-                  }
+                  </div>
                 </div>
 
                 <!-- Category -->
@@ -384,7 +367,7 @@
                 <!-- Diet Labels Dropdown -->
                 <div [style.z-index]="showDietLabelsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
-                    <i class="ti ti-apple mr-1"></i>
+                    <i class="ti ti-salad mr-1"></i>
                     Diet Labels
                   </label>
                   <div class="relative">
@@ -633,14 +616,36 @@
                 </div>
 
                 <!-- Add new ingredient form -->
-                <div class="flex items-center gap-4 p-4 glass rounded-2xl"
+                <div class="flex items-center gap-4 p-4 glass rounded-2xl relative"
                      style="background: var(--primary-100-40);">
-                  <input type="text"
-                         [(ngModel)]="newIngredient.name"
-                         name="newIngredientName"
-                         placeholder="Ingredient name"
-                         class="px-3 py-2 flex-1 rounded-xl border transition-all focus:outline-none"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                  <!-- Ingredient name with autocomplete -->
+                  <div class="flex-1 relative ingredient-autocomplete-container">
+                    <input type="text"
+                           [(ngModel)]="newIngredient.name"
+                           name="newIngredientName"
+                           (input)="onIngredientNameInput($event)"
+                           (focus)="onIngredientNameInput($event)"
+                           placeholder="Ingredient name"
+                           class="w-full px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+
+                    <!-- Autocomplete dropdown -->
+                    @if (showIngredientDropdown && filteredIngredients.length > 0) {
+                      <div class="absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-50"
+                           style="background: var(--primary-50); border-color: var(--primary-100);">
+                        @for (ingredient of filteredIngredients; track ingredient) {
+                          <div (click)="selectIngredient(ingredient)"
+                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100"
+                               [class.bg-primary-200]="ingredient === newIngredient.name"
+                               style="color: var(--primary-700);">
+                            <i class="ti {{ ingredientIconService.getIconForIngredient(ingredient) }} mr-2"></i>
+                            {{ ingredient }}
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+
                   <input type="text"
                          [(ngModel)]="newIngredient.quantity"
                          name="newIngredientQuantity"
@@ -655,6 +660,9 @@
                          style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
                   <button type="button"
                           (click)="addIngredient()"
+                          [disabled]="!isValidIngredient()"
+                          [class.opacity-50]="!isValidIngredient()"
+                          [class.cursor-not-allowed]="!isValidIngredient()"
                           class="px-2 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
                           style="background: var(--gradient-primary); color: white;">
                     <i class="ti ti-plus"></i>
@@ -662,7 +670,7 @@
                 </div>
 
                 <!-- Ingredients list with drag and drop -->
-                <div class="flex flex-col gap-4 mt-3" id="ingredients-list">
+                <div class="flex flex-col gap-4 mt-3 z-[-1]" id="ingredients-list">
                   @if (ingredients.length === 0) {
                     <div class="text-center py-2" style="color: var(--primary-400);">
                       <i class="ti ti-basket-off text-4xl mb-2"></i>
@@ -683,7 +691,7 @@
                       <div class="flex-1 flex flex-row items-center gap-4">
                         <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
                              style="background: var(--primary-100-40);">
-                          <i class="ti ti-apple text-xl" style="color: var(--primary-700)"></i>
+                          <i class="ti {{ ingredientIconService.getIconForIngredient(ingredient.name) }} text-xl" style="color: var(--primary-700)"></i>
                         </div>
                         <span class="flex-1 font-medium" style="color: var(--primary-700);">
                           {{ ingredient.name }}
@@ -909,7 +917,7 @@
           </div>
         </div>
         <!-- Action Buttons -->
-        <div class="publishBut flex w-full justify-center gap-4 pt-8">
+        <div class="publishBut flex w-full justify-center gap-4 pt-8 z-[-1]">
           <button type="button"
                   (click)="saveRecipe()"
                   [class.disabled]="checkFields()"

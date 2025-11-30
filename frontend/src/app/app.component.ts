@@ -1,4 +1,5 @@
 import {ActivatedRoute, NavigationEnd, Router, RouterOutlet, RoutesRecognized} from '@angular/router';
+import {Location} from '@angular/common';
 import {filter} from 'rxjs';
 import {Component, ElementRef, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {NavbarComponent} from './components/navbar/navbar.component';
@@ -6,6 +7,7 @@ import {NavbarComponent} from './components/navbar/navbar.component';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
+  standalone: true,
   imports: [
     NavbarComponent,
     RouterOutlet
@@ -19,7 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
   backButton: boolean = false;
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private elementRef: ElementRef,
-              private renderer: Renderer2) {
+              private renderer: Renderer2, private location: Location) {
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd || event instanceof RoutesRecognized)
@@ -285,6 +287,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Reset all positions as available
     this.gridPositions.forEach(pos => pos.occupied = false);
+  }
+
+  goBack(): void {
+    this.location.back();
+  }
+
+  goForward(): void {
+    this.location.forward();
   }
 
 }

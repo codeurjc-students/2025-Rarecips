@@ -1,10 +1,11 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
-import {HttpClientModule} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {RecipeService} from '../../services/recipe.service';
 import {EnumService} from '../../services/enum.service';
+import {IngredientService} from '../../services/ingredient.service';
+import {IngredientIconService} from '../../services/ingredient-icon.service';
 
 interface Ingredient {
   name: string;
@@ -37,12 +38,13 @@ interface RecipeData {
   standalone: true,
   imports: [
     FormsModule,
-    CommonModule,
-    HttpClientModule
+    CommonModule
   ],
   styleUrls: ['./recipe-edit.component.css']
 })
 export class RecipeEditComponent implements OnInit {
+
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   // Recipe ID (null for new recipe)
   recipeId: number | null = null;
@@ -53,11 +55,8 @@ export class RecipeEditComponent implements OnInit {
   prepTime: number = 0;
   servings: number = 1;
 
-  // Difficulty dropdown
-  difficulty: number = 1;
-  difficultyOptions: number[] = [];
-  filteredDifficultyOptions: number[] = [];
-  showDifficultyDropdown: boolean = false;
+  // Difficulty slider
+  difficulty: number = 3;
 
   // Category dropdown
   category: string = '';
@@ -66,9 +65,8 @@ export class RecipeEditComponent implements OnInit {
   showCategoryDropdown: boolean = false;
 
   // Tags and Characteristics - Multi-select dropdowns
-  // Dietary
   dietaryCharacteristics: string[] = [];
-  dietaryOptions: string[] = ['Vegetarian', 'Vegan', 'Gluten Free', 'Lactose Free'];
+  dietaryOptions: string[] = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free'];
   showDietaryDropdown: boolean = false;
   dietarySearchTerm: string = '';
 
@@ -110,6 +108,10 @@ export class RecipeEditComponent implements OnInit {
   newIngredient: Ingredient = {name: '', quantity: '', unit: ''};
   draggedIngredientIndex: number | null = null;
 
+  availableIngredients: string[] = [];
+  filteredIngredients: string[] = [];
+  showIngredientDropdown: boolean = false;
+
   // Instructions management
   instructions: Instruction[] = [];
   newInstruction: string = '';
@@ -132,12 +134,22 @@ export class RecipeEditComponent implements OnInit {
   sodium: number = 0;
   totalWeight: number = 0;
 
-  constructor(private route: ActivatedRoute, private router: Router, private recipeService: RecipeService, private enumService: EnumService) {
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private recipeService: RecipeService,
+    private enumService: EnumService,
+    private ingredientService: IngredientService,
+    public ingredientIconService: IngredientIconService
+  ) {
   }
 
   ngOnInit(): void {
     // Load enum values from backend
     this.loadEnumValues();
+
+    // Load all ingredient names
+    this.loadIngredients();
 
     this.route.params.subscribe(params => {
       const id = params['id'];
@@ -150,15 +162,16 @@ export class RecipeEditComponent implements OnInit {
     });
   }
 
-  loadEnumValues(): void {
-    this.enumService.getDifficultyLevels().subscribe({
-      next: (levels) => {
-        this.difficultyOptions = levels;
-        this.filteredDifficultyOptions = [...levels];
+  loadIngredients(): void {
+    this.ingredientService.getAllIngredientNames().subscribe({
+      next: (names) => {
+        this.availableIngredients = names;
       },
-      error: (err) => console.error('Error loading difficulty levels:', err)
+      error: (err) => console.error('Error loading ingredients:', err)
     });
+  }
 
+  loadEnumValues(): void {
     this.enumService.getMealTypes().subscribe({
       next: (types) => {
         this.categoryOptions = types;
@@ -213,7 +226,17 @@ export class RecipeEditComponent implements OnInit {
 
         this.difficulty = recipe.difficulty || 1;
 
-        this.imagePreviewUrl = recipe.imageString;
+        if (recipe.mealTypes && recipe.mealTypes.length > 0) {
+          this.category = recipe.mealTypes[0];
+        }
+
+        if (recipe.imageString) {
+          if (!recipe.imageString.startsWith('data:image')) {
+            this.imagePreviewUrl = 'data:image/jpeg;base64,' + recipe.imageString;
+          } else {
+            this.imagePreviewUrl = recipe.imageString;
+          }
+        }
 
         // Convert ingredients
         this.ingredients = recipe.ingredients.map(ing => ({
@@ -228,13 +251,20 @@ export class RecipeEditComponent implements OnInit {
           description: step
         }));
 
-        this.cuisineTypes = recipe.cuisineType;
-        this.cautions = recipe.cautions;
-        this.dietLabels = recipe.dietLabels;
-        this.dishTypes = recipe.dishTypes;
-        this.healthLabels = recipe.healthLabels;
-        this.calories = recipe.calories;
+        this.cuisineTypes = recipe.cuisineType || [];
+        this.cautions = recipe.cautions || [];
+
+        this.dietLabels = recipe.dietLabels || [];
+
+        const allHealthLabels = recipe.healthLabels || [];
+        const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free'];
+        this.dietaryCharacteristics = allHealthLabels.filter(label => dietaryOptions.includes(label));
+        this.healthLabels = allHealthLabels.filter(label => !dietaryOptions.includes(label));
+
+        this.dishTypes = recipe.dishTypes || [];
+        this.calories = recipe.calories || 0;
         this.totalWeight = recipe.totalWeight || 0;
+        this.prepTime = recipe.totalTime || 0;
       }
     }
   }
@@ -282,24 +312,14 @@ export class RecipeEditComponent implements OnInit {
   }
 
   // Difficulty methods
-  onDifficultyInput(event: Event): void {
-    const input = parseInt((event.target as HTMLInputElement).value);
-    this.difficulty = input;
-    this.filteredDifficultyOptions = this.difficultyOptions.filter(option =>
-      option === input
-    );
-    this.showDifficultyDropdown = true;
-  }
-
-  selectDifficulty(option: number): void {
-    this.difficulty = option;
-    this.showDifficultyDropdown = false;
-  }
-
-  toggleDifficultyDropdown(): void {
-    this.showDifficultyDropdown = !this.showDifficultyDropdown;
-    if (this.showDifficultyDropdown) {
-      this.filteredDifficultyOptions = [...this.difficultyOptions];
+  getDifficultyLabel(): string {
+    switch(this.difficulty) {
+      case 1: return 'Very Easy';
+      case 2: return 'Easy';
+      case 3: return 'Medium';
+      case 4: return 'Hard';
+      case 5: return 'Very Hard';
+      default: return 'Medium';
     }
   }
 
@@ -335,14 +355,14 @@ export class RecipeEditComponent implements OnInit {
   onClickOutside(event: Event): void {
     const target = event.target as HTMLElement;
 
-    // Check if click is outside difficulty dropdown
-    if (!target.closest('.difficulty-dropdown-container')) {
-      this.showDifficultyDropdown = false;
-    }
 
     // Check if click is outside category dropdown
     if (!target.closest('.category-dropdown-container')) {
       this.showCategoryDropdown = false;
+    }
+
+    if (!target.closest('.ingredient-autocomplete-container')) {
+      this.showIngredientDropdown = false;
     }
 
     // Check if click is outside multi-select dropdowns
@@ -552,10 +572,39 @@ export class RecipeEditComponent implements OnInit {
     this.healthLabels = this.healthLabels.filter(i => i !== item);
   }
 
+  onIngredientNameInput(event: Event): void {
+    const input = (event.target as HTMLInputElement).value;
+    this.newIngredient.name = input;
+
+    if (input.trim().length > 0) {
+      this.filteredIngredients = this.availableIngredients.filter(ingredient =>
+        ingredient.toLowerCase().includes(input.toLowerCase())
+      );
+      this.showIngredientDropdown = this.filteredIngredients.length > 0;
+    } else {
+      this.showIngredientDropdown = false;
+    }
+  }
+
+  selectIngredient(ingredient: string): void {
+    this.newIngredient.name = ingredient;
+    this.showIngredientDropdown = false;
+  }
+
+  isValidIngredient(): boolean {
+    const nameValid = this.availableIngredients.includes(this.newIngredient.name.trim());
+
+    const quantityValid = this.newIngredient.quantity.trim() === '' ||
+                          (!isNaN(parseFloat(this.newIngredient.quantity)) && parseFloat(this.newIngredient.quantity) > 0);
+
+    return nameValid && quantityValid;
+  }
+
   addIngredient(): void {
-    if (this.newIngredient.name.trim() && this.newIngredient.quantity.trim()) {
+    if (this.isValidIngredient()) {
       this.ingredients.push({...this.newIngredient});
       this.newIngredient = {name: '', quantity: '', unit: ''};
+      this.showIngredientDropdown = false;
     }
   }
 
@@ -646,15 +695,14 @@ export class RecipeEditComponent implements OnInit {
   removeImage(): void {
     this.selectedImageFile = null;
     this.imagePreviewUrl = '';
+
+    // Clean inout image file
+    if (this.fileInput && this.fileInput.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
   saveRecipe(): void {
-    const difficultyMap: {[key: string]: number} = {
-      'Easy': 1,
-      'Medium': 2,
-      'Hard': 3
-    };
-
     let cleanImageString = '';
     if (this.imagePreviewUrl) {
       const base64Index = this.imagePreviewUrl.indexOf('base64,');
@@ -669,7 +717,7 @@ export class RecipeEditComponent implements OnInit {
       label: this.title || '',
       description: this.description || '',
       people: this.servings || 1,
-      difficulty: difficultyMap[this.difficulty] || 2,
+      difficulty: this.difficulty || 1,
       imageString: cleanImageString,
       ingredients: this.ingredients.map(ing => ({
         food: ing.name,
@@ -679,12 +727,12 @@ export class RecipeEditComponent implements OnInit {
         weight: 0
       })),
       steps: this.instructions.map(inst => inst.description),
-      cuisineType: this.cuisineTypes,
-      cautions: this.cautions,
-      dietLabels: this.dietLabels,
-      dishTypes: this.dishTypes,
-      mealTypes: [this.category],
-      healthLabels: this.healthLabels,
+      cuisineType: this.cuisineTypes || [],
+      cautions: this.cautions || [],
+      dietLabels: this.dietLabels || [], // Solo Diet Labels (Balanced, High-Fiber, etc.)
+      dishTypes: this.dishTypes || [],
+      mealTypes: this.category ? [this.category] : [],
+      healthLabels: [...(this.dietaryCharacteristics || []), ...(this.healthLabels || [])], // Combinar dietaryCharacteristics con healthLabels
       totalTime: (this.prepTime || 0),
       calories: this.calories || 0,
       totalWeight: this.totalWeight || 0,

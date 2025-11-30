@@ -53,6 +53,24 @@ public class RecipeService {
     public Recipe createRecipe(Recipe recipe, String username) {
         User author = userRepository.findByUsername(username);
         recipe.setAuthor(author);
+
+        EnumValidator.validateDifficulty(recipe.getDifficulty());
+        if (recipe.getCuisineType() != null) EnumValidator.validateCuisineTypes(recipe.getCuisineType());
+        if (recipe.getCautions() != null) EnumValidator.validateCautions(recipe.getCautions());
+        if (recipe.getDietLabels() != null) EnumValidator.validateDietLabels(recipe.getDietLabels());
+        if (recipe.getDishTypes() != null) EnumValidator.validateDishTypes(recipe.getDishTypes());
+        if (recipe.getMealTypes() != null) EnumValidator.validateMealTypes(recipe.getMealTypes());
+        if (recipe.getHealthLabels() != null) EnumValidator.validateHealthLabels(recipe.getHealthLabels());
+
+        if (recipe.getIngredients() != null && !recipe.getIngredients().isEmpty()) {
+            List<Ingredient> savedIngredients = new ArrayList<>();
+            for (Ingredient ingredient : recipe.getIngredients()) {
+                Ingredient savedIngredient = ingredientRepository.save(ingredient);
+                savedIngredients.add(savedIngredient);
+            }
+            recipe.setIngredients(savedIngredients);
+        }
+
         return recipeRepository.save(recipe);
     }
 
@@ -86,7 +104,12 @@ public class RecipeService {
             existingRecipe.setPeople(recipeDetails.getPeople());
         }
         if (recipeDetails.getIngredients() != null) {
-            existingRecipe.setIngredients(recipeDetails.getIngredients());
+            List<Ingredient> savedIngredients = new ArrayList<>();
+            for (Ingredient ingredient : recipeDetails.getIngredients()) {
+                Ingredient savedIngredient = ingredientRepository.save(ingredient);
+                savedIngredients.add(savedIngredient);
+            }
+            existingRecipe.setIngredients(savedIngredients);
         }
         existingRecipe.setDifficulty(recipeDetails.getDifficulty());
         if (recipeDetails.getDishTypes() != null) {
@@ -109,6 +132,10 @@ public class RecipeService {
         }
         if (recipeDetails.getTotalTime() != null) {
             existingRecipe.setTotalTime(recipeDetails.getTotalTime());
+        }
+
+        if (recipeDetails.getTotalWeight() != null) {
+            existingRecipe.setTotalWeight(recipeDetails.getTotalWeight());
         }
         if (recipeDetails.getCalories() != null) {
             existingRecipe.setCalories(recipeDetails.getCalories());

@@ -51,6 +51,78 @@ input[type="number"] {
   appearance: textfield;
 }
 
+.difficulty-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(to right,
+    #22c55e 0%,
+    #eab308 40%,
+    #f97316 60%,
+    #ef4444 100%);
+}
+
+.difficulty-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-700);
+  cursor: pointer;
+  border: 3px solid var(--primary-50);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.difficulty-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.difficulty-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-700);
+  cursor: pointer;
+  border: 3px solid var(--primary-50);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.difficulty-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.difficulty-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.difficulty-slider-container {
+  transition: all 0.2s ease;
+}
+
+.difficulty-slider-container:hover {
+  border-color: var(--primary-300) !important;
+}
+
+/* Ingredient autocomplete*/
+.ingredient-autocomplete-container {
+  position: relative;
+}
+
+.ingredient-autocomplete-container .dropdown-menu {
+  position: absolute;
+  z-index: 1000;
+}
+
 /* Form section animations */
 .form-section {
   animation: slideInUp 0.6s ease-out;

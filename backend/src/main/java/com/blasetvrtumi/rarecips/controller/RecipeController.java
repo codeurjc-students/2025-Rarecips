@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Blob;
 import java.util.HashMap;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/recipes")
@@ -59,7 +60,7 @@ public class RecipeController {
                 return ResponseEntity.status(400).body("Recipe label is required");
             }
 
-            if (createdRecipe.getImageFile() == null) {
+            if (Objects.equals(createdRecipe.getImageString(), "")) {
                 String defaultRecipeImage = imageService.localImageToString("static/assets/img/recipe.png");
                 createdRecipe.setImageString(defaultRecipeImage);
             }
@@ -88,9 +89,15 @@ public class RecipeController {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("User must be authenticated");
             }
+
+            if (recipe.getLabel() == null || recipe.getLabel().isEmpty()) {
+                return ResponseEntity.status(400).body("Recipe label is required");
+            }
+
             String username = authentication.getName();
+            Recipe updatedRecipe = recipeService.updateRecipe(id, recipe, username);
             HashMap<String, Object> response = new HashMap<>();
-            response.put("recipe", recipe);
+            response.put("recipe", updatedRecipe);
             return ResponseEntity.ok(response);
         } catch (SecurityException e) {
             return ResponseEntity.status(403).body(e.getMessage());
