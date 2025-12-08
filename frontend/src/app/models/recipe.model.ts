@@ -1,3 +1,5 @@
+import { Review } from './review.model';
+
 export interface Recipe {
   id: number;
   label: string;
@@ -19,7 +21,7 @@ export interface Recipe {
   calories: number;
   rating: number;
   author: string;
-  reviews: string[];
+  reviews: Review[];
   steps: string[];
   createdAt: Date;
   updatedAt: Date;

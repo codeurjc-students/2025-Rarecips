@@ -327,6 +327,11 @@ public class Recipe {
         }
     }
 
+    public void addReview(Review review) {
+        this.reviews.add(review);
+        review.setRecipe(this);
+    }
+
     public void setImageString(String imageString) {
         this.imageString = imageString;
     }

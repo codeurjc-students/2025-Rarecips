@@ -78,7 +78,7 @@ public class User {
     private List<Recipe> recipes = new ArrayList<>();
 
     // Reviews a user has made
-    @JsonView(Reviews.class)
+    @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Review> reviews = new HashSet<>();
 
