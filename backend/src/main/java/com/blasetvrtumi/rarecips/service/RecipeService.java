@@ -74,6 +74,68 @@ public class RecipeService {
         return recipeRepository.save(recipe);
     }
 
+    @SuppressWarnings("unchecked")
+    public Recipe createRecipeFromMap(Map<String, Object> recipeData, String username) {
+        Recipe recipe = new Recipe();
+        recipe.setLabel((String) recipeData.get("label"));
+        recipe.setDescription((String) recipeData.get("description"));
+        recipe.setPeople((Integer) recipeData.get("people"));
+        recipe.setDifficulty((Integer) recipeData.get("difficulty"));
+        recipe.setImageString((String) recipeData.get("imageString"));
+        recipe.setSteps((List<String>) recipeData.get("steps"));
+        recipe.setCuisineType((List<String>) recipeData.get("cuisineType"));
+        recipe.setCautions((List<String>) recipeData.get("cautions"));
+        recipe.setDietLabels((List<String>) recipeData.get("dietLabels"));
+        recipe.setDishTypes((List<String>) recipeData.get("dishTypes"));
+        recipe.setMealTypes((List<String>) recipeData.get("mealTypes"));
+        recipe.setHealthLabels((List<String>) recipeData.get("healthLabels"));
+
+        Object totalTimeObj = recipeData.get("totalTime");
+        if (totalTimeObj != null) {
+            recipe.setTotalTime(((Number) totalTimeObj).floatValue());
+        }
+        Object caloriesObj = recipeData.get("calories");
+        if (caloriesObj != null) {
+            recipe.setCalories(((Number) caloriesObj).floatValue());
+        }
+        Object totalWeightObj = recipeData.get("totalWeight");
+        if (totalWeightObj != null) {
+            recipe.setTotalWeight(((Number) totalWeightObj).floatValue());
+        }
+
+        if (recipeData.containsKey("ingredients")) {
+            List<Map<String, Object>> ingredientsData = (List<Map<String, Object>>) recipeData.get("ingredients");
+            List<Ingredient> ingredients = new ArrayList<>();
+            Map<Long, Float> quantities = new HashMap<>();
+            Map<Long, String> units = new HashMap<>();
+
+            for (Map<String, Object> ingData : ingredientsData) {
+                String food = (String) ingData.get("food");
+                String image = (String) ingData.get("image");
+
+                Ingredient ingredient = new Ingredient(food, image);
+                Ingredient savedIngredient = ingredientRepository.save(ingredient);
+                ingredients.add(savedIngredient);
+
+                Object quantityObj = ingData.get("quantity");
+                if (quantityObj != null) {
+                    quantities.put(savedIngredient.getId(), ((Number) quantityObj).floatValue());
+                }
+
+                String measure = (String) ingData.get("measure");
+                if (measure != null) {
+                    units.put(savedIngredient.getId(), measure);
+                }
+            }
+
+            recipe.setIngredients(ingredients);
+            recipe.setIngredientQuantities(quantities);
+            recipe.setIngredientUnits(units);
+        }
+
+        return createRecipe(recipe, username);
+    }
+
     public Recipe updateRecipe(Long id, Recipe recipeDetails, String username) {
         Recipe existingRecipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
@@ -145,6 +207,126 @@ public class RecipeService {
         }
         if (recipeDetails.getImageString() != null) {
             existingRecipe.setImageString(recipeDetails.getImageString());
+        }
+        if (recipeDetails.getIngredientQuantities() != null) {
+            existingRecipe.setIngredientQuantities(recipeDetails.getIngredientQuantities());
+        }
+        if (recipeDetails.getIngredientUnits() != null) {
+            existingRecipe.setIngredientUnits(recipeDetails.getIngredientUnits());
+        }
+
+        return recipeRepository.save(existingRecipe);
+    }
+
+    public Recipe updateRecipeFromMap(Long id, Map<String, Object> recipeData, String username) {
+        Recipe existingRecipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
+
+        User recipeAuthor = existingRecipe.getAuthorUser();
+        if (recipeAuthor == null || !recipeAuthor.getUsername().equals(username)) {
+            User user = userRepository.findByUsername(username);
+            if (user == null || !user.getRole().equals("ADMIN")) {
+                throw new SecurityException("You are not authorized to update this recipe");
+            }
+        }
+
+        if (recipeData.containsKey("label")) {
+            existingRecipe.setLabel((String) recipeData.get("label"));
+        }
+        if (recipeData.containsKey("description")) {
+            existingRecipe.setDescription((String) recipeData.get("description"));
+        }
+        if (recipeData.containsKey("people")) {
+            existingRecipe.setPeople((Integer) recipeData.get("people"));
+        }
+        if (recipeData.containsKey("difficulty")) {
+            Integer difficulty = (Integer) recipeData.get("difficulty");
+            existingRecipe.setDifficulty(difficulty);
+            EnumValidator.validateDifficulty(difficulty);
+        }
+        if (recipeData.containsKey("imageString")) {
+            existingRecipe.setImageString((String) recipeData.get("imageString"));
+        }
+        if (recipeData.containsKey("steps")) {
+            existingRecipe.setSteps((List<String>) recipeData.get("steps"));
+        }
+        if (recipeData.containsKey("cuisineType")) {
+            List<String> cuisineType = (List<String>) recipeData.get("cuisineType");
+            existingRecipe.setCuisineType(cuisineType);
+            if (cuisineType != null) EnumValidator.validateCuisineTypes(cuisineType);
+        }
+        if (recipeData.containsKey("cautions")) {
+            List<String> cautions = (List<String>) recipeData.get("cautions");
+            existingRecipe.setCautions(cautions);
+            if (cautions != null) EnumValidator.validateCautions(cautions);
+        }
+        if (recipeData.containsKey("dietLabels")) {
+            List<String> dietLabels = (List<String>) recipeData.get("dietLabels");
+            existingRecipe.setDietLabels(dietLabels);
+            if (dietLabels != null) EnumValidator.validateDietLabels(dietLabels);
+        }
+        if (recipeData.containsKey("dishTypes")) {
+            List<String> dishTypes = (List<String>) recipeData.get("dishTypes");
+            existingRecipe.setDishTypes(dishTypes);
+            if (dishTypes != null) EnumValidator.validateDishTypes(dishTypes);
+        }
+        if (recipeData.containsKey("mealTypes")) {
+            List<String> mealTypes = (List<String>) recipeData.get("mealTypes");
+            existingRecipe.setMealTypes(mealTypes);
+            if (mealTypes != null) EnumValidator.validateMealTypes(mealTypes);
+        }
+        if (recipeData.containsKey("healthLabels")) {
+            List<String> healthLabels = (List<String>) recipeData.get("healthLabels");
+            existingRecipe.setHealthLabels(healthLabels);
+            if (healthLabels != null) EnumValidator.validateHealthLabels(healthLabels);
+        }
+        if (recipeData.containsKey("totalTime")) {
+            Object totalTimeObj = recipeData.get("totalTime");
+            if (totalTimeObj != null) {
+                existingRecipe.setTotalTime(((Number) totalTimeObj).floatValue());
+            }
+        }
+        if (recipeData.containsKey("calories")) {
+            Object caloriesObj = recipeData.get("calories");
+            if (caloriesObj != null) {
+                existingRecipe.setCalories(((Number) caloriesObj).floatValue());
+            }
+        }
+        if (recipeData.containsKey("totalWeight")) {
+            Object totalWeightObj = recipeData.get("totalWeight");
+            if (totalWeightObj != null) {
+                existingRecipe.setTotalWeight(((Number) totalWeightObj).floatValue());
+            }
+        }
+
+        if (recipeData.containsKey("ingredients")) {
+            List<Map<String, Object>> ingredientsData = (List<Map<String, Object>>) recipeData.get("ingredients");
+            List<Ingredient> ingredients = new ArrayList<>();
+            Map<Long, Float> quantities = new HashMap<>();
+            Map<Long, String> units = new HashMap<>();
+
+            for (Map<String, Object> ingData : ingredientsData) {
+                String food = (String) ingData.get("food");
+                String image = (String) ingData.get("image");
+
+                Ingredient ingredient = new Ingredient(food, image);
+                Ingredient savedIngredient = ingredientRepository.save(ingredient);
+                ingredients.add(savedIngredient);
+
+                Object quantityObj = ingData.get("quantity");
+                if (quantityObj != null) {
+                    quantities.put(savedIngredient.getId(), ((Number) quantityObj).floatValue());
+                }
+
+                String measure = (String) ingData.get("measure");
+                if (measure != null) {
+                    units.put(savedIngredient.getId(), measure);
+                }
+            }
+
+            existingRecipe.setIngredients(ingredients);
+            existingRecipe.setIngredientQuantities(quantities);
+            existingRecipe.setIngredientUnits(units);
         }
 
         return recipeRepository.save(existingRecipe);

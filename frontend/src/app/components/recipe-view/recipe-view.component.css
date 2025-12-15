@@ -550,28 +550,6 @@
   animation: slideLeftIn 0.3s ease-in-out;
 }
 
-@keyframes slideLeftIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideRightIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 /* Reviews animations */
 @keyframes spin {
   from {
@@ -584,11 +562,6 @@
 
 .animate-spin {
   animation: spin 1s linear infinite;
-}
-
-/* Review container animations */
-.reviewsContainer {
-  animation: fadeIn 0.3s ease-out;
 }
 
 /* User review highlight */

@@ -74,6 +74,8 @@ public class RecipeInitializationService {
 
                 // Ingredients entity!!
                 List<Ingredient> ingredients;
+                java.util.Map<Long, Float> ingredientQuantities = new HashMap<>();
+                java.util.Map<Long, String> ingredientUnits = new HashMap<>();
 
                 if (recipeJson.isNull("ingredients")) {
                     ingredients = new ArrayList<>();
@@ -81,13 +83,17 @@ public class RecipeInitializationService {
                     ingredients = recipeJson.optJSONArray("ingredients", new JSONArray()).toList().stream()
                             .map(obj -> {
                                 JSONObject ingredientJson = new JSONObject((HashMap<?, ?>) obj);
-                                String ingDescription = ingredientJson.optString("text", null);
-                                Float quantity = ingredientJson.optFloat("quantity", 0.0f);
-                                String measure = ingredientJson.optString("measure", "<unit>");
-                                Float weight = ingredientJson.optFloat("weight", 0.0f);
+                                String imageString = ingredientJson.optString("image", null);
                                 String food = ingredientJson.optString("food", null);
-                                Ingredient ingredient = new Ingredient(ingDescription, food, quantity, measure, weight);
+                                Ingredient ingredient = new Ingredient(food, imageString);
                                 ingredientRepository.save(ingredient);
+
+                                Float quantity = ingredientJson.optFloat("quantity", 0.0f);
+                                String measure = ingredientJson.optString("measure", "");
+
+                                ingredientQuantities.put(ingredient.getId(), quantity);
+                                ingredientUnits.put(ingredient.getId(), measure);
+
                                 return ingredient;
                             })
                             .toList();
@@ -122,6 +128,10 @@ public class RecipeInitializationService {
                 Recipe recipe = new Recipe(label, description, dietLabels, healthLabels, cautions,
                         people, ingredients, difficulty, dishTypes, mealTypes, cuisineType, totalTime,
                         totalWeight, calories, recipeAuthor, steps);
+
+                // Add new qty and measure as mapped properties to ingredient
+                recipe.setIngredientQuantities(ingredientQuantities);
+                recipe.setIngredientUnits(ingredientUnits);
 
                 // Save the new recipe to the database
                 recipeRepository.save(recipe);

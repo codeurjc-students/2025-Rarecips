@@ -52,21 +52,23 @@ public class RecipeController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)})
     @PutMapping
-    public ResponseEntity<?> createRecipe(@RequestBody Recipe createdRecipe, Authentication authentication) {
+    public ResponseEntity<?> createRecipe(@RequestBody java.util.Map<String, Object> recipeData, Authentication authentication) {
         try {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("User must be authenticated");
-            } else if (createdRecipe.getLabel() == null || createdRecipe.getLabel().isEmpty()) {
+            } else if (!recipeData.containsKey("label") || recipeData.get("label").toString().isEmpty()) {
                 return ResponseEntity.status(400).body("Recipe label is required");
             }
 
-            if (Objects.equals(createdRecipe.getImageString(), "")) {
+            String username = authentication.getName();
+            Recipe recipe = recipeService.createRecipeFromMap(recipeData, username);
+
+            if (Objects.equals(recipe.getImageString(), "")) {
                 String defaultRecipeImage = imageService.localImageToString("static/assets/img/recipe.png");
-                createdRecipe.setImageString(defaultRecipeImage);
+                recipe.setImageString(defaultRecipeImage);
+                recipe = recipeService.updateRecipe(recipe.getId(), recipe, username);
             }
 
-            String username = authentication.getName();
-            Recipe recipe = recipeService.createRecipe(createdRecipe, username);
             HashMap<String, Object> response = new HashMap<>();
             response.put("recipe", recipe);
             return ResponseEntity.status(201).body(response);
@@ -84,18 +86,18 @@ public class RecipeController {
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
             @ApiResponse(responseCode = "403", description = "Forbidden - Not the recipe author", content = @Content)})
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRecipe(@PathVariable Long id, @RequestBody Recipe recipe, Authentication authentication) {
+    public ResponseEntity<?> updateRecipe(@PathVariable Long id, @RequestBody java.util.Map<String, Object> recipeData, Authentication authentication) {
         try {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("User must be authenticated");
             }
 
-            if (recipe.getLabel() == null || recipe.getLabel().isEmpty()) {
+            if (!recipeData.containsKey("label") || recipeData.get("label").toString().isEmpty()) {
                 return ResponseEntity.status(400).body("Recipe label is required");
             }
 
             String username = authentication.getName();
-            Recipe updatedRecipe = recipeService.updateRecipe(id, recipe, username);
+            Recipe updatedRecipe = recipeService.updateRecipeFromMap(id, recipeData, username);
             HashMap<String, Object> response = new HashMap<>();
             response.put("recipe", updatedRecipe);
             return ResponseEntity.ok(response);

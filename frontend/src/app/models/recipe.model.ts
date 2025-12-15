@@ -1,4 +1,5 @@
 import { Review } from './review.model';
+import { RecipeIngredient } from './recipe-ingredient.model';
 
 export interface Recipe {
   id: number;
@@ -9,7 +10,8 @@ export interface Recipe {
   imageString: string;
   people: number;
   difficulty: number;
-  ingredients: { description: string; food: string; quantity: number; measure: string; weight: number }[];
+  ingredients: { id: number, description: string; food: string; quantity: number; measure: string; weight: number }[];
+  recipeIngredients?: RecipeIngredient[];
   dishTypes: string[];
   mealTypes: string[];
   cuisineType: string[];

@@ -1,43 +1,144 @@
-<div class="flex items-center justify-center">
-  <div class="flex flex-col items-center justify-center py-12 mt-32 max-w-7xl w-fit">
-    <div class="flex flex-col glass p-8 gap-8 ingredients-container">
+<div class="flex min-h-screen w-full flex-col items-start justify-center">
+  <!-- Main Content -->
+  <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
+    <div class="flex max-w-7xl w-[70rem] min-h-full flex-col items-center gap-8">
 
-      <!-- Search and Filters -->
-      <div class="flex gap-4 justify-center items-center filters">
-        <div class="search-wrapper">
-          <i class="ti ti-search search-icon"></i>
-          <input type="text" class="search-input" placeholder="Search ingredients...">
-        </div>
-
-        <div class="category-select rounded-2xl">
-          All categories
-          <i class="ti ti-caret-down-filled select-icon"></i>
-        </div>
-
-        <!-- View Toggle -->
-        <div class="view-toggle">
-          <button class="view-btn">
-            <i class="ti ti-grid-dots"></i>
+      <!-- Tab Navigation -->
+      <div class="flex w-full">
+        <div class="tabs glass text-nowrap w-full">
+          <button class="tab" [class.active]="activeTab === 'ingredients'" (click)="setActiveTab('ingredients')">
+            <i class="ti ti-carrot text-xl" aria-hidden="true"></i>
+            Ingredients
           </button>
-          <button class="view-btn">
-            <i class="ti ti-list"></i>
-          </button>
-        </div>
-
-        <!-- Add Ingredient Button -->
-        <div class="header flex flex-col items-start">
-          <button class="add-btn w-fit">
-            <i class="ti ti-plus"></i>
-            <span>Add More Ingredients</span>
+          <button class="tab" [class.active]="activeTab === 'pantry'" (click)="setActiveTab('pantry')">
+            <i class="ti ti-cooker text-xl" aria-hidden="true"></i>
+            My pantry
           </button>
         </div>
       </div>
 
-      <!-- Add Form Modal -->
+      <!-- Ingredients Tab -->
+      <div class="w-full ingredientList" [class.active]="activeTab === 'ingredients'" [class.hidden]="activeTab !== 'ingredients'">
+        <div class="gap-8 max-w-7xl w-full glass p-8">
 
-      <!-- Grid View -->
+          <!-- Ingredients Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Ingredient Card template-->
+            @for (ingredient of ingredients; track $index) {
+              <div class="ingredient-card glass-strong rounded-2xl overflow-hidden transition-all hover:scale-[1.02]">
+              <div class="ingredient-image relative h-48">
+                <img [src]="ingredient.image"
+                     [alt]="ingredient.food"
+                     class="w-full h-full object-cover">
+                <div class="ingredient-icon">
+                  <i class="ti {{ingredient.icon}}" style="color: var(--primary-700);"></i>
+                </div>
+              </div>
+              <div class="ingredient-content p-4">
+                <div class="ingredient-header mb-3">
+                  <h3 class="ingredient-name" style="color: var(--primary-700);">{{ingredient.food}}</h3>
+                  <span class="ingredient-category">{{ingredient.category}}</span>
+                </div>
+                <button class="add-more-btn min-h-12" (click)="addToPantry(ingredient)">
+                  @if (!hasIngredient(ingredient)) { <i class="ti ti-plus"></i>Add to my pantry } @else { <i class="ti ti-check"></i> }
+                </button>
+              </div>
+            </div>
+            }
 
-      <!-- List View -->
+          </div>
+
+          @if (hasMore) {
+            <div class="flex justify-center mt-8">
+              <button
+                class="px-8 py-4 rounded-2xl w-full h-10 font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
+                style="background: var(--gradient-primary); color: white;"
+                (click)="loadMoreIngredients()"
+                [disabled]="loadingIngredients">
+                @if (loadingIngredients) {
+                  <i class="ti ti-loader-2 animate-spin"></i>
+                  Loading...
+                } @else {
+                  <i class="ti ti-refresh"></i>
+                  Load more
+                }
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Pantry Tab -->
+      <div class="w-full cart" [class.active]="activeTab === 'pantry'" [class.hidden]="activeTab !== 'pantry'">
+        <div class="gap-8 max-w-7xl w-full glass p-8">
+
+          @if (displayedUserIngredients.length > 0) {
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-2xl font-bold" style="color: var(--primary-700);">
+                {{ userIngredients.size }} items
+              </h2>
+              <button class="px-4 py-2 rounded-xl font-semibold transition-all hover:scale-105 flex items-center gap-2"
+                      style="background: var(--primary-400); color: white;"
+                      (click)="clearPantry()">
+                <i class="ti ti-trash"></i>
+                Clear Pantry
+              </button>
+            </div>
+
+            <!-- grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (ingredient of displayedUserIngredients; track ingredient.id) {
+                <div class="flex items-center justify-between p-4 rounded-2xl border-2"
+                     style="background: var(--primary-100-40); border-color: var(--primary-100);">
+                  <div class="flex items-center gap-4">
+                    <img [src]="ingredient.image"
+                         [alt]="ingredient.food"
+                         class="w-16 h-16 rounded-xl object-cover">
+                    <div>
+                      <h3 class="font-semibold" style="color: var(--primary-700);">{{ ingredient.food }}</h3>
+                      <p class="text-sm" style="color: var(--primary-400);">{{ ingredient.category }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-4">
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                            style="background: rgba(255, 0, 0, 0.1); color: red;"
+                            (click)="removeFromPantry(ingredient)">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (hasMorePantryItems) {
+              <div class="flex justify-center mt-8">
+                <button
+                  class="px-8 py-4 rounded-2xl w-full h-10 font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
+                  style="background: var(--gradient-primary); color: white;"
+                  (click)="loadMorePantryItems()">
+                  <i class="ti ti-refresh"></i>
+                  Load more
+                </button>
+              </div>
+            }
+          } @else {
+            <div class="flex flex-col items-center justify-center gap-4 py-12">
+              <div class="w-24 h-24 rounded-full flex items-center justify-center" style="background: var(--primary-100);">
+                <i class="ti ti-mood-sick text-5xl" style="color: var(--primary-400);"></i>
+              </div>
+              <p class="text-lg font-semibold" style="color: var(--primary-500);">Your pantry is empty</p>
+              <p class="text-sm" style="color: var(--primary-400);">Add ingredients from the catalog to get started</p>
+              <button class="px-6 py-3 rounded-2xl font-semibold transition-all hover:scale-105"
+                      style="background: var(--gradient-primary); color: white;"
+                      (click)="setActiveTab('ingredients')">
+                <i class="ti ti-shopping-cart mr-2"></i>
+                Explore Ingredients
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

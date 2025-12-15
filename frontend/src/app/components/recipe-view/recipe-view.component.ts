@@ -10,6 +10,7 @@ import {SessionService} from '../../services/session.service';
 import {UserService} from '../../services/user.service';
 import {FormsModule} from '@angular/forms';
 import {ReviewService} from '../../services/review.service';
+import {Ingredient} from '../../models/ingredient.model';
 
 
 @Component({
@@ -79,6 +80,8 @@ export class RecipeViewComponent implements OnInit {
   userHasReview: boolean = false;
   isRecipeAuthor: boolean = false;
 
+  userIngredients: Set<Ingredient> = new Set<Ingredient>();
+
   constructor(
     private router: Router,
     private recipeService: RecipeService,
@@ -121,6 +124,12 @@ export class RecipeViewComponent implements OnInit {
         this.isRecipeAuthor = this.recipe?.author === user.username;
 
         this.loadReviews();
+
+        this.userService.getUserIngredients(user.username).subscribe({
+          next: (ingredients: Ingredient[]) => {
+            this.userIngredients = new Set<Ingredient>(ingredients);
+          }
+        });
       },
       error: () => {
         this.isAuthenticated = false;
@@ -621,5 +630,13 @@ export class RecipeViewComponent implements OnInit {
 
   checkReview() {
     return !(this.newReview.rating > 0 && this.newReview.comment.trim().length > 0);
+  }
+
+  hasIngredientInPantry(ingredient: number, ingred: any): boolean {
+    let res = false;
+    this.userIngredients.forEach((ing: Ingredient) => {
+      if (!res) res = ing.id == ingredient;
+    });
+    return res;
   }
 }

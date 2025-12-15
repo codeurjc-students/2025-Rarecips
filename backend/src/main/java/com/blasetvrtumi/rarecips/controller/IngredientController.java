@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,5 +35,15 @@ public class IngredientController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ingredientNames);
     }
+
+    @Operation(summary = "Get paged ingredients")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK")
+    })
+    @GetMapping
+    public Page<Ingredient> getIngredients(Pageable pageable) {
+        return ingredientRepository.findAll(pageable);
+    }
 }
+
 

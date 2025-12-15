@@ -191,12 +191,198 @@ export class IngredientIconService {
     'box': 'ti-box',
     'package': 'ti-package',
   };
+  private categoryMap: { [key: string]: string } = {
+    // Fruit
+    'apple': 'Fruit',
+    'banana': 'Fruit',
+    'lemon': 'Fruit',
+    'orange': 'Fruit',
+    'cherry': 'Fruit',
+    'grape': 'Fruit',
+    'strawberry': 'Fruit',
+    'watermelon': 'Fruit',
+    'melon': 'Fruit',
+    'pineapple': 'Fruit',
+    'peach': 'Fruit',
+    'pear': 'Fruit',
+    'avocado': 'Fruit',
+    'mango': 'Fruit',
+    'kiwi': 'Fruit',
+    'coconut': 'Fruit',
+    'fruit': 'Fruit',
+
+    // Vegetables
+    'tomato': 'Vegetables',
+    'carrot': 'Vegetables',
+    'potato': 'Vegetables',
+    'onion': 'Vegetables',
+    'garlic': 'Vegetables',
+    'pepper': 'Vegetables',
+    'bell pepper': 'Vegetables',
+    'chili': 'Vegetables',
+    'lettuce': 'Vegetables',
+    'salad': 'Vegetables',
+    'spinach': 'Vegetables',
+    'broccoli': 'Vegetables',
+    'cucumber': 'Vegetables',
+    'mushroom': 'Vegetables',
+    'corn': 'Vegetables',
+    'pumpkin': 'Vegetables',
+    'eggplant': 'Vegetables',
+    'cabbage': 'Vegetables',
+    'celery': 'Vegetables',
+    'zucchini': 'Vegetables',
+    'asparagus': 'Vegetables',
+    'vegetable': 'Vegetables',
+
+    // Meat
+    'meat': 'Meat',
+    'beef': 'Meat',
+    'pork': 'Meat',
+    'chicken': 'Meat',
+    'turkey': 'Meat',
+    'lamb': 'Meat',
+    'bacon': 'Meat',
+    'sausage': 'Meat',
+    'ham': 'Meat',
+    'steak': 'Meat',
+    'protein': 'Meat',
+
+    // Fish
+    'fish': 'Fish',
+    'salmon': 'Fish',
+    'tuna': 'Fish',
+    'cod': 'Fish',
+    'shrimp': 'Fish',
+    'prawn': 'Fish',
+    'lobster': 'Fish',
+    'crab': 'Fish',
+    'oyster': 'Fish',
+    'mussel': 'Fish',
+    'clam': 'Fish',
+    'seafood': 'Fish',
+
+    // Dairy
+    'milk': 'Dairy',
+    'cheese': 'Dairy',
+    'butter': 'Dairy',
+    'cream': 'Dairy',
+    'yogurt': 'Dairy',
+    'yoghurt': 'Dairy',
+    'dairy': 'Dairy',
+
+    // Egg
+    'egg': 'Egg',
+    'eggs': 'Egg',
+
+    // Bread and grain
+    'bread': 'Bread & Grain',
+    'toast': 'Bread & Grain',
+    'baguette': 'Bread & Grain',
+    'rice': 'Bread & Grain',
+    'pasta': 'Bread & Grain',
+    'spaghetti': 'Bread & Grain',
+    'noodle': 'Bread & Grain',
+    'macaroni': 'Bread & Grain',
+    'flour': 'Bread & Grain',
+    'wheat': 'Bread & Grain',
+    'oat': 'Bread & Grain',
+    'cereal': 'Bread & Grain',
+    'quinoa': 'Bread & Grain',
+    'barley': 'Bread & Grain',
+    'grain': 'Bread & Grain',
+
+    // Drinks
+    'coffee': 'Drinks',
+    'tea': 'Drinks',
+    'wine': 'Drinks',
+    'beer': 'Drinks',
+    'juice': 'Drinks',
+    'water': 'Drinks',
+    'soda': 'Drinks',
+    'drink': 'Drinks',
+
+    // Sweets and desserts
+    'dessert': 'Sweets & Desserts',
+    'pie': 'Sweets & Desserts',
+    'cake': 'Sweets & Desserts',
+    'cookie': 'Sweets & Desserts',
+    'candy': 'Sweets & Desserts',
+    'sugar': 'Sweets & Desserts',
+    'honey': 'Sweets & Desserts',
+    'ice cream': 'Sweets & Desserts',
+    'icecream': 'Sweets & Desserts',
+    'sweet': 'Sweets & Desserts',
+
+    // Condiments
+    'salt': 'Condiments',
+    'oil': 'Condiments',
+    'vinegar': 'Condiments',
+    'sauce': 'Condiments',
+    'ketchup': 'Condiments',
+    'mustard': 'Condiments',
+    'mayonnaise': 'Condiments',
+    'soy sauce': 'Condiments',
+    'black pepper': 'Condiments',
+    'spice': 'Condiments',
+    'herb': 'Condiments',
+    'basil': 'Condiments',
+    'oregano': 'Condiments',
+    'thyme': 'Condiments',
+    'rosemary': 'Condiments',
+    'parsley': 'Condiments',
+    'cilantro': 'Condiments',
+    'mint': 'Condiments',
+    'cinnamon': 'Condiments',
+    'ginger': 'Condiments',
+    'curry': 'Condiments',
+    'paprika': 'Condiments',
+    'condiment': 'Condiments',
+
+    // Nuts and seeds
+    'nut': 'Nuts & Seeds',
+    'almond': 'Nuts & Seeds',
+    'walnut': 'Nuts & Seeds',
+    'peanut': 'Nuts & Seeds',
+    'cashew': 'Nuts & Seeds',
+    'pistachio': 'Nuts & Seeds',
+    'hazelnut': 'Nuts & Seeds',
+    'seed': 'Nuts & Seeds',
+    'sunflower': 'Nuts & Seeds',
+
+    // Legumes
+    'bean': 'Legumes',
+    'lentil': 'Legumes',
+    'chickpea': 'Legumes',
+    'pea': 'Legumes',
+    'soy': 'Legumes',
+    'soybean': 'Legumes',
+    'tofu': 'Legumes',
+    'legume': 'Legumes',
+
+    // Fast food
+    'pizza': 'Fast Food',
+    'burger': 'Fast Food',
+    'sandwich': 'Fast Food',
+    'hotdog': 'Fast Food',
+    'taco': 'Fast Food',
+    'burrito': 'Fast Food',
+
+    // Miscellaneous
+    'soup': 'Miscellaneous',
+    'bowl': 'Miscellaneous',
+    'bottle': 'Miscellaneous',
+    'can': 'Miscellaneous',
+    'jar': 'Miscellaneous',
+    'box': 'Miscellaneous',
+    'package': 'Miscellaneous',
+  };
 
   constructor() { }
 
   getIconForIngredient(ingredientName: string): string {
     if (!ingredientName) {
-      return 'ti-apple';
+      return 'ti-circles';
     }
 
     const normalizedName = ingredientName.toLowerCase().trim();
@@ -213,6 +399,14 @@ export class IngredientIconService {
 
     return 'ti-circles';
   }
-}
 
+  getCategoryFromIcon(icon: string): string {
+    for (const [keyword, iconValue] of Object.entries(this.iconMap)) {
+      if (iconValue === icon) {
+        return this.categoryMap[keyword] || 'Others';
+      }
+    }
+    return 'Others';
+  }
+}
 

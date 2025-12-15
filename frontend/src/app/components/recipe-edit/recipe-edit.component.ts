@@ -104,7 +104,7 @@ export class RecipeEditComponent implements OnInit {
   private timeoutId: any = null;
 
   // Ingredients management
-  ingredients: Ingredient[] = [];
+  ingredients: { name: string; quantity: string | undefined; unit: string | undefined }[] = [];
   newIngredient: Ingredient = {name: '', quantity: '', unit: ''};
   draggedIngredientIndex: number | null = null;
 
@@ -241,7 +241,7 @@ export class RecipeEditComponent implements OnInit {
         // Convert ingredients
         this.ingredients = recipe.ingredients.map(ing => ({
           name: ing.food,
-          quantity: ing.quantity.toString(),
+          quantity: ing.quantity?.toString(),
           unit: ing.measure
         }));
 
@@ -721,10 +721,9 @@ export class RecipeEditComponent implements OnInit {
       imageString: cleanImageString,
       ingredients: this.ingredients.map(ing => ({
         food: ing.name,
-        quantity: parseFloat(ing.quantity) || 0,
-        measure: ing.unit,
-        description: `${ing.quantity} ${ing.unit} ${ing.name}`,
-        weight: 0
+        quantity: parseFloat(<string>ing.quantity) || 0,
+        measure: ing.unit || '',
+        image: ''
       })),
       steps: this.instructions.map(inst => inst.description),
       cuisineType: this.cuisineTypes || [],

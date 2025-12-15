@@ -1,10 +1,14 @@
 package com.blasetvrtumi.rarecips.controller;
 
+import com.blasetvrtumi.rarecips.entity.Ingredient;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.security.jwt.JwtTokenProvider;
 import com.blasetvrtumi.rarecips.service.UserService;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -87,6 +91,9 @@ public class UserController {
         currentUser.setDisplayName(updatedUser.getDisplayName());
         currentUser.setEmail(updatedUser.getEmail());
         currentUser.setBio(updatedUser.getBio());
+        List<Ingredient> ingredients = updatedUser.getIngredients();
+        System.out.println("Updating ingredients: " + updatedUser);
+        Optional.ofNullable(ingredients).ifPresent(currentUser::setIngredients);
         userService.save(currentUser);
 
         String currentUsername = authentication.getName();
@@ -117,6 +124,74 @@ public class UserController {
 
         User user = userService.findByUsername(principal.getName());
         user.setLastOnline(java.time.LocalDateTime.now());
+        userService.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Add an ingredient to your stored ingredients")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingredient added successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "Forbidden access")
+    })
+    @PutMapping("/me/ingredients")
+    public ResponseEntity<Void> addStoredIngredient(HttpServletRequest request, @RequestBody Ingredient ingredient) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(400).build();
+        }
+
+        User user = userService.findByUsername(principal.getName());
+        user.addIngredient(ingredient);
+        userService.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Get your stored ingredients")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Stored ingredients retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Ingredient.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "Forbidden access")
+    })
+    @GetMapping("/me/ingredients")
+    public ResponseEntity<List<Ingredient>> getStoredIngredients(HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(400).build();
+        }
+
+        User user = userService.findByUsername(principal.getName());
+        List<Ingredient> ingredients = user.getIngredients();
+        return ResponseEntity.ok(ingredients);
+    }
+
+    @Operation(summary = "Delete a user stored ingredient by ID")
+    @PutMapping("/me/ingredients/remove")
+    public ResponseEntity<Void> deleteStoredIngredient(HttpServletRequest request, @RequestBody Long ingredientId) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(400).build();
+        }
+
+        User user = userService.findByUsername(principal.getName());
+        List<Ingredient> ingredients = user.getIngredients();
+        ingredients.removeIf(ingredient -> ingredient.getId().equals(ingredientId));
+        user.setIngredients(ingredients);
+        userService.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Clear user's ingredient pantry")
+    @PutMapping("/me/ingredients/clear")
+    public ResponseEntity<Void> clearStoredIngredients(HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) return ResponseEntity.status(400).build();
+        User user = userService.findByUsername(principal.getName());
+        user.setIngredients(new ArrayList<>());
         userService.save(user);
         return ResponseEntity.ok().build();
     }

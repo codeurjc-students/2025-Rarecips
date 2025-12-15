@@ -62,6 +62,20 @@ public class Recipe {
     private List<Ingredient> ingredients = new ArrayList<>();
 
     @JsonView(BasicInfo.class)
+    @ElementCollection
+    @CollectionTable(name = "recipe_ingredient_quantities", joinColumns = @JoinColumn(name = "recipe_id"))
+    @MapKeyColumn(name = "ingredient_id")
+    @Column(name = "quantity")
+    private java.util.Map<Long, Float> ingredientQuantities = new java.util.HashMap<>();
+
+    @JsonView(BasicInfo.class)
+    @ElementCollection
+    @CollectionTable(name = "recipe_ingredient_units", joinColumns = @JoinColumn(name = "recipe_id"))
+    @MapKeyColumn(name = "ingredient_id")
+    @Column(name = "unit")
+    private java.util.Map<Long, String> ingredientUnits = new java.util.HashMap<>();
+
+    @JsonView(BasicInfo.class)
     private int difficulty;
 
     @JsonView(BasicInfo.class)
@@ -360,6 +374,22 @@ public class Recipe {
 
     public void setSteps(List<String> steps) {
         this.steps = steps;
+    }
+
+    public java.util.Map<Long, Float> getIngredientQuantities() {
+        return ingredientQuantities;
+    }
+
+    public void setIngredientQuantities(java.util.Map<Long, Float> ingredientQuantities) {
+        this.ingredientQuantities = ingredientQuantities;
+    }
+
+    public java.util.Map<Long, String> getIngredientUnits() {
+        return ingredientUnits;
+    }
+
+    public void setIngredientUnits(java.util.Map<Long, String> ingredientUnits) {
+        this.ingredientUnits = ingredientUnits;
     }
 
 }

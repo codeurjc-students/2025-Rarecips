@@ -33,7 +33,14 @@ export class RecipeService {
       imageString: recipe.imageString,
       people: recipe.people || 4,
       difficulty: recipe.difficulty || 1,
-      ingredients: recipe.ingredients || [],
+      ingredients: recipe.ingredients?.map((ing: any) => ({
+        id: ing.id,
+        food: ing.food,
+        description: ing.food,
+        quantity: recipe.ingredientQuantities?.[ing.id] || 0,
+        measure: recipe.ingredientUnits?.[ing.id] || "",
+        weight: recipe.ingredientQuantities?.[ing.id] || 0
+      })) || [],
       dishTypes: recipe.dishTypes || [],
       mealTypes: recipe.mealTypes || [],
       cuisineType: recipe.cuisineType || [],
@@ -67,7 +74,14 @@ export class RecipeService {
       imageString: data.imageString,
       people: data.people || 4,
       difficulty: data.difficulty || "Medium",
-      ingredients: data.ingredients || [],
+      ingredients: data.ingredients?.map((ing: any) => ({
+        id: ing.id,
+        food: ing.food,
+        description: ing.food,
+        quantity: data.ingredientQuantities?.[ing.id] || 0,
+        measure: data.ingredientUnits?.[ing.id] || "",
+        weight: data.ingredientQuantities?.[ing.id] || 0
+      })) || [],
       dishTypes: data.dishTypes || [],
       mealTypes: data.mealTypes || [],
       cuisineType: data.cuisineType || [],

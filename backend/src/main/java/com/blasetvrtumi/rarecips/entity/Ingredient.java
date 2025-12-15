@@ -14,45 +14,21 @@ public class Ingredient {
     private Long id;
 
     @JsonView(BasicInfo.class)
-    private String description;
-
-    @JsonView(BasicInfo.class)
     private String food;
 
-    @JsonView(BasicInfo.class)
-    private Float quantity;
-
-    @JsonView(BasicInfo.class)
-    private String measure;
-
-    @JsonView(BasicInfo.class)
-    private Float weight;
+    @JsonView
+    private String image;
 
     public Ingredient() {
     }
 
-    public Ingredient(String description, String food, Float quantity, String measure, Float weight) {
-        this.description = description;
+    public Ingredient(String food, String image) {
         this.food = food;
-        this.quantity = quantity;
-        this.measure = measure;
-        this.weight = weight;
+        this.image = image;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getFood() {
@@ -63,27 +39,4 @@ public class Ingredient {
         this.food = food;
     }
 
-    public Float getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Float quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getMeasure() {
-        return measure;
-    }
-
-    public void setMeasure(String measure) {
-        this.measure = measure;
-    }
-
-    public Float getWeight() {
-        return weight;
-    }
-
-    public void setWeight(Float weight) {
-        this.weight = weight;
-    }
 }

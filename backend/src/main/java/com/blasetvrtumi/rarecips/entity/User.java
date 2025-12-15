@@ -13,10 +13,7 @@ import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class User {
@@ -81,6 +78,11 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Review> reviews = new HashSet<>();
+
+    // Ingredients a user has stored
+    @JsonIgnore
+    @ManyToMany
+    private List<Ingredient> ingredients = new ArrayList<>();
 
     // Recipes a user has saved
     @ManyToMany
@@ -217,6 +219,18 @@ public class User {
         return profileImageString;
     }
 
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void addIngredient(Ingredient ingredient) {
+        this.ingredients.add(ingredient);
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -227,6 +241,7 @@ public class User {
                 ", role=" + role +
                 ", createdAt=" + createdAt +
                 ", lastOnline=" + lastOnline +
+                ", ingredients=" + ingredients +
                 '}';
     }
 

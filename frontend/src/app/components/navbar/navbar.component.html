@@ -27,14 +27,12 @@
         <i class="flex items-center ti ti-compass w-4 h-4 text-xl"></i>
         <span class="text-lg">Explore</span>
       </div>
-      <div class="nav-item px-3 py-4" (click)="navigateTo('ingredients', $event)">
-        <i class="flex items-center ti ti-basket w-4 h-4 text-xl"></i>
-        <span class="text-lg">Ingredients</span>
-      </div>
-      <div class="nav-item px-3 py-4" (click)="navigateTo('health-report', $event)">
-        <i class="flex items-center ti ti-chart-donut w-4 h-4 text-xl"></i>
-        <span class="text-lg">Health</span>
-      </div>
+      @if (isAuthenticated) {
+        <div class="nav-item px-3 py-4" (click)="navigateTo('ingredients', $event)">
+          <i class="flex items-center ti ti-basket w-4 h-4 text-xl"></i>
+          <span class="text-lg">Ingredients</span>
+        </div>
+      }
     </div>
   </div>
 
