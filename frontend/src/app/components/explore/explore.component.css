@@ -336,3 +336,33 @@ input[type="range"].range-slider-thumb::-moz-range-thumb {
   pointer-events: all;
 }
 
+@keyframes slideRightIn {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideLeftIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slideright {
+  animation: slideRightIn 0.3s ease-in-out;
+}
+
+.slideleft {
+  animation: slideLeftIn 0.3s ease-in-out;
+}
+

@@ -2,15 +2,21 @@ package com.blasetvrtumi.rarecips.controller;
 
 import com.blasetvrtumi.rarecips.entity.Ingredient;
 import com.blasetvrtumi.rarecips.entity.User;
+import com.blasetvrtumi.rarecips.repository.UserRepository;
 import com.blasetvrtumi.rarecips.security.jwt.JwtTokenProvider;
 import com.blasetvrtumi.rarecips.service.UserService;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,6 +35,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -193,5 +202,54 @@ public class UserController {
         user.setIngredients(new ArrayList<>());
         userService.save(user);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Search users by query")
+    @GetMapping("/search")
+    @JsonView(User.BasicInfo.class)
+    public ResponseEntity<?> searchUsers(
+            @RequestParam(required = false) String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size) {
+
+        Pageable pageable = PageRequest.of(page, size,
+            org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+
+        Page<User> users = userRepository.findUsersWithFilters(query, null, null, null, pageable);
+
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("users", users.getContent());
+        response.put("total", users.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Filter users with multiple criteria")
+    @GetMapping("/filter")
+    @JsonView(User.BasicInfo.class)
+    public ResponseEntity<?> filterUsers(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) Integer minRecipes,
+            @RequestParam(required = false) Integer minReviews,
+            @RequestParam(required = false) Integer minCollections,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy) {
+
+        org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.DESC;
+
+        Pageable pageable = PageRequest.of(page, size,
+            org.springframework.data.domain.Sort.by(direction, sortBy));
+
+        Page<User> users = userRepository.findUsersWithFilters(query, minRecipes, minReviews, minCollections, pageable);
+
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("users", users.getContent());
+        response.put("total", users.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
     }
 }

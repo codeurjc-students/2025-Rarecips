@@ -3,7 +3,7 @@ import {RecipeService} from '../../services/recipe.service';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Recipe} from '../../models/recipe.model';
 import {Review} from '../../models/review.model';
-import {CommonModule} from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {IngredientIconService} from '../../services/ingredient-icon.service';
 import {Subject, takeUntil} from 'rxjs';
 import {SessionService} from '../../services/session.service';
@@ -19,7 +19,8 @@ import {Ingredient} from '../../models/ingredient.model';
   imports: [
     RouterLink,
     CommonModule,
-    FormsModule
+    FormsModule,
+    NgOptimizedImage
   ],
   styleUrls: ['./recipe-view.component.css']
 })
@@ -169,11 +170,13 @@ export class RecipeViewComponent implements OnInit {
 
         if (this.recipe?.author) {
           this.userService.getUserByUsername(<string>this.recipe?.author).subscribe((res) => {
-            this.authorPfp = res.profileImageString;
+            this.authorPfp = "data:image/png;base6," + res.profileImageString;
           });
         } else {
           this.authorPfp = '/assets/img/user.png';
         }
+
+        console.log(this.authorPfp)
 
         if (this.recipe?.createdAt) {
           const createdDate = new Date(this.recipe.createdAt);

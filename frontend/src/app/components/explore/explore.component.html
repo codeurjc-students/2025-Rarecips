@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <div id="search-results" class="flex w-full max-w-7xl flex-col items-start gap-8 glass p-8">
+    <div id="search-results" [ngClass]="['flex', 'w-full', 'max-w-7xl', 'flex-col', 'items-start', 'gap-8', 'glass', 'p-8', animationClass]">
 
       <!-- Search Header -->
       <div class="flex w-full flex-col items-center gap-6 mb-8">
@@ -34,7 +34,7 @@
         <div class="flex flex-row w-full max-w-3xl relative gap-4 items-center">
           <div class="w-full">
             <input type="text"
-                   placeholder="Search recipes..."
+                   [placeholder]="activeSearchTab === 'recipes' ? 'Search recipes...' : activeSearchTab === 'users' ? 'Search users...' : 'Search...'"
                    [(ngModel)]="searchQuery"
                    (keyup.enter)="performSearch()"
                    class="w-full px-6 py-4 pl-14 pr-20 rounded-3xl border-2 transition-all focus:outline-none text-lg border-solid"
@@ -53,76 +53,17 @@
           </div>
         </div>
 
-        @if (filters.query) {
+        @if ((activeSearchTab === 'recipes' && filters.query) || (activeSearchTab === 'users' && userFilters.query)) {
           <div class="flex items-center gap-2 px-4 py-2 rounded-full"
                style="background: var(--primary-200); color: var(--primary-700);">
             <i class="ti ti-search text-lg"></i>
-            <span class="text-sm font-medium">Searching for: "{{ filters.query }}"</span>
+            <span class="text-sm font-medium">Searching for: "{{ activeSearchTab === 'recipes' ? filters.query : userFilters.query }}"</span>
             <button (click)="clearSearch()"
                     class="ml-2 hover:bg-white hover:bg-opacity-50 rounded-full p-1 transition-all">
               <i class="ti ti-x text-sm"></i>
             </button>
           </div>
         }
-
-        <!-- Quick Filters -->
-        <div class="flex flex-wrap gap-3 justify-center">
-          <button
-            (click)="applyQuickFilter('popular')"
-            [class.selected]="activeQuickFilter === 'popular'"
-            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-            [style.background]="activeQuickFilter === 'popular' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
-            [style.color]="activeQuickFilter === 'popular' ? 'white' : 'var(--primary-700)'">
-            <div class="flex flex-rows items-center min-w-[2rem]">
-              <i class="absolute ti ti-star mr-1 text-xl"></i>
-            </div>
-            Popular
-          </button>
-          <button
-            (click)="applyQuickFilter('quick')"
-            [class.selected]="activeQuickFilter === 'quick'"
-            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-            [style.background]="activeQuickFilter === 'quick' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
-            [style.color]="activeQuickFilter === 'quick' ? 'white' : 'var(--primary-700)'">
-            <div class="flex flex-rows items-center min-w-[2rem]">
-              <i class="absolute ti ti-brand-speedtest mr-1 text-xl"></i>
-            </div>
-            Quick
-          </button>
-          <button
-            (click)="applyQuickFilter('healthy')"
-            [class.selected]="activeQuickFilter === 'healthy'"
-            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-            [style.background]="activeQuickFilter === 'healthy' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
-            [style.color]="activeQuickFilter === 'healthy' ? 'white' : 'var(--primary-700)'">
-            <div class="flex flex-rows items-center min-w-[2rem]">
-              <i class="absolute ti ti-leaf mr-1 text-xl"></i>
-            </div>
-            Healthy
-          </button>
-          <button
-            (click)="applyQuickFilter('traditional')"
-            [class.selected]="activeQuickFilter === 'traditional'"
-            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-            [style.background]="activeQuickFilter === 'traditional' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
-            [style.color]="activeQuickFilter === 'traditional' ? 'white' : 'var(--primary-700)'">
-            <div class="flex flex-rows items-center min-w-[2rem]">
-              <i class="absolute ti ti-ladle mr-1 text-xl"></i>
-            </div>
-            Traditional
-          </button>
-          <button
-            (click)="applyQuickFilter('easy')"
-            [class.selected]="activeQuickFilter === 'easy'"
-            class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-            [style.background]="activeQuickFilter === 'easy' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
-            [style.color]="activeQuickFilter === 'easy' ? 'white' : 'var(--primary-700)'">
-            <div class="flex flex-rows items-center min-w-[2rem]">
-              <i class="absolute ti ti-mood-smile mr-1 text-xl"></i>
-            </div>
-            Easy
-          </button>
-        </div>
       </div>
 
       <!-- Content Based on Active Tab -->
@@ -224,18 +165,18 @@
             <div class="space-y-3">
               <h4 class="font-semibold" style="color: var(--primary-700);">Preparation Time</h4>
               <div class="space-y-4">
-                  <div class="relative pt-2 pb-2">
-                    <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
+                <div class="relative pt-2 pb-2">
+                  <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
                       <div class="absolute h-2 rounded-lg"
-                           [style.left.%]="(Math.min(minTime, filters.maxTime) / 180) * 100"
-                           [style.right.%]="100 - (Math.max(minTime, filters.maxTime) / 180) * 100"
+                           [style.left.%]="(Math.min(minTime, filters.maxTime) / 300) * 100"
+                           [style.right.%]="100 - (Math.max(minTime, filters.maxTime) / 300) * 100"
                            style="background: var(--primary-500);"></div>
                     </div>
-                  <input type="range" min="0" max="180" step="5"
+                  <input type="range" min="0" max="300" step="5"
                          [(ngModel)]="minTime"
                          class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
                          style="background: transparent; pointer-events: none;">
-                  <input type="range" min="0" max="180" step="5"
+                  <input type="range" min="0" max="300" step="5"
                          [(ngModel)]="filters.maxTime"
                          class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
                          style="background: transparent; pointer-events: none;">
@@ -455,15 +396,15 @@
                   <div class="relative pt-2 pb-2">
                     <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
                       <div class="absolute h-2 rounded-lg"
-                           [style.left.%]="(Math.min(filters.minCalories, filters.maxCalories) / 5000) * 100"
-                           [style.right.%]="100 - (Math.max(filters.minCalories, filters.maxCalories) / 5000) * 100"
+                           [style.left.%]="(Math.min(filters.minCalories, filters.maxCalories) / 10000) * 100"
+                           [style.right.%]="100 - (Math.max(filters.minCalories, filters.maxCalories) / 10000) * 100"
                            style="background: var(--primary-500);"></div>
                     </div>
-                    <input type="range" min="0" max="5000" step="50"
+                    <input type="range" min="0" max="10000" step="100"
                            [(ngModel)]="filters.minCalories"
                            class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
                            style="background: transparent; pointer-events: none;">
-                    <input type="range" min="0" max="5000" step="50"
+                    <input type="range" min="0" max="10000" step="100"
                            [(ngModel)]="filters.maxCalories"
                            class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
                            style="background: transparent; pointer-events: none;">
@@ -481,15 +422,15 @@
                   <div class="relative pt-2 pb-2">
                     <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
                       <div class="absolute h-2 rounded-lg"
-                           [style.left.%]="(Math.min(filters.minWeight, filters.maxWeight) / 10000) * 100"
-                           [style.right.%]="100 - (Math.max(filters.minWeight, filters.maxWeight) / 10000) * 100"
+                           [style.left.%]="(Math.min(filters.minWeight, filters.maxWeight) / 20000) * 100"
+                           [style.right.%]="100 - (Math.max(filters.minWeight, filters.maxWeight) / 20000) * 100"
                            style="background: var(--primary-500);"></div>
                     </div>
-                    <input type="range" min="0" max="10000" step="100"
+                    <input type="range" min="0" max="20000" step="200"
                            [(ngModel)]="filters.minWeight"
                            class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
                            style="background: transparent; pointer-events: none;">
-                    <input type="range" min="0" max="10000" step="100"
+                    <input type="range" min="0" max="20000" step="200"
                            [(ngModel)]="filters.maxWeight"
                            class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
                            style="background: transparent; pointer-events: none;">
@@ -507,15 +448,15 @@
                   <div class="relative pt-2 pb-2">
                     <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
                       <div class="absolute h-2 rounded-lg"
-                           [style.left.%]="(Math.min(filters.minPeople, filters.maxPeople) / 12) * 100"
-                           [style.right.%]="100 - (Math.max(filters.minPeople, filters.maxPeople) / 12) * 100"
+                           [style.left.%]="(Math.min(filters.minPeople, filters.maxPeople) / 20) * 100"
+                           [style.right.%]="100 - (Math.max(filters.minPeople, filters.maxPeople) / 20) * 100"
                            style="background: var(--primary-500);"></div>
                     </div>
-                    <input type="range" min="1" max="12" step="1"
+                    <input type="range" min="1" max="20" step="1"
                            [(ngModel)]="filters.minPeople"
                            class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
                            style="background: transparent; pointer-events: none;">
-                    <input type="range" min="1" max="12" step="1"
+                    <input type="range" min="1" max="20" step="1"
                            [(ngModel)]="filters.maxPeople"
                            class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
                            style="background: transparent; pointer-events: none;">
@@ -653,7 +594,7 @@
                 </div>
               } @else if (!recipeList || recipeList.length === 0) {
                 <div [class]="viewMode === 'grid' ? 'col-span-3' : ''" class="flex flex-col items-center justify-center py-20">
-                  <i class="ti ti-search-off text-6xl mb-4" style="color: var(--primary-400);"></i>
+                  <i class="ti ti-chef-hat-off text-6xl mb-4" style="color: var(--primary-400);"></i>
                   <h3 class="text-xl font-bold mb-2" style="color: var(--primary-700);">No recipes found</h3>
                   <p class="text-sm" style="color: var(--primary-600);">Try adjusting your filters to see more results</p>
                 </div>
@@ -908,6 +849,18 @@
 
       <!-- Ingredients Section -->
       @if (activeSearchTab === 'ingredients') {
+        <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-700);">Ingredients Section - Coming Soon</h2>
+        <p style="color: var(--primary-600);">This section will display ingredient exploration.</p>
+      }
+
+      <!-- Collections Section -->
+      @if (activeSearchTab === 'collections') {
+        <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-700);">Collections Section - Coming Soon</h2>
+        <p style="color: var(--primary-600);">This section will display recipe collections.</p>
+      }
+
+      <!-- Users Section -->
+      @if (activeSearchTab === 'users') {
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
 
         <!-- User Filters Sidebar -->
@@ -920,67 +873,73 @@
                 <i class="ti ti-adjustments mr-2"></i>
                 User Filters
               </h3>
-              <button class="text-sm font-medium transition-all hover:scale-105"
+              <button (click)="clearUserFilters()"
+                      class="text-sm font-medium transition-all hover:scale-105"
                       style="color: var(--primary-500);">
                 Clear
               </button>
             </div>
 
-            <!-- Verified Filter -->
-            <div class="space-y-3">
-              <h4 class="font-semibold" style="color: var(--primary-700);">Status</h4>
-              <div class="space-y-2">
-                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                  <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                         style="accent-color: var(--primary-500);">
-                  <span class="checkbox-custom glass-input"></span>
-                  <span style="color: var(--primary-600);">Verified</span>
-                  <i class="ti ti-badge-filled text-primary-500 ml-auto" title="Verified user"></i>
-                </label>
-              </div>
-            </div>
-
-
-            <!-- Followers Range -->
-            <div class="space-y-3">
-              <h4 class="font-semibold" style="color: var(--primary-700);">Followers</h4>
-              <div class="space-y-4">
-                <div>
-                  <input type="range" min="0" max="50000"
-                         class="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                         style="background: var(--primary-100); accent-color: var(--primary-500);">
-                  <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
-                    <span>0</span>
-                    <span class="font-semibold" style="color: var(--primary-700);">0+</span>
-                    <span>50k+</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Recipe Count Range -->
             <div class="space-y-3">
               <h4 class="font-semibold" style="color: var(--primary-700);">Published Recipes</h4>
               <div class="space-y-4">
                 <div>
-                  <input type="range" min="0" max="200"
+                  <input type="range" min="0" max="50"
+                         [(ngModel)]="userFilters.minRecipes"
                          class="w-full h-2 rounded-lg appearance-none cursor-pointer"
                          style="background: var(--primary-100); accent-color: var(--primary-500);">
                   <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
                     <span>0</span>
-                    <span class="font-semibold" style="color: var(--primary-700);">0+</span>
-                    <span>200+</span>
+                    <span class="font-semibold" style="color: var(--primary-700);">{{ userFilters.minRecipes }}+</span>
+                    <span>50+</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Rating Filter -->
+            <!-- Reviews Count Range -->
             <div class="space-y-3">
-              <h4 class="font-semibold" style="color: var(--primary-700);">Minimum Rating</h4>
-              <div class="flex gap-2">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Reviews Written</h4>
+              <div class="space-y-4">
+                <div>
+                  <input type="range" min="0" max="100"
+                         [(ngModel)]="userFilters.minReviews"
+                         class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                         style="background: var(--primary-100); accent-color: var(--primary-500);">
+                  <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
+                    <span>0</span>
+                    <span class="font-semibold" style="color: var(--primary-700);">{{ userFilters.minReviews }}+</span>
+                    <span>100+</span>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <!-- Collections Count Range -->
+            <div class="space-y-3">
+              <h4 class="font-semibold" style="color: var(--primary-700);">Saved Recipes</h4>
+              <div class="space-y-4">
+                <div>
+                  <input type="range" min="0" max="50"
+                         [(ngModel)]="userFilters.minCollections"
+                         class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                         style="background: var(--primary-100); accent-color: var(--primary-500);">
+                  <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
+                    <span>0</span>
+                    <span class="font-semibold" style="color: var(--primary-700);">{{ userFilters.minCollections }}+</span>
+                    <span>50+</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              (click)="applyUserFilters()"
+              class="w-full py-3 rounded-xl font-semibold transition-all hover:scale-105"
+              style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+              <i class="ti ti-filter mr-2"></i>
+              Apply Filters
+            </button>
           </div>
         </div>
 
@@ -992,64 +951,155 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
                 <h2 class="text-xl font-bold" style="color: var(--primary-700);">
-                  Users Found
+                  {{ totalUsers }} Users Found
                 </h2>
               </div>
 
               <div class="flex items-center gap-4">
-                <select class="px-4 py-2 rounded-xl border-0 text-sm font-medium"
-                        style="background: var(--primary-100); color: var(--primary-700);">
-                  <option>Sort Option</option>
-                </select>
+                <div class="relative sort-dropdown-container">
+                  <button
+                    (click)="toggleUserSortDropdown()"
+                    class="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all hover:scale-105"
+                    style="background: var(--primary-300-40); color: var(--primary-700);">
+                    <i class="ti ti-arrows-sort"></i>
+                    {{ getCurrentUserSortLabel() }}
+                    <i class="ti ti-chevron-down transition-transform"
+                       [class.rotate-180]="showUserSortDropdown"></i>
+                  </button>
 
-                <div class="flex border rounded-xl overflow-hidden" style="border-color: var(--primary-200);">
-                  <button class="p-2 transition-all hover:scale-105">
-                    <i class="ti ti-grid-dots text-lg"></i>
-                  </button>
-                  <button class="p-2 transition-all hover:scale-105">
-                    <i class="ti ti-list text-lg"></i>
-                  </button>
+                  @if (showUserSortDropdown) {
+                    <div class="absolute right-0 top-full mt-2 w-56 rounded-2xl shadow-lg z-50 overflow-hidden"
+                         style="background: var(--primary-100);">
+                      @for (option of userSortOptions; track option.value) {
+                        <button
+                          (click)="changeUserSortOrder(option.value)"
+                          class="w-full px-4 py-3 text-left text-sm font-medium transition-all hover:scale-[1.02] flex items-center gap-3"
+                          [class.selected]="userFilters.sortBy === option.value"
+                          [style.background]="userFilters.sortBy === option.value ? 'var(--primary-500)' : 'transparent'"
+                          [style.color]="userFilters.sortBy === option.value ? 'white' : 'var(--primary-700)'">
+                          <i class="ti {{ option.icon }} text-lg"></i>
+                          {{ option.label }}
+                          @if (userFilters.sortBy === option.value) {
+                            <i class="ti ti-check ml-auto"></i>
+                          }
+                        </button>
+                      }
+                    </div>
+                  }
                 </div>
               </div>
             </div>
 
             <!-- Users Grid -->
-            <div class="grid gap-6">
-            </div>
+            @if (userLoading && userResults.length === 0) {
+              <div class="flex flex-col items-center justify-center py-20">
+                <img src="assets/icons/Rarecips_Spinner.svg" alt="Loading" class="w-24 h-24 mb-4">
+                <p class="text-lg font-medium" style="color: var(--primary-600);">Loading users...</p>
+              </div>
+            } @else if (!userResults || userResults.length === 0) {
+              <div class="flex flex-col items-center justify-center py-20">
+                <i class="ti ti-user-off text-6xl mb-4" style="color: var(--primary-400);"></i>
+                <h3 class="text-xl font-bold mb-2" style="color: var(--primary-700);">No users found</h3>
+                <p class="text-sm" style="color: var(--primary-600);">Try adjusting your filters to see more results</p>
+              </div>
+            } @else {
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @for (user of userResults; track user.username) {
+                  <div class="glass rounded-3xl p-6 transition-all hover:shadow-lg">
+                    <div class="flex items-start gap-4 mb-4">
+                      <div class="relative">
+                        @if (user.profileImageString) {
+                          <img [src]="'data:image/png;base64,' + user.profileImageString"
+                               [alt]="user.displayName"
+                               class="w-16 h-16 rounded-full object-cover">
+                        } @else {
+                          <div class="w-16 h-16 rounded-full flex items-center justify-center"
+                               style="background: var(--gradient-primary);">
+                            <span class="text-white text-2xl font-bold">
+                              {{ user.displayName ? user.displayName.charAt(0).toUpperCase() : user.username.charAt(0).toUpperCase() }}
+                            </span>
+                          </div>
+                        }
+                      </div>
 
-            <!-- User Pagination -->
-            <div class="flex justify-center items-center gap-4 mt-8">
-              <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                      style="background: var(--primary-100); color: var(--primary-700);">
-                <i class="ti ti-chevron-left mr-1"></i>
-                Previous
-              </button>
-              <div class="flex gap-2">
-                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105">
+                      <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-lg truncate" style="color: var(--primary-700);">
+                          {{ user.displayName || user.username }}
+                        </h3>
+                        <p class="text-sm truncate" style="color: var(--primary-500);">
+                          &#64;{{ user.username }}
+                        </p>
+                      </div>
+                    </div>
+
+                    @if (user.bio) {
+                      <p class="text-sm line-clamp-2 mb-4" style="color: var(--primary-600);">
+                        {{ user.bio }}
+                      </p>
+                    }
+
+                    <div class="flex items-center justify-between pt-4 border-t"
+                         style="border-color: var(--primary-200);">
+                      <div class="text-center">
+                        <div class="font-bold text-lg" style="color: var(--primary-700);">
+                          {{ user.recipesCount || 0 }}
+                        </div>
+                        <div class="text-xs" style="color: var(--primary-500);">
+                          Recipes
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <div class="font-bold text-lg" style="color: var(--primary-700);">
+                          {{ user.reviewsCount || 0 }}
+                        </div>
+                        <div class="text-xs" style="color: var(--primary-500);">
+                          Reviews
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <div class="font-bold text-lg" style="color: var(--primary-700);">
+                          {{ user.savedRecipesCount || 0 }}
+                        </div>
+                        <div class="text-xs" style="color: var(--primary-500);">
+                          Collections
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      (click)="viewProfile(user.username); $event.stopPropagation()"
+                      class="w-full mt-4 py-2 rounded-xl font-semibold transition-all hover:scale-105"
+                      style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                      <i class="ti ti-user mr-2"></i>
+                      View User
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (hasMoreUsers && !loadingMoreUsers) {
+              <div class="flex justify-center mt-8">
+                <button
+                  (click)="loadMoreUsers()"
+                  class="px-8 py-3 rounded-xl font-semibold transition-all hover:scale-105 flex items-center gap-2"
+                  style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                  <i class="ti ti-refresh"></i>
+                  Load More Users
                 </button>
               </div>
-              <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                      style="background: var(--primary-100); color: var(--primary-700);">
-                Next
-                <i class="ti ti-chevron-right ml-1"></i>
-              </button>
-            </div>
+            }
+
+            @if (loadingMoreUsers) {
+              <div class="flex justify-center mt-8">
+                <img src="assets/icons/Rarecips_Spinner.svg" alt="Loading" class="w-16 h-16">
+              </div>
+            }
           </div>
         </div>
       </div>
       }
 
-      <!-- Collections Section -->
-      @if (activeSearchTab === 'collections') {
-        <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-700);">Collections Section - Coming Soon</h2>
-        <p style="color: var(--primary-600);">This section will display recipe collections.</p>
-      }
-
-      <!-- Users Section -->
-      @if (activeSearchTab === 'users') {
-        <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-700);">Users Section - Coming Soon</h2>
-        <p style="color: var(--primary-600);">This section will display searchable users.</p>
-      }
 
     </div>
   </div>

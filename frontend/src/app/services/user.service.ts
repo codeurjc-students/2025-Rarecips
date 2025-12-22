@@ -69,4 +69,25 @@ export class UserService {
       })
     );
   }
+
+  searchUsers(query: string, page: number, size: number): Observable<any> {
+    const params: any = {page, size};
+    if (query) params.query = query;
+
+    return this.httpClient.get(`${this.API_URL}/search`, {params}).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(`Error searching users: ${error.statusText}`));
+      })
+    );
+  }
+
+  filterUsers(filterParams: any, page: number, size: number): Observable<any> {
+    const params: any = {page, size, ...filterParams};
+
+    return this.httpClient.get(`${this.API_URL}/filter`, {params}).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(`Error filtering users: ${error.statusText}`));
+      })
+    );
+  }
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit, HostListener} from '@angular/core';
+import {Component, OnInit, HostListener, ChangeDetectorRef} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {RecipeService} from '../../services/recipe.service';
 import {CommonModule} from '@angular/common';
@@ -66,11 +66,9 @@ interface SearchFilters {
 
 interface UserFilters {
   query: string;
-  specialties: string[];
-  verified: boolean;
-  minFollowers: number;
   minRecipes: number;
-  minRating: number;
+  minReviews: number;
+  minCollections: number;
   sortBy: string;
 }
 
@@ -87,12 +85,13 @@ export class ExploreComponent implements OnInit {
   activeSearchTab: 'recipes' | 'ingredients' | 'collections' | 'users' = 'recipes';
 
   // User results and pagination
-  userResults: User[] = [];
-  totalUsers = 247;
-  currentUserPage = 1;
+  userResults: any[] = [];
+  totalUsers = 0;
+  currentUserPage = 0;
   userPageSize = 9;
-  totalUserPages = 28;
   userLoading = false;
+  loadingMoreUsers = false;
+  hasMoreUsers = true;
   recipeList: any[] = [];
   recipeLoading = false;
   loadingMore = false;
@@ -100,6 +99,8 @@ export class ExploreComponent implements OnInit {
   currentRecipePage = 0;
   recipePageSize = 9;
   hasMoreRecipes = true;
+
+  animationClass: string = '';
 
   mealTypeCategories = [
     { name: 'Breakfast', value: 'Breakfast', count: 0 },
@@ -173,40 +174,79 @@ export class ExploreComponent implements OnInit {
     { value: 'title', label: 'Alphabetical', icon: 'ti-sort-ascending-letters' }
   ];
 
+  userSortOptions = [
+    { value: 'createdAt', label: 'Newest', icon: 'ti-clock' },
+    { value: 'username', label: 'Username (A-Z)', icon: 'ti-sort-ascending-letters' },
+  ];
+
+  showUserSortDropdown: boolean = false;
+
   filters: SearchFilters = {
     query: '',
     mealTypes: [],
     difficulties: [],
-    maxTime: 180,
+    maxTime: 300,
     healthLabels: [],
     cuisines: [],
     dishTypes: [],
     dietLabels: [],
     minRating: 0,
     minCalories: 0,
-    maxCalories: 5000,
+    maxCalories: 10000,
     minWeight: 0,
-    maxWeight: 10000,
+    maxWeight: 20000,
     minPeople: 1,
-    maxPeople: 12,
+    maxPeople: 20,
     sortBy: 'popular',
     onlyUserIngredients: false
   };
 
   minTime: number = 0;
 
+  userFilters: UserFilters = {
+    query: '',
+    minRecipes: 0,
+    minReviews: 0,
+    minCollections: 0,
+    sortBy: 'createdAt'
+  };
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private sessionService: SessionService,
     private recipeService: RecipeService,
-    private userService: UserService
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
   ) {
   }
 
   ngOnInit(): void {
     this.loadMealTypeCounts();
-    this.applyQuickFilter('popular');
+
+    this.route.queryParams.subscribe(params => {
+      const mode = params['mode'];
+      if (mode && ['recipes', 'ingredients', 'collections', 'users'].includes(mode)) {
+        this.activeSearchTab = mode as 'recipes' | 'ingredients' | 'collections' | 'users';
+      }
+
+      const query = params['q'];
+      if (query) {
+        this.searchQuery = query;
+        this.filters.query = query;
+        this.userFilters.query = query;
+      }
+    });
+
+    if (this.activeSearchTab === 'recipes') {
+      if (!this.filters.query) {
+        this.applyQuickFilter('popular');
+      } else {
+        this.applyRecipeFilters();
+      }
+    } else if (this.activeSearchTab === 'users') {
+      this.applyUserFilters();
+    }
 
     this.sessionService.getLoggedUser().pipe(
       takeUntil(new Subject<void>())
@@ -239,7 +279,42 @@ export class ExploreComponent implements OnInit {
   }
 
   setActiveTab(tab: 'recipes' | 'ingredients' | 'collections' | 'users'): void {
+    const tabOrder = ['recipes', 'ingredients', 'collections', 'users'];
+    const currentIndex = tabOrder.indexOf(this.activeSearchTab);
+    const newIndex = tabOrder.indexOf(tab);
+
+    const newAnimationClass = newIndex > currentIndex ? 'slideright' : 'slideleft';
+
+    this.animationClass = '';
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      this.animationClass = newAnimationClass;
+      this.cdr.detectChanges();
+    }, 10);
+
     this.activeSearchTab = tab;
+
+    const queryParams: any = { mode: tab };
+    if (this.searchQuery) {
+      queryParams.q = this.searchQuery;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: queryParams,
+      queryParamsHandling: 'merge'
+    });
+
+    if (tab === 'recipes' && this.searchQuery) {
+      this.applyRecipeFilters();
+    } else if (tab === 'users' && this.searchQuery) {
+      this.applyUserFilters();
+    } else if (tab === 'recipes' && !this.searchQuery) {
+      this.applyQuickFilter('popular');
+    } else if (tab === 'users' && !this.searchQuery) {
+      this.applyUserFilters();
+    }
   }
 
   toggleFilter(filterType: keyof SearchFilters, value: string): void {
@@ -250,7 +325,7 @@ export class ExploreComponent implements OnInit {
     } else {
       filterArray.push(value);
     }
-    this.applyFilters();
+    this.applyRecipeFilters();
   }
 
   isFilterActive(filterType: keyof SearchFilters, value: string): boolean {
@@ -263,32 +338,32 @@ export class ExploreComponent implements OnInit {
       query: '',
       mealTypes: [],
       difficulties: [],
-      maxTime: 180,
+      maxTime: 300,
       healthLabels: [],
       cuisines: [],
       dishTypes: [],
       dietLabels: [],
       minRating: 0,
       minCalories: 0,
-      maxCalories: 5000,
+      maxCalories: 10000,
       minWeight: 0,
-      maxWeight: 10000,
+      maxWeight: 20000,
       minPeople: 1,
-      maxPeople: 12,
+      maxPeople: 20,
       sortBy: 'popular',
       onlyUserIngredients: false
     };
     this.minTime = 0;
     this.activeQuickFilter = '';
-    this.applyFilters();
+    this.applyRecipeFilters();
   }
 
   applyManualFilters(): void {
     this.activeQuickFilter = '';
-    this.applyFilters();
+    this.applyRecipeFilters();
   }
 
-  applyFilters(): void {
+  applyRecipeFilters(): void {
     this.recipeLoading = true;
     this.currentRecipePage = 0;
     this.recipeList = [];
@@ -314,14 +389,14 @@ export class ExploreComponent implements OnInit {
       healthLabels: this.filters.healthLabels.length > 0 ? this.filters.healthLabels : undefined,
       difficulties: this.filters.difficulties.length > 0 ? this.filters.difficulties : undefined,
       minRating: this.filters.minRating > 0 ? this.filters.minRating : undefined,
-      minTime: actualMinTime > 0 || actualMaxTime < 180 ? actualMinTime : undefined,
-      maxTime: actualMinTime > 0 || actualMaxTime < 180 ? actualMaxTime : undefined,
-      minCalories: actualMinCalories > 0 || actualMaxCalories < 5000 ? actualMinCalories : undefined,
-      maxCalories: actualMinCalories > 0 || actualMaxCalories < 5000 ? actualMaxCalories : undefined,
-      minWeight: actualMinWeight > 0 || actualMaxWeight < 10000 ? actualMinWeight : undefined,
-      maxWeight: actualMinWeight > 0 || actualMaxWeight < 10000 ? actualMaxWeight : undefined,
-      minPeople: actualMinPeople > 1 || actualMaxPeople < 12 ? actualMinPeople : undefined,
-      maxPeople: actualMinPeople > 1 || actualMaxPeople < 12 ? actualMaxPeople : undefined,
+      minTime: actualMinTime > 0 || actualMaxTime < 300 ? actualMinTime : undefined,
+      maxTime: actualMinTime > 0 || actualMaxTime < 300 ? actualMaxTime : undefined,
+      minCalories: actualMinCalories > 0 || actualMaxCalories < 10000 ? actualMinCalories : undefined,
+      maxCalories: actualMinCalories > 0 || actualMaxCalories < 10000 ? actualMaxCalories : undefined,
+      minWeight: actualMinWeight > 0 || actualMaxWeight < 20000 ? actualMinWeight : undefined,
+      maxWeight: actualMinWeight > 0 || actualMaxWeight < 20000 ? actualMaxWeight : undefined,
+      minPeople: actualMinPeople > 1 || actualMaxPeople < 20 ? actualMinPeople : undefined,
+      maxPeople: actualMinPeople > 1 || actualMaxPeople < 20 ? actualMaxPeople : undefined,
       sortBy: this.filters.sortBy,
       onlyUserIngredients: this.filters.onlyUserIngredients
     };
@@ -369,14 +444,14 @@ export class ExploreComponent implements OnInit {
       healthLabels: this.filters.healthLabels.length > 0 ? this.filters.healthLabels : undefined,
       difficulties: this.filters.difficulties.length > 0 ? this.filters.difficulties : undefined,
       minRating: this.filters.minRating > 0 ? this.filters.minRating : undefined,
-      minTime: actualMinTime > 0 || actualMaxTime < 180 ? actualMinTime : undefined,
-      maxTime: actualMinTime > 0 || actualMaxTime < 180 ? actualMaxTime : undefined,
-      minCalories: actualMinCalories > 0 || actualMaxCalories < 5000 ? actualMinCalories : undefined,
-      maxCalories: actualMinCalories > 0 || actualMaxCalories < 5000 ? actualMaxCalories : undefined,
-      minWeight: actualMinWeight > 0 || actualMaxWeight < 10000 ? actualMinWeight : undefined,
-      maxWeight: actualMinWeight > 0 || actualMaxWeight < 10000 ? actualMaxWeight : undefined,
-      minPeople: actualMinPeople > 1 || actualMaxPeople < 12 ? actualMinPeople : undefined,
-      maxPeople: actualMinPeople > 1 || actualMaxPeople < 12 ? actualMaxPeople : undefined,
+      minTime: actualMinTime > 0 || actualMaxTime < 300 ? actualMinTime : undefined,
+      maxTime: actualMinTime > 0 || actualMaxTime < 300 ? actualMaxTime : undefined,
+      minCalories: actualMinCalories > 0 || actualMaxCalories < 10000 ? actualMinCalories : undefined,
+      maxCalories: actualMinCalories > 0 || actualMaxCalories < 10000 ? actualMaxCalories : undefined,
+      minWeight: actualMinWeight > 0 || actualMaxWeight < 20000 ? actualMinWeight : undefined,
+      maxWeight: actualMinWeight > 0 || actualMaxWeight < 20000 ? actualMaxWeight : undefined,
+      minPeople: actualMinPeople > 1 || actualMaxPeople < 20 ? actualMinPeople : undefined,
+      maxPeople: actualMinPeople > 1 || actualMaxPeople < 20 ? actualMaxPeople : undefined,
       sortBy: this.filters.sortBy,
       onlyUserIngredients: this.filters.onlyUserIngredients
     };
@@ -418,6 +493,7 @@ export class ExploreComponent implements OnInit {
     }
     if (!target.closest('.sort-dropdown-container')) {
       this.showSortDropdown = false;
+      this.showUserSortDropdown = false;
     }
   }
 
@@ -578,15 +654,46 @@ export class ExploreComponent implements OnInit {
 
   performSearch(): void {
     this.filters.query = this.searchQuery.trim();
-    this.currentRecipePage = 0;
-    this.applyFilters();
+    this.userFilters.query = this.searchQuery.trim();
+
+    const queryParams: any = { mode: this.activeSearchTab };
+    if (this.searchQuery.trim()) {
+      queryParams.q = this.searchQuery.trim();
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: queryParams,
+      queryParamsHandling: 'merge'
+    });
+
+    if (this.activeSearchTab === 'recipes') {
+      this.currentRecipePage = 0;
+      this.applyRecipeFilters();
+    } else if (this.activeSearchTab === 'users') {
+      this.currentUserPage = 0;
+      this.applyUserFilters();
+    }
   }
 
   clearSearch(): void {
     this.searchQuery = '';
     this.filters.query = '';
-    this.currentRecipePage = 0;
-    this.applyFilters();
+    this.userFilters.query = '';
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { mode: this.activeSearchTab },
+      queryParamsHandling: 'merge'
+    });
+
+    if (this.activeSearchTab === 'recipes') {
+      this.currentRecipePage = 0;
+      this.applyRecipeFilters();
+    } else if (this.activeSearchTab === 'users') {
+      this.currentUserPage = 0;
+      this.applyUserFilters();
+    }
   }
 
   applyQuickFilter(filterType: string): void {
@@ -624,7 +731,7 @@ export class ExploreComponent implements OnInit {
     }
 
     this.currentRecipePage = 0;
-    this.applyFilters();
+    this.applyRecipeFilters();
   }
 
   resetQuickFilterCriteria(): void {
@@ -652,11 +759,97 @@ export class ExploreComponent implements OnInit {
     this.filters.sortBy = sortValue;
     this.showSortDropdown = false;
     this.currentRecipePage = 0;
-    this.applyFilters();
+    this.applyRecipeFilters();
   }
 
   getCurrentSortLabel(): string {
     const option = this.sortOptions.find(opt => opt.value === this.filters.sortBy);
+    return option ? option.label : 'Sort by';
+  }
+
+  applyUserFilters(): void {
+    this.userLoading = true;
+    this.currentUserPage = 0;
+    this.userResults = [];
+
+    const filterParams: any = {};
+
+    if (this.userFilters.query) filterParams.query = this.userFilters.query;
+    if (this.userFilters.minRecipes > 0) filterParams.minRecipes = this.userFilters.minRecipes;
+    if (this.userFilters.minReviews > 0) filterParams.minReviews = this.userFilters.minReviews;
+    if (this.userFilters.minCollections > 0) filterParams.minCollections = this.userFilters.minCollections;
+    if (this.userFilters.sortBy) filterParams.sortBy = this.userFilters.sortBy;
+
+    this.userService.filterUsers(filterParams, this.currentUserPage, this.userPageSize).subscribe({
+      next: (result) => {
+        this.userResults = result.users;
+        this.totalUsers = result.total;
+        this.hasMoreUsers = this.userResults.length < this.totalUsers;
+        this.userLoading = false;
+      },
+      error: (error) => {
+        console.error('Error applying user filters:', error);
+        this.userLoading = false;
+      }
+    });
+  }
+
+  loadMoreUsers(): void {
+    if (this.loadingMoreUsers || !this.hasMoreUsers) {
+      return;
+    }
+
+    this.loadingMoreUsers = true;
+    this.currentUserPage++;
+
+    const filterParams: any = {};
+
+    if (this.userFilters.query) filterParams.query = this.userFilters.query;
+    if (this.userFilters.minRecipes > 0) filterParams.minRecipes = this.userFilters.minRecipes;
+    if (this.userFilters.minReviews > 0) filterParams.minReviews = this.userFilters.minReviews;
+    if (this.userFilters.minCollections > 0) filterParams.minCollections = this.userFilters.minCollections;
+    if (this.userFilters.sortBy) filterParams.sortBy = this.userFilters.sortBy;
+
+    this.userService.filterUsers(filterParams, this.currentUserPage, this.userPageSize).subscribe({
+      next: (result) => {
+        this.userResults = [...this.userResults, ...result.users];
+        this.totalUsers = result.total;
+        this.hasMoreUsers = this.userResults.length < this.totalUsers;
+        this.loadingMoreUsers = false;
+      },
+      error: (error) => {
+        console.error('Error loading more users:', error);
+        this.loadingMoreUsers = false;
+      }
+    });
+  }
+
+  clearUserFilters(): void {
+    this.userFilters = {
+      query: '',
+      minRecipes: 0,
+      minReviews: 0,
+      minCollections: 0,
+      sortBy: 'createdAt'
+    };
+    this.applyUserFilters();
+  }
+
+  viewProfile(username: string): void {
+    this.router.navigate(['/users', username]);
+  }
+
+  toggleUserSortDropdown(): void {
+    this.showUserSortDropdown = !this.showUserSortDropdown;
+  }
+
+  changeUserSortOrder(sortValue: string): void {
+    this.userFilters.sortBy = sortValue;
+    this.showUserSortDropdown = false;
+  }
+
+  getCurrentUserSortLabel(): string {
+    const option = this.userSortOptions.find(opt => opt.value === this.userFilters.sortBy);
     return option ? option.label : 'Sort by';
   }
 }

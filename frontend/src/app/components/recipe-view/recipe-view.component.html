@@ -502,6 +502,7 @@
                       <div class="flex items-start gap-3">
                         <img class="w-12 h-12 rounded-full border-2"
                              alt="Your profile"
+                             [src]="authorPfp"
                              style="border-color: var(--primary-500);"/>
                         <div class="flex-1">
                           <div class="flex items-center justify-between mb-2">
@@ -537,7 +538,7 @@
                              style="background: var(--primary-200-40);">
                           <div class="flex items-start gap-3">
                             <img class="w-10 h-10 rounded-full"
-                                 src="/assets/img/user.png"
+                                 [src]="authorPfp"
                                  alt="User profile"/>
                             <div class="flex-1">
                               <div class="flex items-center justify-between mb-2">

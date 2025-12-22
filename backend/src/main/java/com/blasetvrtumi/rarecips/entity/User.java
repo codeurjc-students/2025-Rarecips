@@ -231,6 +231,21 @@ public class User {
         this.ingredients.add(ingredient);
     }
 
+    @JsonView(BasicInfo.class)
+    public int getRecipesCount() {
+        return this.recipes != null ? this.recipes.size() : 0;
+    }
+
+    @JsonView(BasicInfo.class)
+    public int getReviewsCount() {
+        return this.reviews != null ? this.reviews.size() : 0;
+    }
+
+    @JsonView(BasicInfo.class)
+    public int getSavedRecipesCount() {
+        return this.savedRecipes != null ? this.savedRecipes.size() : 0;
+    }
+
     @Override
     public String toString() {
         return "User{" +
