@@ -92,7 +92,6 @@ public class UserController {
         currentUser.setEmail(updatedUser.getEmail());
         currentUser.setBio(updatedUser.getBio());
         List<Ingredient> ingredients = updatedUser.getIngredients();
-        System.out.println("Updating ingredients: " + updatedUser);
         Optional.ofNullable(ingredients).ifPresent(currentUser::setIngredients);
         userService.save(currentUser);
 

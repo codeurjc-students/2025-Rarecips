@@ -41,39 +41,43 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     Page<Recipe> findByCaloriesBetween(double minCalories, double maxCalories, Pageable pageable);
 
-    //Page<Recipe> findByVegetarian(boolean vegetarian, Pageable pageable);
-
-    //Page<Recipe> findByGlutenFree(boolean glutenFree, Pageable pageable);
-
-
     @Query("SELECT r FROM Recipe r WHERE " +
-            "(:query IS NULL OR LOWER(r.label) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
-            "(:minDifficulty IS NULL OR r.difficulty >= :minDifficulty) AND " +
-            "(:maxDifficulty IS NULL OR r.difficulty <= :maxDifficulty) AND " +
+            "(:query IS NULL OR LOWER(r.label) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.description) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
+            "(:difficulties IS NULL OR r.difficulty IN :difficulties) AND " +
             "(:minPeople IS NULL OR r.people >= :minPeople) AND " +
             "(:maxPeople IS NULL OR r.people <= :maxPeople) AND " +
             "(:minTime IS NULL OR r.totalTime >= :minTime) AND " +
             "(:maxTime IS NULL OR r.totalTime <= :maxTime) AND " +
             "(:minCalories IS NULL OR r.calories >= :minCalories) AND " +
             "(:maxCalories IS NULL OR r.calories <= :maxCalories) AND " +
-            "(:cuisineType IS NULL OR LOWER(r.cuisineType) LIKE LOWER(CONCAT('%', :cuisineType, '%'))) AND " +
-            "(:dishType IS NULL OR LOWER(r.dishTypes) LIKE LOWER(CONCAT('%', :dishType, '%'))) AND " +
-            "(:mealType IS NULL OR LOWER(r.mealTypes) LIKE LOWER(CONCAT('%', :mealType, '%')))")
+            "(:minWeight IS NULL OR r.totalWeight >= :minWeight) AND " +
+            "(:maxWeight IS NULL OR r.totalWeight <= :maxWeight) AND " +
+            "(:minRating IS NULL OR r.rating >= :minRating) AND " +
+            "(:dietLabels IS NULL OR EXISTS (SELECT dl FROM r.dietLabels dl WHERE dl IN :dietLabels)) AND " +
+            "(:healthLabels IS NULL OR EXISTS (SELECT hl FROM r.healthLabels hl WHERE hl IN :healthLabels)) AND " +
+            "(:cuisineTypes IS NULL OR EXISTS (SELECT ct FROM r.cuisineType ct WHERE ct IN :cuisineTypes)) AND " +
+            "(:dishTypes IS NULL OR EXISTS (SELECT dt FROM r.dishTypes dt WHERE dt IN :dishTypes)) AND " +
+            "(:mealTypes IS NULL OR EXISTS (SELECT mt FROM r.mealTypes mt WHERE mt IN :mealTypes)) AND " +
+            "(:userIngredientIds IS NULL OR SIZE(r.ingredients) = 0 OR " +
+            "(SELECT COUNT(ing) FROM r.ingredients ing WHERE ing.id NOT IN :userIngredientIds) = 0)")
     Page<Recipe> findRecipesWithFilters(
             @Param("query") String query,
-            @Param("minDifficulty") Integer minDifficulty,
-            @Param("maxDifficulty") Integer maxDifficulty,
+            @Param("difficulties") List<Integer> difficulties,
             @Param("minPeople") Integer minPeople,
             @Param("maxPeople") Integer maxPeople,
             @Param("minTime") Integer minTime,
             @Param("maxTime") Integer maxTime,
             @Param("minCalories") Double minCalories,
             @Param("maxCalories") Double maxCalories,
-            @Param("vegetarian") Boolean vegetarian,
-            @Param("glutenFree") Boolean glutenFree,
-            @Param("cuisineType") String cuisineType,
-            @Param("dishType") String dishType,
-            @Param("mealType") String mealType,
+            @Param("minWeight") Double minWeight,
+            @Param("maxWeight") Double maxWeight,
+            @Param("minRating") Integer minRating,
+            @Param("dietLabels") List<String> dietLabels,
+            @Param("healthLabels") List<String> healthLabels,
+            @Param("cuisineTypes") List<String> cuisineTypes,
+            @Param("dishTypes") List<String> dishTypes,
+            @Param("mealTypes") List<String> mealTypes,
+            @Param("userIngredientIds") List<Long> userIngredientIds,
             Pageable pageable
     );
 
@@ -112,4 +116,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             @Param("mealTypes") List<String> mealTypes,
             Pageable pageable
     );
+
+    @Query("SELECT COUNT(r) FROM Recipe r JOIN r.dishTypes dt WHERE dt = :dishType")
+    long countByDishType(@Param("dishType") String dishType);
+
+    @Query("SELECT COUNT(r) FROM Recipe r JOIN r.mealTypes mt WHERE mt = :mealType")
+    long countByMealType(@Param("mealType") String mealType);
 }
+
+

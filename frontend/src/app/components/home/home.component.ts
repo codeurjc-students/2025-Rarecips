@@ -26,20 +26,35 @@ export class HomeComponent implements OnInit {
     this.fetchRecipes();
   }
 
-  async fetchRecipes() {
+  fetchRecipes() {
     this.isLoading = true;
     this.page = 0; // Reset to first page on new fetch
-    this.recipeList = await this.recipeService.getRecipes(this.page);
-    this.isLoading = false;
-    this.hasMore = this.recipeList.length % this.itemsPerPage === 0;
+    this.recipeService.getRecipes(this.page).subscribe({
+      next: (recipes) => {
+        this.recipeList = recipes;
+        this.isLoading = false;
+        this.hasMore = this.recipeList.length % this.itemsPerPage === 0;
+      },
+      error: (error) => {
+        console.error('Error fetching recipes:', error);
+        this.isLoading = false;
+      }
+    });
   }
 
-  async loadMoreRecipes() {
+  loadMoreRecipes() {
     this.isLoading = true;
-    const moreRecipes = await this.recipeService.getRecipes(++this.page);
-    this.recipeList = [...this.recipeList, ...moreRecipes];
-    this.isLoading = false;
-    this.hasMore = moreRecipes.length % this.itemsPerPage > 0;
+    this.recipeService.getRecipes(++this.page).subscribe({
+      next: (moreRecipes) => {
+        this.recipeList = [...this.recipeList, ...moreRecipes];
+        this.isLoading = false;
+        this.hasMore = moreRecipes.length % this.itemsPerPage > 0;
+      },
+      error: (error) => {
+        console.error('Error loading more recipes:', error);
+        this.isLoading = false;
+      }
+    });
   }
 
   viewRecipe(id: number) {

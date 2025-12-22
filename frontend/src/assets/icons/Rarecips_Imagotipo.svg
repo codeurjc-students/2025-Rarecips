@@ -3,6 +3,11 @@
      viewBox="0 0 560.8 266.51">
   <defs>
     <style>
+      @font-face {
+        font-family: "Fredoka";
+        src: url("../fonts/Fredoka-VariableFont_wdth,wght.ttf");
+      }
+
       .cls-1 {
         letter-spacing: -.04em;
       }

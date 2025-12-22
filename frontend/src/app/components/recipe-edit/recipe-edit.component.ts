@@ -216,56 +216,60 @@ export class RecipeEditComponent implements OnInit {
     });
   }
 
-  async loadRecipe(): Promise<void> {
+  loadRecipe(): void {
     if (this.recipeId !== null) {
-      const recipe = await this.recipeService.getRecipeById(this.recipeId);
-      if (recipe) {
-        this.title = recipe.title;
-        this.description = recipe.description;
-        this.servings = recipe.people;
+      this.recipeService.getRecipeById(this.recipeId).subscribe({
+        next: (recipe) => {
+          if (recipe) {
+            this.title = recipe.title;
+            this.description = recipe.description;
+            this.servings = recipe.people;
 
-        this.difficulty = recipe.difficulty || 1;
+            this.difficulty = recipe.difficulty || 1;
 
-        if (recipe.mealTypes && recipe.mealTypes.length > 0) {
-          this.category = recipe.mealTypes[0];
-        }
+            if (recipe.mealTypes && recipe.mealTypes.length > 0) {
+              this.category = recipe.mealTypes[0];
+            }
 
-        if (recipe.imageString) {
-          if (!recipe.imageString.startsWith('data:image')) {
-            this.imagePreviewUrl = 'data:image/jpeg;base64,' + recipe.imageString;
-          } else {
-            this.imagePreviewUrl = recipe.imageString;
+            if (recipe.imageString) {
+              if (!recipe.imageString.startsWith('data:image')) {
+                this.imagePreviewUrl = 'data:image/jpeg;base64,' + recipe.imageString;
+              } else {
+                this.imagePreviewUrl = recipe.imageString;
+              }
+            }
+
+            this.ingredients = recipe.ingredients.map(ing => ({
+              name: ing.food,
+              quantity: ing.quantity?.toString(),
+              unit: ing.measure
+            }));
+
+            this.instructions = recipe.steps.map((step, index) => ({
+              step: index + 1,
+              description: step
+            }));
+
+            this.cuisineTypes = recipe.cuisineType || [];
+            this.cautions = recipe.cautions || [];
+
+            this.dietLabels = recipe.dietLabels || [];
+
+            const allHealthLabels = recipe.healthLabels || [];
+            const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free'];
+            this.dietaryCharacteristics = allHealthLabels.filter(label => dietaryOptions.includes(label));
+            this.healthLabels = allHealthLabels.filter(label => !dietaryOptions.includes(label));
+
+            this.dishTypes = recipe.dishTypes || [];
+            this.calories = recipe.calories || 0;
+            this.totalWeight = recipe.totalWeight || 0;
+            this.prepTime = recipe.totalTime || 0;
           }
+        },
+        error: (err) => {
+          console.error('Error loading recipe:', err);
         }
-
-        // Convert ingredients
-        this.ingredients = recipe.ingredients.map(ing => ({
-          name: ing.food,
-          quantity: ing.quantity?.toString(),
-          unit: ing.measure
-        }));
-
-        // Load instructions
-        this.instructions = recipe.steps.map((step, index) => ({
-          step: index + 1,
-          description: step
-        }));
-
-        this.cuisineTypes = recipe.cuisineType || [];
-        this.cautions = recipe.cautions || [];
-
-        this.dietLabels = recipe.dietLabels || [];
-
-        const allHealthLabels = recipe.healthLabels || [];
-        const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free'];
-        this.dietaryCharacteristics = allHealthLabels.filter(label => dietaryOptions.includes(label));
-        this.healthLabels = allHealthLabels.filter(label => !dietaryOptions.includes(label));
-
-        this.dishTypes = recipe.dishTypes || [];
-        this.calories = recipe.calories || 0;
-        this.totalWeight = recipe.totalWeight || 0;
-        this.prepTime = recipe.totalTime || 0;
-      }
+      });
     }
   }
 

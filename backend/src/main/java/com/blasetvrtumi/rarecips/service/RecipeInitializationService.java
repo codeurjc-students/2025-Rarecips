@@ -159,7 +159,7 @@ public class RecipeInitializationService {
                 }
 
                 recipe.setReviews(reviews);
-                String imageString = "static/assets/img/" + recipe.getId() + ".jpg";
+                String imageString = "static/assets/img/" + (recipe.getId() - 1) + ".jpg";
                 Blob imageBlob = imageService.localImageToBlob(imageString);
                 recipe.setImageFile(imageBlob);
                 recipe.setImageString(imageService.blobToString(imageBlob));

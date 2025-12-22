@@ -370,4 +370,21 @@ public class RecipeService {
         return response;
     }
 
+    public List<Long> getUserIngredientIds(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User must be authenticated");
+        }
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("User not found: " + username);
+        }
+        if (user.getIngredients() == null || user.getIngredients().isEmpty()) {
+            return new ArrayList<>();
+        }
+        return user.getIngredients().stream()
+                .map(Ingredient::getId)
+                .collect(Collectors.toList());
+    }
+
 }

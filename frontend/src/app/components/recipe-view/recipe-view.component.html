@@ -280,7 +280,7 @@
                       </h4>
                       <div class="flex flex-wrap gap-2">
                         @for (label of getHealthLabels(); track label) {
-                          <span class="px-4 py-2 rounded-xl glass" style="background: var(--accent-300); color: var(--accent-700);">
+                          <span class="px-4 py-2 rounded-xl glass">
                             {{ label }}
                           </span>
                         }
@@ -291,13 +291,13 @@
                   <!-- Cautions -->
                   @if (getCautions().length > 0) {
                     <div>
-                      <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--error-700);">
+                      <h4 class="text-lg font-semibold mb-3 flex items-center gap-2">
                         <i class="ti ti-alert-triangle"></i>
                         Allergen Warnings
                       </h4>
                       <div class="flex flex-wrap gap-2">
                         @for (caution of getCautions(); track caution) {
-                          <span class="px-4 py-2 rounded-xl glass" style="background: var(--error-300); color: var(--error-700);">
+                          <span class="px-4 py-2 rounded-xl glass">
                             {{ caution }}
                           </span>
                         }
@@ -352,12 +352,12 @@
                      style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
                   @if (isRecipeAuthor) {
-                    <div class="p-6 rounded-2xl text-center glass" style="background: var(--accent-300-40); border: 2px solid var(--accent-500);">
-                      <i class="ti ti-chef-hat text-4xl mb-2" style="color: var(--accent-600);"></i>
-                      <p class="font-semibold text-lg mb-1" style="color: var(--accent-700);">
+                    <div class="p-6 rounded-2xl text-center glass">
+                      <i class="ti ti-chef-hat text-4xl mb-2"></i>
+                      <p class="font-semibold text-lg mb-1">
                         This is your recipe!
                       </p>
-                      <p class="text-sm" style="color: var(--accent-600);">
+                      <p class="text-sm">
                         You can't review your own creation, but you can see what others think below.
                       </p>
                     </div>
@@ -494,7 +494,6 @@
                         <button
                           (click)="deleteReview(userReview.id)"
                           class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2 text-red-500"
-                          style="background: var(--error-500);"
                           title="Delete your review">
                           <i class="ti ti-trash text-red-500"></i>
                           Delete
@@ -502,7 +501,6 @@
                       </div>
                       <div class="flex items-start gap-3">
                         <img class="w-12 h-12 rounded-full border-2"
-                             src="data:image/png;base64,{{user?.profileImageString || '/assets/img/user.png'}}"
                              alt="Your profile"
                              style="border-color: var(--primary-500);"/>
                         <div class="flex-1">

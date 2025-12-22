@@ -2,6 +2,11 @@
 <svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560.8 166.8">
   <defs>
     <style>
+      @font-face {
+        font-family: "Fredoka";
+        src: url("../fonts/Fredoka-VariableFont_wdth,wght.ttf");
+      }
+
       .cls-1 {
         letter-spacing: -.04em;
       }

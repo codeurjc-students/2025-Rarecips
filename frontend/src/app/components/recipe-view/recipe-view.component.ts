@@ -92,22 +92,8 @@ export class RecipeViewComponent implements OnInit {
     public ingredientIconService: IngredientIconService
   ) {}
 
-  async ngOnInit() {
-    this.recipe = await this.loadRecipe();
-
-    if (this.recipe?.people) {
-      this.originalServings = this.recipe.people;
-      this.currentServings = this.recipe.people;
-      this.servingsScale = 1;
-    }
-
-    if (this.recipe?.author) {
-      this.userService.getUserByUsername(<string>this.recipe?.author).subscribe((res) => {
-        this.authorPfp = res.profileImageString;
-      });
-    } else {
-      this.authorPfp = '/assets/img/user.png';
-    }
+  ngOnInit() {
+    this.loadRecipe();
 
     this.sessionService.getLoggedUser().pipe(
       takeUntil(new Subject<void>())
@@ -169,9 +155,50 @@ export class RecipeViewComponent implements OnInit {
     })
   }
 
-  async loadRecipe() {
+  loadRecipe(): void {
     const id = this.activatedRoute.snapshot.params['id'];
-    return this.recipeService.getRecipeById(id);
+    this.recipeService.getRecipeById(id).subscribe({
+      next: (recipe) => {
+        this.recipe = recipe;
+
+        if (this.recipe?.people) {
+          this.originalServings = this.recipe.people;
+          this.currentServings = this.recipe.people;
+          this.servingsScale = 1;
+        }
+
+        if (this.recipe?.author) {
+          this.userService.getUserByUsername(<string>this.recipe?.author).subscribe((res) => {
+            this.authorPfp = res.profileImageString;
+          });
+        } else {
+          this.authorPfp = '/assets/img/user.png';
+        }
+
+        if (this.recipe?.createdAt) {
+          const createdDate = new Date(this.recipe.createdAt);
+          const day = String(createdDate.getDate()).padStart(2, '0');
+          const month = String(createdDate.getMonth() + 1).padStart(2, '0');
+          const year = createdDate.getFullYear();
+          this.created = `${day}/${month}/${year}`;
+        }
+
+        if (this.recipe?.updatedAt) {
+          const updatedDate = new Date(this.recipe.updatedAt);
+          const day = String(updatedDate.getDate()).padStart(2, '0');
+          const month = String(updatedDate.getMonth() + 1).padStart(2, '0');
+          const year = updatedDate.getFullYear();
+          this.lastUpdated = `${day}/${month}/${year}`;
+        }
+
+        if (this.recipe?.totalTime) {
+          this.time = this.recipe.totalTime * 60;
+        }
+      },
+      error: (err) => {
+        console.error('Error loading recipe:', err);
+      }
+    });
   }
 
   setActiveTab(tab: 'instructions' | 'nutrition' | 'reviews'): void {
@@ -448,11 +475,11 @@ export class RecipeViewComponent implements OnInit {
     reviewData.comment = sanitizedComment;
 
     this.reviewService.submitReview(reviewData).subscribe({
-      next: async (response) => {
+      next: (response) => {
         this.resetReviewForm();
         this.showReviewForm = false;
         this.userHasReview = true;
-        this.recipe = await this.loadRecipe();
+        this.loadRecipe();
         this.reviewsPage = 0;
         this.reviews = [];
         this.userReview = null;
@@ -502,10 +529,10 @@ export class RecipeViewComponent implements OnInit {
     }
 
     this.reviewService.deleteReview(reviewId).subscribe({
-      next: async () => {
+      next: () => {
         this.userReview = null;
         this.userHasReview = false;
-        this.recipe = await this.loadRecipe();
+        this.loadRecipe();
         this.reviewsPage = 0;
         this.reviews = [];
         this.loadReviews();

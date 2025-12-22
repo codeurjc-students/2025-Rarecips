@@ -23,6 +23,15 @@
   background: var(--primary-500);
 }
 
+@font-face {
+  font-family: "Fredoka";
+  src: url("assets/fonts/Fredoka-VariableFont_wdth,wght.ttf");
+}
+
+svg {
+  font-family: "Fredoka";
+}
+
 body {
   font-family: 'Fredoka', sans-serif;
   color: var(--primary-text);
