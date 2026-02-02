@@ -293,7 +293,7 @@ select.invalid {
 
 .delete-button:hover {
   transform: scale(1.1);
-  background: #fee2e2 !important;
+  background: color-mix(in srgb, #fecaca 10%, var(--primary-100) 90%) !important;
 }
 
 .delete-button:hover i {

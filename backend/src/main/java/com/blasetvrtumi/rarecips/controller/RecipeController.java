@@ -1,10 +1,12 @@
 package com.blasetvrtumi.rarecips.controller;
 
 import com.blasetvrtumi.rarecips.entity.Recipe;
+import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
 import com.blasetvrtumi.rarecips.service.ImageService;
 import com.blasetvrtumi.rarecips.service.RecipeService;
 
+import com.blasetvrtumi.rarecips.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,9 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Blob;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -34,6 +36,8 @@ public class RecipeController {
     private ImageService imageService;
     @Autowired
     private RecipeRepository recipeRepository;
+    @Autowired
+    private UserService userService;
 
     @Operation(summary = "Get recipe by ID")
     @ApiResponses(value = {
@@ -59,7 +63,7 @@ public class RecipeController {
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)})
     @PutMapping
-    public ResponseEntity<?> createRecipe(@RequestBody java.util.Map<String, Object> recipeData, Authentication authentication) {
+    public ResponseEntity<?> createRecipe(@RequestBody Map<String, Object> recipeData, Authentication authentication) {
         try {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("User must be authenticated");
@@ -68,6 +72,8 @@ public class RecipeController {
             }
 
             String username = authentication.getName();
+            User user = this.userService.findByUsername(username);
+            if (user.getRole().equals("ADMIN") && recipeData.get("username") != null) username = recipeData.get("username").toString();
             Recipe recipe = recipeService.createRecipeFromMap(recipeData, username);
 
             if (Objects.equals(recipe.getImageString(), "")) {
@@ -93,7 +99,7 @@ public class RecipeController {
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
             @ApiResponse(responseCode = "403", description = "Forbidden - Not the recipe author", content = @Content)})
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRecipe(@PathVariable Long id, @RequestBody java.util.Map<String, Object> recipeData, Authentication authentication) {
+    public ResponseEntity<?> updateRecipe(@PathVariable Long id, @RequestBody Map<String, Object> recipeData, Authentication authentication) {
         try {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("User must be authenticated");
@@ -104,6 +110,8 @@ public class RecipeController {
             }
 
             String username = authentication.getName();
+            User user = this.userService.findByUsername(username);
+            if (user.getRole().equals("ADMIN") && recipeData.get("username") != null) username = recipeData.get("username").toString();
             Recipe updatedRecipe = recipeService.updateRecipeFromMap(id, recipeData, username);
             HashMap<String, Object> response = new HashMap<>();
             response.put("recipe", updatedRecipe);
@@ -121,27 +129,36 @@ public class RecipeController {
     @Operation(summary = "Delete a recipe")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Recipe deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Recipe not found", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "403", description = "Forbidden - Not the recipe author", content = @Content)})
+            @ApiResponse(responseCode = "403", description = "Forbidden - Not the recipe author", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Recipe not found", content = @Content)
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRecipe(@PathVariable Long id, Authentication authentication) {
         try {
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(401).body("User must be authenticated");
+            User user = this.userService.findByUsername(authentication.getName());
+            Recipe recipe = this.recipeService.findById(id);
+            if (!authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body(Map.of("error", "User must be authenticated"));
             }
             String username = authentication.getName();
-            recipeService.deleteRecipe(id, username);
-            return ResponseEntity.ok("Recipe deleted successfully");
+            if (username.equals(recipe.getAuthor()) || user.getRole().equals("ADMIN")) {
+                recipeService.deleteRecipe(id, username);
+                return ResponseEntity.ok(Map.of("message", "Recipe deleted successfully"));
+            }
+            throw new SecurityException("User is not the author of the recipe");
         } catch (SecurityException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
+            return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
         }
     }
 
 
     @Operation(summary = "Search recipes by query text")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recipes retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content)
+    })
     @GetMapping("/search")
     public ResponseEntity<?> searchRecipes(
             @RequestParam(required = false) String query,
@@ -164,6 +181,11 @@ public class RecipeController {
     }
 
     @Operation(summary = "Count recipes by meal type or dish type")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Count retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters", content = @Content),
+            @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content)
+    })
     @GetMapping("/search/count")
     public ResponseEntity<?> countRecipes(
             @RequestParam(required = false) String mealType,
@@ -187,6 +209,12 @@ public class RecipeController {
     }
 
     @Operation(summary = "Filter recipes with multiple criteria")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recipes retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - User must be authenticated for certain filters", content = @Content),
+            @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content)
+    })
     @GetMapping("/filter")
     public ResponseEntity<?> filterRecipes(
             @RequestParam(required = false) String query,
@@ -231,25 +259,59 @@ public class RecipeController {
             }
         }
 
-        org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.DESC;
-        if ("rating".equals(sortBy)) {
-            direction = org.springframework.data.domain.Sort.Direction.DESC;
+        if ("mostPopular".equals(sortBy)) {
+            Page<Recipe> filtered = recipeRepository.findRecipesWithFilters(
+                query, difficulties, minPeople, maxPeople, minTime, maxTime, minCalories, maxCalories, minWeight, maxWeight, minRating,
+                dietLabels, healthLabels, cuisines, dishTypes, mealTypes, userIngredientIds, Pageable.unpaged()
+            );
+            List<Recipe> all = new java.util.ArrayList<>(filtered.getContent());
+            all.sort((a, b) -> Integer.compare(
+                b.getReviews() != null ? b.getReviews().size() : 0,
+                a.getReviews() != null ? a.getReviews().size() : 0
+            ));
+            int start = page * size;
+            int end = Math.min(start + size, all.size());
+            List<Recipe> pageContent = start < end ? all.subList(start, end) : new java.util.ArrayList<>();
+            HashMap<String, Object> response = new HashMap<>();
+            response.put("recipes", pageContent);
+            response.put("total", all.size());
+            response.put("page", page);
+            response.put("size", size);
+            return ResponseEntity.ok(response);
+        } else if ("highestRated".equals(sortBy)) {
+            Page<Recipe> filtered = recipeRepository.findRecipesWithFilters(
+                query, difficulties, minPeople, maxPeople, minTime, maxTime, minCalories, maxCalories, minWeight, maxWeight, minRating,
+                dietLabels, healthLabels, cuisines, dishTypes, mealTypes, userIngredientIds, Pageable.unpaged()
+            );
+            List<Recipe> all = new java.util.ArrayList<>(filtered.getContent());
+            all.sort((a, b) -> Float.compare(b.getRating(), a.getRating()));
+            int start = page * size;
+            int end = Math.min(start + size, all.size());
+            List<Recipe> pageContent = start < end ? all.subList(start, end) : new java.util.ArrayList<>();
+            HashMap<String, Object> response = new HashMap<>();
+            response.put("recipes", pageContent);
+            response.put("total", all.size());
+            response.put("page", page);
+            response.put("size", size);
+            return ResponseEntity.ok(response);
+        } else {
+            org.springframework.data.domain.Sort sort;
+            if ("alphabetical".equals(sortBy)) {
+                sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "label");
+            } else {
+                sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "updatedAt");
+            }
+            Pageable pageable = PageRequest.of(page, size, sort);
+            Page<Recipe> recipes = recipeRepository.findRecipesWithFilters(
+                query, difficulties, minPeople, maxPeople, minTime, maxTime, minCalories, maxCalories, minWeight, maxWeight, minRating,
+                dietLabels, healthLabels, cuisines, dishTypes, mealTypes, userIngredientIds, pageable
+            );
+            HashMap<String, Object> response = new HashMap<>();
+            response.put("recipes", recipes.getContent());
+            response.put("total", recipes.getTotalElements());
+            response.put("page", page);
+            response.put("size", size);
+            return ResponseEntity.ok(response);
         }
-
-        Pageable pageable = PageRequest.of(page, size,
-            org.springframework.data.domain.Sort.by(direction, sortBy));
-
-        Page<Recipe> recipes = recipeRepository.findRecipesWithFilters(
-                query, difficulties, minPeople, maxPeople, minTime, maxTime,
-                minCalories, maxCalories, minWeight, maxWeight, minRating,
-                dietLabels, healthLabels, cuisines, dishTypes, mealTypes,
-                userIngredientIds, pageable);
-
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("recipes", recipes.getContent());
-        response.put("total", recipes.getTotalElements());
-        response.put("page", page);
-        response.put("size", size);
-        return ResponseEntity.ok(response);
     }
 }

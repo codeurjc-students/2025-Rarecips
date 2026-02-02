@@ -22,8 +22,8 @@ export class ReviewService {
     );
   }
 
-  getReviewsByRecipeId(recipeId: number, page: number, size: number): Observable<any> {
-    return this.httpClient.get(`${this.API_URL}/recipe/${recipeId}?page=${page}&size=${size}`).pipe(
+  getReviewsByRecipeId(recipeId: number | undefined, page: number, size: number): Observable<any> {
+    return this.httpClient.get(`${this.API_URL}?recipeId=${recipeId}&page=${page}&size=${size}`).pipe(
       catchError((error: any) => {
         return throwError(() => new Error(`Error loading reviews: ${error.statusText}`));
       })

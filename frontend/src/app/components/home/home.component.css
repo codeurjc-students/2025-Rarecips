@@ -112,3 +112,31 @@ body {
   padding: 0;
   border-radius: 9999px;
 }
+
+.heart-icon path {
+  fill: none;
+  transition: all 0.3s ease;
+}
+
+button.favorites-active {
+  background: color-mix(in srgb, var(--primary-400) 20%, transparent);
+}
+
+button.favorites-active .heart-icon path {
+  stroke: #ef4444 !important;
+  fill: #ef4444 !important;
+}
+
+button.btn-icon.favorites-active .heart-icon path {
+  stroke: #ef4444 !important;
+  fill: #ef4444 !important;
+}
+
+button.glass-strong.favorites-active {
+  background: color-mix(in srgb, var(--primary-400) 20%, transparent);
+}
+
+button.glass-strong.favorites-active .heart-icon path {
+  stroke: #ef4444 !important;
+  fill: #ef4444 !important;
+}

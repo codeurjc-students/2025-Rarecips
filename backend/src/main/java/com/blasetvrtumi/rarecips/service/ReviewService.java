@@ -1,5 +1,6 @@
 package com.blasetvrtumi.rarecips.service;
 
+import com.blasetvrtumi.rarecips.entity.Activity;
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.Review;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
@@ -22,6 +23,9 @@ public class ReviewService {
 
     @Autowired
     private RecipeRepository recipeRepository;
+
+    @Autowired
+    private ActivityService activityService;
 
     public List<Review> getReviewsByRecipeId(Long recipeId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -48,6 +52,24 @@ public class ReviewService {
 
         review.setRecipe(recipe);
         Review savedReview = reviewRepository.save(review);
+
+        activityService.logActivity(
+            review.getAuthor().getUsername(),
+            Activity.ActivityType.CREATE_REVIEW,
+            review.getRecipe().getLabel(),
+            "created review for recipe " + review.getRecipe().getLabel(),
+            review.getRecipe().getId(),
+            null
+        );
+
+        activityService.logReview(
+            review.getAuthor().getUsername(),
+            review.getRecipe().getId(),
+            review.getRecipe().getLabel(),
+            Math.round(review.getRating()),
+            review.getComment(),
+            null
+        );
 
         // Recalculate and update rating
         List<Review> reviews = reviewRepository.findByRecipeId(recipe.getId());
@@ -81,5 +103,9 @@ public class ReviewService {
             recipe.getReviews().remove(review);
             recipeRepository.save(recipe);
         }
+    }
+
+    public Review findById(Long reviewId) {
+        return reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("Review with ID not found"));
     }
 }

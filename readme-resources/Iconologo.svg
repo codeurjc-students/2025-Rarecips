@@ -11,7 +11,7 @@
       }
 
       .cls-3 {
-        fill: #e84d13;
+        fill: var(--logo-textcolor);
         font-family: Fredoka-Medium, Fredoka;
         font-size: 82.55px;
         font-variation-settings: 'wght' 500, 'wdth' 100;
@@ -27,19 +27,19 @@
       }
 
       .cls-6 {
-        fill: #f8b371;
+        fill: var(--logo-spoon);"
       }
 
       .cls-7 {
-        fill: #ec6822;
+        fill: var(--logo-plate1);
       }
 
       .cls-8 {
-        fill: #f1863a;
+        fill: var(--primary-plate2);
       }
 
       .cls-9 {
-        fill: #a02d16;
+        fill: var(--logo-handle);
       }
 
       .cls-10 {
@@ -47,7 +47,7 @@
       }
 
       .cls-11 {
-        fill: #fcd2a7;
+        fill: var(--logo-bg);
       }
 
       .cls-12 {

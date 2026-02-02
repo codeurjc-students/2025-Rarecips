@@ -1,18 +1,22 @@
 package com.blasetvrtumi.rarecips.enums;
 
 public enum DishType {
-    STARTER("Starter"),
-    MAIN_COURSE("Main course"),
-    SIDE_DISH("Side dish"),
-    SOUP("Soup"),
-    SALAD("Salad"),
-    BREAD("Bread"),
-    CEREALS("Cereals"),
-    DESSERT("Dessert"),
-    DRINKS("Drinks"),
-    SANDWICHES("Sandwiches"),
-    BISCUITS_AND_COOKIES("Biscuits and cookies"),
-    CONDIMENTS_AND_SAUCES("Condiments and sauces");
+    ALCOHOL_COCKTAIL("alcohol cocktail"),
+    BISCUITS_AND_COOKIES("biscuits and cookies"),
+    BREAD("bread"),
+    CEREALS("cereals"),
+    CHRISTMAS("christmas"),
+    CONDIMENTS_AND_SAUCES("condiments and sauces"),
+    DESSERTS("desserts"),
+    DRINKS("drinks"),
+    EGG("egg"),
+    MAIN_COURSE("main course"),
+    PANCAKE("pancake"),
+    SALAD("salad"),
+    SANDWICHES("sandwiches"),
+    SOUP("soup"),
+    SPECIAL_OCCASIONS("special occasions"),
+    STARTER("starter");
 
     private final String displayName;
 

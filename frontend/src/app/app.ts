@@ -20,7 +20,7 @@ export class App implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd || event instanceof RoutesRecognized)
     ).subscribe((event: any) => {
-      this.showNavbarFooter = !(event.url === '/login' || event.url === '/signup');
+      this.showNavbarFooter = !(event.url.includes('/login') || event.url.includes('/signup') || event.url.includes('/change-password'));
 
       this.backButton = (event.url === 'home' ||
           event.url.includes('/users') ||

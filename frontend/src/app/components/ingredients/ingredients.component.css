@@ -99,19 +99,6 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-.ingredient-image {
-  position: relative;
-  height: 192px;
-  overflow: hidden;
-}
-
-.ingredient-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
 .ingredient-card:hover .ingredient-image img {
   transform: scale(1.1);
 }

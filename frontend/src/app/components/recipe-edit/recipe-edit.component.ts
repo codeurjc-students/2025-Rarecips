@@ -6,6 +6,7 @@ import {RecipeService} from '../../services/recipe.service';
 import {EnumService} from '../../services/enum.service';
 import {IngredientService} from '../../services/ingredient.service';
 import {IngredientIconService} from '../../services/ingredient-icon.service';
+import { TranslatorService } from '../../services/translator.service';
 
 interface Ingredient {
   name: string;
@@ -140,8 +141,13 @@ export class RecipeEditComponent implements OnInit {
     private recipeService: RecipeService,
     private enumService: EnumService,
     private ingredientService: IngredientService,
-    public ingredientIconService: IngredientIconService
+    public ingredientIconService: IngredientIconService,
+    private translatorService: TranslatorService
   ) {
+  }
+
+  t(key: string): string {
+    return this.translatorService.translate(key);
   }
 
   ngOnInit(): void {
@@ -318,12 +324,12 @@ export class RecipeEditComponent implements OnInit {
   // Difficulty methods
   getDifficultyLabel(): string {
     switch(this.difficulty) {
-      case 1: return 'Very Easy';
-      case 2: return 'Easy';
-      case 3: return 'Medium';
-      case 4: return 'Hard';
-      case 5: return 'Very Hard';
-      default: return 'Medium';
+      case 1: return this.t('very_easy');
+      case 2: return this.t('easy');
+      case 3: return this.t('medium');
+      case 4: return this.t('hard');
+      case 5: return this.t('very_hard');
+      default: return this.t('medium');
     }
   }
 
@@ -772,3 +778,4 @@ export class RecipeEditComponent implements OnInit {
     }
   }
 }
+

@@ -3,6 +3,7 @@ package com.blasetvrtumi.rarecips.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.core.io.ClassPathResource;
@@ -81,7 +82,7 @@ public class User {
 
     // Ingredients a user has stored
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.ALL})
     private List<Ingredient> ingredients = new ArrayList<>();
 
     // Recipes a user has saved
@@ -90,6 +91,16 @@ public class User {
             joinColumns = @JoinColumn(name = "username"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
     private List<Recipe> savedRecipes = new ArrayList<>();
+
+    @JsonView(BasicInfo.class)
+    @Column(name = "private_profile", nullable = false)
+    private boolean privateProfile = false;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_token_expiry")
+    private LocalDateTime passwordResetTokenExpiry;
 
     public enum Role {
         USER, ADMIN
@@ -244,6 +255,27 @@ public class User {
     @JsonView(BasicInfo.class)
     public int getSavedRecipesCount() {
         return this.savedRecipes != null ? this.savedRecipes.size() : 0;
+    }
+
+    public boolean isPrivateProfile() {
+        return privateProfile;
+    }
+
+    public void setPrivateProfile(boolean privateProfile) {
+        this.privateProfile = privateProfile;
+    }
+
+    public String getPasswordResetToken() {
+        return passwordResetToken;
+    }
+    public void setPasswordResetToken(String token) {
+        this.passwordResetToken = token;
+    }
+    public LocalDateTime getPasswordResetTokenExpiry() {
+        return passwordResetTokenExpiry;
+    }
+    public void setPasswordResetTokenExpiry(LocalDateTime expiry) {
+        this.passwordResetTokenExpiry = expiry;
     }
 
     @Override

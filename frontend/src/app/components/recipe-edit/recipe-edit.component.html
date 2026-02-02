@@ -14,13 +14,13 @@
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-info-circle mr-2"></i>
-                Basic Information
+                {{ t('basic_information') }}
               </h3>
 
               <!-- Recipe Title -->
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                  Recipe Title *
+                  {{ t('recipe_title') }} *
                 </label>
                 <div class="relative">
                   <input type="text"
@@ -38,7 +38,7 @@
               <!-- Description -->
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                  Brief Description *
+                  {{ t('brief_description') }} *
                 </label>
                 <div class="relative">
                   <textarea rows="3"
@@ -47,7 +47,7 @@
                             class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
                             id="recipeDesc"
                             style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                            placeholder="Describe your recipe in a few words..." required></textarea>
+                            placeholder="{{ t('describe_recipe') }}" required></textarea>
                   <i class="ti ti-message absolute right-3 top-3"
                      style="color: var(--primary-400);"></i>
                 </div>
@@ -58,7 +58,7 @@
                 <!-- Prep Time -->
                 <div class="flex flex-col gap-2 w-full">
                   <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Preparation Time
+                    {{ t('preparation_time') }}
                   </label>
                   <div class="relative">
                     <div
@@ -88,7 +88,7 @@
                     </div>
                     <span
                       class="flex items-center gap-2 absolute right-20 top-1/2 transform -translate-y-1/2 text-sm"
-                      style="color: var(--primary-400);">min
+                      style="color: var(--primary-400);">{{ t('min') }}
                     </span>
                   </div>
                 </div>
@@ -96,7 +96,7 @@
                 <!-- Servings -->
                 <div class="flex flex-col gap-2 w-full">
                   <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Servings
+                    {{ t('servings') }}
                   </label>
                   <div class="relative">
                     <div
@@ -134,7 +134,7 @@
                 <div class="flex flex-col gap-2">
                   <label class="text-sm font-semibold flex items-center gap-2" style="color: var(--primary-400);">
                     <i class="ti ti-brand-speedtest"></i>
-                    Difficulty: <span style="color: var(--primary-700);">{{ getDifficultyLabel() }}</span>
+                    {{ t('difficulty') }}: <span style="color: var(--primary-700);">{{ getDifficultyLabel() }}</span>
                   </label>
                   <div class="difficulty-slider-container px-4 py-4 rounded-2xl border-2"
                        style="background: var(--primary-100-40); border-color: var(--primary-100);">
@@ -144,12 +144,12 @@
                            min="1"
                            max="5"
                            step="1"
-                           class="difficulty-slider w-full"
+                           class="difficulty-slider w-full transition-all"
                            [attr.data-difficulty]="difficulty"/>
                     <div class="flex justify-between mt-2 text-xs" style="color: var(--primary-400);">
-                      <span>Easy</span>
-                      <span>Medium</span>
-                      <span>Hard</span>
+                      <span>{{ t('easy') }}</span>
+                      <span>{{ t('medium') }}</span>
+                      <span>{{ t('hard') }}</span>
                     </div>
                   </div>
                 </div>
@@ -157,7 +157,7 @@
                 <!-- Category -->
                 <div class="flex flex-col gap-2 relative category-dropdown-container">
                   <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Category
+                    {{ t('category') }}
                   </label>
                   <div
                     class="w-full px-4 py-3 rounded-2xl border-2 focus-within:border-primary-500 flex justify-between items-center relative"
@@ -202,7 +202,7 @@
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-tags mr-2"></i>
-                Tags and Characteristics
+                {{ t('tags_and_characteristics') }}
               </h3>
 
               <!-- Multi-select Dropdowns Grid -->
@@ -212,7 +212,7 @@
                 <div [style.z-index]="showDietaryDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-leaf mr-1"></i>
-                    Dietary
+                    {{ t('dietary') }}
                   </label>
                   <div class="relative">
                     <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
@@ -220,7 +220,7 @@
                       <input type="text"
                              [(ngModel)]="dietarySearchTerm"
                              name="dietarySearch"
-                             placeholder="Search or select..."
+                             placeholder="{{ t('search_or_select') }}"
                              (click)="toggleDietaryDropdown()"
                              class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
                              style="color: var(--primary-700);">
@@ -264,7 +264,7 @@
                 <div [style.z-index]="showCuisineDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-flag mr-1"></i>
-                    Cuisine
+                    {{ t('cuisine') }}
                   </label>
                   <div class="relative">
                     <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
@@ -272,7 +272,7 @@
                       <input type="text"
                              [(ngModel)]="cuisineSearchTerm"
                              name="cuisineSearch"
-                             placeholder="Search or select..."
+                             placeholder="{{ t('search_or_select') }}"
                              (click)="toggleCuisineDropdown()"
                              class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
                              style="color: var(--primary-700);">
@@ -316,7 +316,7 @@
                 <div [style.z-index]="showCautionsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-alert-triangle mr-1"></i>
-                    Allergens
+                    {{ t('allergens') }}
                   </label>
                   <div class="relative">
                     <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
@@ -324,7 +324,7 @@
                       <input type="text"
                              [(ngModel)]="cautionsSearchTerm"
                              name="cautionsSearch"
-                             placeholder="Search or select..."
+                             placeholder="{{ t('search_or_select') }}"
                              (click)="toggleCautionsDropdown()"
                              class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
                              style="color: var(--primary-700);">
@@ -368,7 +368,7 @@
                 <div [style.z-index]="showDietLabelsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-salad mr-1"></i>
-                    Diet Labels
+                    {{ t('diet_labels') }}
                   </label>
                   <div class="relative">
                     <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
@@ -376,7 +376,7 @@
                       <input type="text"
                              [(ngModel)]="dietLabelsSearchTerm"
                              name="dietLabelsSearch"
-                             placeholder="Search or select..."
+                             placeholder="{{ t('search_or_select') }}"
                              (click)="toggleDietLabelsDropdown()"
                              class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
                              style="color: var(--primary-700);">
@@ -420,7 +420,7 @@
                 <div [style.z-index]="showDishTypesDropdown ? 1 : 0"class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-tools-kitchen-2 mr-1"></i>
-                    Dish Type
+                    {{ t('dish_type') }}
                   </label>
                   <div class="relative">
                     <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
@@ -428,7 +428,7 @@
                       <input type="text"
                              [(ngModel)]="dishTypesSearchTerm"
                              name="dishTypesSearch"
-                             placeholder="Search or select..."
+                             placeholder="{{ t('search_or_select') }}"
                              (click)="toggleDishTypesDropdown()"
                              class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
                              style="color: var(--primary-700);">
@@ -472,7 +472,7 @@
                 <div [style.z-index]="showHealthLabelsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
                   <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-heart-plus mr-1"></i>
-                    Health Labels
+                    {{ t('health_labels') }}
                   </label>
                   <div class="relative">
                     <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
@@ -480,7 +480,7 @@
                       <input type="text"
                              [(ngModel)]="healthLabelsSearchTerm"
                              name="healthLabelsSearch"
-                             placeholder="Search or select..."
+                             placeholder="{{ t('search_or_select') }}"
                              (click)="toggleHealthLabelsDropdown()"
                              class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
                              style="color: var(--primary-700);">
@@ -531,56 +531,90 @@
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-photo mr-2"></i>
-                Recipe Image
+                {{ t('recipe_image') }}
               </h3>
 
               <div class="flex flex-col items-center gap-2 w-full">
                 @if (imagePreviewUrl) {
-                  <img [src]="imagePreviewUrl" alt="Recipe preview" class="h-[10.5rem] w-[10.5rem] flex-none object-cover rounded-xl">
+                  <img [src]="imagePreviewUrl" alt="Recipe preview" class="h-[10.5rem] w-[10.5rem] flex-none border-2 object-cover rounded-xl" style="border-color: var(--primary-300)">
                   <button type="button"
                           (click)="removeImage()"
                           class="absolute mt-4 px-3 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex gap-2 ml-24"
-                          style="background: var(--primary-500); color: white;">
+                          style="background: var(--primary-500); color: white; border-color: var(--primary-300)">
                     <i class="ti ti-trash"></i>
                   </button>
                 } @else {
-                  <img alt="Recipe" class="h-[10.5rem] w-[10.5rem] flex-none object-cover rounded-xl" src="/assets/img/recipe.png">
+                  <img alt="Recipe" class="h-[10.5rem] w-[10.5rem] flex-none object-cover border-2 rounded-xl" style="border-color: var(--primary-300); background: var(--primary-300)" src="/assets/img/recipe.png">
                 }
               </div>
-              <div class="flex flex-col items-center">
+              <div class="w-full">
                 <div
-                  class="w-full max-w-md h-64 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden drag-drop-area transition-all cursor-pointer"
-                  style="border-color: var(--primary-300); background: var(--primary-100-40);"
-                  [class.dragging]="isDragging"
-                  (dragover)="onDragOver($event)"
-                  (dragleave)="onDragLeave($event)"
-                  (drop)="onDrop($event)"
-                  (click)="fileInput.click()">
-                  <div class="flex flex-col items-center text-center" id="image-placeholder">
-                    <i class="ti ti-camera text-6xl mb-4" style="color: var(--primary-400);"></i>
-                    <p class="text-lg font-medium" style="color: var(--primary-700);">Drag an image here</p>
-                    <div class="text-sm" style="color: var(--primary-400);">or
-                      <!-- Upload Buttons -->
-                      <div class="flex flex-wrap gap-3 pt-2">
-                        <button type="button"
-                                class="px-6 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
-                                style="background: var(--gradient-primary); color: white;">
-                          <i class="ti ti-upload"></i>
-                          Upload Image
-                        </button>
-                      </div>
+                  class="drag-drop-area border-2 border-dashed rounded-2xl p-6 text-center transition-all hover:border-primary-400 hover:bg-primary-50"
+                  style="border-color: var(--primary-300); background: var(--primary-50-40);"
+                  [class.dragging]="isDragging" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                  (drop)="onDrop($event)">
+                  <div class="flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center"
+                         style="background: var(--primary-300);">
+                      <i class="ti ti-cloud-upload text-2xl"
+                         style="color: var(--primary-500);"></i>
                     </div>
+
+                    <div class="flex flex-col gap-2">
+                      <h4 class="font-semibold text-lg"
+                          style="color: var(--primary-700);">
+                        {{ t('drag_image_here') }}
+                      </h4>
+                      <p class="flex flex-row items-center justify-center text-sm gap-2"
+                         style="color: var(--primary-500);">
+                        {{ t('or') }}
+                        <input
+                          #fileInput
+                          type="file"
+                          accept="image/*"
+                          (change)="onFileSelected($event)"
+                          style="display: none;">
+                        <button
+                          class="px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2"
+                          style="background: var(--gradient-primary); color: white;"
+                          (click)="fileInput.click()">
+                          <i class="ti ti-photo"></i>
+                          {{ t('select') }}
+                        </button>
+                      </p>
+                    </div>
+
+                    <!-- Image Requirements -->
+                    <div class="w-full text-left">
+                      <div class="text-xs font-medium mb-2"
+                           style="color: var(--primary-600);">
+                        {{ t('image_requirements') }}
+                      </div>
+                      <ul class="text-xs space-y-1" style="color: var(--primary-400);">
+                        <li class="flex items-center gap-2">
+                          <i class="ti ti-check text-green-500"></i>
+                          {{ t('formats') }}
+                        </li>
+                        <li class="flex items-center gap-2">
+                          <i class="ti ti-check text-green-500"></i>
+                          {{ t('max_size') }}
+                        </li>
+                        <li class="flex items-center gap-2">
+                          <i class="ti ti-check text-green-500"></i>
+                          {{ t('min_resolution') }}
+                        </li>
+                        <li class="flex items-center gap-2">
+                          <i class="ti ti-info-circle text-blue-500"></i>
+                          {{ t('recommended_square') }}
+                        </li>
+                      </ul>
+                    </div>
+
+                    <!-- Hidden file input -->
+                    <input type="file" class="hidden"
+                           accept="image/jpeg,image/png,image/webp" multiple="false">
                   </div>
                 </div>
-
-                <!-- Hidden file input -->
-                <input
-                  #fileInput
-                  type="file"
-                  accept="image/*"
-                  (change)="onFileSelected($event)"
-                  class="hidden">
-
               </div>
 
             </div>
@@ -590,15 +624,15 @@
                 <div class="tabs glass text-nowrap w-full">
                   <button type="button" class="tab" [class.active]="activeTab === 'ingredients'" (click)="setActiveTab('ingredients')">
                     <i class="ti ti-basket text-2xl" aria-hidden="true"></i>
-                    Ingredients
+                    {{ t('ingredients') }}
                   </button>
                   <button type="button" class="tab" [class.active]="activeTab === 'instructions'" (click)="setActiveTab('instructions')">
                     <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
-                    Instructions
+                    {{ t('instructions') }}
                   </button>
                   <button type="button" class="tab" [class.active]="activeTab === 'nutrition'" (click)="setActiveTab('nutrition')">
                     <i class="ti ti-report text-2xl" aria-hidden="true"></i>
-                    Nutrition
+                    {{ t('nutrition') }}
                   </button>
                 </div>
               </div>
@@ -611,7 +645,7 @@
                 <div class="flex justify-between items-center">
                   <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                     <i class="ti ti-basket mr-2"></i>
-                    Ingredients
+                    {{ t('ingredients') }}
                   </h3>
                 </div>
 
@@ -625,7 +659,7 @@
                            name="newIngredientName"
                            (input)="onIngredientNameInput($event)"
                            (focus)="onIngredientNameInput($event)"
-                           placeholder="Ingredient name"
+                           placeholder="{{ t('ingredient_name') }}"
                            class="w-full px-3 py-2 rounded-xl border transition-all focus:outline-none"
                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
 
@@ -649,13 +683,13 @@
                   <input type="text"
                          [(ngModel)]="newIngredient.quantity"
                          name="newIngredientQuantity"
-                         placeholder="Qty"
+                         placeholder="{{ t('qty') }}"
                          class="px-3 py-2 w-24 rounded-xl border transition-all focus:outline-none"
                          style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
                   <input type="text"
                          [(ngModel)]="newIngredient.unit"
                          name="newIngredientUnit"
-                         placeholder="Unit"
+                         placeholder="{{ t('unit') }}"
                          class="px-3 py-2 w-24 rounded-xl border transition-all focus:outline-none"
                          style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
                   <button type="button"
@@ -674,7 +708,7 @@
                   @if (ingredients.length === 0) {
                     <div class="text-center py-2" style="color: var(--primary-400);">
                       <i class="ti ti-basket-off text-4xl mb-2"></i>
-                      <p>No ingredients added yet</p>
+                      <p>{{ t('no_ingredients_added') }}</p>
                     </div>
                   }
                   @for (ingredient of ingredients; track $index; let i = $index) {
@@ -720,7 +754,7 @@
                 <div class="flex items-center justify-between">
                     <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                         <i class="ti ti-list-numbers mr-2"></i>
-                        Instructions
+                        {{ t('instructions') }}
                     </h3>
                 </div>
 
@@ -730,7 +764,7 @@
                   <textarea rows="2"
                          [(ngModel)]="newInstruction"
                          name="newInstruction"
-                         placeholder="Describe this preparation step..."
+                         placeholder="{{ t('describe_step') }}"
                          maxlength="500"
                          class="px-3 py-2 flex-1 rounded-xl border transition-all focus:outline-none resize-none"
                          style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"></textarea>
@@ -758,7 +792,7 @@
                         </div>
                         <button type="button"
                             (click)="removeInstruction(i)"
-                            class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
+                            class="delete-button w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
                             style="background: var(--primary-100); color: var(--primary-700);">
                             <i class="ti ti-trash text-red-500"></i>
                         </button>
@@ -776,9 +810,9 @@
                 <div class="flex items-center justify-between">
                     <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                         <i class="ti ti-report mr-2"></i>
-                        Nutritional Information
+                        {{ t('nutritional_information') }}
                     </h3>
-                    <span class="text-sm" style="color: var(--primary-600);">Per serving</span>
+                    <span class="text-sm" style="color: var(--primary-600);">{{ t('per_serving') }}</span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -786,7 +820,7 @@
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-weight mr-1"></i>
-                      Total Weight (g)
+                      {{ t('total_weight') }} (g)
                     </label>
                     <input type="number"
                            [(ngModel)]="totalWeight"
@@ -802,7 +836,7 @@
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-flame mr-1"></i>
-                      Calories (kcal)
+                      {{ t('calories') }} (kcal)
                     </label>
                     <input type="number"
                            [(ngModel)]="calories"
@@ -817,7 +851,7 @@
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-meat mr-1"></i>
-                      Protein (g)
+                      {{ t('protein') }} (g)
                     </label>
                     <input type="number"
                            [(ngModel)]="protein"
@@ -833,7 +867,7 @@
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-bread mr-1"></i>
-                      Carbohydrates (g)
+                      {{ t('carbohydrates') }} (g)
                     </label>
                     <input type="number"
                            [(ngModel)]="carbs"
@@ -849,7 +883,7 @@
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-droplet mr-1"></i>
-                      Fat (g)
+                      {{ t('fat') }} (g)
                     </label>
                     <input type="number"
                            [(ngModel)]="fat"
@@ -865,7 +899,7 @@
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-plant mr-1"></i>
-                      Fiber (g)
+                      {{ t('fiber') }} (g)
                     </label>
                     <input type="number"
                            [(ngModel)]="fiber"
@@ -881,7 +915,7 @@
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-candy mr-1"></i>
-                      Sugar (g)
+                      {{ t('sugar') }} (g)
                     </label>
                     <input type="number"
                            [(ngModel)]="sugar"
@@ -897,7 +931,7 @@
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-salt mr-1"></i>
-                      Sodium (mg)
+                      {{ t('sodium') }} (mg)
                     </label>
                     <input type="number"
                            [(ngModel)]="sodium"
@@ -924,7 +958,7 @@
                   class="disabled px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
                   style="background: var(--gradient-primary); color: white;">
             <i class="ti ti-send"></i>
-            {{ isEditMode ? 'Update Recipe' : 'Publish Recipe' }}
+            {{ isEditMode ? t('update_recipe') : t('publish_recipe') }}
           </button>
         </div>
       </form>

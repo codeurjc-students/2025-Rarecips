@@ -1,8 +1,9 @@
-import {ActivatedRoute, NavigationEnd, Router, RouterOutlet, RoutesRecognized} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterOutlet, RoutesRecognized} from '@angular/router';
 import {Location} from '@angular/common';
 import {filter} from 'rxjs';
 import {Component, ElementRef, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {NavbarComponent} from './components/navbar/navbar.component';
+import {ThemeService} from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -20,15 +21,15 @@ export class AppComponent implements OnInit, OnDestroy {
   showNavbarFooter: boolean = true;
   backButton: boolean = false;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private elementRef: ElementRef,
+  constructor(private router: Router, private themeService: ThemeService, private elementRef: ElementRef,
               private renderer: Renderer2, private location: Location) {
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd || event instanceof RoutesRecognized)
     ).subscribe((event) => {
       // Check if the current route is the login or signup route
-      this.showNavbarFooter = !(event.url === '/login' ||
-        event.url === '/signup');
+      this.showNavbarFooter = !(event.url.includes('/login') ||
+        event.url.includes('/signup') || event.url.includes('/change-password'));
 
       this.backButton = (event.url === 'home' ||
           event.url.includes('/users') ||
@@ -53,8 +54,21 @@ export class AppComponent implements OnInit, OnDestroy {
   private gridPositions: { x: number, y: number, occupied: boolean }[] = [];
   private cols = 0;
   private rows = 0;
+  private themes = [
+                            'tangerine-light', 'tangerine-dark',
+                            'ocean-light', 'ocean-dark',
+                            'forest-light', 'forest-dark',
+                            'rose-light', 'rose-dark',
+                            'neutral-light', 'neutral-dark'
+                          ];
 
   ngOnInit(): void {
+    const currentTheme = localStorage.getItem('selectedTheme');
+    if (!currentTheme || !this.themes.includes(currentTheme)) localStorage.setItem("selectedTheme", 'tangerine-light');
+    this.themeService.changeTheme(localStorage.getItem('selectedTheme') as any);
+    this.themeService.setFavicon(`Iconotipo_${localStorage.getItem('selectedTheme')}` || 'Iconotipo_tangerine-light');
+
+
     this.initializeTiledBackground();
     this.startTileAnimation();
 

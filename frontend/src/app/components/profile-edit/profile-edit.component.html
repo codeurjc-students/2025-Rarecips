@@ -15,17 +15,23 @@
               <div class="flex flex-col items-center gap-6 w-full">
                 <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                   <i class="ti ti-photo mr-2"></i>
-                  Profile Picture
+                  {{ t('profile_picture') }}
                 </h3>
 
                 <div class="flex flex-col items-center gap-4 w-full">
                   <!-- Current Profile Picture -->
                   <div class="relative">
                     <div
-                      class="flex h-32 w-32 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative">
-                      <img class="h-32 w-32 flex-none object-cover absolute"
-                           src="data:image/jpeg;base64,{{user?.profileImageString}}" alt="Profile"/>
+                      class="flex h-32 w-32 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative border-2" style="border-color: var(--primary-300)">
+                      <img *ngIf="base64String" class="h-32 w-32 flex-none object-cover absolute"
+                           src="data:image/jpeg;base64,{{base64String}}" alt="Profile" style="background: var(--primary-400); border-color: var(--primary-300)"/>
+                      <img *ngIf="!base64String" class="h-32 w-32 flex-none object-cover absolute"
+                           [src]="user?.profilePictureUrl || 'assets/img/user.png'" alt="Profile" style="background: var(--primary-400)"/>
                     </div>
+                    <button *ngIf="base64String && !defaultPfp.includes(base64String)" type="button"
+                            class="absolute top-1 px-3 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex gap-2 ml-32"
+                            (click)="removeImage()"
+                            style="background: var(--primary-500); color: white;"><i class="ti ti-trash"></i></button>
                     <!-- Edit overlay -->
                     <button
                       class="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50 opacity-0 transition-opacity">
@@ -42,7 +48,7 @@
                       (drop)="onDrop($event)">
                       <div class="flex flex-col items-center gap-4">
                         <div class="w-16 h-16 rounded-full flex items-center justify-center"
-                             style="background: var(--primary-100);">
+                             style="background: var(--primary-300);">
                           <i class="ti ti-cloud-upload text-2xl"
                              style="color: var(--primary-500);"></i>
                         </div>
@@ -50,11 +56,11 @@
                         <div class="flex flex-col gap-2">
                           <h4 class="font-semibold text-lg"
                               style="color: var(--primary-700);">
-                            Drag your image here
+                            {{ t('drag_image_here') }}
                           </h4>
                           <p class="flex flex-row items-center justify-center text-sm gap-2"
                              style="color: var(--primary-500);">
-                            or
+                            {{ t('or') }}
                             <input
                               #fileInput
                               type="file"
@@ -66,7 +72,7 @@
                               style="background: var(--gradient-primary); color: white;"
                               (click)="fileInput.click()">
                               <i class="ti ti-photo"></i>
-                              Select
+                              {{ t('select') }}
                             </button>
                           </p>
                         </div>
@@ -75,24 +81,24 @@
                         <div class="w-full text-left">
                           <div class="text-xs font-medium mb-2"
                                style="color: var(--primary-600);">
-                            Image requirements:
+                            {{ t('image_requirements') }}
                           </div>
                           <ul class="text-xs space-y-1" style="color: var(--primary-400);">
                             <li class="flex items-center gap-2">
                               <i class="ti ti-check text-green-500"></i>
-                              Formats: JPG, PNG, WEBP, GIF
+                              {{ t('formats') }}
                             </li>
                             <li class="flex items-center gap-2">
                               <i class="ti ti-check text-green-500"></i>
-                              Maximum size: 5MB
+                              {{ t('max_size') }}
                             </li>
                             <li class="flex items-center gap-2">
                               <i class="ti ti-check text-green-500"></i>
-                              Minimum resolution: 200x200px
+                              {{ t('min_resolution') }}
                             </li>
                             <li class="flex items-center gap-2">
                               <i class="ti ti-info-circle text-blue-500"></i>
-                              Recommended: square image
+                              {{ t('recommended_square') }}
                             </li>
                           </ul>
                         </div>
@@ -113,20 +119,20 @@
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-user mr-2"></i>
-                Personal Information
+                {{ t('personal_information') }}
               </h3>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Display Name -->
                 <div class="flex flex-col gap-2">
                   <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Display Name
+                    {{ t('display_name') }}
                   </label>
                   <div class="relative">
                     <input type="text" value="{{user?.displayName}}"
                            class="displayNameInput w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                           placeholder="Enter your display name"/>
+                           placeholder="{{ t('enter_display_name') }}"/>
                     <i class="ti ti-user absolute right-3 top-1/2 transform -translate-y-1/2"
                        style="color: var(--primary-400);"></i>
                   </div>
@@ -135,7 +141,7 @@
                 <!-- Email -->
                 <div class="flex flex-col gap-2 md:col-span-2">
                   <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                    Email Address
+                    {{ t('email_address') }}
                   </label>
                   <div class="relative">
                     <input type="email" value="{{user?.email}}"
@@ -145,15 +151,15 @@
                     <div class="email-status absolute top-[3.2rem] left-4">
                       @if (isEmailAvailable != null) {
                         @if (isEmailAvailable === true && isEmailValid) {
-                          <small class="text-success" style="color: green;">Email available ✓</small>
+                          <small class="text-success" style="color: green;">{{ t('email_available') }}</small>
                         } @else if (isEmailAvailable === false && isEmailValid) {
-                          <small class="text-danger" style="color: red;">Email not available ✕</small>
+                          <small class="text-danger" style="color: red;">{{ t('email_not_available') }}</small>
                         }
                         @if (!isEmailValid) {
-                          <small class="text-danger" style="color: red;">Invalid email format ✕</small>
+                          <small class="text-danger" style="color: red;">{{ t('invalid_email_format') }}</small>
                         }
                       } @else {
-                        <small class="text-muted" style="color: gray;">Checking availability...</small>
+                        <small class="text-muted" style="color: gray;">{{ t('checking_availability') }}</small>
                       }
                     </div>
                     <i class="ti ti-mail absolute right-3 top-1/2 transform -translate-y-1/2"
@@ -170,24 +176,26 @@
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-edit mr-2"></i>
-                Biography
+                {{ t('biography') }}
               </h3>
 
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold" style="color: var(--primary-400);">
-                  Tell us about yourself
+                  {{ t('tell_us_about_yourself') }}
                 </label>
                 <div class="relative">
                                     <textarea rows="4"
                                               class="bioInput w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
                                               style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700); field-sizing: content;"
-                                              placeholder="Write something about yourself, your culinary tastes, specialties...">{{ user?.description }}</textarea>
+                                              placeholder="{{ t('write_about_yourself') }}"
+                                              [value]="user?.bio">
+                                    </textarea>
                   <i class="ti ti-message absolute right-3 top-7"
                      style="color: var(--primary-400);"></i>
                 </div>
                 <div class="flex justify-between items-center">
                                     <span class="text-xs" style="color: var(--primary-400);">
-                                        Maximum 500 characters
+                                        {{ t('max_500_characters') }}
                                     </span>
                   <span class="text-xs" style="color: var(--primary-400);">
                                         124/500
@@ -201,7 +209,7 @@
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-shield-lock mr-2"></i>
-                Privacy & Security
+                {{ t('privacy_security') }}
               </h3>
 
               <div class="flex flex-col gap-4">
@@ -211,13 +219,13 @@
                   <div class="flex items-center gap-3">
                     <i class="ti ti-eye text-xl" style="color: var(--primary-500);"></i>
                     <div>
-                      <p class="font-semibold" style="color: var(--primary-700);">Public Profile
+                      <p class="font-semibold" style="color: var(--primary-700);">{{ t('public_profile') }}
                       </p>
-                      <p class="text-sm" style="color: var(--primary-400);">Allow other users to see your profile</p>
+                      <p class="text-sm" style="color: var(--primary-400);">{{ t('allow_see_profile') }}</p>
                     </div>
                   </div>
                   <label class="switch">
-                    <input type="checkbox" checked>
+                    <input id="publicProfileInput" type="checkbox" [checked]="!user?.privateProfile">
                     <span class="slider round"></span>
                   </label>
                 </div>
@@ -227,9 +235,8 @@
                   <div class="flex items-center gap-3 max-w-72 w-full">
                     <i class="ti ti-mail text-xl" style="color: var(--primary-500);"></i>
                     <div>
-                      <p class="font-semibold" style="color: var(--primary-700);">Email Notifications</p>
-                      <p class="text-sm" style="color: var(--primary-400);">Receive notifications about new recipes and
-                        comments</p>
+                      <p class="font-semibold" style="color: var(--primary-700);">{{ t('email_notifications') }}</p>
+                      <p class="text-sm" style="color: var(--primary-400);">{{ t('receive_notifications') }}</p>
                     </div>
                   </div>
                   <label class="switch">
@@ -241,22 +248,54 @@
                 <!-- Change Password Button -->
                 <button
                   class="flex items-center justify-center gap-3 p-4 rounded-2xl transition-all hover:scale-[1.02]"
-                  style="background: var(--primary-100-40); color: var(--primary-700);">
+                  style="background: var(--gradient-primary); color: white"
+                  (click)="openChangePasswordModal()">
                   <i class="ti ti-key text-xl"></i>
-                  <span class="font-semibold">Change Password</span>
-                  <i class="ti ti-chevron-right"></i>
+                  <span class="font-semibold">{{ t('change_password') }}</span>
+                  <i class="ti ti-chevron-right mt-1"></i>
                 </button>
               </div>
             </div>
+            <!-- DANGER ZONE -->
+            <div class="flex flex-col gap-4 rounded-3xl border-2 border-red-400 p-6 mt-1.5 shadow-md" style="background: color-mix(in srgb, color-mix(in srgb, indianred 70%, var(--primary-400) 30%) 30%, transparent 70%);">
+              <h3 class="text-xl font-bold text-red-700 flex items-center gap-2">
+                <i class="ti ti-alert-triangle text-2xl"></i>
+                {{ t('danger_zone') }}
+              </h3>
+              <p class="text-red-600">{{ t('deleting_irreversible') }}</p>
+              <div class="relative w-fit">
+                <button
+                  class="px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 transition-all w-fit flex items-center gap-2 select-none relative overflow-hidden"
+                  [ngStyle]="deleteHoldActive && confirmDeleteMode ? {'background': 'linear-gradient(to right, #dc2626 ' + deleteHoldProgress + '%, #b91c1c ' + deleteHoldProgress + '%)'} : {}"
+                  (click)="activateConfirmDelete()"
+                  (mousedown)="startDeleteHold()"
+                  (mouseup)="cancelDeleteHold()"
+                  (mouseleave)="cancelDeleteHold()"
+                  [disabled]="deleteInProgress">
+                  <i [ngClass]="confirmDeleteMode ? (deleteHoldActive ? 'ti ti-hourglass' : 'ti ti-user-x') : 'ti ti-user-x'" class="ti-anim"></i>
+                  @if (!confirmDeleteMode) {
+                    <span>{{ t('delete_my_account') }}</span>
+                  } @else {
+                    @if (!deleteHoldActive) {
+                      <span id="deleteHoldBtnText"> {{ t('are_you_sure') }} </span>
+                    } @else {
+                      <span> {{ secondDeletionText }} </span>
+                    }
+                  }
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
         <!-- Action Buttons -->
         <div class="flex z-0 w-full justify-center gap-4 pt-8">
           <button
             class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
-            style="background: var(--primary-300-40); color: var(--primary-700);">
+            style="background: var(--primary-300-40); color: var(--primary-700);"
+            (click)="cancelChanges()">
             <i class="ti ti-x mt-[1px]"></i>
-            Cancel
+            {{ t('cancel') }}
           </button>
           <button
             class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
@@ -264,10 +303,38 @@
             [class.disabled]="formValid()"
             (click)="saveChanges()">
             <i class="ti ti-device-floppy"></i>
-            Save Changes
+            {{ t('save_changes') }}
           </button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Change Password Modal -->
+  <app-change-password-modal
+    [show]="showChangePasswordModal"
+    [requireCurrentPassword]="!changePasswordToken"
+    [loading]="changePasswordLoading"
+    [error]="changePasswordError"
+    [success]="changePasswordSuccess"
+    [showPasswordRequirements]="showPasswordRequirements"
+    [strengthPercent]="strengthPercent"
+    [strengthColor]="strengthColor"
+    [strengthLabel]="strengthLabel"
+    [strengthCriteria]="strengthCriteria"
+    [showPasswordStatus]="showPasswordStatus"
+    [showNewPassword]="showNewPassword"
+    [showConfirmPassword]="showConfirmPassword"
+    [isChangePasswordDisabled]="isChangePasswordDisabled()"
+    [showCurrentPassword]="showCurrentPassword"
+    (showCurrentPasswordChange)="showCurrentPassword = $event"
+    (close)="closeChangePasswordModal()"
+    (submit)="onChangePasswordSubmit($event)"
+    (passwordInput)="onPasswordInput($event)"
+    (confirmPasswordInput)="onConfirmPasswordInput($event)"
+    (showNewPasswordChange)="showNewPassword = $event"
+    (showConfirmPasswordChange)="showConfirmPassword = $event"
+    (showPasswordRequirementsChange)="showPasswordRequirements = $event"
+  ></app-change-password-modal>
 </div>
+

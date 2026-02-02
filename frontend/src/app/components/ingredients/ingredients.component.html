@@ -8,11 +8,11 @@
         <div class="tabs glass text-nowrap w-full">
           <button class="tab" [class.active]="activeTab === 'ingredients'" (click)="setActiveTab('ingredients')">
             <i class="ti ti-carrot text-xl" aria-hidden="true"></i>
-            Ingredients
+            {{ t('ingredients') }}
           </button>
           <button class="tab" [class.active]="activeTab === 'pantry'" (click)="setActiveTab('pantry')">
             <i class="ti ti-cooker text-xl" aria-hidden="true"></i>
-            My pantry
+            {{ t('my_pantry') }}
           </button>
         </div>
       </div>
@@ -21,13 +21,47 @@
       <div class="w-full ingredientList" [class.active]="activeTab === 'ingredients'" [class.hidden]="activeTab !== 'ingredients'">
         <div class="gap-8 max-w-7xl w-full glass p-8">
 
+          @if (isAdmin) {
+            <div class="w-full flex justify-end mb-4">
+              <button class="btn btn-primary px-6 py-2 rounded-xl font-semibold flex items-center gap-2"
+                      style="background: var(--gradient-primary); color: white;"
+                      (click)="openCreateIngredientModal();">
+                <i class="ti ti-plus"></i>
+                {{ t('create_ingredient') }}
+              </button>
+            </div>
+          }
+
           <!-- Ingredients Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Ingredient Card template-->
             @for (ingredient of ingredients; track $index) {
-              <div class="ingredient-card glass-strong rounded-2xl overflow-hidden transition-all hover:scale-[1.02]">
+              <div data-id="{{ ingredient.id }}" class="ingredient-card glass-strong rounded-2xl overflow-hidden transition-all hover:scale-[1.02]">
               <div class="ingredient-image relative h-48">
-                <img [src]="ingredient.image"
+                @if (isAdmin) {
+                  <button class="btn btn-primary flex flex-row gap-2 deleteBut absolute top-2 left-2 z-10 hover:scale-110 min-h-10 min-w-10 transition-all text-nowrap"
+                          style="background: red"
+                          [class.w-48]="confirmDeleteId === ingredient.id"
+                          [class.w-12]="confirmDeleteId !== ingredient.id"
+                          (click)="deleteIngredient(ingredient, $event)"
+                          (blur)="cancelDelete($event)">
+                    @if (!confirmDeleteId || confirmDeleteId !== ingredient.id) {
+                      <i class="ti ti-trash"></i>
+                    } @else {
+                      {{ t('are_you_sure') }}
+                    }
+                    <button [class.hidden]="confirmDeleteId != ingredient.id" class="confirmDelete rounded-xl py-1 px-2 hover:bg-red-400 transition-all"
+                            (click)="confirmDeleteIngredient(ingredient, $event)">
+                      <i class="ti ti-check"></i>
+                    </button>
+                  </button>
+                  <button class="btn btn-primary flex flex-row gap-2 deleteBut absolute top-14 left-2 z-10 hover:scale-110 min-h-10 min-w-10 transition-all"
+                          style="background: var(--gradient-primary)"
+                          (click)="openCreateIngredientModal(ingredient)">
+                      <i class="ti ti-pencil"></i>
+                  </button>
+                }
+                <img [src]="ingredient.imageString || ingredient.image || 'assets/img/ingredient.png'"
                      [alt]="ingredient.food"
                      class="w-full h-full object-cover">
                 <div class="ingredient-icon">
@@ -40,7 +74,7 @@
                   <span class="ingredient-category">{{ingredient.category}}</span>
                 </div>
                 <button class="add-more-btn min-h-12" (click)="addToPantry(ingredient)">
-                  @if (!hasIngredient(ingredient)) { <i class="ti ti-plus"></i>Add to my pantry } @else { <i class="ti ti-check"></i> }
+                  @if (!hasIngredient(ingredient)) { <i class="ti ti-plus"></i>{{ t('add_to_my_pantry') }} } @else { <i class="ti ti-check"></i> }
                 </button>
               </div>
             </div>
@@ -56,11 +90,11 @@
                 (click)="loadMoreIngredients()"
                 [disabled]="loadingIngredients">
                 @if (loadingIngredients) {
-                  <i class="ti ti-loader-2 animate-spin"></i>
-                  Loading...
+                  <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:h-5"></div>
+                  {{ t('loading_ingredients') }}
                 } @else {
                   <i class="ti ti-refresh"></i>
-                  Load more
+                  {{ t('load_more_ingredients') }}
                 }
               </button>
             </div>
@@ -75,13 +109,24 @@
           @if (displayedUserIngredients.length > 0) {
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-2xl font-bold" style="color: var(--primary-700);">
-                {{ userIngredients.size }} items
+                {{ userIngredients.size }} {{ t('items') }}
               </h2>
-              <button class="px-4 py-2 rounded-xl font-semibold transition-all hover:scale-105 flex items-center gap-2"
-                      style="background: var(--primary-400); color: white;"
-                      (click)="clearPantry()">
-                <i class="ti ti-trash"></i>
-                Clear Pantry
+              <button class="px-4 py-2 rounded-xl font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
+                      style="background: var(--gradient-primary); color: white;"
+                      [class.w-80]="confirmClearPantry"
+                      [class.w-60]="!confirmClearPantry"
+                      (mousedown)="manageClearPantry($event)"
+                      (focusout)="confirmClearPantry = false">
+                @if (!confirmClearPantry) {
+                  <i class="ti ti-trash"></i>
+                  {{ t('clear_pantry') }}
+                } @else {
+                  {{ t('are_you_sure') }}
+                }
+                <button [class.hidden]="!confirmClearPantry" class="confirmDelete rounded-xl h-min px-1 hover:bg-orange-400 transition-all"
+                        (mousedown)="clearPantry($event)">
+                  <i class="ti ti-check"></i>
+                </button>
               </button>
             </div>
 
@@ -91,7 +136,7 @@
                 <div class="flex items-center justify-between p-4 rounded-2xl border-2"
                      style="background: var(--primary-100-40); border-color: var(--primary-100);">
                   <div class="flex items-center gap-4">
-                    <img [src]="ingredient.image"
+                    <img [src]="ingredient.imageString || ingredient.image || 'assets/img/ingredient.png'"
                          [alt]="ingredient.food"
                          class="w-16 h-16 rounded-xl object-cover">
                     <div>
@@ -100,8 +145,7 @@
                     </div>
                   </div>
                   <div class="flex items-center gap-4">
-                    <button class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                            style="background: rgba(255, 0, 0, 0.1); color: red;"
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 bg-error-200 text-red-600"
                             (click)="removeFromPantry(ingredient)">
                       <i class="ti ti-trash"></i>
                     </button>
@@ -117,7 +161,7 @@
                   style="background: var(--gradient-primary); color: white;"
                   (click)="loadMorePantryItems()">
                   <i class="ti ti-refresh"></i>
-                  Load more
+                  {{ t('load_more_ingredients') }}
                 </button>
               </div>
             }
@@ -126,13 +170,13 @@
               <div class="w-24 h-24 rounded-full flex items-center justify-center" style="background: var(--primary-100);">
                 <i class="ti ti-mood-sick text-5xl" style="color: var(--primary-400);"></i>
               </div>
-              <p class="text-lg font-semibold" style="color: var(--primary-500);">Your pantry is empty</p>
-              <p class="text-sm" style="color: var(--primary-400);">Add ingredients from the catalog to get started</p>
+              <p class="text-lg font-semibold" style="color: var(--primary-500);">{{ t('your_pantry_is_empty') }}</p>
+              <p class="text-sm" style="color: var(--primary-400);">{{ t('add_ingredients_from_catalog') }}</p>
               <button class="px-6 py-3 rounded-2xl font-semibold transition-all hover:scale-105"
                       style="background: var(--gradient-primary); color: white;"
                       (click)="setActiveTab('ingredients')">
                 <i class="ti ti-shopping-cart mr-2"></i>
-                Explore Ingredients
+                {{ t('explore_ingredients') }}
               </button>
             </div>
           }
@@ -142,3 +186,125 @@
     </div>
   </div>
 </div>
+
+@if (createIngredientModalOpen) {
+  <div class="createIngredientModal fixed inset-0 z-[9999] flex items-center justify-center w-screen h-screen visibleBackdrop"
+       style="backdrop-filter: blur(10px); background: var(--primary-backdrop);"
+       (blur)="manageModalClose($event)"
+       (click)="manageModalClose($event)"
+       (keydown)="manageModalClose($event)">
+    <div class="w-96 rounded-3xl shadow-2xl p-8 relative" style="background: var(--primary-200);">
+      <button class="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition hover:scale-110"
+              style="background: var(--primary-100);" (click)="closeCreateIngredientModal($event)">
+        <i class="ti ti-x" style="color: var(--primary-700);"></i>
+      </button>
+      <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-700);">{{ t('create_new_ingredient') }}</h2>
+      <form class="flex flex-col gap-4">
+        <div class="mb-2">
+          <label class="block text-sm font-semibold mb-1" style="color: var(--primary-500);">{{ t('name') }}</label>
+          @if (editing) {
+            <input class="recipeNameInp w-full p-2 rounded border" [value]="ingredients[editIngredientInd].food" name="food" required>
+          } @else {
+            <input class="recipeNameInp w-full p-2 rounded border" [(ngModel)]="newIngredient.food" name="food" required>
+          }
+        </div>
+        <div class="mb-2">
+          <label class="block text-sm font-semibold mb-1" style="color: var(--primary-500);">{{ t('image') }}</label>
+          <div class="w-full">
+            <div class="relative flex flex-col items-center justify-center mb-4">
+              <ng-container *ngIf="currentImage; else noImage">
+                <img [src]="currentImage" alt="Ingredient" class="h-32 w-32 object-cover rounded-2xl border-2" style="border-color: var(--primary-300)" />
+                <button *ngIf="!currentImage.includes('assets/')" type="button" class="relative top-1 px-3 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex gap-2 ml-36"
+                        (click)="removeImage()" style="background: var(--primary-500); color: white">
+                  <i class="ti ti-trash"></i>
+                </button>
+              </ng-container>
+              <ng-template #noImage>
+                <img src="assets/img/ingredient.png" alt="Ingredient" class="h-32 w-32 object-cover rounded-lg border-2 border-primary-300 opacity-60" style="border-color: var(--primary-300)" />
+              </ng-template>
+            </div>
+            <div
+              class="drag-drop-area border-2 border-dashed rounded-2xl p-6 text-center transition-all hover:border-primary-400 hover:bg-primary-50"
+              style="border-color: var(--primary-300); background: var(--primary-50-40);"
+              [class.dragging]="isDragging" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)">
+              <div class="flex flex-col items-center gap-4">
+                <div class="w-16 h-16 rounded-full flex items-center justify-center"
+                     style="background: var(--primary-300);">
+                  <i class="ti ti-cloud-upload text-2xl"
+                     style="color: var(--primary-500);"></i>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <h4 class="font-semibold text-lg"
+                      style="color: var(--primary-700);">
+                    {{ t('drag_image_here') }}
+                  </h4>
+                  <p class="flex flex-row items-center justify-center text-sm gap-2"
+                     style="color: var(--primary-500);">
+                    {{ t('or') }}
+                    <input
+                      #fileInput
+                      type="file"
+                      accept="image/*"
+                      (change)="onFileSelected($event)"
+                      style="display: none;">
+                    <button
+                      class="px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2"
+                      style="background: var(--gradient-primary); color: white;"
+                      (click)="fileInput.click()">
+                      <i class="ti ti-photo"></i>
+                      {{ t('select') }}
+                    </button>
+                  </p>
+                </div>
+
+                <!-- Image Requirements -->
+                <div class="w-full text-left">
+                  <div class="text-xs font-medium mb-2"
+                       style="color: var(--primary-600);">
+                    {{ t('image_requirements') }}
+                  </div>
+                  <ul class="text-xs space-y-1" style="color: var(--primary-400);">
+                    <li class="flex items-center gap-2">
+                      <i class="ti ti-check text-green-500"></i>
+                      {{ t('formats') }}
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <i class="ti ti-check text-green-500"></i>
+                      {{ t('max_size') }}
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <i class="ti ti-check text-green-500"></i>
+                      {{ t('min_resolution') }}
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <i class="ti ti-info-circle text-blue-500"></i>
+                      {{ t('recommended_square') }}
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Hidden file input -->
+                <input type="file" class="hidden"
+                       accept="image/jpeg,image/png,image/webp" multiple="false">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div [class.hidden]="!createIngredientError" class="text-red-600 text-sm mb-2">{{ createIngredientError }}</div>
+        <button (click)="createIngredient($event)" class="btn btn-primary w-full mt-2" style="background: var(--gradient-primary)" type="submit" [disabled]="creatingIngredient">
+          @if (!creatingIngredient) {
+            <span *ngIf="!editing">{{ t('create') }}</span>
+            <span *ngIf="editing">{{ t('update') }}</span>
+          } @else {
+            <span class="flex flex-row items-center justify-center gap-2">
+              <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:h-5"></div>
+              <span *ngIf="!editing"> {{ t('creating') }} </span>
+              <span *ngIf="editing"> {{ t('updating') }} </span>
+            </span>
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+}

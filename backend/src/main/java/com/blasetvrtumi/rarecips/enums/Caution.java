@@ -1,17 +1,14 @@
 package com.blasetvrtumi.rarecips.enums;
 
 public enum Caution {
+    EGGS("Eggs"),
+    FODMAP("FODMAP"),
+    GLUTEN("Gluten"),
+    MILK("Milk"),
+    SOY("Soy"),
     SULFITES("Sulfites"),
     TREE_NUTS("Tree-Nuts"),
-    SHELLFISH("Shellfish"),
-    PEANUTS("Peanuts"),
-    GLUTEN("Gluten"),
-    DAIRY("Dairy"),
-    EGGS("Eggs"),
-    SOY("Soy"),
-    WHEAT("Wheat"),
-    FISH("Fish"),
-    FODMAP("FODMAP");
+    WHEAT("Wheat");
 
     private final String displayName;
 

@@ -3,10 +3,16 @@ import {Router, ActivatedRoute} from '@angular/router';
 import {RecipeService} from '../../services/recipe.service';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {Subject, takeUntil} from 'rxjs';
+import {Subject, takeUntil, forkJoin} from 'rxjs';
 import {Ingredient} from '../../models/ingredient.model';
 import {SessionService} from '../../services/session.service';
 import {UserService} from '../../services/user.service';
+import {IngredientService} from '../../services/ingredient.service';
+import {IngredientIconService} from '../../services/ingredient-icon.service';
+import {RecipeCollectionService} from '../../services/recipe-collection.service';
+import {CollectionCardComponent} from '../shared/collection-card/collection-card.component';
+import { TranslatorService } from '../../services/translator.service';
+import {ThemeService} from '../../services/theme.service';
 
 interface Recipe {
   id: string;
@@ -75,7 +81,7 @@ interface UserFilters {
 @Component({
   selector: 'app-explore',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CollectionCardComponent],
   templateUrl: './explore.component.html',
   styleUrls: ['./explore.component.css']
 })
@@ -99,6 +105,36 @@ export class ExploreComponent implements OnInit {
   currentRecipePage = 0;
   recipePageSize = 9;
   hasMoreRecipes = true;
+
+  ingredients: Ingredient[] = [];
+  ingredientResults: Ingredient[] = [];
+  ingredientLoading = false;
+  loadingMoreIngredients = false;
+  currentIngredientPage = 0;
+  ingredientPageSize = 12;
+  hasMoreIngredients = true;
+  userIngredients: Set<Ingredient> = new Set<Ingredient>();
+  ingredientSearchQuery: string = '';
+
+  collections: any[] = [];
+  collectionLoading = false;
+  currentUsername: string = '';
+
+  currentCollectionPage: number = 0;
+  collectionPageSize: number = 9;
+  loadingMoreCollections: boolean = false;
+  hasMoreCollections: boolean = true;
+  totalCollections: number = 0;
+
+  showViewCollectionModal: boolean = false;
+  viewingCollection: any = null;
+  viewModalClosing: boolean = false;
+  collectionRecipesLimit: number = 4;
+
+  showAddToCollectionDialog: boolean = false;
+  selectedRecipeId?: number;
+  favoritesCollection?: any;
+  favoriteRecipeIds: Set<number> = new Set();
 
   animationClass: string = '';
 
@@ -165,18 +201,32 @@ export class ExploreComponent implements OnInit {
   searchQuery: string = '';
   activeQuickFilter: string = 'popular';
   viewMode: 'grid' | 'list' = 'grid';
+  ingredientViewMode: 'grid' | 'list' = 'grid';
+  collectionViewMode: 'grid' | 'list' = 'grid';
+  userViewMode: 'grid' | 'list' = 'grid';
   showSortDropdown: boolean = false;
+  showCollectionSortDropdown: boolean = false;
 
-  sortOptions = [
-    { value: 'popular', label: 'Most Popular', icon: 'ti-star' },
-    { value: 'rating', label: 'Highest Rated', icon: 'ti-trophy' },
-    { value: 'updatedAt', label: 'Recently Updated', icon: 'ti-clock' },
-    { value: 'title', label: 'Alphabetical', icon: 'ti-sort-ascending-letters' }
+  sortingOptions = [
+    { value: 'date_desc', label: 'sort_newest', icon: 'clock-down' },
+    { value: 'date_asc', label: 'sort_oldest', icon: 'clock-up' },
+    { value: 'rating_desc', label: 'sort_best_rated', icon: 'message-circle-down' },
+    { value: 'rating_asc', label: 'sort_worst_rated', icon: 'message-circle-up' },
+    { value: 'difficulty_asc', label: 'sort_easiest', icon: 'sort-descending-shapes' },
+    { value: 'difficulty_desc', label: 'sort_hardest', icon: 'sort-ascending-shapes' },
+    { value: 'time_asc', label: 'sort_shortest_time', icon: 'sort-ascending-numbers' },
+    { value: 'time_desc', label: 'sort_longest_time', icon: 'sort-descending-numbers' },
+  ];
+
+  collectionSortOptions = [
+    { value: 'createdAt', label: 'sort_newest', icon: 'ti-clock' },
+    { value: 'title', label: 'sort_title_az', icon: 'ti-sort-ascending-letters' },
+    { value: 'recipeCount', label: 'sort_most_recipes', icon: 'ti-chef-hat' }
   ];
 
   userSortOptions = [
-    { value: 'createdAt', label: 'Newest', icon: 'ti-clock' },
-    { value: 'username', label: 'Username (A-Z)', icon: 'ti-sort-ascending-letters' },
+    { value: 'createdAt', label: 'sort_newest', icon: 'ti-clock' },
+    { value: 'username', label: 'sort_username_az', icon: 'ti-sort-ascending-letters' },
   ];
 
   showUserSortDropdown: boolean = false;
@@ -197,7 +247,7 @@ export class ExploreComponent implements OnInit {
     maxWeight: 20000,
     minPeople: 1,
     maxPeople: 20,
-    sortBy: 'popular',
+    sortBy: 'mostPopular',
     onlyUserIngredients: false
   };
 
@@ -211,17 +261,33 @@ export class ExploreComponent implements OnInit {
     sortBy: 'createdAt'
   };
 
+  logos: Map<string, string> = new Map();
+
+  ingredientSearchHasMore: boolean = false;
+  ingredientSearchLoading: boolean = false;
+
+  collectionSortBy: string = 'createdAt';
+  totalIngredients: number = 0;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private sessionService: SessionService,
+    private themeService: ThemeService,
     private recipeService: RecipeService,
     private userService: UserService,
-    private cdr: ChangeDetectorRef
+    private ingredientService: IngredientService,
+    private ingredientIconService: IngredientIconService,
+    private collectionService: RecipeCollectionService,
+    private cdr: ChangeDetectorRef,
+    public translatorService: TranslatorService
   ) {
   }
 
   ngOnInit(): void {
+    this.logos = this.themeService.getLogos();
+
+
     this.loadMealTypeCounts();
 
     this.route.queryParams.subscribe(params => {
@@ -235,17 +301,26 @@ export class ExploreComponent implements OnInit {
         this.searchQuery = query;
         this.filters.query = query;
         this.userFilters.query = query;
+        this.ingredientSearchQuery = query;
       }
     });
 
     if (this.activeSearchTab === 'recipes') {
-      if (!this.filters.query) {
-        this.applyQuickFilter('popular');
-      } else {
-        this.applyRecipeFilters();
-      }
+      this.clearFilters();
     } else if (this.activeSearchTab === 'users') {
       this.applyUserFilters();
+    } else if (this.activeSearchTab === 'ingredients') {
+      this.loadIngredients();
+    } else if (this.activeSearchTab === 'collections') {
+      this.sessionService.getLoggedUser().pipe(
+        takeUntil(new Subject<void>())
+      ).subscribe({
+        next: user => {
+          if (user?.username) {
+            this.currentUsername = user.username;
+          }
+        }
+      });
     }
 
     this.sessionService.getLoggedUser().pipe(
@@ -257,11 +332,24 @@ export class ExploreComponent implements OnInit {
           return;
         }
         this.isAuthenticated = true;
+        this.currentUsername = user.username;
+
+        if (this.activeSearchTab === 'ingredients') {
+          this.loadUserIngredients();
+        }
+
+        this.loadFavoritesCollection();
       },
       error: (err) => {
         this.router.navigate(['/error'], {state: {status: err.status, reason: err.message}});
       }
     });
+
+    if (this.activeSearchTab === 'collections') {
+      this.performSearch();
+    }
+
+    this.updateSortingLabels();
   }
 
   loadMealTypeCounts(): void {
@@ -307,30 +395,15 @@ export class ExploreComponent implements OnInit {
     });
 
     if (tab === 'recipes' && this.searchQuery) {
+      this.clearFilters();
       this.applyRecipeFilters();
-    } else if (tab === 'users' && this.searchQuery) {
+    } else if (tab === 'users') {
       this.applyUserFilters();
-    } else if (tab === 'recipes' && !this.searchQuery) {
-      this.applyQuickFilter('popular');
-    } else if (tab === 'users' && !this.searchQuery) {
-      this.applyUserFilters();
+    } else if (tab === 'ingredients') {
+      this.loadIngredients();
+    } else if (tab === 'collections') {
+      this.performSearch();
     }
-  }
-
-  toggleFilter(filterType: keyof SearchFilters, value: string): void {
-    const filterArray = this.filters[filterType] as string[];
-    const index = filterArray.indexOf(value);
-    if (index > -1) {
-      filterArray.splice(index, 1);
-    } else {
-      filterArray.push(value);
-    }
-    this.applyRecipeFilters();
-  }
-
-  isFilterActive(filterType: keyof SearchFilters, value: string): boolean {
-    const filterArray = this.filters[filterType] as string[];
-    return filterArray.includes(value);
   }
 
   clearFilters(): void {
@@ -350,7 +423,7 @@ export class ExploreComponent implements OnInit {
       maxWeight: 20000,
       minPeople: 1,
       maxPeople: 20,
-      sortBy: 'popular',
+      sortBy: 'mostPopular',
       onlyUserIngredients: false
     };
     this.minTime = 0;
@@ -655,6 +728,7 @@ export class ExploreComponent implements OnInit {
   performSearch(): void {
     this.filters.query = this.searchQuery.trim();
     this.userFilters.query = this.searchQuery.trim();
+    this.ingredientSearchQuery = this.searchQuery.trim();
 
     const queryParams: any = { mode: this.activeSearchTab };
     if (this.searchQuery.trim()) {
@@ -673,6 +747,46 @@ export class ExploreComponent implements OnInit {
     } else if (this.activeSearchTab === 'users') {
       this.currentUserPage = 0;
       this.applyUserFilters();
+    } else if (this.activeSearchTab === 'ingredients') {
+      this.ingredientSearchLoading = true;
+      this.currentIngredientPage = 0;
+      this.ingredientService.searchIngredients(this.ingredientSearchQuery, this.currentIngredientPage, this.ingredientPageSize).subscribe({
+        next: (result: any) => {
+          this.ingredientResults = (result.content || []).map((element: Ingredient) => {
+            element.icon = this.ingredientIconService.getIconForIngredient(element.food);
+            element.category = this.ingredientIconService.getCategoryFromIcon(element.icon);
+            return element;
+          });
+          this.ingredientSearchHasMore = !result.last;
+          try { this.cdr.detectChanges(); } catch(e) { }
+          this.ingredientSearchLoading = false;
+        },
+        error: (error) => {
+          this.ingredientResults = [];
+          this.ingredientSearchHasMore = false;
+          this.ingredientSearchLoading = false;
+        }
+      });
+    } else if (this.activeSearchTab === 'collections') {
+      this.currentCollectionPage = 0;
+      this.collections = [];
+      this.collectionLoading = true;
+      this.hasMoreCollections = true;
+      this.collectionService.searchCollectionsPaged(this.searchQuery ? this.searchQuery.trim() : null, this.currentCollectionPage, this.collectionPageSize).subscribe({
+        next: (result: any) => {
+          this.collections = result.content || [];
+          this.totalCollections = result.total || 0;
+          this.hasMoreCollections = !result.last;
+          this.collectionLoading = false;
+        },
+        error: (error) => {
+          console.error('Error searching collections:', error);
+          this.collections = [];
+          this.totalCollections = 0;
+          this.hasMoreCollections = false;
+          this.collectionLoading = false;
+        }
+      });
     }
   }
 
@@ -680,10 +794,11 @@ export class ExploreComponent implements OnInit {
     this.searchQuery = '';
     this.filters.query = '';
     this.userFilters.query = '';
+    this.ingredientSearchQuery = '';
 
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { mode: this.activeSearchTab },
+      queryParams: { mode: this.activeSearchTab, q: '' },
       queryParamsHandling: 'merge'
     });
 
@@ -693,6 +808,13 @@ export class ExploreComponent implements OnInit {
     } else if (this.activeSearchTab === 'users') {
       this.currentUserPage = 0;
       this.applyUserFilters();
+    } else if (this.activeSearchTab === 'collections') {
+      this.currentCollectionPage = 0;
+      this.applyCollectionFilters();
+    } else if (this.activeSearchTab === 'ingredients') {
+      this.ingredientSearchLoading = true;
+      this.currentIngredientPage = 0;
+      this.applyIngredientFilters();
     }
   }
 
@@ -700,42 +822,41 @@ export class ExploreComponent implements OnInit {
     if (this.activeQuickFilter === filterType) {
       this.activeQuickFilter = '';
       this.resetQuickFilterCriteria();
+      this.clearFilters();
     } else {
-      this.activeQuickFilter = filterType;
       this.resetQuickFilterCriteria();
+      this.clearFilters();
+      this.activeQuickFilter = filterType;
 
       switch(filterType) {
         case 'popular':
-          this.filters.sortBy = 'rating';
+          this.filters.sortBy = 'mostPopular';
           this.filters.minRating = 4;
           break;
-
         case 'quick':
           this.minTime = 0;
           this.filters.maxTime = 60;
           break;
-
         case 'healthy':
           this.filters.maxCalories = 600;
           this.filters.healthLabels = ['Low Sugar', 'Low Fat', 'Low Sodium'];
           break;
-
         case 'traditional':
           this.filters.cuisines = ['Italian', 'French', 'Spanish', 'Greek', 'Turkish', 'Middle Eastern'];
           break;
-
         case 'easy':
           this.filters.difficulties = [1, 2];
           break;
       }
-    }
 
-    this.currentRecipePage = 0;
-    this.applyRecipeFilters();
+
+      this.currentRecipePage = 0;
+      this.applyRecipeFilters();
+    }
   }
 
   resetQuickFilterCriteria(): void {
-    this.filters.sortBy = 'popular';
+    this.filters.sortBy = 'mostPopular';
     this.filters.minRating = 0;
     this.minTime = 0;
     this.filters.maxTime = 180;
@@ -751,20 +872,87 @@ export class ExploreComponent implements OnInit {
     this.viewMode = mode;
   }
 
+  toggleIngredientViewMode(mode: 'grid' | 'list'): void {
+    this.ingredientViewMode = mode;
+  }
+
+  toggleUserViewMode(mode: 'grid' | 'list'): void {
+    this.userViewMode = mode;
+  }
+
   toggleSortDropdown(): void {
     this.showSortDropdown = !this.showSortDropdown;
   }
 
+  toggleCollectionSortDropdown(): void {
+    this.showCollectionSortDropdown = !this.showCollectionSortDropdown;
+  }
+
   changeSortOrder(sortValue: string): void {
-    this.filters.sortBy = sortValue;
+    let backendSortBy = sortValue;
+    switch (sortValue) {
+      case 'mostPopular':
+        backendSortBy = 'mostPopular';
+        break;
+      case 'highestRated':
+        backendSortBy = 'highestRated';
+        break;
+      case 'recentlyUpdated':
+        backendSortBy = 'recentlyUpdated';
+        break;
+      case 'alphabetical':
+        backendSortBy = 'alphabetical';
+        break;
+      default:
+        backendSortBy = sortValue;
+    }
+    this.filters.sortBy = backendSortBy;
     this.showSortDropdown = false;
     this.currentRecipePage = 0;
     this.applyRecipeFilters();
   }
 
+  changeCollectionSortOrder(sortValue: string): void {
+    this.collectionSortBy = sortValue;
+    this.showCollectionSortDropdown = false;
+    this.currentCollectionPage = 0;
+    this.collections = [];
+    this.collectionLoading = true;
+    this.hasMoreCollections = true;
+    this.collectionService.searchCollectionsPaged(
+      this.searchQuery ? this.searchQuery.trim() : null,
+      this.currentCollectionPage,
+      this.collectionPageSize,
+      this.collectionSortBy
+    ).subscribe({
+      next: (result: any) => {
+        this.collections = result.content || [];
+        this.totalCollections = result.total || 0;
+        this.hasMoreCollections = !result.last;
+        this.collectionLoading = false;
+      },
+      error: (error) => {
+        this.collections = [];
+        this.totalCollections = 0;
+        this.hasMoreCollections = false;
+        this.collectionLoading = false;
+      }
+    });
+  }
+
   getCurrentSortLabel(): string {
-    const option = this.sortOptions.find(opt => opt.value === this.filters.sortBy);
-    return option ? option.label : 'Sort by';
+    const option = this.sortingOptions.find(opt => opt.value === this.filters.sortBy);
+    return option ? this.translatorService.translate(option.label) : this.translatorService.translate('sort_by');
+  }
+
+  getCurrentCollectionSortLabel(): string {
+    const option = this.collectionSortOptions.find((opt: { value: string; label: string }) => opt.value === this.collectionSortBy);
+    return option ? this.translatorService.translate(option.label) : this.translatorService.translate('sort_by');
+  }
+
+  getCurrentUserSortLabel(): string {
+    const option = this.userSortOptions.find((opt: { value: string; label: string }) => opt.value === this.userFilters.sortBy);
+    return option ? this.translatorService.translate(option.label) : this.translatorService.translate('sort_by');
   }
 
   applyUserFilters(): void {
@@ -846,11 +1034,375 @@ export class ExploreComponent implements OnInit {
   changeUserSortOrder(sortValue: string): void {
     this.userFilters.sortBy = sortValue;
     this.showUserSortDropdown = false;
+    this.applyUserFilters();
   }
 
-  getCurrentUserSortLabel(): string {
-    const option = this.userSortOptions.find(opt => opt.value === this.userFilters.sortBy);
-    return option ? option.label : 'Sort by';
+  loadIngredients(): void {
+    this.ingredientLoading = true;
+    this.ingredientService.getPagedIngredients(this.currentIngredientPage, this.ingredientPageSize).subscribe({
+      next: (data) => {
+        data.content.forEach((element: Ingredient) => {
+          element.icon = this.ingredientIconService.getIconForIngredient(element.food);
+          element.category = this.ingredientIconService.getCategoryFromIcon(element.icon);
+          this.totalIngredients = data.totalElements;
+          this.ingredients.push(element);
+        });
+        this.hasMoreIngredients = !data.last;
+
+        this.ingredientResults = [...this.ingredients];
+        try { this.cdr.detectChanges(); } catch(e) {  }
+        this.ingredientLoading = false;
+        this.ingredientSearchHasMore = this.hasMoreIngredients;
+        this.ingredientSearchLoading = this.ingredientLoading;
+      },
+      error: (error) => {
+        console.error('Error loading ingredients:', error);
+        this.ingredientLoading = false;
+        this.ingredientSearchLoading = this.ingredientLoading;
+      }
+    });
+  }
+
+  loadMoreIngredients(): void {
+    if (this.loadingMoreIngredients || !this.hasMoreIngredients) return;
+    this.loadingMoreIngredients = true;
+    this.currentIngredientPage++;
+
+    this.ingredientService.getPagedIngredients(this.currentIngredientPage, this.ingredientPageSize).subscribe({
+      next: (data) => {
+        data.content.forEach((element: Ingredient) => {
+          element.icon = this.ingredientIconService.getIconForIngredient(element.food);
+          element.category = this.ingredientIconService.getCategoryFromIcon(element.icon);
+          this.ingredients.push(element);
+        });
+        this.hasMoreIngredients = !data.last;
+        this.ingredientResults = [...this.ingredients];
+        try { this.cdr.detectChanges(); } catch(e) { }
+        this.loadingMoreIngredients = false;
+        this.ingredientSearchHasMore = this.hasMoreIngredients;
+        this.ingredientSearchLoading = this.loadingMoreIngredients;
+      },
+      error: (error) => {
+        console.error('Error loading more ingredients:', error);
+        this.loadingMoreIngredients = false;
+        this.ingredientSearchLoading = this.loadingMoreIngredients;
+      }
+    });
+  }
+
+  loadMoreIngredientResults() {
+    this.loadMoreIngredients();
+  }
+
+  loadUserIngredients(): void {
+    this.sessionService.getLoggedUser().pipe(
+      takeUntil(new Subject<void>())
+    ).subscribe({
+      next: user => {
+        if (!user?.username) return;
+
+        this.userService.getUserIngredients(user.username).subscribe({
+          next: (ingredients: Ingredient[]) => {
+            this.userIngredients.clear();
+            ingredients.forEach(element => {
+              element.icon = this.ingredientIconService.getIconForIngredient(element.food);
+              element.category = this.ingredientIconService.getCategoryFromIcon(element.icon);
+              this.userIngredients.add(element);
+            });
+          },
+          error: (error) => {
+            console.error('Error loading user ingredients:', error);
+          }
+        });
+      }
+    });
+  }
+
+  addToPantry(ingredient: Ingredient): void {
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/error'], {state: {status: 403, reason: "You must be logged in to add ingredients to your pantry."}});
+      return;
+    }
+
+    if (this.hasIngredient(ingredient)) return;
+
+    this.userService.addIngredient(ingredient).subscribe({
+      next: () => {
+        ingredient.isItOwned = true;
+        this.userIngredients.add(ingredient);
+      },
+      error: (error) => {
+        console.error('Error adding ingredient to pantry:', error);
+      }
+    });
+  }
+
+  hasIngredient(ingredient: Ingredient): boolean {
+    return Array.from(this.userIngredients).some(i => i.id === ingredient.id);
+  }
+
+  loadUserCollections(): void {
+    this.sessionService.getLoggedUser().pipe(
+      takeUntil(new Subject<void>())
+    ).subscribe({
+      next: user => {
+        if (!user?.username) {
+          this.collectionLoading = false;
+          return;
+        }
+
+        this.currentUsername = user.username;
+        this.collectionLoading = true;
+
+        this.currentCollectionPage = 0;
+        this.collections = [];
+        this.collectionService.searchCollectionsPaged(null, this.currentCollectionPage, this.collectionPageSize).subscribe({
+          next: (result: any) => {
+            this.collections = result.content || [];
+            this.totalCollections = result.total || 0;
+            this.hasMoreCollections = !result.last;
+            this.collectionLoading = false;
+          },
+          error: (error) => {
+            console.error('Error loading user collections:', error);
+            this.collections = [];
+            this.totalCollections = 0;
+            this.hasMoreCollections = false;
+            this.collectionLoading = false;
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading user collections:', error);
+        this.collectionLoading = false;
+      }
+    });
+  }
+
+  openViewCollectionModal(collection: any): void {
+    this.viewingCollection = collection;
+    this.showViewCollectionModal = true;
+    this.viewModalClosing = false;
+    this.collectionRecipesLimit = 4;
+  }
+
+  closeViewCollectionModal(): void {
+    this.viewModalClosing = true;
+    setTimeout(() => {
+      this.showViewCollectionModal = false;
+      this.viewingCollection = null;
+      this.viewModalClosing = false;
+      this.collectionRecipesLimit = 4;
+    }, 300);
+  }
+
+  getVisibleCollectionRecipes(): any[] {
+    if (!this.viewingCollection?.recipes) return [];
+    return this.viewingCollection.recipes.slice(0, this.collectionRecipesLimit);
+  }
+
+  hasMoreCollectionRecipes(): boolean {
+    if (!this.viewingCollection?.recipes) return false;
+    return this.viewingCollection.recipes.length > this.collectionRecipesLimit;
+  }
+
+  getRemainingCollectionRecipes(): number {
+    if (!this.viewingCollection?.recipes) return 0;
+    return this.viewingCollection.recipes.length - this.collectionRecipesLimit;
+  }
+
+  loadMoreCollectionRecipes(event: Event): void {
+    event.stopPropagation();
+    this.collectionRecipesLimit += 4;
+  }
+
+  loadMoreCollections(): void {
+    if (this.loadingMoreCollections || !this.hasMoreCollections) return;
+    this.loadingMoreCollections = true;
+    this.currentCollectionPage++;
+
+    this.collectionService.searchCollectionsPaged(this.searchQuery ? this.searchQuery.trim() : null, this.currentCollectionPage, this.collectionPageSize).subscribe({
+      next: (result: any) => {
+        const items = result.content || [];
+        this.collections = [...this.collections, ...items];
+        this.totalCollections = result.total || this.totalCollections;
+        this.hasMoreCollections = !result.last;
+        this.loadingMoreCollections = false;
+      },
+      error: (error) => {
+        console.error('Error loading more collections:', error);
+        this.loadingMoreCollections = false;
+      }
+    });
+  }
+
+  navigateToRecipeFromCollection(recipeId: number): void {
+    this.closeViewCollectionModal();
+    setTimeout(() => {
+      this.router.navigate(['/recipes', recipeId]);
+    }, 300);
+  }
+
+  navigateToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  loadFavoritesCollection(): void {
+    if (!this.sessionService.currentUser) return;
+
+    forkJoin({
+      collection: this.collectionService.getFavoritesCollection(this.sessionService.currentUser.username),
+      ids: this.collectionService.getFavoriteRecipeIds(this.sessionService.currentUser.username)
+    }).subscribe({
+      next: (result) => {
+        this.favoritesCollection = result.collection;
+        this.favoriteRecipeIds.clear();
+        result.ids.forEach(id => this.favoriteRecipeIds.add(id));
+      },
+      error: (error) => {
+        console.error('Error loading favorites:', error);
+      }
+    });
+  }
+
+  toggleFavorite(recipeId: number, event: Event): void {
+    event.stopPropagation();
+
+    if (!this.sessionService.currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (!this.favoritesCollection) {
+      this.collectionService.getFavoritesCollection(this.sessionService.currentUser.username).subscribe({
+        next: (collection) => {
+          this.favoritesCollection = collection;
+          this.toggleFavoriteInternal(recipeId);
+        },
+        error: (error) => {
+          console.error('Error loading favorites:', error);
+        }
+      });
+      return;
+    }
+
+    this.toggleFavoriteInternal(recipeId);
+  }
+
+  private toggleFavoriteInternal(recipeId: number): void {
+    if (!this.favoritesCollection) return;
+
+    const isInFavorites = this.isRecipeInFavorites(recipeId);
+
+    if (isInFavorites) {
+      this.collectionService.removeRecipeFromCollection(this.favoritesCollection.id, recipeId).subscribe({
+        next: () => {
+          this.favoriteRecipeIds.delete(recipeId);
+        },
+        error: (error) => {
+          console.error('Error removing from favorites:', error);
+        }
+      });
+    } else {
+      this.collectionService.addRecipeToCollection(this.favoritesCollection.id, recipeId).subscribe({
+        next: () => {
+          this.favoriteRecipeIds.add(recipeId);
+        },
+        error: (error) => {
+          console.error('Error adding to favorites:', error);
+        }
+      });
+    }
+  }
+
+  openAddToCollection(recipeId: number, event: Event): void {
+    event.stopPropagation();
+
+    if (!this.sessionService.currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.selectedRecipeId = recipeId;
+    this.showAddToCollectionDialog = true;
+  }
+
+  closeAddToCollection(): void {
+    this.showAddToCollectionDialog = false;
+    this.selectedRecipeId = undefined;
+  }
+
+  onRecipeAddedToCollection(): void {
+    this.closeAddToCollection();
+  }
+
+  isRecipeInFavorites(recipeId: number): boolean {
+    return this.favoriteRecipeIds.has(recipeId);
+  }
+
+  private applyCollectionFilters() {
+    this.collections = [];
+    this.collectionLoading = true;
+    this.hasMoreCollections = true;
+    this.collectionService.searchCollectionsPaged(null, this.currentCollectionPage, this.collectionPageSize).subscribe({
+      next: (result: any) => {
+        this.collections = result.content || [];
+        this.totalCollections = result.total || 0;
+        this.hasMoreCollections = !result.last;
+        this.collectionLoading = false;
+      },
+      error: (err) => {
+        console.error('Error clearing collection search:', err);
+        this.collections = [];
+        this.totalCollections = 0;
+        this.hasMoreCollections = false;
+        this.collectionLoading = false;
+      }
+    });
+  }
+
+  private applyIngredientFilters() {
+    this.ingredientService.searchIngredients('', this.currentIngredientPage, this.ingredientPageSize).subscribe({
+      next: (result: any) => {
+        this.ingredientResults = (result.content || []).map((element: Ingredient) => {
+          element.icon = this.ingredientIconService.getIconForIngredient(element.food);
+          element.category = this.ingredientIconService.getCategoryFromIcon(element.icon);
+          return element;
+        });
+        this.ingredientSearchHasMore = !result.last;
+        this.ingredientSearchLoading = false;
+        try { this.cdr.detectChanges(); } catch(e) { }
+      },
+      error: (error) => {
+        this.ingredientResults = [];
+        this.ingredientSearchHasMore = false;
+        this.ingredientSearchLoading = false;
+      }
+    });
+  }
+
+  toggleCollectionViewMode(mode: any) {
+    this.collectionViewMode = mode;
+  }
+
+  navigateToUser(username: string, event: Event): void {
+    event.stopPropagation();
+    this.router.navigate(['/users', username]);
+  }
+
+  updateSortingLabels() {
+    this.sortingOptions = [
+      { value: 'newest', label: this.t('sort_newest'), icon: 'clock-up' },
+      { value: 'oldest', label: this.t('sort_oldest'), icon: 'clock-down' },
+      { value: 'rating', label: this.t('sort_rating'), icon: 'message-circle-up' },
+      { value: 'difficulty', label: this.t('sort_difficulty'), icon: 'sort-descending-shapes' },
+      { value: 'preptime', label: this.t('sort_preptime'), icon: 'sort-ascending-numbers' },
+      { value: 'servings', label: this.t('sort_servings'), icon: 'tools-kitchen-2' },
+    ];
+  }
+
+  t(key: string): string {
+    return this.translatorService.translate(key);
   }
 }
 

@@ -63,6 +63,11 @@ body {
   --primary-text: #451005;
   --primary-100-rgb: 255, 235, 211;
   --primary-backdrop: rgba(249, 115, 22, 0.15);
+  --logo-spoon: #f8b371;
+  --logo-handle: #a02d16;
+  --logo-plate1: #ec6822;
+  --logo-plate2: #f1863a;
+  --logo-bg: #fff6ec;
 }
 
 .theme-tangerine-light {
@@ -82,6 +87,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(255, 104, 14, 0.15);
+  --logo-spoon: #f8b371;
+  --logo-handle: #a02d16;
+  --logo-plate1: #ec6822;
+  --logo-plate2: #f1863a;
+  --logo-bg: #fcd2a7;
+  --logo-textcolor: #e84d13;
 }
 
 .theme-tangerine-dark {
@@ -101,6 +112,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(255, 138, 80, 0.15);
+  --logo-spoon: #f7cfa1;
+  --logo-handle: #e8a15c;
+  --logo-plate1: #c35519;
+  --logo-plate2: #e8a15c;
+  --logo-bg: #532d01;
+  --logo-textcolor: #ddb28b;
 }
 
 .theme-ocean-light {
@@ -120,6 +137,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(0, 188, 212, 0.15);
+  --logo-spoon: #4dd0e1;
+  --logo-handle: #002f33;
+  --logo-plate1: #00bcd4;
+  --logo-plate2: #26c6da;
+  --logo-bg: #b3e0f7;
+  --logo-textcolor: #0097a7;
 }
 
 .theme-ocean-dark {
@@ -139,6 +162,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(77, 208, 225, 0.15);
+  --logo-spoon: #4dd0e1;
+  --logo-handle: #b3f0f7;
+  --logo-plate1: #00bcd4;
+  --logo-plate2: #26c6da;
+  --logo-bg: #1b3a4b;
+  --logo-textcolor: #b2ebf2;
 }
 
 .theme-forest-light {
@@ -158,6 +187,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(76, 175, 80, 0.15);
+  --logo-spoon: #81c784;
+  --logo-handle: #0d2e09;
+  --logo-plate1: #4caf50;
+  --logo-plate2: #66bb6a;
+  --logo-bg: #b6d7b0;
+  --logo-textcolor: #388e3c;
 }
 
 .theme-forest-dark {
@@ -177,6 +212,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(102, 187, 106, 0.15);
+  --logo-spoon: #81c784;
+  --logo-handle: #c8e6c9;
+  --logo-plate1: #4caf50;
+  --logo-plate2: #66bb6a;
+  --logo-bg: #142510;
+  --logo-textcolor: #66bb6a;
 }
 
 .theme-rose-light {
@@ -196,6 +237,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(244, 63, 94, 0.15);
+  --logo-spoon: #fda4af;
+  --logo-handle: #3b0a0f;
+  --logo-plate1: #f43f5e;
+  --logo-plate2: #fb7185;
+  --logo-bg: #f7bfc9;
+  --logo-textcolor: #be123c;
 }
 
 .theme-rose-dark {
@@ -215,6 +262,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(251, 113, 133, 0.15);
+  --logo-spoon: #fda4af;
+  --logo-handle: #ffe4e6;
+  --logo-plate1: #f43f5e;
+  --logo-plate2: #fb7185;
+  --logo-bg: #2d1419;
+  --logo-textcolor: #fb7185;
 }
 
 .theme-neutral-light {
@@ -234,6 +287,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(100, 116, 139, 0.15);
+  --logo-spoon: #64748b;
+  --logo-handle: #02071a;
+  --logo-plate1: #6b6b7d;
+  --logo-plate2: #94a3b8;
+  --logo-bg: #d3d3d3;
+  --logo-textcolor: #334155;
 }
 
 .theme-neutral-dark {
@@ -253,6 +312,12 @@ body {
   --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   --gradient-secondary: linear-gradient(135deg, var(--primary-600), var(--primary-700));
   --primary-backdrop: rgba(161, 161, 170, 0.15);
+  --logo-spoon: #a1a1aa;
+  --logo-handle: #f4f4f5;
+  --logo-plate1: #64748b;
+  --logo-plate2: #94a3b8;
+  --logo-bg: #18181b;
+  --logo-textcolor: #a3a3a3;
 }
 
 .theme-error-light {
@@ -263,6 +328,7 @@ body {
   --primary-600: #dc2626;
   --primary-700: #b91c1c;
   --primary-backdrop: rgba(239, 68, 68, 0.15);
+  --logo-textcolor: #b91c1c;
 }
 
 .theme-error-dark {
@@ -280,6 +346,7 @@ body {
   --primary-700: #fca5a5;
   --primary-text: #fecaca;
   --primary-backdrop: rgba(239, 68, 68, 0.15);
+  --logo-textcolor: #ef4444;
 }
 
 .theme-warning-light {
@@ -290,6 +357,7 @@ body {
   --primary-600: #0284c7;
   --primary-700: #0369a1;
   --primary-backdrop: rgba(14, 165, 233, 0.15);
+  --logo-textcolor: #0ea5e9;
 }
 
 .theme-warning-dark {
@@ -307,6 +375,7 @@ body {
   --primary-700: #7dd3fc;
   --primary-text: #bae6fd;
   --primary-backdrop: rgba(14, 165, 233, 0.15);
+  --logo-textcolor: #0ea5e9;
 }
 
 .theme-success-light {
@@ -317,6 +386,7 @@ body {
   --primary-600: #16a34a;
   --primary-700: #15803d;
   --primary-backdrop: rgba(34, 197, 94, 0.15);
+  --logo-textcolor: #15803d;
 }
 
 .theme-success-dark {
@@ -334,6 +404,7 @@ body {
   --primary-700: #86efac;
   --primary-text: #bbf7d0;
   --primary-backdrop: rgba(34, 197, 94, 0.15);
+  --logo-textcolor: #22c55e;
 }
 
 /* Example for a dark theme */
@@ -432,12 +503,6 @@ button.disabled {
 
 .tab:hover {
   background: rgba(255, 255, 255, 0.2);
-}
-
-.tab.active {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: 0 4px 12px var(--primary-300);
 }
 
 .tab-icon {
@@ -717,6 +782,201 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   left: 0;
   opacity: 0;
   cursor: pointer;
+}
+
+.form-input {
+  width: 100%;
+  margin-left: 0.75rem;
+  padding: 0.75rem 1rem 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  background: var(--primary-100-40);
+  backdrop-filter: blur(10px);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.glass-input {
+  background: var(--primary-100-40);
+}
+
+[contentEditable=true]:empty:not(:focus):before {
+  content: attr(data-text)
+}
+
+div::placeholder {
+  color: black;
+}
+
+.form-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+input::placeholder {
+  color: var(--primary-500);
+  opacity: 0.7;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100-40);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.password-requirements {
+  position: absolute;
+  margin-top: -2rem;
+  transform: translateY(-100%);
+  width: 280px;
+  background: var(--primary-100);
+  color: #1f2937;
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 40px rgba(2, 6, 23, 0.12);
+  padding: 0.75rem 0.9rem;
+  display: none;
+  z-index: 60;
+  font-size: 0.9rem;
+}
+
+.password-requirements.visible {
+  display: block;
+}
+
+.password-requirements ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.password-requirements li {
+  padding: 0.25rem 0;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.password-requirements li::before {
+  content: '✕';
+  color: #ef4444;
+  display: inline-block;
+  width: 18px;
+  text-align: center;
+}
+
+.password-requirements li.ok::before {
+  content: '✓';
+  color: #10b981;
+}
+
+.password-requirements li.ok {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.strength-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.strength-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.strength-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--primary-500);
+  transition: width 220ms ease, background 220ms ease;
+}
+
+.slideright {
+  animation: slideRightIn 0.3s ease-in-out;
+}
+
+.slideleft {
+  animation: slideLeftIn 0.3s ease-in-out;
+}
+
+.ingredient-image {
+  background: var(--primary-200);
+  position: relative;
+  height: 192px;
+  overflow: hidden;
+}
+
+.ingredient-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.tab.active, .auth-tab.active {
+  transition: all 0.3s ease-in-out;
+  transform: scale(0.9);
+  color: white;
+  background: var(--gradient-primary);
+  box-shadow: 0 4px 12px var(--primary-300);
+}
+
+.tab:not(.active), .auth-tab:not(.active) {
+  transition: all 0.3s ease-in-out;
+  transform: scale(1);
+  color: var(--primary-text);
+  background: transparent;
+  box-shadow: none;
+}
+
+.visibleBackdrop {
+  animation: fadeInBackdrop 0.3s ease forwards;
+  opacity: 1;
+}
+
+.visibleBackdrop > div {
+  animation: growIn 0.3s ease forwards;
+  transform: scale(1);
+}
+
+:not(.visibleBackdrop)[style*="backdrop-filter"] {
+  animation: fadeOutBackdrop 0.3s ease forwards;
+  opacity: 0;
+}
+
+:not(.visibleBackdrop)[style*="backdrop-filter"] > div {
+  animation: shrinkOut 0.3s ease forwards;
+  transform: scale(0.5);
+}
+
+@keyframes growIn {
+  from { transform: scale(0.5); }
+  to { transform: scale(1); }
+}
+
+@keyframes shrinkOut {
+  from { transform: scale(1); }
+  to { transform: scale(0.5); }
+}
+
+@keyframes fadeInBackdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOutBackdrop {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 /* Responsive adjustments */

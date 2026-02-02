@@ -1,4 +1,24 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
+  @if (showDeleteModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center visibleBackdrop" style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;" (click)="onDeleteBackdropClick($event)">
+      <div class="w-11/12 max-w-4xl rounded-3xl shadow-2xl p-8 relative transition-all" style="background: var(--primary-200);" >
+        <button class="absolute top-6 right-6 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90" style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);" (click)="closeDeleteModal($event)">
+          <i class="ti ti-x text-2xl"></i>
+        </button>
+        <div class="flex flex-col items-center gap-6 mb-8">
+          <div class="flex items-center gap-3">
+            <i class="ti ti-trash text-4xl" style="color: var(--error);"></i>
+            <span class="text-2xl font-semibold" style="color: var(--error);">{{ t('delete_recipe') }}</span>
+          </div>
+          <p class="text-lg font-medium" style="color: var(--primary-700);">{{ t('delete_recipe_confirm') }}</p>
+          <div class="flex gap-4 mt-4">
+            <button class="px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-3 transition-all hover:scale-105 shadow-lg" style="background: var(--primary-400); color: white;" (click)="closeDeleteModal($event)">{{ t('cancel') }}</button>
+            <button class="px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-3 transition-all hover:scale-105 shadow-lg" style="background: red; color: white;" (click)="confirmDeleteRecipe($event)"><i class="ti ti-trash text-2xl"></i> {{ t('delete') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
   <!-- Main Content -->
   <div
     class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
@@ -11,23 +31,32 @@
 
             <div class="flex items-center gap-8">
               <!-- Recipe Image -->
-              <div class="relative w-2/4 h-96">
-                <img class="w-full h-full rounded-3xl object-cover shadow-lg"
-                     src="data:image/png;base64,{{ recipe?.imageString }}"
+              <div class="relative w-2/4">
+                <img *ngIf="user?.imageString || recipe?.imageUrl" class="w-full h-full aspect-square rounded-3xl object-cover shadow-lg"
+                     src="data:image/png;base64,{{ recipe?.imageString || recipe?.imageUrl}}"
+                     alt="{{ recipe?.title }}"/>
+                <img *ngIf="!recipe?.imageString && !recipe?.imageUrl" class="w-full h-full aspect-square rounded-3xl object-cover shadow-lg"
+                     src="assets/img/recipe.png"
                      alt="{{ recipe?.title }}"/>
 
                 <!-- Image Actions -->
                 <div class="absolute top-4 right-4 flex gap-2">
                   <button
-                    class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md">
-                    <i class="ti ti-heart text-xl" style="color: var(--primary-500);"></i>
+                    (click)="toggleFavorite()"
+                    class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-transform hover:scale-110"
+                    [class.favorites-active]="isInFavorites">
+                    <i class="ti text-xl"
+                       [class.ti-heart]="!isInFavorites"
+                       [class.ti-heart-filled]="isInFavorites"
+                       [style.color]="isInFavorites ? 'var(--error)' : 'var(--primary-500)'"></i>
                   </button>
                   <button
-                    class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md">
+                    (click)="openAddToCollection(recipe?.id, $event)"
+                    class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-transform hover:scale-110">
                     <i class="ti ti-bookmark text-xl" style="color: var(--primary-500);"></i>
                   </button>
                   <button
-                    class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md">
+                    class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-transform hover:scale-110">
                     <i class="ti ti-share text-xl" style="color: var(--primary-500);"></i>
                   </button>
                 </div>
@@ -35,17 +64,25 @@
 
               <!-- Recipe Info -->
               <div class="w-3/4">
-                @if (isAuthenticated && user?.username === recipe?.author) {
-                  <button
-                    routerLink="/recipes/{{ recipe?.id }}/edit"
-                    class="absolute top-8 right-8 w-12 h-12 flex items-center justify-center rounded-xl"
-                    style="background: var(--gradient-primary); color: white;">
-                    <i class="ti ti-edit text-primary-700 text-xl"></i>
-                  </button>
-                }
+                  @if (isAuthenticated && (user?.username === recipe?.author || user?.role === 'ADMIN')) {
+                    <div class="absolute top-8 right-8 flex gap-2">
+                      <button
+                        routerLink="/recipes/{{ recipe?.id }}/edit"
+                        class="w-12 h-12 flex items-center justify-center rounded-xl"
+                        style="background: var(--gradient-primary); color: white;">
+                        <i class="ti ti-edit text-primary-700 text-xl"></i>
+                      </button>
+                      <button
+                        (click)="openDeleteModal()"
+                        class="w-12 h-12 flex items-center justify-center rounded-xl"
+                        style="background: red; color: white;">
+                        <i class="ti ti-trash text-xl"></i>
+                      </button>
+                    </div>
+                  }
                 <div class="flex flex-col gap-6">
                   <div class="flex flex-col gap-4">
-                    <h1 class="text-4xl font-bold recipe-title max-w-[80%]"
+                    <h1 class="text-4xl font-bold recipe-title max-w-[75%]"
                         style="color: var(--primary-700); font-kerning: none;">
                       {{ recipe?.title }}
                     </h1>
@@ -56,26 +93,30 @@
 
                   <!-- Author Info -->
                   <div class="flex items-center gap-4">
+                    @if (authorPfp) {
+                      <img class="w-12 h-12 rounded-full object-cover cursor-pointer border-2" routerLink="/users/{{recipe?.author}}" src="{{ authorPfp }}"
+                           style="background: var(--primary-400); border-color: var(--primary-300)" alt="Chef"/>
+                    } @else {
+                      <img class="w-12 h-12 rounded-full object-cover cursor-pointer border-2" routerLink="/users/{{recipe?.author}}" src="assets/img/user.png"
+                           style="background: var(--primary-400); border-color: var(--primary-300)" alt="Chef"/>
+                    }
                     @if (recipe?.author) {
-                      <img class="w-12 h-12 rounded-full object-cover cursor-pointer" routerLink="/users/{{recipe?.author}}" src="data:image/png;base64,{{ authorPfp }}"
-                           alt="Chef"/>
                       <div>
-                        <p class="font-semibold" style="color: var(--primary-700);">Chef {{ recipe?.author }}</p>
-                        <p class="text-sm" style="color: var(--primary-400);">Published
+                        <p class="font-semibold" style="color: var(--primary-700);">{{ t('chef') }} {{ recipe?.author }}</p>
+                        <p class="text-sm" style="color: var(--primary-400);">{{ t('published') }}
                           {{ created }}
                           @if (recipe?.updatedAt) {
-                            | Updated on {{ lastUpdated }}
+                            | {{ t('updated_on') }} {{ lastUpdated }}
                           }
                         </p>
                       </div>
                     } @else {
-                      <img class="w-12 h-12 rounded-full object-cover" [src]="authorPfp" alt="Chef"/>
                       <div>
-                        <p class="font-semibold" style="color: var(--primary-700);">Unknown chef</p>
-                        <p class="text-sm" style="color: var(--primary-400);">Published
+                        <p class="font-semibold" style="color: var(--primary-700);">{{ t('unknown_chef') }}</p>
+                        <p class="text-sm" style="color: var(--primary-400);">{{ t('published') }}
                           {{ created }}
                           @if (recipe?.updatedAt) {
-                            | Updated on {{ lastUpdated }}
+                            | {{ t('updated_on') }} {{ lastUpdated }}
                           }
                         </p>
                       </div>
@@ -92,22 +133,21 @@
                          style="background: var(--primary-200-40);">
                       <i class="ti ti-clock text-2xl mb-2" style="color: var(--primary-500);"></i>
                       <span class="text-sm font-semibold"
-                            style="color: var(--primary-400);">Time</span>
-                      <span class="text-lg font-bold" style="color: var(--primary-700);">{{ recipe?.totalTime }}
-                        min</span>
+                            style="color: var(--primary-400);">{{ t('total_time') }}</span>
+                      <span class="text-lg font-bold" style="color: var(--primary-700);">{{ recipe?.totalTime }} {{ t('min') }}</span>
                     </div>
                     <div class="flex flex-col items-center p-4 glass h-full w-full"
                          style="background: var(--primary-200-40);">
                       <i class="ti ti-users text-2xl mb-2" style="color: var(--primary-500);"></i>
                       <span class="text-sm font-semibold"
-                            style="color: var(--primary-400);">Servings</span>
+                            style="color: var(--primary-400);">{{ t('servings') }}</span>
                       <span class="text-lg font-bold" style="color: var(--primary-700);">{{ recipe?.people }}</span>
                     </div>
                     <div class="flex flex-col items-center p-4 glass h-full w-full"
                          style="background: var(--primary-200-40);">
                       <i class="ti ti-star text-2xl mb-2" style="color: var(--primary-500);"></i>
                       <span class="text-sm font-semibold"
-                            style="color: var(--primary-400);">Rating</span>
+                            style="color: var(--primary-400);">{{ t('rating') }}</span>
                       <span class="text-lg font-bold"
                             style="color: var(--primary-700);">{{ recipe?.rating }}</span>
                     </div>
@@ -122,7 +162,7 @@
                         }
                       </div>
                       <span class="text-sm font-semibold"
-                            style="color: var(--primary-400);">Difficulty</span>
+                            style="color: var(--primary-400);">{{ t('difficulty') }}</span>
                       <span class="text-lg font-bold text-center"
                             style="color: var(--primary-700);">{{ getDifficultyLabel() }}</span>
                     </div>
@@ -130,468 +170,474 @@
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Content Tabs -->
-          <div class="flex w-full">
-            <div class="tabs glass text-nowrap w-full">
-              <button class="tab"
-                      [class.active]="activeTab === 'instructions'"
-                      (click)="setActiveTab('instructions')">
-                <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
-                Instructions
-              </button>
-              <button class="tab"
-                      [class.active]="activeTab === 'nutrition'"
-                      (click)="setActiveTab('nutrition')">
-                <i class="ti ti-info-circle text-2xl" aria-hidden="true"></i>
-                Details & Tags
-              </button>
-              <button class="tab"
-                      [class.active]="activeTab === 'reviews'"
-                      (click)="setActiveTab('reviews')">
-                <i class="ti ti-stars text-2xl" aria-hidden="true"></i>
-                Reviews ({{ recipe?.reviews?.length || 0 }})
-              </button>
+            <!-- Content Tabs -->
+            <div class="flex w-full">
+              <div class="tabs glass text-nowrap w-full">
+                <button class="tab"
+                        [class.active]="activeTab === 'instructions'"
+                        (click)="setActiveTab('instructions')">
+                  <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
+                  {{ t('instructions') }}
+                </button>
+                <button class="tab"
+                        [class.active]="activeTab === 'nutrition'"
+                        (click)="setActiveTab('nutrition')">
+                  <i class="ti ti-info-circle text-2xl" aria-hidden="true"></i>
+                  {{ t('details_tags') }}
+                </button>
+                <button class="tab"
+                        [class.active]="activeTab === 'reviews'"
+                        (click)="setActiveTab('reviews')">
+                  <i class="ti ti-stars text-2xl" aria-hidden="true"></i>
+                  {{ t('reviews') }} ({{ recipe?.reviews?.length || 0 }})
+                </button>
+              </div>
             </div>
-          </div>
 
-          <!-- Recipe Content -->
-          <div class="gap-8 w-full">
+            <!-- Recipe Content -->
+            <div class="gap-8 w-full">
 
-            <!-- Instructions Panel -->
-            @if (activeTab === 'instructions') {
-              <div class="lg:col-span-2 instructionsContainer">
-                <div class="flex flex-col gap-8 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                     style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+              <!-- Instructions Panel -->
+              @if (activeTab === 'instructions') {
+                <div class="lg:col-span-2 instructionsContainer">
+                  <div class="flex flex-col gap-8 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                       style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
-                  <!-- Header Section -->
-                  <div class="flex flex-col items-center justify-center gap-2">
-                    <div class="flex items-center gap-1 text-center">
-                      <i class="ti ti-clock text-2xl" style="color: var(--primary-700);"></i>
-                      <p class="font-semibold" style="color: var(--primary-700);">Total Time: {{ recipe?.totalTime }} minutes</p>
+                    <!-- Header Section -->
+                    <div class="flex flex-col items-center justify-center gap-2">
+                      <div class="flex items-center gap-1 text-center">
+                        <i class="ti ti-clock text-2xl" style="color: var(--primary-700);"></i>
+                        <p class="font-semibold" style="color: var(--primary-700);">{{ t('total_time') }}: {{ recipe?.totalTime }} {{ t('min') }}</p>
+                      </div>
+                      <button
+                        (click)="startTimer()"
+                        class="max-w-xs w-1/5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
+                        style="background: var(--gradient-primary); color: white;">
+                        <i class="ti ti-tools-kitchen text-xl"></i>
+                        {{ t('start') }}
+                      </button>
                     </div>
-                    <button
-                      (click)="startTimer()"
-                      class="max-w-xs w-1/5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
-                      style="background: var(--gradient-primary); color: white;">
-                      <i class="ti ti-tools-kitchen text-xl"></i>
-                      Start
-                    </button>
-                  </div>
 
-                  <div class="space-y-4">
-                    @for (step of recipe?.steps; track $index) {
-                      <div class="flex items-center gap-6 instruction-step">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0"
-                             style="background: var(--primary-500); color: white; font-weight: bold;">
-                          {{ $index + 1 }}
+                    <div class="space-y-4">
+                      @for (step of recipe?.steps; track $index) {
+                        <div class="flex items-center gap-6 instruction-step">
+                          <div class="flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0"
+                               style="background: var(--primary-500); color: white; font-weight: bold;">
+                            {{ $index + 1 }}
+                          </div>
+                          <div class="flex-1 p-4 glass instruction-desc" style="background: var(--primary-200-40);">
+                            <p class="font-medium" style="color: var(--primary-700);">{{ step }}</p>
+                          </div>
                         </div>
-                        <div class="flex-1 p-4 glass instruction-desc" style="background: var(--primary-200-40);">
-                          <p class="font-medium" style="color: var(--primary-700);">{{ step }}</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Details & Tags Panel -->
+              @if (activeTab === 'nutrition') {
+                <div class="lg:col-span-2 nutritionContainer" [class.slide-left]="animationMode === 'left'" [class.slide-right]="animationMode === 'right'">
+                  <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                       style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                    <!-- Cuisine Types -->
+                    @if (getCuisineTypes().length > 0) {
+                      <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
+                          <i class="ti ti-world"></i>
+                          {{ t('cuisine_type') }}
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                          @for (cuisine of getCuisineTypes(); track cuisine) {
+                            <span class="px-4 py-2 rounded-xl glass hover:scale-105 transition-all" style="background: var(--primary-500); color: white;">
+                              {{ cuisine }}
+                            </span>
+                          }
                         </div>
                       </div>
                     }
-                  </div>
-                </div>
-              </div>
-            }
 
-            <!-- Details & Tags Panel -->
-            @if (activeTab === 'nutrition') {
-              <div class="lg:col-span-2 nutritionContainer" [class.slide-left]="animationMode === 'left'" [class.slide-right]="animationMode === 'right'">
-                <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                     style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-                  <!-- Cuisine Types -->
-                  @if (getCuisineTypes().length > 0) {
-                    <div>
-                      <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
-                        <i class="ti ti-world"></i>
-                        Cuisine Type
-                      </h4>
-                      <div class="flex flex-wrap gap-2">
-                        @for (cuisine of getCuisineTypes(); track cuisine) {
-                          <span class="px-4 py-2 rounded-xl glass" style="background: var(--primary-500); color: white;">
-                            {{ cuisine }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Meal Types -->
-                  @if (getMealTypes().length > 0) {
-                    <div>
-                      <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
-                        <i class="ti ti-tools-kitchen-2"></i>
-                        Meal Type
-                      </h4>
-                      <div class="flex flex-wrap gap-2">
-                        @for (mealType of getMealTypes(); track mealType) {
-                          <span class="px-4 py-2 rounded-xl glass" style="background: var(--primary-400); color: white;">
-                            {{ mealType }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Dish Types -->
-                  @if (getDishTypes().length > 0) {
-                    <div>
-                      <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
-                        <i class="ti ti-chef-hat"></i>
-                        Dish Type
-                      </h4>
-                      <div class="flex flex-wrap gap-2">
-                        @for (dishType of getDishTypes(); track dishType) {
-                          <span class="px-4 py-2 rounded-xl glass" style="background: var(--primary-300-40); color: var(--primary-700);">
-                            {{ dishType }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Diet Labels Info -->
-                  @if (getDietLabels().length > 0) {
-                    <div>
-                      <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
-                        <i class="ti ti-salad"></i>
-                        Diet Information
-                      </h4>
-                      <div class="flex flex-wrap gap-2">
-                        @for (label of getDietLabels(); track label) {
-                          <span class="px-4 py-2 rounded-xl glass" style="background: var(--primary-300-40); color: var(--primary-700);">
-                            {{ label }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Health Labels Info -->
-                  @if (getHealthLabels().length > 0) {
-                    <div>
-                      <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
-                        <i class="ti ti-heartbeat"></i>
-                        Health Information
-                      </h4>
-                      <div class="flex flex-wrap gap-2">
-                        @for (label of getHealthLabels(); track label) {
-                          <span class="px-4 py-2 rounded-xl glass">
-                            {{ label }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Cautions -->
-                  @if (getCautions().length > 0) {
-                    <div>
-                      <h4 class="text-lg font-semibold mb-3 flex items-center gap-2">
-                        <i class="ti ti-alert-triangle"></i>
-                        Allergen Warnings
-                      </h4>
-                      <div class="flex flex-wrap gap-2">
-                        @for (caution of getCautions(); track caution) {
-                          <span class="px-4 py-2 rounded-xl glass">
-                            {{ caution }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Divider -->
-                  <div class="flex justify-center my-4">
-                    <hr class="border-t w-full" style="border-color: var(--primary-300);"/>
-                  </div>
-
-                  <!-- Nutritional Information -->
-                  <h3 class="text-xl font-semibold flex items-center gap-2" style="color: var(--primary-700);">
-                    <i class="ti ti-report"></i>
-                    Nutritional Information
-                  </h3>
-
-                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Calories -->
-                    <div class="flex flex-col items-center p-4 glass" style="background: var(--primary-200-40);">
-                      <i class="ti ti-flame text-3xl mb-2" style="color: var(--primary-500);"></i>
-                      <span class="text-sm font-semibold" style="color: var(--primary-400);">Calories</span>
-                      <span class="text-2xl font-bold" style="color: var(--primary-700);">{{ recipe?.calories || 0 }}</span>
-                      <span class="text-xs" style="color: var(--primary-400);">kcal</span>
-                    </div>
-
-                    <!-- Total Weight -->
-                    <div class="flex flex-col items-center p-4 glass" style="background: var(--primary-200-40);">
-                      <i class="ti ti-scale text-3xl mb-2" style="color: var(--primary-500);"></i>
-                      <span class="text-sm font-semibold" style="color: var(--primary-400);">Total Weight</span>
-                      <span class="text-2xl font-bold" style="color: var(--primary-700);">{{ recipe?.totalWeight || 0 }}</span>
-                      <span class="text-xs" style="color: var(--primary-400);">g</span>
-                    </div>
-
-                    <!-- Per Serving -->
-                    <div class="flex flex-col items-center p-4 glass" style="background: var(--primary-200-40);">
-                      <i class="ti ti-users text-3xl mb-2" style="color: var(--primary-500);"></i>
-                      <span class="text-sm font-semibold" style="color: var(--primary-400);">Per Serving</span>
-                      <span class="text-2xl font-bold" style="color: var(--primary-700);">{{ (recipe?.calories || 0) / (recipe?.people || 1) | number:'1.0-0' }}</span>
-                      <span class="text-xs" style="color: var(--primary-400);">kcal</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            }
-
-            <!-- Reviews Panel -->
-            @if (activeTab === 'reviews') {
-              <div class="lg:col-span-2 reviewsContainer">
-                <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                     style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-                  @if (isRecipeAuthor) {
-                    <div class="p-6 rounded-2xl text-center glass">
-                      <i class="ti ti-chef-hat text-4xl mb-2"></i>
-                      <p class="font-semibold text-lg mb-1">
-                        This is your recipe!
-                      </p>
-                      <p class="text-sm">
-                        You can't review your own creation, but you can see what others think below.
-                      </p>
-                    </div>
-                  } @else if (isAuthenticated) {
-                    @if (!showReviewForm && !userHasReview) {
-                      <button
-                        (click)="toggleReviewForm()"
-                        class="w-full px-6 py-4 rounded-2xl text-base font-semibold transition-all hover:scale-[1.02] flex items-center justify-center gap-3"
-                        style="background: var(--gradient-primary); color: white;">
-                        <i class="ti ti-pencil-star text-2xl"></i>
-                        Write a Review
-                      </button>
-                    } @else if (showReviewForm) {
-                      <div class="p-6 glass rounded-2xl reviewForm" style="background: var(--primary-300-40);">
-                        <div class="flex items-center justify-between mb-4">
-                          <h4 class="text-lg font-semibold" style="color: var(--primary-700);">
-                            <i class="ti ti-pencil mr-2"></i>
-                            Write Your Review
-                          </h4>
-                          <button
-                            (click)="toggleReviewForm()"
-                            class="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                            style="background: var(--primary-400); color: white;">
-                            <i class="ti ti-x"></i>
-                          </button>
+                    <!-- Meal Types -->
+                    @if (getMealTypes().length > 0) {
+                      <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
+                          <i class="ti ti-tools-kitchen-2"></i>
+                          {{ t('meal_type') }}
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                          @for (mealType of getMealTypes(); track mealType) {
+                            <span class="px-4 py-2 rounded-xl glass hover:scale-105 transition-all" style="background: var(--primary-400); color: white;">
+                              {{ mealType }}
+                            </span>
+                          }
                         </div>
+                      </div>
+                    }
 
-                        <div class="mb-4">
-                          <label class="block text-sm font-semibold mb-2" style="color: var(--primary-700);">
-                            Your Rating *
-                          </label>
-                          <div class="flex gap-2">
-                            @for (i of [1,2,3,4,5]; track i) {
+                    <!-- Dish Types -->
+                    @if (getDishTypes().length > 0) {
+                      <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
+                          <i class="ti ti-chef-hat"></i>
+                          {{ t('dish_type') }}
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                          @for (dishType of getDishTypes(); track dishType) {
+                            <span class="px-4 py-2 rounded-xl glass hover:scale-105 transition-all" style="background: var(--primary-300-40); color: var(--primary-700);">
+                              {{ dishType }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Diet Labels Info -->
+                    @if (getDietLabels().length > 0) {
+                      <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
+                          <i class="ti ti-salad"></i>
+                          {{ t('diet_information') }}
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                          @for (label of getDietLabels(); track label) {
+                            <span class="px-4 py-2 rounded-xl glass hover:scale-105 transition-all" style="background: var(--primary-300-40); color: var(--primary-700);">
+                              {{ label }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Health Labels Info -->
+                    @if (getHealthLabels().length > 0) {
+                      <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center gap-2" style="color: var(--primary-700);">
+                          <i class="ti ti-heartbeat"></i>
+                          {{ t('health_information') }}
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                          @for (label of getHealthLabels(); track label) {
+                            <span class="px-4 py-2 rounded-xl glass hover:scale-105 transition-all">
+                              {{ label }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Cautions -->
+                    @if (getCautions().length > 0) {
+                      <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                          <i class="ti ti-alert-triangle"></i>
+                          {{ t('allergen_warnings') }}
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                          @for (caution of getCautions(); track caution) {
+                            <span class="px-4 py-2 rounded-xl glass hover:scale-105 transition-all">
+                              {{ caution }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Divider -->
+                    <div class="flex justify-center my-4">
+                      <hr class="border-t w-full" style="border-color: var(--primary-300);"/>
+                    </div>
+
+                    <!-- Nutritional Information -->
+                    <h3 class="text-xl font-semibold flex items-center gap-2" style="color: var(--primary-700);">
+                      <i class="ti ti-report"></i>
+                      {{ t('nutritional_information') }}
+                    </h3>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <!-- Calories -->
+                      <div class="flex flex-col items-center p-4 glass hover:scale-110 transition-all" style="background: var(--primary-200-40);">
+                        <i class="ti ti-flame text-3xl mb-2" style="color: var(--primary-500);"></i>
+                        <span class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('calories_kcal') }}</span>
+                        <span class="text-2xl font-bold" style="color: var(--primary-700);">{{ recipe?.calories || 0 }}</span>
+                        <span class="text-xs" style="color: var(--primary-400);">kcal</span>
+                      </div>
+
+                      <!-- Total Weight -->
+                      <div class="flex flex-col items-center p-4 glass hover:scale-110 transition-all" style="background: var(--primary-200-40);">
+                        <i class="ti ti-scale text-3xl mb-2" style="color: var(--primary-500);"></i>
+                        <span class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('total_weight_g') }}</span>
+                        <span class="text-2xl font-bold" style="color: var(--primary-700);">{{ recipe?.totalWeight || 0 }}</span>
+                        <span class="text-xs" style="color: var(--primary-400);">g</span>
+                      </div>
+
+                      <!-- Per Serving -->
+                      <div class="flex flex-col items-center p-4 glass hover:scale-110 transition-all" style="background: var(--primary-200-40);">
+                        <i class="ti ti-users text-3xl mb-2" style="color: var(--primary-500);"></i>
+                        <span class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('per_serving') }}</span>
+                        <span class="text-2xl font-bold" style="color: var(--primary-700);">{{ (recipe?.calories || 0) / (recipe?.people || 1) | number:'1.0-0' }}</span>
+                        <span class="text-xs" style="color: var(--primary-400);">kcal</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Reviews Panel -->
+              @if (activeTab === 'reviews') {
+                <div class="lg:col-span-2 reviewsContainer">
+                  <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+                       style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+                    @if (isRecipeAuthor && !isAdmin) {
+                      <div class="p-6 rounded-2xl text-center glass">
+                        <i class="ti ti-chef-hat text-4xl mb-2"></i>
+                        <p class="font-semibold text-lg mb-1">
+                          {{ t('this_is_your_recipe') }}
+                        </p>
+                        <p class="text-sm">
+                          {{ t('cannot_review_own') }}
+                        </p>
+                      </div>
+                    } @else if (isAuthenticated) {
+                      @if (!showReviewForm && !userHasReview) {
+                        <button
+                          (click)="toggleReviewForm()"
+                          class="w-full px-6 py-4 rounded-2xl text-base font-semibold transition-all hover:scale-[1.02] flex items-center justify-center gap-3"
+                          style="background: var(--gradient-primary); color: white;">
+                          <i class="ti ti-pencil-star text-2xl"></i>
+                          {{ t('write_a_review') }}
+                        </button>
+                      } @else if (showReviewForm) {
+                        <div class="p-6 glass rounded-2xl reviewForm" style="background: var(--primary-300-40);">
+                          <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-semibold" style="color: var(--primary-700);">
+                              <i class="ti ti-pencil mr-2"></i>
+                              {{ t('write_your_review') }}
+                            </h4>
+                            <button
+                              (click)="toggleReviewForm()"
+                              class="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                              style="background: var(--primary-400); color: white;">
+                              <i class="ti ti-x"></i>
+                            </button>
+                          </div>
+
+                          <div class="mb-4">
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--primary-700);">
+                              {{ t('your_rating') }} *
+                            </label>
+                            <div class="flex gap-2">
+                              @for (i of [1,2,3,4,5]; track i) {
+                                <button
+                                  type="button"
+                                  (click)="setRating(i)"
+                                  (mouseenter)="setHoverRating(i)"
+                                  (mouseleave)="clearHoverRating()"
+                                  class="transition-all hover:scale-125">
+                                  <i class="ti ti-star-filled text-3xl"
+                                     [style.color]="i <= (reviewHoverRating || newReview.rating) ? '#eab308' : 'var(--primary-300)'"></i>
+                                </button>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Rich text editotr -->
+                          <div class="mb-2">
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--primary-700);">
+                              {{ t('your_comment') }} *
+                            </label>
+                            <div class="flex gap-2 p-2 rounded-lg mb-2 w-max" style="background: var(--primary-200-40);">
                               <button
                                 type="button"
-                                (click)="setRating(i)"
-                                (mouseenter)="setHoverRating(i)"
-                                (mouseleave)="clearHoverRating()"
-                                class="transition-all hover:scale-125">
-                                <i class="ti ti-star-filled text-3xl"
-                                   [style.color]="i <= (reviewHoverRating || newReview.rating) ? '#eab308' : 'var(--primary-300)'"></i>
+                                (click)="applyFormat($event, 'bold')"
+                                class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
+                                style="background: var(--primary-300-40);"
+                                title="{{ t('bold') }}">
+                                <i class="ti ti-bold" style="color: var(--primary-700);"></i>
                               </button>
-                            }
-                          </div>
-                        </div>
+                              <button
+                                type="button"
+                                (click)="applyFormat($event, 'italic')"
+                                class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
+                                style="background: var(--primary-300-40);"
+                                title="{{ t('italic') }}">
+                                <i class="ti ti-italic" style="color: var(--primary-700);"></i>
+                              </button>
+                              <button
+                                type="button"
+                                (click)="applyFormat($event, 'underline')"
+                                class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
+                                style="background: var(--primary-300-40);"
+                                title="{{ t('underline') }}">
+                                <i class="ti ti-underline" style="color: var(--primary-700);"></i>
+                              </button>
+                              <div class="w-px mx-1" style="background: var(--primary-300);"></div>
+                              <button
+                                type="button"
+                                (click)="applyFormat($event, 'insertUnorderedList')"
+                                class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
+                                style="background: var(--primary-300-40);"
+                                title="{{ t('bullet_list') }}">
+                                <i class="ti ti-list" style="color: var(--primary-700);"></i>
+                              </button>
+                              <button
+                                type="button"
+                                (click)="applyFormat($event, 'insertOrderedList')"
+                                class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
+                                style="background: var(--primary-300-40);"
+                                title="{{ t('numbered_list') }}">
+                                <i class="ti ti-list-numbers" style="color: var(--primary-700);"></i>
+                              </button>
+                            </div>
 
-                        <!-- Rich text editotr -->
-                        <div class="mb-2">
-                          <label class="block text-sm font-semibold mb-2" style="color: var(--primary-700);">
-                            Your Comment *
-                          </label>
-                          <div class="flex gap-2 p-2 rounded-lg mb-2 w-max" style="background: var(--primary-200-40);">
-                            <button
-                              type="button"
-                              (click)="applyFormat($event, 'bold')"
-                              class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
-                              style="background: var(--primary-300-40);"
-                              title="Bold">
-                              <i class="ti ti-bold" style="color: var(--primary-700);"></i>
-                            </button>
-                            <button
-                              type="button"
-                              (click)="applyFormat($event, 'italic')"
-                              class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
-                              style="background: var(--primary-300-40);"
-                              title="Italic">
-                              <i class="ti ti-italic" style="color: var(--primary-700);"></i>
-                            </button>
-                            <button
-                              type="button"
-                              (click)="applyFormat($event, 'underline')"
-                              class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
-                              style="background: var(--primary-300-40);"
-                              title="Underline">
-                              <i class="ti ti-underline" style="color: var(--primary-700);"></i>
-                            </button>
-                            <div class="w-px mx-1" style="background: var(--primary-300);"></div>
-                            <button
-                              type="button"
-                              (click)="applyFormat($event, 'insertUnorderedList')"
-                              class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
-                              style="background: var(--primary-300-40);"
-                              title="Bullet List">
-                              <i class="ti ti-list" style="color: var(--primary-700);"></i>
-                            </button>
-                            <button
-                              type="button"
-                              (click)="applyFormat($event, 'insertOrderedList')"
-                              class="w-8 h-8 rounded flex items-center justify-center transition-all hover:scale-110 toolbar-button"
-                              style="background: var(--primary-300-40);"
-                              title="Numbered List">
-                              <i class="ti ti-list-numbers" style="color: var(--primary-700);"></i>
-                            </button>
-                          </div>
-
-                          <div
+                          <textarea
                             contenteditable="true"
                             (input)="onCommentInput($event)"
-                            class="w-full min-h-[150px] p-4 rounded-lg glass-input focus:outline-none reviewEditor"
-                            style="background: var(--primary-200-40); color: var(--primary-700); border: 2px solid var(--primary-300);"
-                            placeholder="Share your experience with this recipe...">
-                          </div>
+                            class="w-full min-h-[150px] p-4 rounded-lg focus:outline-none reviewEditor"
+                            style="background: var(--primary-100-40) !important; color: var(--primary-700); border: 2px solid var(--primary-300);"
+                            [placeholder]="t('share_experience')"></textarea>
                         </div>
 
-                        <div class="flex gap-3 mt-4">
-                          <button
-                            (click)="submitReview()"
-                            [class.disabled]="checkReview()"
-                            class="flex-1 px-6 py-3 rounded-xl text-base font-semibold transition-all hover:scale-[1.02]"
-                            style="background: var(--gradient-primary); color: white;">
-                            <i class="ti ti-send mr-2"></i>
-                            Submit Review
+                          <div class="flex gap-3 mt-4">
+                            <button
+                              (click)="submitReview()"
+                              [class.disabled]="checkReview()"
+                              class="flex-1 px-6 py-3 rounded-xl text-base font-semibold transition-all hover:scale-[1.02]"
+                              style="background: var(--gradient-primary); color: white;">
+                              <i class="ti ti-send mr-2"></i>
+                              {{ t('submit_review') }}
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    } @else {
+                      <div class="p-4 rounded-2xl text-center glass" style="background: var(--primary-300-40);">
+                        <p style="color: var(--primary-600);">
+                          <i class="ti ti-login mr-2"></i>
+                          {{ t('please_log_in_to_review') }}
+                        </p>
+                      </div>
+                    }
+
+                    <!-- User's Own Review (if authenticated and exists) -->
+                    @if (userReview) {
+                      <div class="p-6 glass rounded-2xl border-2" style="background: var(--primary-300-40); border-color: var(--primary-500);">
+                        <div class="flex items-center justify-between mb-3">
+                          <div class="flex items-center gap-2">
+                            <i class="ti ti-star-filled text-lg" style="color: var(--primary-500);"></i>
+                            <h4 class="text-lg font-semibold" style="color: var(--primary-700);">{{ t('your_review') }}</h4>
+                          </div>
+                          <button class="btn btn-primary text-sm flex flex-row gap-2 deleteBut hover:scale-110 min-h-10 min-w-10 text-nowrap transition-all"
+                                  [class.w-10]="!confirmDeleteReview"
+                                  [class.w-52]="confirmDeleteReview"
+                                  style="background: red" (click)="confirmDeleteReviewPrompt($event)" (blur)="cancelReviewDelete($event)">
+                            @if (!confirmDeleteReview) {
+                              <i class="ti ti-trash"></i>
+                            } @else {
+                              {{ t('are_you_sure') }}
+                              <button class="confirmDelete py-0.5 px-1.5 rounded-xl hover:bg-red-400 transition-all" (click)="deleteReview(userReview.id)">
+                                <i class="ti ti-check"></i>
+                              </button>
+                            }
                           </button>
+                        </div>
+                        <div class="flex items-start gap-3">
+                          <img *ngIf="user.profileImageString" class="object-cover w-12 h-12 rounded-full border-2"
+                               alt="Your profile"
+                               src="data:image/jpeg;base64,{{user.profileImageString}}"
+                               style="background: var(--primary-400); border-color: var(--primary-500);"/>
+                          <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                              <div>
+                                <p class="font-bold text-base" style="color: var(--primary-700);">{{ user?.username }}</p>
+                                <div class="flex items-center gap-1 mt-1">
+                                  @for (i of [1,2,3,4,5]; track i) {
+                                    <i class="ti ti-star-filled text-base"
+                                       [style.color]="i <= userReview.rating ? '#eab308' : 'var(--primary-300)'"></i>
+                                  }
+                                </div>
+                              </div>
+                              <span class="text-sm font-medium" style="color: var(--primary-500);">
+                                {{ formatReviewDate(userReview.createdAt) }}
+                              </span>
+                            </div>
+                            <div [innerHTML]="userReview.comment" class="mt-3 prose prose-sm max-w-none"
+                                 style="color: var(--primary-600);"></div>
+                          </div>
                         </div>
                       </div>
                     }
-                  } @else {
-                    <div class="p-4 rounded-2xl text-center glass" style="background: var(--primary-300-40);">
-                      <p style="color: var(--primary-600);">
-                        <i class="ti ti-login mr-2"></i>
-                        Please log in to write a review
-                      </p>
-                    </div>
-                  }
 
-                  <!-- User's Own Review (if authenticated and exists) -->
-                  @if (userReview) {
-                    <div class="p-6 glass rounded-2xl border-2" style="background: var(--primary-300-40); border-color: var(--primary-500);">
-                      <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                          <i class="ti ti-star-filled text-lg" style="color: var(--primary-500);"></i>
-                          <h4 class="text-lg font-semibold" style="color: var(--primary-700);">Your Review</h4>
-                        </div>
-                        <button
-                          (click)="deleteReview(userReview.id)"
-                          class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2 text-red-500"
-                          title="Delete your review">
-                          <i class="ti ti-trash text-red-500"></i>
-                          Delete
-                        </button>
-                      </div>
-                      <div class="flex items-start gap-3">
-                        <img class="w-12 h-12 rounded-full border-2"
-                             alt="Your profile"
-                             [src]="authorPfp"
-                             style="border-color: var(--primary-500);"/>
-                        <div class="flex-1">
-                          <div class="flex items-center justify-between mb-2">
-                            <div>
-                              <p class="font-bold text-base" style="color: var(--primary-700);">{{ user?.username }}</p>
-                              <div class="flex items-center gap-1 mt-1">
-                                @for (i of [1,2,3,4,5]; track i) {
-                                  <i class="ti ti-star-filled text-base"
-                                     [style.color]="i <= userReview.rating ? '#eab308' : 'var(--primary-300)'"></i>
-                                }
+                    <!-- All Reviews -->
+                    @if (recipe?.reviews?.length) {
+                      <div class="space-y-4">
+                        <h4 class="text-lg font-semibold flex items-center gap-2" style="color: var(--primary-700);">
+                          <i class="ti ti-messages"></i>
+                          {{ t('community_reviews') }}
+                        </h4>
+                        @for (review of uniqueReviews; track review.id) {
+                          <div class="p-5 glass rounded-2xl transition-all hover:scale-[1.01]"
+                               style="background: var(--primary-200-40);">
+                            <div class="flex items-start gap-3">
+                              <img class="w-10 h-10 rounded-full object-cover border-2"
+                                   style="background: var(--primary-400); border-color: var(--primary-500);"
+                                   src="{{review.authorPfp}}"
+                                   alt="User profile"/>
+                              <div class="flex-1">
+                                <div class="flex items-center justify-between mb-2">
+                                  <div>
+                                    <p class="font-semibold text-base" style="color: var(--primary-700);">
+                                      {{ review.authorUsername || review.author }}
+                                    </p>
+                                    <div class="flex items-center gap-1 mt-1">
+                                      @for (i of [1,2,3,4,5]; track i) {
+                                        <i class="ti ti-star-filled text-sm"
+                                           [style.color]="i <= review.rating ? '#eab308' : 'var(--primary-300)'"></i>
+                                      }
+                                    </div>
+                                  </div>
+                                  <span class="text-sm font-medium" style="color: var(--primary-400);">
+                                    {{ formatReviewDate(review.createdAt) }}
+                                  </span>
+                                </div>
+                                <div [innerHTML]="review.comment" class="mt-2 prose prose-sm max-w-none"
+                                     style="color: var(--primary-600);"></div>
                               </div>
                             </div>
-                            <span class="text-sm font-medium" style="color: var(--primary-500);">
-                              {{ formatReviewDate(userReview.createdAt) }}
-                            </span>
                           </div>
-                          <div [innerHTML]="userReview.comment" class="mt-3 prose prose-sm max-w-none"
-                               style="color: var(--primary-600);"></div>
-                        </div>
+                        }
+
+                        <!-- Load More Button -->
+                        @if (hasMoreReviews) {
+                          <button
+                            (click)="loadMoreReviews()"
+                            [disabled]="loadingReviews"
+                            class="w-full px-6 py-4 rounded-2xl text-base font-semibold transition-all hover:scale-[1.02] flex items-center justify-center gap-3"
+                            [class.opacity-50]="loadingReviews"
+                            style="background: var(--primary-400); color: white;">
+                            @if (loadingReviews) {
+                              <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:h-6"></div>
+                              {{ t('loading_more_reviews') }}
+                            } @else {
+                              <i class="ti ti-chevron-down text-xl"></i>
+                              {{ t('load_more_reviews') }}
+                            }
+                          </button>
+                        }
                       </div>
-                    </div>
-                  }
-
-                  <!-- All Reviews -->
-                  @if (reviews.length > 0) {
-                    <div class="space-y-4">
-                      <h4 class="text-lg font-semibold flex items-center gap-2" style="color: var(--primary-700);">
-                        <i class="ti ti-messages"></i>
-                        Community Reviews
-                      </h4>
-                      @for (review of reviews; track review.id) {
-                        <div class="p-5 glass rounded-2xl transition-all hover:scale-[1.01]"
-                             style="background: var(--primary-200-40);">
-                          <div class="flex items-start gap-3">
-                            <img class="w-10 h-10 rounded-full"
-                                 [src]="authorPfp"
-                                 alt="User profile"/>
-                            <div class="flex-1">
-                              <div class="flex items-center justify-between mb-2">
-                                <div>
-                                  <p class="font-semibold text-base" style="color: var(--primary-700);">
-                                    {{ review.authorUsername || review.author }}
-                                  </p>
-                                  <div class="flex items-center gap-1 mt-1">
-                                    @for (i of [1,2,3,4,5]; track i) {
-                                      <i class="ti ti-star-filled text-sm"
-                                         [style.color]="i <= review.rating ? '#eab308' : 'var(--primary-300)'"></i>
-                                    }
-                              </div>
-                            </div>
-                            <span class="text-sm font-medium" style="color: var(--primary-400);">
-                              {{ formatReviewDate(review.createdAt) }}
-                            </span>
-                          </div>
-                          <div [innerHTML]="review.comment" class="mt-2 prose prose-sm max-w-none"
-                                   style="color: var(--primary-600);"></div>
-                            </div>
-                          </div>
-                        </div>
-                      }
-
-                      <!-- Load More Button -->
-                      @if (hasMoreReviews) {
-                        <button
-                          (click)="loadMoreReviews()"
-                          [disabled]="loadingReviews"
-                          class="w-full px-6 py-4 rounded-2xl text-base font-semibold transition-all hover:scale-[1.02] flex items-center justify-center gap-3"
-                          [class.opacity-50]="loadingReviews"
-                          style="background: var(--primary-400); color: white;">
-                          @if (loadingReviews) {
-                            <i class="ti ti-loader animate-spin text-xl"></i>
-                            Loading more reviews...
-                          } @else {
-                            <i class="ti ti-chevron-down text-xl"></i>
-                            Load More Reviews
-                          }
-                        </button>
-                      }
-                    </div>
-                  } @else if (!userReview) {
-                    <div class="text-center py-8">
-                      <i class="ti ti-message-off text-6xl mb-4" style="color: var(--primary-300);"></i>
-                      <p class="text-lg" style="color: var(--primary-400);">No reviews yet</p>
-                      <p class="text-sm" style="color: var(--primary-400);">Be the first to review this recipe!</p>
-                    </div>
-                  }
+                    } @else if (!userReview) {
+                      <div class="text-center py-8">
+                        <i class="ti ti-message-off text-6xl mb-4" style="color: var(--primary-300);"></i>
+                        <p class="text-lg" style="color: var(--primary-400);">{{ t('no_reviews_yet') }}</p>
+                        <p class="text-sm" style="color: var(--primary-400);">{{ t('be_first_to_review') }}</p>
+                      </div>
+                    }
+                  </div>
                 </div>
-              </div>
-            }
+              }
+            </div>
           </div>
         </div>
         <div class="flex flex-col w-1/4">
@@ -604,7 +650,7 @@
                 <div class="flex w-full">
                   <h3 class="flex items-center text-xl font-semibold" style="color: var(--primary-700);">
                     <i class="ti ti-shopping-cart mr-2"></i>
-                    Ingredients
+                    {{ t('ingredients') }}
                   </h3>
                 </div>
                 <div class="flex items-center gap-2">
@@ -617,14 +663,14 @@
                             (touchend)="stopHold()"
                             [disabled]="currentServings <= 1"
                             class="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                            [style.background]="currentServings <= 1 ? 'var(--primary-200)' : 'var(--primary-500)'"
+                            [style.background]="currentServings <= 1 ? 'var(--primary-400)' : 'var(--primary-500)'"
                             [style.color]="'white'"
                             [style.opacity]="currentServings <= 1 ? '0.5' : '1'"
                             [style.cursor]="currentServings <= 1 ? 'not-allowed' : 'pointer'">
                       <i class="ti ti-minus"></i>
                     </button>
                     <span class="text-sm font-bold min-w-[4rem] text-center" style="color: var(--primary-700);">
-                      {{ currentServings }} {{ currentServings === 1 ? 'person' : 'people' }}
+                      {{ currentServings }} {{ t('people') }}
                     </span>
                     <button (mousedown)="startHoldIncrement()"
                             (mouseup)="stopHold()"
@@ -675,7 +721,7 @@
 
   <!-- Focus Mode Modal -->
   @if (focusMode) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center focus-mode-overlay"
+    <div class="fixed inset-0 z-50 flex items-center justify-center visibleBackdrop"
          [class.closing]="focusModeClosing"
          style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;">
       <div class="w-11/12 max-w-4xl rounded-3xl shadow-2xl p-8 relative focus-mode-modal"
@@ -683,7 +729,7 @@
            style="background: var(--primary-200);">
 
         <!-- Close Button -->
-        <button (click)="exitFocusMode()"
+        <button (click)="exitFocusMode($event)"
                 class="absolute top-6 right-6 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90"
                 style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);">
           <i class="ti ti-x text-2xl"></i>
@@ -693,7 +739,7 @@
         <div class="flex flex-col items-center gap-6 mb-8">
           <div class="flex items-center gap-3">
             <i class="ti ti-clock text-4xl" style="color: var(--primary-600);"></i>
-            <span class="text-2xl font-semibold" style="color: var(--primary-600);">Cooking Timer</span>
+            <span class="text-2xl font-semibold" style="color: var(--primary-600);">{{ t('cooking_timer') }}</span>
           </div>
 
           <div class="text-8xl font-mono font-bold tracking-wider focus-timer" style="color: var(--primary-700);">
@@ -706,27 +752,27 @@
                     class="px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-3 transition-all hover:scale-105 shadow-lg"
                     [ngClass]="{'opacity-50 cursor-not-allowed': timerRunning}"
                     style="background: var(--gradient-primary); color: white;">
-              <i class="ti ti-player-play text-2xl"></i> Start
+              <i class="ti ti-player-play text-2xl"></i> {{ t('start') }}
             </button>
 
             <button (click)="pauseTimer()" [disabled]="!timerRunning"
                     class="px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-3 transition-all hover:scale-105 shadow-lg"
                     [ngClass]="{'opacity-50 cursor-not-allowed': !timerRunning}"
                     style="background: var(--gradient-primary); color: white;">
-              <i class="ti ti-player-pause text-2xl"></i> Pause
+              <i class="ti ti-player-pause text-2xl"></i> {{ t('pause') }}
             </button>
 
             <button (click)="resetTimer()"
                     class="px-8 py-4 rounded-2xl text-lg font-semibold flex items-center gap-3 transition-all hover:scale-105 shadow-lg"
                     style="background: var(--gradient-primary); color: white;">
-              <i class="ti ti-refresh text-2xl"></i> Reset
+              <i class="ti ti-refresh text-2xl"></i> {{ t('reset') }}
             </button>
           </div>
         </div>
 
         <!-- Current Step Display -->
         <div class="rounded-2xl p-8 mb-6 focus-step-card overflow-hidden"
-             style="background: var(--primary-400); color: white;">
+             style="background: var(--primary-400); color: var(--primary-text);">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold"
@@ -750,7 +796,7 @@
                   [ngClass]="{'opacity-40 cursor-not-allowed': currentStep === 0}"
                   style="background: var(--primary-300); color: var(--primary-text);">
             <i class="ti ti-arrow-left text-xl"></i>
-            Previous
+            {{ t('previous') }}
           </button>
 
           <!-- Step Progress Dots -->
@@ -778,3 +824,11 @@
     </div>
   }
 </div>
+
+<app-collection-card
+  [mode]="'add-dialog'"
+  [recipeId]="selectedRecipeId"
+  [showDialog]="showAddToCollectionDialog"
+  (onClose)="closeAddToCollection()"
+  (onAdded)="onRecipeAddedToCollection()">
+</app-collection-card>

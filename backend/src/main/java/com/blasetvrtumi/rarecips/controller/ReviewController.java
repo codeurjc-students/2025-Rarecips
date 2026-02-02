@@ -31,7 +31,7 @@ public class ReviewController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review submitted successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Recipe not found")
     })
     @PutMapping
@@ -39,8 +39,8 @@ public class ReviewController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        if (username == null || username.equals("anonymousUser")) {
-            return ResponseEntity.status(401).body("You must be logged in to submit a review");
+        if (username == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(403).body("You must be logged in to submit a review");
         }
 
         User user = userService.getUserByUsername(username);
@@ -48,7 +48,8 @@ public class ReviewController {
             return ResponseEntity.status(404).body("User not found");
         }
 
-        review.setAuthor(user);
+        User userAuthor = this.userService.getUserByUsername(username);
+        review.setAuthor(userAuthor);
 
         try {
             Review savedReview = reviewService.saveReview(review);
@@ -64,9 +65,9 @@ public class ReviewController {
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = "Recipe not found")
     })
-    @GetMapping("/recipe/{recipeId}")
+    @GetMapping
     public ResponseEntity<Map<String, Object>> getReviews(
-            @PathVariable Long recipeId,
+            @RequestParam Long recipeId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
@@ -92,9 +93,15 @@ public class ReviewController {
             @ApiResponse(responseCode = "403", description = "Unauthorized to delete this review")
     })
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId) {
-        reviewService.deleteReview(reviewId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId, Authentication authentication) {
+        User user = userService.getUserByUsername(authentication.getName());
+        Review review = reviewService.findById(reviewId);
+        if (review.getAuthor().equals(authentication.getName()) || user.getRole().equals("ADMIN")) {
+            reviewService.deleteReview(reviewId);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(403).body("You are not authorized to delete this review");
+        }
     }
 
 }

@@ -59,7 +59,6 @@ public class UIRecipeTest extends BaseE2ETest {
 
         assertFalse(detailTitle.isEmpty(), "Recipe detail title should not be empty");
 
-        // Si los títulos son diferentes, al menos verificar que hay contenido
         if (!recipeTitle.equals(detailTitle)) {
             assertTrue(detailTitle.length() > 0, "Recipe detail should have a title");
         } else {

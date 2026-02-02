@@ -18,6 +18,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByAuthor(User author);
 
+    Page<Recipe> findByAuthorUsername(String username, Pageable pageable);
+
     @Query("SELECT DISTINCT ct FROM Recipe r JOIN r.cuisineType ct WHERE ct IS NOT NULL")
     List<String> findDistinctCuisineTypes();
 
@@ -122,6 +124,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     @Query("SELECT COUNT(r) FROM Recipe r JOIN r.mealTypes mt WHERE mt = :mealType")
     long countByMealType(@Param("mealType") String mealType);
+
+    @Query("SELECT r FROM Recipe r LEFT JOIN r.reviews rev GROUP BY r.id ORDER BY COUNT(rev) DESC")
+    Page<Recipe> findAllOrderByReviewsCountDesc(Pageable pageable);
 }
-
-

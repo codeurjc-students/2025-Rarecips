@@ -49,7 +49,6 @@ public class RecipeServiceTest {
     }
 
     private User createMockUser() {
-        // USAR EL CONSTRUCTOR EN LUGAR DE SETTERS
         User user = new User(
                 "testuser",           // username
                 "password",           // password

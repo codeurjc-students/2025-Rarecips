@@ -29,7 +29,8 @@ export const routes: Routes = [
   {path: "ingredients", component: IngredientsComponent},
   {path: "admin-panel", component: AdminPanelComponent},
   {path: "health-report", component: HealthReportComponent},
-  {path: "error", component: ErrorComponent}
+  {path: "error", component: ErrorComponent},
+  {path: "change-password", component: AuthComponent}
 ];
 
 @NgModule({

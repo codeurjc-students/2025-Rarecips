@@ -2,23 +2,23 @@ package com.blasetvrtumi.rarecips.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import com.blasetvrtumi.rarecips.security.jwt.AuthResponse;
 import com.blasetvrtumi.rarecips.security.jwt.AuthService;
 import com.blasetvrtumi.rarecips.service.UserService;
 import com.blasetvrtumi.rarecips.security.jwt.AuthRequest;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -36,7 +36,6 @@ public class AuthController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
             }),
             @ApiResponse(responseCode = "400", description = "Invalid credentials"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
     @PutMapping("/login")
     public ResponseEntity<AuthResponse> login(
@@ -53,7 +52,6 @@ public class AuthController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
             }),
             @ApiResponse(responseCode = "400", description = "Invalid registration data"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
     @PutMapping("/signup")
     public ResponseEntity<AuthResponse> signup(@RequestBody AuthRequest signupRequest) {
@@ -109,7 +107,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usernames retrieved successfully", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
-            })
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @GetMapping("/usernames")
     public ResponseEntity<String[]> getAllUsernames() {
@@ -124,9 +123,9 @@ public class AuthController {
             })
     })
     @GetMapping("/emails")
-    public ResponseEntity<String[]> getAllEmails() {
-        String[] emails = userService.getAllEmails();
-        return ResponseEntity.ok(emails);
+    public ResponseEntity<Boolean> getAllEmails(@RequestParam String email) {
+        boolean exists = userService.existsByEmail(email);
+        return ResponseEntity.ok(exists);
     }
 
     @Operation(summary = "Logout")
@@ -138,8 +137,10 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
     @PutMapping("/logout")
-    public ResponseEntity<AuthResponse> logOut(HttpServletRequest request, HttpServletResponse response) {
-
+    public ResponseEntity<AuthResponse> logOut(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        if (!authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(new AuthResponse(AuthResponse.Status.FAILURE, "Unauthorized access"));
+        }
         return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS, authService.logout(request, response)));
     }
 

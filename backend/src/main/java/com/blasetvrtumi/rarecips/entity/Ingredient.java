@@ -19,12 +19,18 @@ public class Ingredient {
     @JsonView
     private String image;
 
+    @JsonView
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String imageString;
+
     public Ingredient() {
     }
 
-    public Ingredient(String food, String image) {
+    public Ingredient(String food, String image, String imageString) {
         this.food = food;
         this.image = image;
+        this.imageString = imageString;
     }
 
     public Long getId() {
@@ -39,4 +45,11 @@ public class Ingredient {
         this.food = food;
     }
 
+    public String getImageString() {
+        return imageString;
+    }
+
+    public void setImageString(String imageString) {
+        this.imageString = imageString;
+    }
 }

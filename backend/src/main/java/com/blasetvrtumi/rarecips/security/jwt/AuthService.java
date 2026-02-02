@@ -1,6 +1,7 @@
-
 package com.blasetvrtumi.rarecips.security.jwt;
 
+import com.blasetvrtumi.rarecips.entity.Recipe;
+import com.blasetvrtumi.rarecips.entity.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.slf4j.Logger;
@@ -21,11 +22,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.util.List;
+
 @Service
 public class AuthService {
 
-    // QUITAR
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
 
     @Autowired
@@ -42,6 +43,13 @@ public class AuthService {
 
     @Autowired
     private JwtCookieManager cookieUtil;
+
+    @Autowired
+    private com.blasetvrtumi.rarecips.service.MailService mailService;
+    @Autowired
+    private com.blasetvrtumi.rarecips.service.RecipeService recipeService;
+    @Autowired
+    private com.blasetvrtumi.rarecips.repository.UserRepository userRepository;
 
     public ResponseEntity<AuthResponse> login(AuthRequest authRequest, String encryptedAccessToken, String
             encryptedRefreshToken) {
@@ -94,10 +102,12 @@ public class AuthService {
     }
 
     public ResponseEntity<AuthResponse> signup(AuthRequest signupRequest) {
-
         try {
             userDetailsService.createUser(signupRequest.getUsername(), signupRequest.getEmail(),
                     signupRequest.getPassword());
+
+            User user = userRepository.findByUsername(signupRequest.getUsername());
+            mailService.sendWelcomeEmail(user.getEmail(), signupRequest.getPreferences().get("baseUrl"), signupRequest.getPreferences().get("lang"), signupRequest.getPreferences().get("theme"), user.getUsername());
 
             AuthResponse signupResponse = new AuthResponse(AuthResponse.Status.SUCCESS,
                     "User registered successfully. You can now log in.");

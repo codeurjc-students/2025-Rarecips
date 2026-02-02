@@ -1,7 +1,7 @@
 import {User} from "../models/user.model";
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {catchError, map, Observable, of, throwError, tap} from "rxjs";
+import {catchError, map, Observable, of, throwError} from "rxjs";
 
 @Injectable({
   providedIn: "root"
@@ -22,7 +22,8 @@ export class SessionService {
     );
   }
 
-  signup(user: { username: string, email: string, password: string }): Observable<any> {
+  signup(user: { username: string, email: string, password: string,
+    preferences: object }): Observable<any> {
     return this.httpClient.put(this.baseUrl + "signup", user, {withCredentials: true}).pipe(
       catchError(error => this.handleError(error))
     );
@@ -55,9 +56,9 @@ export class SessionService {
     );
   }
 
-  getEmailList(): Observable<string[]> {
-    return this.httpClient.get<string[]>(this.baseUrl + "emails").pipe(
-      catchError(() => of([]))
+  isEmailAvailable(email: string): Observable<boolean> {
+    return this.httpClient.get<boolean>(this.baseUrl + `emails?email=${email}`).pipe(
+      catchError(() => of(false))
     );
   }
 

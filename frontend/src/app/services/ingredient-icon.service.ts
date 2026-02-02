@@ -377,6 +377,50 @@ export class IngredientIconService {
     'box': 'Miscellaneous',
     'package': 'Miscellaneous',
   };
+  private categoryTranslations: { [key: string]: { [lang: string]: string } } = {
+    'Fruit': {
+      es: 'Fruta', en: 'Fruit', fr: 'Fruit', zh: '水果', ja: 'フルーツ'
+    },
+    'Vegetables': {
+      es: 'Verduras', en: 'Vegetables', fr: 'Légumes', zh: '蔬菜', ja: '野菜'
+    },
+    'Meat': {
+      es: 'Carne', en: 'Meat', fr: 'Viande', zh: '肉类', ja: '肉'
+    },
+    'Fish': {
+      es: 'Pescado y marisco', en: 'Fish & Seafood', fr: 'Poisson & Fruits de mer', zh: '鱼和海鲜', ja: '魚介類'
+    },
+    'Dairy': {
+      es: 'Lácteos', en: 'Dairy', fr: 'Produits laitiers', zh: '乳制品', ja: '乳製品'
+    },
+    'Egg': {
+      es: 'Huevo', en: 'Egg', fr: 'Œuf', zh: '蛋', ja: '卵'
+    },
+    'Bread & Grain': {
+      es: 'Pan y cereales', en: 'Bread & Grain', fr: 'Pain & Céréales', zh: '面包和谷物', ja: 'パン・穀物'
+    },
+    'Drinks': {
+      es: 'Bebidas', en: 'Drinks', fr: 'Boissons', zh: '饮料', ja: '飲み物'
+    },
+    'Sweets & Desserts': {
+      es: 'Dulces y postres', en: 'Sweets & Desserts', fr: 'Desserts & Sucreries', zh: '甜点', ja: 'スイーツ・デザート'
+    },
+    'Condiments': {
+      es: 'Condimentos', en: 'Condiments', fr: 'Condiments', zh: '调味品', ja: '調味料'
+    },
+    'Nuts & Seeds': {
+      es: 'Frutos secos y semillas', en: 'Nuts & Seeds', fr: 'Noix & Graines', zh: '坚果和种子', ja: 'ナッツ・種子'
+    },
+    'Legumes': {
+      es: 'Legumbres', en: 'Legumes', fr: 'Légumineuses', zh: '豆类', ja: '豆類'
+    },
+    'Fast Food': {
+      es: 'Comida rápida', en: 'Fast Food', fr: 'Restauration rapide', zh: '快餐', ja: 'ファストフード'
+    },
+    'Miscellaneous': {
+      es: 'Varios', en: 'Miscellaneous', fr: 'Divers', zh: '杂项', ja: 'その他'
+    }
+  };
 
   constructor() { }
 
@@ -409,4 +453,3 @@ export class IngredientIconService {
     return 'Others';
   }
 }
-

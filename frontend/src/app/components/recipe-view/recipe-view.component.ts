@@ -1,16 +1,23 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, SecurityContext} from '@angular/core';
 import {RecipeService} from '../../services/recipe.service';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Recipe} from '../../models/recipe.model';
 import {Review} from '../../models/review.model';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {IngredientIconService} from '../../services/ingredient-icon.service';
-import {Subject, takeUntil} from 'rxjs';
+import {firstValueFrom, Subject, takeUntil} from 'rxjs';
 import {SessionService} from '../../services/session.service';
 import {UserService} from '../../services/user.service';
 import {FormsModule} from '@angular/forms';
 import {ReviewService} from '../../services/review.service';
 import {Ingredient} from '../../models/ingredient.model';
+import {RecipeCollectionService} from '../../services/recipe-collection.service';
+import {RecipeCollection} from '../../models/recipe-collection.model';
+import {CollectionCardComponent} from '../shared/collection-card/collection-card.component';
+import {DomSanitizer} from '@angular/platform-browser';
+import { TranslatorService } from '../../services/translator.service';
+import {ThemeService} from '../../services/theme.service';
+import {ActivityService} from '../../services/activity.service';
 
 
 @Component({
@@ -20,21 +27,19 @@ import {Ingredient} from '../../models/ingredient.model';
     RouterLink,
     CommonModule,
     FormsModule,
-    NgOptimizedImage
+    CollectionCardComponent
   ],
   styleUrls: ['./recipe-view.component.css']
 })
 export class RecipeViewComponent implements OnInit {
 
   // User interactions
-  isLiked = false;
-  isSaved = false;
-  userRating = 0;
   recipe: Recipe | null = null;
 
   activeTab: 'instructions' | 'nutrition' | 'reviews' = 'instructions';
   user: any = null;
   authorPfp: string = '';
+  defaultPfp: string = '';
   isAuthenticated: any;
   created: string | number | Date = "";
   lastUpdated: string | number | Date = "";
@@ -61,6 +66,38 @@ export class RecipeViewComponent implements OnInit {
 
   // Review properties
   showReviewForm: boolean = false;
+  showDeleteModal: boolean = false;
+  selectedRecipeId: number | undefined = -1;
+  showAddToCollectionDialog: boolean = false;
+
+    openDeleteModal() {
+      this.showDeleteModal = true;
+      document.getElementsByTagName("html")[0].style.overflow = 'hidden';
+    }
+
+    closeDeleteModal(event: Event) {
+      ((event?.target as HTMLElement).closest('.visibleBackdrop')?.classList.remove('visibleBackdrop'));
+      setTimeout(() => this.showDeleteModal = false, 500);
+    }
+
+    onDeleteBackdropClick(event: MouseEvent) {
+      if (event.target === event.currentTarget) {
+        this.closeDeleteModal(event);
+      }
+    }
+
+    async confirmDeleteRecipe(event: Event) {
+      const id: number = this.activatedRoute.snapshot.params['id'];
+        this.recipeService.deleteRecipe(id).subscribe({
+        next: () => {
+          this.router.navigate(["/"])
+        },
+        error: (error) => {
+          this.router.navigate(['/error'], {state: {status: error.status, reason: error.message}});
+        }
+      })
+      this.closeDeleteModal(event);
+    }
   newReview: {
     rating: number;
     comment: string;
@@ -72,7 +109,10 @@ export class RecipeViewComponent implements OnInit {
   private selection: Selection | null = null;
   animationMode: string = '';
 
-  reviews: Review[] = [];
+  logos: Map<string, string> = new Map();
+
+  reviews: Set<any> = new Set<Review>();
+  uniqueReviews: Review[] = [];
   userReview: Review | null = null;
   reviewsPage: number = 0;
   reviewsPageSize: number = 10;
@@ -83,47 +123,95 @@ export class RecipeViewComponent implements OnInit {
 
   userIngredients: Set<Ingredient> = new Set<Ingredient>();
 
+  userCollections: RecipeCollection[] = [];
+  favoritesCollection: RecipeCollection | null = null;
+  showCollectionModal: boolean = false;
+  isInFavorites: boolean = false;
+  isAdmin: boolean = false;
+
+  confirmDeleteReview: boolean = false;
+
   constructor(
     private router: Router,
     private recipeService: RecipeService,
     private userService: UserService,
     private activatedRoute: ActivatedRoute,
     private sessionService: SessionService,
+    private themeService: ThemeService,
     private reviewService: ReviewService,
-    public ingredientIconService: IngredientIconService
+    private collectionService: RecipeCollectionService,
+    public ingredientIconService: IngredientIconService,
+    private activityService: ActivityService,
+    private sanitizer: DomSanitizer,
+    private translatorService: TranslatorService
   ) {}
 
-  ngOnInit() {
-    this.loadRecipe();
+  t(key: string): string {
+    return this.translatorService.translate(key);
+  }
 
-    this.sessionService.getLoggedUser().pipe(
-      takeUntil(new Subject<void>())
-    ).subscribe({
-      next: user => {
-        if (!user) {
-          this.isAuthenticated = false;
-          this.loadReviews();
-          return;
-        }
-        this.user = user;
-        this.isAuthenticated = true;
-
-        this.isRecipeAuthor = this.recipe?.author === user.username;
-
-        this.loadReviews();
-
-        this.userService.getUserIngredients(user.username).subscribe({
-          next: (ingredients: Ingredient[]) => {
-            this.userIngredients = new Set<Ingredient>(ingredients);
-          }
-        });
-      },
-      error: () => {
-        this.isAuthenticated = false;
-        this.loadReviews();
+  private getUniqueReviewsArray(): Review[] {
+    const seen = new Set<number>();
+    const unique: Review[] = [];
+    this.reviews.forEach((review: Review) => {
+      if (!seen.has(Number(review.id))) {
+        seen.add(Number(review.id));
+        unique.unshift(review);
       }
     });
+    return unique;
+  }
 
+  async ngOnInit() {
+    await this.initAll();
+    this.uniqueReviews = this.getUniqueReviewsArray();
+  }
+
+  private async initAll() {
+    this.logos = this.themeService.getLogos();
+
+    this.userService.getDefaultPfp().subscribe({
+      next: (data: any) => {
+        this.defaultPfp = data.profileImageString;
+      }
+    })
+
+    await this.loadRecipe();
+    await this.loadReviews();
+    await new Promise<void>((resolve) => {
+      this.sessionService.getLoggedUser().pipe(
+        takeUntil(new Subject<void>())
+      ).subscribe({
+        next: async user => {
+          if (!user) {
+            this.isAuthenticated = false;
+            await this.loadReviews();
+            this.uniqueReviews = this.getUniqueReviewsArray();
+            resolve();
+            return;
+          }
+          this.user = user;
+          this.isAuthenticated = true;
+          this.isRecipeAuthor = this.recipe?.author === user.username;
+          this.isAdmin = user.role.includes('ADMIN');
+          await this.loadReviews();
+          this.uniqueReviews = this.getUniqueReviewsArray();
+          this.userService.getUserIngredients(user.username).subscribe({
+            next: (ingredients: Ingredient[]) => {
+              this.userIngredients = new Set<Ingredient>(ingredients);
+            }
+          });
+          this.loadUserCollections(user.username);
+          resolve();
+        },
+        error: async () => {
+          this.isAuthenticated = false;
+          await this.loadReviews();
+          this.uniqueReviews = this.getUniqueReviewsArray();
+          resolve();
+        }
+      });
+    });
     if (this.recipe?.createdAt) {
       const createdDate = new Date(this.recipe.createdAt);
       const day = String(createdDate.getDate()).padStart(2, '0');
@@ -131,7 +219,6 @@ export class RecipeViewComponent implements OnInit {
       const year = createdDate.getFullYear();
       this.created = `${day}/${month}/${year}`;
     }
-
     if (this.recipe?.updatedAt) {
       const updatedDate = new Date(this.recipe.updatedAt);
       const day = String(updatedDate.getDate()).padStart(2, '0');
@@ -139,11 +226,9 @@ export class RecipeViewComponent implements OnInit {
       const year = updatedDate.getFullYear();
       this.lastUpdated = `${day}/${month}/${year}`;
     }
-
     if (this.recipe?.totalTime) {
       this.time = this.recipe.totalTime * 60;
     }
-
     addEventListener('keydown', (event) => {
       if (!this.focusMode) return;
       if (event?.key === 'ArrowRight') {
@@ -153,15 +238,17 @@ export class RecipeViewComponent implements OnInit {
       } else if (event?.key === 'Escape') {
         this.exitFocusMode();
       }
-    })
+    });
   }
 
-  loadRecipe(): void {
+  async loadRecipe(): Promise<void> {
     const id = this.activatedRoute.snapshot.params['id'];
+
+
+    this.recipe = await firstValueFrom(this.recipeService.getRecipeById(this.activatedRoute.snapshot.params['id']));
     this.recipeService.getRecipeById(id).subscribe({
       next: (recipe) => {
         this.recipe = recipe;
-
         if (this.recipe?.people) {
           this.originalServings = this.recipe.people;
           this.currentServings = this.recipe.people;
@@ -170,13 +257,11 @@ export class RecipeViewComponent implements OnInit {
 
         if (this.recipe?.author) {
           this.userService.getUserByUsername(<string>this.recipe?.author).subscribe((res) => {
-            this.authorPfp = "data:image/png;base6," + res.profileImageString;
+            if (res.profileImageString) {
+              this.authorPfp = "data:image/png;base64," + res.profileImageString;
+            }
           });
-        } else {
-          this.authorPfp = '/assets/img/user.png';
         }
-
-        console.log(this.authorPfp)
 
         if (this.recipe?.createdAt) {
           const createdDate = new Date(this.recipe.createdAt);
@@ -219,14 +304,39 @@ export class RecipeViewComponent implements OnInit {
   }
 
   getDifficultyLabel(): string {
-    if (!this.recipe) return 'Medium';
+    if (!this.recipe) return this.t('medium');
     switch(this.recipe.difficulty) {
-      case 1: return 'Easy';
-      case 2: return 'Easy';
-      case 3: return 'Medium';
-      case 4: return 'Hard';
-      case 5: return 'Hard';
-      default: return 'Medium';
+      case 1: return this.t('very_easy');
+      case 2: return this.t('easy');
+      case 3: return this.t('medium');
+      case 4: return this.t('hard');
+      case 5: return this.t('very_hard');
+      default: return this.t('medium');
+    }
+  }
+
+  openAddToCollection(recipeId: number | undefined, event: Event): void {
+    event.stopPropagation();
+
+    if (!this.sessionService.currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.selectedRecipeId = recipeId;
+    this.showAddToCollectionDialog = true;
+    document.getElementsByTagName("html")[0].style.overflow = 'hidden';
+  }
+
+  closeAddToCollection(): void {
+    this.showAddToCollectionDialog = false;
+    this.selectedRecipeId = undefined;
+  }
+
+  onRecipeAddedToCollection(): void {
+    this.closeAddToCollection();
+    if (this.sessionService.currentUser) {
+      this.loadUserCollections(this.sessionService.currentUser.username);
     }
   }
 
@@ -278,6 +388,7 @@ export class RecipeViewComponent implements OnInit {
 
   startTimer() {
     this.focusMode = true;
+    document.getElementsByTagName("html")[0].style.overflow = 'hidden';
     this.focusModeClosing = false;
     this.currentStep = 0;
     document.body.style.overflow = 'hidden';
@@ -348,9 +459,10 @@ export class RecipeViewComponent implements OnInit {
     }
   }
 
-  exitFocusMode() {
-    this.focusModeClosing = true;
+  exitFocusMode(event: Event | null = null) {
+    ((event?.target as HTMLElement).closest('.visibleBackdrop')?.classList.remove('visibleBackdrop'));
     setTimeout(() => {
+      this.focusModeClosing = true;
       this.focusMode = false;
       this.focusModeClosing = false;
       this.resetTimer();
@@ -474,7 +586,7 @@ export class RecipeViewComponent implements OnInit {
       return;
     }
 
-    const sanitizedComment = this.sanitizeHtml(this.newReview.comment);
+    const sanitizedComment = this.sanitizer.sanitize(SecurityContext.HTML, this.sanitizer.bypassSecurityTrustHtml(this.newReview.comment)) || '';
     reviewData.comment = sanitizedComment;
 
     this.reviewService.submitReview(reviewData).subscribe({
@@ -484,7 +596,6 @@ export class RecipeViewComponent implements OnInit {
         this.userHasReview = true;
         this.loadRecipe();
         this.reviewsPage = 0;
-        this.reviews = [];
         this.userReview = null;
         this.loadReviews();
       },
@@ -494,50 +605,79 @@ export class RecipeViewComponent implements OnInit {
     });
   }
 
-  loadReviews() {
-    if (!this.recipe?.id) return;
+  async loadReviews(): Promise<Set<any>> {
+    if (!this.recipe?.id) return Promise.resolve(new Set<any>());
 
     this.loadingReviews = true;
-    this.reviewService.getReviewsByRecipeId(this.recipe.id, this.reviewsPage, this.reviewsPageSize).subscribe({
-      next: (data) => {
-        const newReviews = data.reviews || [];
+    return new Promise((resolve, reject) => {
+      this.reviewService.getReviewsByRecipeId(this.recipe?.id, this.reviewsPage, this.reviewsPageSize).subscribe({
+        next: async (data) => {
+          const newReviews = data.reviews || [];
+          await newReviews.map(async (r: Review) => {
+            try {
+              let user: any;
+              if (r.authorUsername) user = await firstValueFrom(this.userService.getUserByUsername(r.authorUsername));
+              r.authorPfp = "data:image/png;base64," + user?.profileImageString;
+            } catch {
+              r.authorPfp = '/assets/img/user.png';
+            }
+            if (!this.reviewsPage) this.reviews.add(r)
+            this.reviews.forEach((existingReview: Review, index: number) => {
+              if (existingReview.id === r.id) {
 
-        if (this.isAuthenticated && this.user) {
-          const userReviewIndex = newReviews.findIndex((r: Review) =>
-            (r.authorUsername || r.author) === this.user.username
-          );
-          if (userReviewIndex !== -1) {
-            this.userReview = newReviews.splice(userReviewIndex, 1)[0];
-            this.userHasReview = true;
-          } else if (this.reviewsPage === 0) {
-            this.userHasReview = false;
-            this.userReview = null;
+              } else {
+                this.reviews.add(r)
+              }
+            })
+          });
+
+          if (this.isAuthenticated && this.user) {
+            const userReviewIndex = newReviews.findIndex((r: Review) =>
+              (r.authorUsername || r.author) === this.user.username
+            );
+            if (userReviewIndex !== -1) {
+              this.userReview = newReviews.splice(userReviewIndex, 1)[0];
+              this.userHasReview = true;
+            } else if (this.reviewsPage === 0) {
+              this.userHasReview = false;
+              this.userReview = null;
+            }
           }
-        }
 
-        this.reviews = [...this.reviews, ...newReviews];
-        this.hasMoreReviews = data.hasMore || false;
-        this.loadingReviews = false;
-      },
-      error: (error) => {
-        console.error('Error loading reviews:', error);
-        this.loadingReviews = false;
-      }
+          this.hasMoreReviews = data.hasMore || false;
+          this.loadingReviews = false;
+          resolve(this.reviews);
+        },
+        error: (error) => {
+          console.error('Error loading reviews:', error);
+          this.loadingReviews = false;
+          reject(error);
+        }
+      });
     });
   }
 
-  deleteReview(reviewId: string) {
-    if (!confirm('Are you sure you want to delete your review?')) {
-      return;
+  confirmDeleteReviewPrompt(event: Event) {
+    event.stopPropagation();
+    this.confirmDeleteReview = true;
+  }
+
+  cancelReviewDelete(event: FocusEvent) {
+    if (!event.relatedTarget || !(<HTMLElement>event.relatedTarget).classList.contains('confirmDelete')) {
+      this.confirmDeleteReview = false;
     }
+  }
+
+  deleteReview(reviewId: string) {
 
     this.reviewService.deleteReview(reviewId).subscribe({
       next: () => {
+        this.confirmDeleteReview = false;
         this.userReview = null;
         this.userHasReview = false;
         this.loadRecipe();
         this.reviewsPage = 0;
-        this.reviews = [];
+        this.reviews = new Set<Review>();
         this.loadReviews();
       },
       error: (error) => {
@@ -559,84 +699,19 @@ export class RecipeViewComponent implements OnInit {
     const diffMs = now.getTime() - reviewDate.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return `${Math.floor(diffDays / 365)} years ago`;
-  }
+    const relativeDate = new Intl.RelativeTimeFormat(this.translatorService.getLang(), { numeric: "auto" });
 
-  sanitizeHtml(html: string): string {
-    if (!html) return '';
-
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-
-    const allowedTags = ['b', 'i', 'u', 'strong', 'em', 'p', 'br', 'ul', 'ol', 'li'];
-
-    const cleanNode = (node: Node): Node | null => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        return node.cloneNode(false);
-      }
-
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        const element = node as Element;
-        const tagName = element.tagName.toLowerCase();
-
-        if (!allowedTags.includes(tagName)) {
-          const fragment = document.createDocumentFragment();
-          Array.from(node.childNodes).forEach(child => {
-            const cleanedChild = cleanNode(child);
-            if (cleanedChild) fragment.appendChild(cleanedChild);
-          });
-          return fragment;
-        }
-
-        const cleanElement = document.createElement(tagName);
-
-        Array.from(node.childNodes).forEach(child => {
-          const cleanedChild = cleanNode(child);
-          if (cleanedChild) cleanElement.appendChild(cleanedChild);
-        });
-
-        return cleanElement;
-      }
-
-      return null;
-    };
-
-    const cleanDiv = document.createElement('div');
-    Array.from(temp.childNodes).forEach(child => {
-      const cleanedChild = cleanNode(child);
-      if (cleanedChild) cleanDiv.appendChild(cleanedChild);
-    });
-
-    let sanitized = cleanDiv.innerHTML;
-
-    sanitized = sanitized.replace(/<(\w+)>(\s|&nbsp;)*<\/\1>/gi, '');
-
-    sanitized = sanitized.replace(/(<br\s*\/?>){3,}/gi, '<br><br>');
-
-    sanitized = sanitized.replace(/^(<br\s*\/?>)+|(<br\s*\/?>)+$/gi, '');
-
-    sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-    sanitized = sanitized.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
-    sanitized = sanitized.replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '');
-    sanitized = sanitized.replace(/<embed\b[^<]*>/gi, '');
-    sanitized = sanitized.replace(/javascript:/gi, '');
-
-    return sanitized.trim();
+    return this.activityService.getRelativeTime(relativeDate, diffMs);
   }
 
   onCommentInput(event: Event) {
-    const target = event.target as HTMLDivElement;
+    const target = event.target as HTMLTextAreaElement;
     this.selection = window.getSelection();
     const range = this.selection && this.selection.rangeCount > 0 ? this.selection.getRangeAt(0) : null;
     const startOffset = range?.startOffset || 0;
     const startContainer = range?.startContainer;
 
-    this.newReview.comment = target.innerHTML;
+    this.newReview.comment = target.value;
 
     setTimeout(() => {
       if (startContainer && this.selection && range) {
@@ -665,8 +740,125 @@ export class RecipeViewComponent implements OnInit {
   hasIngredientInPantry(ingredient: number, ingred: any): boolean {
     let res = false;
     this.userIngredients.forEach((ing: Ingredient) => {
-      if (!res) res = ing.id == ingredient;
+      if (!res) res = ingred.id == ingredient;
     });
     return res;
   }
+
+  loadUserCollections(username: string): void {
+    this.userService.getUserCollections(username, 0, 100).subscribe({
+      next: (response: any) => {
+        const collections = response.content;
+        this.userCollections = collections.filter((c: any) => !c.isFavorites);
+        this.favoritesCollection = collections.find((c: any) => c.isFavorites) || null;
+        this.checkIfInFavorites();
+      },
+      error: (error: any) => {
+        console.error('Error loading collections:', error);
+      }
+    });
+  }
+
+  checkIfInFavorites(): void {
+    if (!this.favoritesCollection || !this.recipe?.id) {
+      this.isInFavorites = false;
+      return;
+    }
+
+    this.isInFavorites = this.favoritesCollection.recipes.some(r => r.id === this.recipe!.id);
+  }
+
+  toggleFavorite(): void {
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/error'], {state: {status: 403, reason: "You must be logged in to add favorites"}});
+      return;
+    }
+
+    if (!this.favoritesCollection) {
+      this.collectionService.getFavoritesCollection(this.user.username).subscribe({
+        next: (collection) => {
+          this.favoritesCollection = collection;
+          this.addToFavorites();
+        },
+        error: (error) => {
+          console.error('Error getting favorites collection:', error);
+        }
+      });
+    } else {
+      if (this.isInFavorites) {
+        this.removeFromFavorites();
+      } else {
+        this.addToFavorites();
+      }
+    }
+  }
+
+  addToFavorites(): void {
+    if (!this.favoritesCollection || !this.recipe?.id) return;
+
+    this.collectionService.addRecipeToCollection(this.favoritesCollection.id, this.recipe.id).subscribe({
+      next: () => {
+        this.isInFavorites = true;
+        if (this.user?.username) {
+          this.loadUserCollections(this.user.username);
+        }
+      },
+      error: (error) => {
+        console.error('Error adding to favorites:', error);
+        alert('Error adding to favorites. Please try again.');
+      }
+    });
+  }
+
+  removeFromFavorites(): void {
+    if (!this.favoritesCollection || !this.recipe?.id) return;
+
+    this.collectionService.removeRecipeFromCollection(this.favoritesCollection.id, this.recipe.id).subscribe({
+      next: () => {
+        this.isInFavorites = false;
+        if (this.user?.username) {
+          this.loadUserCollections(this.user.username);
+        }
+      },
+      error: (error) => {
+        console.error('Error removing from favorites:', error);
+        alert('Error removing from favorites. Please try again.');
+      }
+    });
+  }
+
+  closeCollectionModal(): void {
+    this.showCollectionModal = false;
+  }
+
+  toggleRecipeInCollection(collection: RecipeCollection): void {
+    if (!this.recipe?.id) return;
+
+    const isInCollection = collection.recipes.some(r => r.id === this.recipe!.id);
+
+    if (isInCollection) {
+      this.collectionService.removeRecipeFromCollection(collection.id, this.recipe.id).subscribe({
+        next: () => {
+          if (this.user?.username) {
+            this.loadUserCollections(this.user.username);
+          }
+        },
+        error: (error) => {
+          console.error('Error removing from collection:', error);
+        }
+      });
+    } else {
+      this.collectionService.addRecipeToCollection(collection.id, this.recipe.id).subscribe({
+        next: () => {
+          if (this.user?.username) {
+            this.loadUserCollections(this.user.username);
+          }
+        },
+        error: (error) => {
+          console.error('Error adding to collection:', error);
+        }
+      });
+    }
+  }
 }
+

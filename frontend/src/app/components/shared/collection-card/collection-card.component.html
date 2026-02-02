@@ -1,0 +1,372 @@
+@if (mode === 'list') {
+  <div class="flex w-full h-full flex-col gap-6">
+    @if (loading) {
+      <div class="flex w-full justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2" style="border-color: var(--primary-700);"></div>
+      </div>
+    } @else {
+      @if (isOwner) {
+        <button
+          class="w-full py-4 rounded-xl flex items-center justify-center gap-2 transition hover:scale-105"
+          style="background: var(--gradient-primary); color: white;"
+          (click)="openCreateModal()">
+          <i class="ti ti-plus text-xl"></i>
+          <span class="font-semibold">{{ t('create_new_collection') }}</span>
+        </button>
+      }
+
+      @if (showCreateNew) {
+        <div class="flex w-full gap-2 items-center glass rounded-3xl p-6"
+             style="background: var(--primary-200-40);">
+          <input
+            type="text"
+            [(ngModel)]="newCollectionTitle"
+            class="flex-1 px-4 py-2 rounded-lg"
+            style="background: var(--primary-100); color: var(--primary-700); border: 2px solid var(--primary-400);"
+            placeholder="{{ t('collection_title') }}"
+            (keyup.enter)="createCollection($event)"
+            (keyup.escape)="toggleCreateNew()"/>
+          <button
+            class="w-10 h-10 rounded-full flex items-center justify-center transition hover:scale-110"
+            style="background: var(--primary-700);"
+            [disabled]="creating"
+            (click)="createCollection($event)">
+            @if (creating) {
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            } @else {
+              <i class="ti ti-check text-lg" style="color: white;"></i>
+            }
+          </button>
+          <button
+            class="w-10 h-10 rounded-full flex items-center justify-center transition hover:scale-110"
+            style="background: var(--error);"
+            (click)="toggleCreateNew()">
+            <i class="ti ti-x text-lg" style="color: white;"></i>
+          </button>
+        </div>
+      }
+
+      @if (collections.length === 0 && !showCreateNew) {
+        <div class="flex w-full flex-col items-center justify-center py-12 gap-4">
+          <i class="ti ti-folder-off text-6xl" style="color: var(--primary-400);"></i>
+          <span class="text-xl font-semibold" style="color: var(--primary-700);">{{ t('no_collections_yet') }}</span>
+          @if (isOwner) {
+            <span class="text-sm" style="color: var(--primary-400);">{{ t('create_first_collection') }}</span>
+          }
+        </div>
+      } @else {
+        <div class="flex w-full flex-col gap-4">
+          @for (collection of collections; track collection.id) {
+            @if ((collection.isFavorites && isOwner) || !collection.isFavorites) {
+              @if (editingCollectionId === collection.id) {
+                <div class="flex w-full gap-2 items-center glass rounded-3xl p-6"
+                     style="background: var(--primary-200-40);">
+                  <input
+                    type="text"
+                    [(ngModel)]="editingCollectionTitle"
+                    class="flex-1 px-4 py-2 rounded-lg"
+                    style="background: var(--primary-100); color: var(--primary-700); border: 2px solid var(--primary-400);"
+                    placeholder="{{ t('collection_title') }}"
+                    (keyup.enter)="saveEdit()"
+                    (keyup.escape)="cancelEdit()"/>
+                  <button
+                    class="w-10 h-10 rounded-full flex items-center justify-center transition hover:scale-110"
+                    style="background: var(--primary-700);"
+                    (click)="saveEdit()">
+                    <i class="ti ti-check text-lg" style="color: white;"></i>
+                  </button>
+                  <button
+                    class="w-10 h-10 rounded-full flex items-center justify-center transition hover:scale-110"
+                    style="background: var(--error);"
+                    (click)="cancelEdit()">
+                    <i class="ti ti-x text-lg" style="color: white;"></i>
+                  </button>
+                </div>
+              } @else {
+                <div class="flex w-full flex-col items-start gap-4 glass rounded-3xl p-6 hover:shadow-lg transition-all cursor-pointer"
+                     style="background: var(--primary-200-40);"
+                     (click)="viewCollection(collection)">
+                  <div class="flex w-full items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      @if (collection.isFavorites) {
+                        <i class="ti ti-heart-filled text-2xl" style="color: var(--primary-700);"></i>
+                      } @else {
+                        <i class="ti ti-bookmark text-2xl" style="color: var(--primary-700);"></i>
+                      }
+                      <span *ngIf="collection.isFavorites" class="text-xl font-semibold" style="color: var(--primary-700);">{{ t('favorites') }}</span>
+                      <span *ngIf="!collection.isFavorites" class="text-xl font-semibold" style="color: var(--primary-700);">{{ collection.title }}</span>
+                    </div>
+                    @if ((isOwner && !collection.isFavorites) || (isAdmin && !collection.isFavorites)) {
+                      <div class="flex gap-2" (click)="$event.stopPropagation()">
+                        <button
+                          class="w-8 h-8 rounded-full flex items-center justify-center transition hover:scale-110"
+                          style="background: var(--primary-100);"
+                          (click)="startEdit(collection.id)">
+                          <i class="ti ti-edit text-sm" style="color: var(--primary-700);"></i>
+                        </button>
+                        <button
+                          class="w-8 h-8 rounded-full flex items-center justify-center transition hover:scale-110"
+                          style="background: var(--error);"
+                          (click)="deleteCollection(collection.id, $event, true)">
+                          <i class="ti ti-trash text-sm" style="color: red;"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="flex w-full items-center gap-4">
+                    @if (getCollectionImage(collection)) {
+                      <img
+                        class="h-20 w-28 flex-none rounded-md object-cover"
+                        [src]="'data:image/jpeg;base64,' + getCollectionImage(collection)"
+                        alt="{{ collection.title }}"/>
+                    } @else {
+                      <div class="h-20 w-28 flex-none rounded-md flex items-center justify-center"
+                           style="background: var(--primary-100);">
+                        <i class="ti ti-chef-hat text-4xl" style="color: var(--primary-200)"></i>
+                      </div>
+                    }
+
+                    <div class="flex flex-col gap-2">
+                      <div class="flex items-center gap-2">
+                        <i class="ti ti-chef-hat text-sm" style="color: var(--primary-400);"></i>
+                        <span class="text-sm" style="color: var(--primary-700);"> {{ collection.recipeCount + ' ' + t('recipes') }} </span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <i class="ti ti-clock text-sm" style="color: var(--primary-400);"></i>
+                        <span *ngIf="collection.updatedAt" class="text-sm" style="color: var(--primary-700);"> {{ t('updated') + ' ' + convertDate(''+collection.updatedAt) }} </span>
+                        <span *ngIf="!collection.updatedAt" class="text-sm" style="color: var(--primary-700);"> {{ t('created') + newDate() }} </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            }
+          }
+
+        </div>
+    }
+
+      @if (hasMore && !loading) {
+        <button
+          class="btn btn-primary w-full py-4 rounded-xl flex items-center justify-center gap-2 transition hover:scale-105"
+          style="background: var(--gradient-primary);"
+          (click)="loadMoreCollections()"
+          [disabled]="loadingMore">
+          @if (loadingMore) {
+            <div class="animate-spin rounded-full h-5 w-5 border-b-2" style="border-color: var(--primary-700);"></div>
+            <span class="font-semibold">{{ t('loading') }}</span>
+          } @else {
+            <i class="ti ti-refresh text-xl"></i>
+            <span class="font-semibold">{{ t('load_more') }}</span>
+          }
+        </button>
+      }
+    }
+  </div>
+} @else if ((mode === 'add-dialog' && showDialog)) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center visibleBackdrop"
+       style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;"
+       (click)="onBackdropClick($event)">
+
+    <div class="relative rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl max-h-[80vh] min-w-fit"
+         style="background: var(--primary-200);">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold" style="color: var(--primary-700);">{{ t('add_to_collection') }}</h2>
+        <button
+          class="w-8 h-8 rounded-full flex items-center justify-center transition hover:scale-110"
+          style="background: var(--primary-100);"
+          (click)="closeDialog($event)">
+          <i class="ti ti-x text-lg" style="color: var(--primary-700);"></i>
+        </button>
+      </div>
+
+      @if (loading) {
+        <div class="flex justify-center items-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2" style="border-color: var(--primary-700);"></div>
+        </div>
+      } @else {
+        <div class="flex flex-col gap-3 relative rounded-3xl p-8 max-w-md mx-4 max-h-[70vh] w-auto overflow-y-auto min-w-fit">
+          @if (collections.length === 0 && !showCreateNew) {
+            <div class="flex flex-col items-center justify-center py-8 gap-4">
+              <i class="ti ti-folder-off text-5xl" style="color: var(--primary-400);"></i>
+              <span class="text-lg font-semibold" style="color: var(--primary-700);">{{ t('no_collections_yet') }}</span>
+              <span class="text-sm text-center" style="color: var(--primary-400);">{{ t('create_first_collection') }}</span>
+            </div>
+          } @else {
+            @for (collection of collections; track collection.id) {
+              <button
+                class="w-full p-4 rounded-xl flex items-center gap-3 transition hover:scale-105"
+                style="background: var(--primary-100);"
+                (click)="addToCollection(collection.id, $event)">
+                <i class="ti ti-bookmark text-xl" style="color: var(--primary-700);"></i>
+                <span class="font-semibold" style="color: var(--primary-700);">{{ collection.title }}</span>
+                <span class="ml-auto text-sm" style="color: var(--primary-400);">{{ collection.recipeCount }} recipes</span>
+              </button>
+            }
+          }
+
+          @if (showCreateNew) {
+            <div class="flex gap-2 p-4 rounded-xl min-w-fit" style="background: var(--primary-100);">
+              <input
+                type="text"
+                [(ngModel)]="newCollectionTitle"
+                class="flex-1 px-4 py-2 rounded-lg"
+                style="background: white; color: var(--primary-700); border: 2px solid var(--primary-400);"
+                placeholder="{{ t('collection_name') }}"
+                (keyup.enter)="createAndAdd($event)"
+                (keyup.escape)="toggleCreateNew()"/>
+              <button
+                class="w-10 h-10 rounded-full flex items-center justify-center transition hover:scale-110"
+                style="background: var(--primary-700);"
+                [disabled]="creating"
+                (click)="createAndAdd($event)">
+                @if (creating) {
+                  <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                } @else {
+                  <i class="ti ti-check text-lg" style="color: white;"></i>
+                }
+              </button>
+              <button
+                class="w-10 h-10 rounded-full flex items-center justify-center transition hover:scale-110"
+                style="background: var(--error);"
+                (click)="toggleCreateNew()">
+                <i class="ti ti-x text-lg" style="color: white;"></i>
+              </button>
+            </div>
+          } @else {
+            <button
+              class="w-full mt-2 py-3 rounded-xl flex items-center justify-center gap-2 transition hover:scale-105"
+              style="background: var(--gradient-primary); color: white;"
+              (click)="toggleCreateNew()">
+              <i class="ti ti-plus text-lg"></i>
+              <span class="font-semibold">{{ t('create_new_collection') }}</span>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+} @else if (mode === 'view' && showDialog && collection) {
+  <div class="opacity-0 fixed inset-0 z-50 flex items-center justify-center transition-all visibleBackdrop"
+       style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;"
+       (click)="onBackdropClick($event)">
+    <div class="w-11/12 max-w-4xl rounded-3xl shadow-2xl p-8 relative transition-all"
+         style="background: var(--primary-200); max-height: 85vh; overflow-y: auto;"
+         (click)="$event.stopPropagation()">
+
+      @if (isOwner || isAdmin) {
+        <button (click)="deleteCollection(collection.id, $event)" (blur)="confirmDeleteId = null"
+                class="!delete-collection-btn absolute top-6 right-24 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                [ngClass]="confirmDeleteId === collection.id ? 'w-48 px-4 h-12' : 'w-12 h-12'"
+                style="background: red; color: white; box-shadow: 0 4px 12px var(--primary-300);">
+          @if (confirmDeleteId === collection.id) {
+            <span class="font-semibold">{{ t('are_you_sure_to_delete') }}</span>
+          } @else {
+            <i class="ti ti-trash text-2xl hover:skew-x-12 py-2 px-3"></i>
+          }
+        </button>
+      }
+
+      <button (click)="closeDialog($event)"
+              class="absolute top-6 right-6 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90"
+              style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);">
+        <i class="ti ti-x text-2xl"></i>
+      </button>
+
+      <div class="flex flex-col gap-6">
+        <div class="flex items-center gap-4 pr-16">
+          @if (collection.isFavorites) {
+            <i class="ti ti-heart-filled text-4xl" style="color: var(--error);"></i>
+          } @else {
+            <i class="ti ti-bookmark-filled text-4xl" style="color: var(--primary-700);"></i>
+          }
+          <div>
+            <h2 class="text-3xl font-bold" style="color: var(--primary-700);">{{ collection.title }}</h2>
+            <p class="text-sm" style="color: var(--primary-400);">{{ t('by') }} <span class="font-semibold cursor-pointer hover:underline" style="color: var(--primary-600);" (click)="navigateToUser(collection.author, $event)">{{ collection.author }}</span></p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 text-sm" style="color: var(--primary-500);">
+          <div class="flex items-center gap-2">
+            <i class="ti ti-chef-hat"></i>
+            <span>{{ collection.recipeCount }} {{ t('recipes') }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="ti ti-calendar"></i>
+            <span>{{ t('created') }} {{ collection.createdAt | date:'mediumDate' }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="ti ti-clock"></i>
+            <span>{{ t('updated') }} {{ collection.updatedAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="h-px w-full" style="background: var(--primary-300);"></div>
+
+        @if (!collection.recipes || collection.recipes.length === 0) {
+          <div class="flex flex-col items-center justify-center py-16 gap-4">
+            <i class="ti ti-chef-hat-off text-6xl" style="color: var(--primary-400);"></i>
+            <span class="text-xl font-semibold" style="color: var(--primary-700);">{{ t('no_recipes_yet') }}</span>
+            <span class="text-sm" style="color: var(--primary-400);">{{ t('add_recipes_to_see_them_here') }}</span>
+          </div>
+        } @else {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            @for (recipe of getVisibleRecipes(); track recipe.id) {
+              <div class="flex gap-4 p-4 rounded-2xl glass-strong transition-all hover:scale-[1.02] cursor-pointer"
+                   style="background: var(--primary-100-40);"
+                   (click)="navigateToRecipe(recipe.id, $event)">
+                @if (recipe.imageString) {
+                  <img [src]="'data:image/jpeg;base64,' + recipe.imageString"
+                       [alt]="recipe.label"
+                       class="w-24 h-24 rounded-xl object-cover flex-shrink-0"/>
+                } @else {
+                  <div class="w-24 h-24 rounded-xl flex items-center justify-center flex-shrink-0"
+                       style="background: var(--primary-200);">
+                    <i class="ti ti-photo text-3xl" style="color: var(--primary-400);"></i>
+                  </div>
+                }
+                <div class="flex flex-col justify-between flex-1 min-w-0">
+                  <div>
+                    <h3 class="font-semibold truncate" style="color: var(--primary-700);">{{ recipe.label }}</h3>
+                    <p class="text-sm line-clamp-2" style="color: var(--primary-500);">{{ recipe.description }}</p>
+                  </div>
+                  <div class="flex items-center gap-4 text-xs" style="color: var(--primary-400);">
+                    @if (recipe.totalTime) {
+                      <div class="flex items-center gap-1">
+                        <i class="ti ti-clock"></i>
+                        <span>{{ recipe.totalTime }} min</span>
+                      </div>
+                    }
+                    @if (recipe.people) {
+                      <div class="flex items-center gap-1">
+                        <i class="ti ti-users"></i>
+                        <span>{{ recipe.people }}</span>
+                      </div>
+                    }
+                    @if (recipe.rating) {
+                      <div class="flex items-center gap-1">
+                        <i class="ti ti-star-filled" style="color: #f59e0b;"></i>
+                        <span>{{ recipe.rating | number:'1.1-1' }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          @if (hasMoreRecipesToShow()) {
+            <button
+              class="btn btn-primary w-full py-4 rounded-xl flex items-center justify-center gap-2 transition hover:scale-105"
+              style="background: var(--gradient-primary);"
+              (click)="loadMoreViewRecipes($event)">
+              <i class="ti ti-refresh text-lg"></i>
+              <span class="font-semibold">{{ t('load_more') }}</span>
+            </button>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

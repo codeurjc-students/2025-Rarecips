@@ -36,7 +36,7 @@ public class APIRecipeTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User testUser = new User("testuser", "testpassword", "testuser@example.com", null, "Test User",
+    private User testUser = new User("testuser", "testpassword", "test@example.com", null, "Test User",
             "This is a test user.", "");
 
     private Recipe testRecipe1;
@@ -56,7 +56,7 @@ public class APIRecipeTest {
                 new ArrayList<>(), // healthLabels
                 new ArrayList<>(), // cautions
                 4, // people
-                new ArrayList<>(), // ingredients (vacía)
+                new ArrayList<>(), // ingredients
                 1, // difficulty (int)
                 new ArrayList<>(), // dishTypes
                 new ArrayList<>(), // mealTypes
@@ -64,7 +64,7 @@ public class APIRecipeTest {
                 45.0f, // totalTime
                 500.0f, // totalWeight
                 650.0f, // calories
-                testUser, // author (null por simplicidad)
+                testUser, // author
                 new ArrayList<>() // steps
         );
 
@@ -75,7 +75,7 @@ public class APIRecipeTest {
                 new ArrayList<>(), // healthLabels
                 new ArrayList<>(), // cautions
                 4, // people
-                new ArrayList<>(), // ingredients (vacía)
+                new ArrayList<>(), // ingredients
                 1, // difficulty (int)
                 new ArrayList<>(), // dishTypes
                 new ArrayList<>(), // mealTypes
@@ -83,7 +83,7 @@ public class APIRecipeTest {
                 30.0f, // totalTime
                 600.0f, // totalWeight
                 520.0f, // calories
-                testUser, // author (null por simplicidad)
+                testUser, // author
                 new ArrayList<>() // steps
         );
 

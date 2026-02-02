@@ -3,9 +3,12 @@ package com.blasetvrtumi.rarecips.service;
 import com.blasetvrtumi.rarecips.entity.Ingredient;
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.User;
+import com.blasetvrtumi.rarecips.entity.Activity;
+import com.blasetvrtumi.rarecips.entity.RecipeCollection;
 import com.blasetvrtumi.rarecips.repository.IngredientRepository;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
+import com.blasetvrtumi.rarecips.repository.RecipeCollectionRepository;
 import com.blasetvrtumi.rarecips.util.EnumValidator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +37,15 @@ public class RecipeService {
     @Autowired
     private IngredientRepository ingredientRepository;
 
+    @Autowired
+    private ActivityService activityService;
+
+    @Autowired
+    private RecipeCollectionRepository recipeCollectionRepository;
+
     public Recipe findById(Long id) {
         return recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
-    }
-
-    public List<Recipe> getRecipes(Pageable pageable) {
-        return recipeRepository.findAll(pageable).getContent();
     }
 
     public Page<Recipe> getRecipes(String sortBy, int size, int page) {
@@ -71,7 +76,16 @@ public class RecipeService {
             recipe.setIngredients(savedIngredients);
         }
 
-        return recipeRepository.save(recipe);
+        Recipe savedRecipe = recipeRepository.save(recipe);
+        activityService.logActivity(
+            author.getUsername(),
+            Activity.ActivityType.CREATE_RECIPE,
+            recipe.getLabel(),
+            "created recipe " + recipe.getLabel(),
+            savedRecipe.getId(),
+            null
+        );
+        return savedRecipe;
     }
 
     @SuppressWarnings("unchecked")
@@ -112,8 +126,8 @@ public class RecipeService {
             for (Map<String, Object> ingData : ingredientsData) {
                 String food = (String) ingData.get("food");
                 String image = (String) ingData.get("image");
-
-                Ingredient ingredient = new Ingredient(food, image);
+                String imageString = (String) ingData.get("imageString");
+                Ingredient ingredient = new Ingredient(food, image, imageString);
                 Ingredient savedIngredient = ingredientRepository.save(ingredient);
                 ingredients.add(savedIngredient);
 
@@ -308,8 +322,8 @@ public class RecipeService {
             for (Map<String, Object> ingData : ingredientsData) {
                 String food = (String) ingData.get("food");
                 String image = (String) ingData.get("image");
-
-                Ingredient ingredient = new Ingredient(food, image);
+                String imageString = (String) ingData.get("imageString");
+                Ingredient ingredient = new Ingredient(food, image, imageString);
                 Ingredient savedIngredient = ingredientRepository.save(ingredient);
                 ingredients.add(savedIngredient);
 
@@ -332,19 +346,26 @@ public class RecipeService {
         return recipeRepository.save(existingRecipe);
     }
 
+    @Transactional
     public void deleteRecipe(Long id, String username) {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
 
-        User recipeAuthor = recipe.getAuthorUser();
-        if (recipeAuthor == null || !recipeAuthor.getUsername().equals(username)) {
-            User user = userRepository.findByUsername(username);
-            if (user == null || !user.getRole().equals("ADMIN")) {
-                throw new SecurityException("You are not authorized to delete this recipe");
+        List<RecipeCollection> collections = recipeCollectionRepository.findAll();
+        for (RecipeCollection collection : collections) {
+            if (collection.getRecipes().contains(recipe)) {
+                collection.removeRecipe(recipe);
+                recipeCollectionRepository.save(collection);
             }
         }
 
+        String recipeLabel = recipe.getLabel();
         recipeRepository.delete(recipe);
+        activityService.logActivity(username, Activity.ActivityType.DELETE_RECIPE, recipeLabel,
+            username + " deleted recipe \"" + recipeLabel + "\"",
+            id,
+            null
+        );
     }
 
     public Object findAll() {

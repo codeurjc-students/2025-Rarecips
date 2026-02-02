@@ -1,0 +1,103 @@
+.collection-modal-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  background: var(--primary-backdrop);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.collection-modal-wrapper.visible {
+  pointer-events: auto;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.collection-modal-content {
+  width: 100%;
+  max-width: 600px;
+  background: var(--primary-200);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.delete-collection-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background: red;
+  color: white;
+  box-shadow: 0 4px 12px var(--primary-300);
+}
+
+.delete-collection-btn:hover {
+  transform: scale(1.1);
+}
+
+.delete-collection-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.hover\:skew-x-12:hover {
+  transform: skewX(12deg);
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.transition-opacity {
+  transition: opacity 0.3s ease;
+}
+
+.transition-transform {
+  transition: transform 0.3s ease;
+}
+
+.active\:scale-105:active {
+  transform: scale(1.05);
+}
+
+.active\:opacity-0:active {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .collection-modal-content {
+    padding: 1.5rem;
+  }
+
+  .delete-collection-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}

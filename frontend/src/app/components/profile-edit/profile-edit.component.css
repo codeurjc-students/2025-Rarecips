@@ -152,6 +152,27 @@ input:checked + .slider:before {
   -webkit-backdrop-filter: blur(10px);
 }
 
+/* Modal styles */
+.change-password-modal {
+  background: var(--primary-200);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(79,140,255,0.15);
+  padding: 2rem;
+  width: 24rem;
+  max-width: 90vw;
+}
+
+.change-password-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  background: var(--primary-backdrop);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .form-section {
@@ -249,3 +270,25 @@ input:checked + .slider:before {
   box-shadow: 0 20px 40px rgba(79, 140, 255, 0.15);
 }
 
+.ti-anim.ti-hourglass {
+  display: inline-block;
+  animation: rotate-animation 2s linear infinite;
+}
+
+@keyframes rotate-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(180deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  75% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

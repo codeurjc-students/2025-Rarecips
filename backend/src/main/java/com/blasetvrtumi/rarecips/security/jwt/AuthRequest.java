@@ -1,5 +1,7 @@
 package com.blasetvrtumi.rarecips.security.jwt;
 
+import java.util.Map;
+
 public class AuthRequest {
 
     private String username;
@@ -7,6 +9,8 @@ public class AuthRequest {
     private String email;
 
     private String password;
+
+    private Map<String, String> preferences;
 
     public AuthRequest() {
     }
@@ -39,6 +43,14 @@ public class AuthRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Map<String, String> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(Map<String, String> preferences) {
+        this.preferences = preferences;
     }
 
     @Override

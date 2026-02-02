@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,14 +42,26 @@ public class RecipeInitializationService {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostConstruct
     public void init() {
+        if (userRepository.findByUsername("user") == null) {
+            userDetailService.createUser("user", "test@example.com", "pass");
+        }
+
+        if (userRepository.findByUsername("admin") == null) {
+            userDetailService.createUser("admin", "admin@rarecips.com", "adminpass");
+            User admin = userRepository.findByUsername("admin");
+            if (admin != null) {
+                admin.setDisplayName("Administrator");
+                admin.setRole("ADMIN");
+                userRepository.save(admin);
+            }
+        }
 
         if (recipes != null && recipes.length() > 0) {
-
-            // Create a default user
-            User defaultUser = new User("user", "", "", null, "", "", "pass");
-            userDetailService.createUser(defaultUser.getUsername(), defaultUser.getEmail(), "pass");
 
             // Add all recipes from the JSON file to the database
             for (int i = 0; i < 20/*recipes.length() - 1*/; i++) {
@@ -83,9 +96,10 @@ public class RecipeInitializationService {
                     ingredients = recipeJson.optJSONArray("ingredients", new JSONArray()).toList().stream()
                             .map(obj -> {
                                 JSONObject ingredientJson = new JSONObject((HashMap<?, ?>) obj);
-                                String imageString = ingredientJson.optString("image", null);
                                 String food = ingredientJson.optString("food", null);
-                                Ingredient ingredient = new Ingredient(food, imageString);
+                                String image = ingredientJson.optString("image", null);
+                                String imageString = ingredientJson.optString("imageString", null);
+                                Ingredient ingredient = new Ingredient(food, image, imageString);
                                 ingredientRepository.save(ingredient);
 
                                 Float quantity = ingredientJson.optFloat("quantity", 0.0f);
@@ -176,5 +190,3 @@ public class RecipeInitializationService {
     }
 
 }
-
-

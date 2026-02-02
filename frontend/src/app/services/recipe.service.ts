@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Recipe} from "../models/recipe.model";
 import {Router} from "@angular/router";
 import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
-import {catchError, map, Observable, throwError} from "rxjs";
+import {catchError, map, Observable, throwError, tap} from "rxjs";
 
 @Injectable({
   providedIn: "root"
@@ -10,7 +10,7 @@ import {catchError, map, Observable, throwError} from "rxjs";
 export class RecipeService {
 
   API_URL = "/api/v1/recipes";
-  size = 10;
+  size = 9;
 
   constructor(private router: Router, private httpClient: HttpClient) {
   }
@@ -47,7 +47,7 @@ export class RecipeService {
     }
     params = params.append('page', page.toString());
     params = params.append('size', size.toString());
-    if (filters.sortBy) params = params.append('sortBy', filters.sortBy === 'popular' ? 'rating' : 'updatedAt');
+    if (filters.sortBy) params = params.append('sortBy', filters.sortBy);
 
     return this.httpClient.get<any>(`${this.API_URL}/filter`, { params }).pipe(
       map(data => ({

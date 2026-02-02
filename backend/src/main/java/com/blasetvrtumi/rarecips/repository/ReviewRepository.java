@@ -3,6 +3,7 @@ package com.blasetvrtumi.rarecips.repository;
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.Review;
 import com.blasetvrtumi.rarecips.entity.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +23,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByRecipeId(@Param("recipeId") Long recipeId);
 
     List<Review> findByAuthor(User author);
+
+    @Query("SELECT r FROM Review r WHERE r.author.username = :username")
+    Page<Review> findByAuthorUsername(@Param("username") String username, Pageable pageable);
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.recipe.id = :recipe")
     Double findAverageRatingByRecipe(@Param("recipe") Long recipe);

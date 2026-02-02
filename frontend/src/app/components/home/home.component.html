@@ -2,8 +2,13 @@
   <div class="space-y-8 ml-16 mr-16">
     <!-- Header -->
     <div class="mt-32">
-      <h1 class="text-4xl font-body text-primary">Welcome back, <b>Weasel</b>!</h1>
-      <p class="text-lg text-secondary">Ready to cook something amazing today?</p>
+      @if (!currentUser) {
+        <span class="flex gap-2 text-4xl font-body text-primary">{{ t('welcome_to') }} <b>Rarecips</b> <div *ngIf="translator.getLang() === 'ja'">へ</div>!</span>
+        <p class="text-lg text-secondary">{{ t('landing_subtitle') }}</p>
+      } @else {
+        <h1 class="text-4xl font-body text-primary">{{ t('welcome_back') }}, <b>{{currentUser.username}}</b>@if (translator.getLang() === 'ja') {さん!} @else {!}</h1>
+        <p class="text-lg text-secondary">{{ t('landing_ready') }}</p>
+      }
     </div>
 
     <!-- Dashboard Grid -->
@@ -11,84 +16,88 @@
       <!-- Main column -->
       <div class="w-2/3 flex-1 space-y-8 main-column">
         <!-- Recommended Actions -->
-        <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-bold text-primary mb-4">What’s next?</h2>
-          <div class="actions flex gap-4">
-            <!-- Action Card 1 -->
-            <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1">
-              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-green-500 mb-3">
-                <i class="ti ti-replace-user text-white text-xl"></i>
+        @if (currentUser) {
+          <div class="glass rounded-2xl p-6">
+            <h2 class="text-xl font-bold text-primary mb-4">{{ t('whats_next') }}</h2>
+            <div class="actions flex gap-4">
+              <!-- Action Card 1 -->
+              <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1 hover:scale-110"
+                   (click)="navigateToCreateRecipe()">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-green-500 mb-3">
+                  <i class="ti ti-replace-user text-white text-xl hover:[transform:translateY(-0.1rem)_rotateZ(10deg)] transition-all"></i>
+                </div>
+                <h3 class="font-semibold text-primary">{{ t('share_first_recipe') }}</h3>
+                <p class="text-xs text-secondary mt-1">{{ t('share_first_recipe_desc') }}</p>
               </div>
-              <h3 class="font-semibold text-primary">Share your first recipe</h3>
-              <p class="text-xs text-secondary mt-1">Know of a great recipe? Share it with the community.</p>
-            </div>
 
-            <!-- Action Card 2 -->
-            <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1">
-              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 mb-3">
-                <i class="ti ti-user-edit text-white text-xl"></i>
+              <!-- Action Card 2 -->
+              <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1 hover:scale-110"
+                   (click)="navigateToEditProfile()">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 mb-3">
+                  <i class="ti ti-user-edit text-white text-xl hover:[transform:translateY(-0.1rem)_rotateZ(10deg)] transition-all"></i>
+                </div>
+                <h3 class="font-semibold text-primary">{{ t('edit_profile') }}</h3>
+                <p class="text-xs text-secondary mt-1">{{ t('edit_profile_desc') }}</p>
               </div>
-              <h3 class="font-semibold text-primary">Edit your profile</h3>
-              <p class="text-xs text-secondary mt-1">Customize your experience on the platform.</p>
-            </div>
 
-            <!-- Action Card 3 -->
-            <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1">
-              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-purple-500 mb-3">
-                <i class="ti ti-pencil-star text-white text-xl"></i>
+              <!-- Action Card 3 -->
+              <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1 hover:scale-110"
+                   (click)="navigateToExploreRecipes()">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-purple-500 mb-3">
+                  <i class="ti ti-pencil-star text-white text-xl hover:[transform:translateY(-0.1rem)_rotateZ(10deg)] transition-all"></i>
+                </div>
+                <h3 class="font-semibold text-primary">{{ t('leave_review') }}</h3>
+                <p class="text-xs text-secondary mt-1">{{ t('leave_review_desc') }}</p>
               </div>
-              <h3 class="font-semibold text-primary">Leave a review</h3>
-              <p class="text-xs text-secondary mt-1">Share your opinion about a recipe.</p>
-            </div>
-            <!-- Action Card 4 -->
-            <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1">
-              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-red-500 mb-3">
-                <i class="ti ti-basket-question text-white text-xl"></i>
+              <!-- Action Card 4 -->
+              <div class="action-card glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer flex-1 hover:scale-110"
+                   (click)="navigateToIngredients()">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-red-500 mb-3">
+                  <i class="ti ti-basket-question text-white text-xl hover:[transform:translateY(-0.1rem)_rotateZ(10deg)] transition-all"></i>
+                </div>
+                <h3 class="font-semibold text-primary">{{ t('check_basket') }}</h3>
+                <p class="text-xs text-secondary mt-1">{{ t('check_basket_desc') }}</p>
               </div>
-              <h3 class="font-semibold text-primary">Check your basket</h3>
-              <p class="text-xs text-secondary mt-1">Make sure you have all the necessary ingredients!</p>
             </div>
           </div>
-        </div>
+        }
 
         <!-- Trending Recipes/based in your preferences -->
         <div class="glass rounded-2xl p-6">
           <div>
-            <h2 class="text-xl font-bold text-primary mb-4">Based in your preferences</h2>
+            <h2 class="text-xl font-bold text-primary mb-4">{{ t('based_on_preferences') }}</h2>
             <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
               <!-- Recipe Card -->
               @for (recipe of recipeList; track recipe.id) {
-                <div
-                  class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
+                <div class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm hover:scale-105 hover:[transform:perspective(900px)_rotateY(5deg)_rotateX(-5deg)_rotateZ(-2deg)] hover-skew-x-1"
+                     (click)="viewRecipe(recipe.id)">
                   <!-- Glass Reflection Effect -->
                   <div
                     class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
                   </div>
 
                   <!-- Image Container -->
-                  <div class="imageCont relative aspect-43 overflow-hidden">
+                  <div class="imageCont relative aspect-43 overflow-hidden" (mouseover)="hoverRecipeId = recipe.id" (mouseout)="hoverRecipeId = undefined">
                     <img
                       src="data:image/png;base64,{{recipe.imageUrl}}"
-                      alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;">
+                      alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;"
+                      [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
 
                     <!-- Gradient Overlay -->
                     <div class="absolute inset-0 gradient-overlay"></div>
 
                     <!-- Top Right Actions -->
                     <div class="absolute top-4 right-4 flex gap-2">
-                      <button class="btn btn-icon glass-strong text-primary">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24">
-                          <path
-                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            fill="none"/>
-                        </svg>
+                      <button
+                        (click)="toggleFavorite(recipe.id, $event)"
+                        class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110"
+                        [class.favorites-active]="isRecipeInFavorites(recipe.id)">
+                        <i [ngClass]="isRecipeInFavorites(recipe.id) ? 'ti ti-heart-filled' : 'ti ti-heart'" class="w-4 h-4 heart-icon"></i>
                       </button>
-                      <button class="btn btn-icon glass-strong text-primary">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24">
-                          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        </svg>
+                      <button
+                        (click)="openAddToCollection(recipe.id, $event)"
+                        class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110">
+                        <i class="ti ti-bookmark w-4 h-4"></i>
                       </button>
                     </div>
 
@@ -101,15 +110,15 @@
                     <div class="absolute bottom-4 left-4">
                       @if (recipe.difficulty < 3) {
                         <div class="badge badge-green text-xs font-medium backdrop-blur-sm">
-                          <span>Easy</span>
+                          <span>{{ t('easy') }}</span>
                         </div>
                       } @else if (recipe.difficulty === 3) {
                         <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">
-                          <span>Medium</span>
+                          <span>{{ t('medium') }}</span>
                         </div>
                       } @else {
                         <div class="badge badge-red text-xs font-medium backdrop-blur-sm">
-                          <span>Hard</span>
+                          <span>{{ t('hard') }}</span>
                         </div>
                       }
                     </div>
@@ -122,29 +131,18 @@
                       <h3 class="text-xl font-bold text-primary line-clamp-2 recipe-title">{{ recipe.title }}</h3>
 
                       <div class="flex items-center justify-between">
-                        <div class="star-rating">
-                          <svg class="star star-filled" viewBox="0 0 24 24">
-                            <polygon
-                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                          </svg>
-                          <svg class="star star-filled" viewBox="0 0 24 24">
-                            <polygon
-                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                          </svg>
-                          <svg class="star star-filled" viewBox="0 0 24 24">
-                            <polygon
-                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                          </svg>
-                          <svg class="star star-filled" viewBox="0 0 24 24">
-                            <polygon
-                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                          </svg>
-                          <svg class="star star-filled" viewBox="0 0 24 24">
-                            <polygon
-                              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                          </svg>
-                          <span class="text-secondary text-sm ml-2">{{ recipe.rating }} ({{ recipe.reviews.length }}
-                            )</span>
+                        <div class="star-rating flex items-center">
+                          <ng-container *ngFor="let star of [1,2,3,4,5]">
+                            @if (recipe.rating >= star) {
+                              <i class="ti ti-star-filled text-lg text-yellow-500 hover:scale-110 transition-all"></i>
+                            } @else if (recipe.rating >= star - 0.5) {
+                              <i class="ti ti-star-half-filled text-lg text-yellow-500 hover:scale-110 transition-all"></i>
+                            } @else {
+                              <i class="ti ti-star text-lg hover:scale-110 transition-all" style="color: var(--primary-text)"></i>
+                            }
+                          </ng-container>
+
+                          <span class="text-secondary text-sm ml-2">{{ recipe.rating | number:'1.1-1' }}</span>
                         </div>
                       </div>
                     </div>
@@ -157,40 +155,30 @@
                     <!-- Meta Information -->
                     <div class="flex items-center gap-4 text-secondary text-sm">
                       <div class="flex items-center gap-1">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24">
-                          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
-                          <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>{{ recipe.totalTime }} min</span>
+                        <i class="ti ti-clock"></i>
+                        <span>{{ recipe.totalTime }} {{ t('min') }}</span>
                       </div>
                       <div class="flex items-center gap-1">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24">
-                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                          <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
-                          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>{{ recipe.people }} people</span>
+                        <i class="ti ti-users"></i>
+                        <span>{{ recipe.people }} {{ t('people') }}</span>
                       </div>
                     </div>
 
                     <!-- Tags -->
                     <div class="flex flex-wrap gap-2">
-                    <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                    <span *ngIf="recipe.dishTypes.length" class="text-xs px-2 py-1 rounded-full text-secondary hover:scale-110 transition-all"
                           style="background-color: var(--primary-300);">{{ recipe.dishTypes[0] }}</span>
-                      <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                      <span *ngIf="recipe.dietLabels.length" class="text-xs px-2 py-1 rounded-full text-secondary hover:scale-110 transition-all"
                             style="background-color: var(--primary-300);">{{ recipe.dietLabels[0] }}</span>
-                      <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                      <span *ngIf="recipe.healthLabels.length" class="text-xs px-2 py-1 rounded-full text-secondary hover:scale-110 transition-all"
                             style="background-color: var(--primary-300);">{{ recipe.healthLabels[0] }}</span>
                     </div>
 
                     <!-- View Button -->
-                    <div class="rounded flex" style="background: var(--gradient-primary);">
+                    <div class="rounded flex hover:scale-110 transition-all" style="background: var(--gradient-primary);">
                       <button class="btn btn-primary w-full view-recipe-btn" (click)="viewRecipe(recipe.id)">
                         <i class="ti ti-eye mr-2"></i>
-                        View recipe
+                        {{ t('view_recipe') }}
                       </button>
                     </div>
                   </div>
@@ -201,171 +189,199 @@
               <div class="text-center mt-6 rounded-2xl" style="background: var(--gradient-primary);">
                 <button class="btn btn-primary w-full" (click)="loadMoreRecipes()">
                   <i class="ti ti-refresh mr-2"></i>
-                  Load more
+                  {{ t('load_more') }}
                 </button>
               </div>
             }
           </div>
           @if (isLoading) {
-            <img src="../../../assets/icons/Rarecips_Spinner.svg" alt="Loading..." class="mx-auto my-8 max-w-20"/>
+            <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-8 [&>svg]:max-w-20"></div>
           }
         </div>
       </div>
 
       <!-- Sidebar column -->
       <div class="w-1/3 space-y-8 sidebar-column">
-        <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-bold text-primary mb-6">Revisit your collections</h2>
-
-          <div class="space-y-4">
-            <!-- First Collection Card -->
-            <div class="glass rounded-xl overflow-hidden">
-              <div class="flex w-full h-32 items-center gap-2">
-                <img class="w-1/3 h-full object-cover"
-                     src="https://res.cloudinary.com/subframe/image/upload/v1724705499/uploads/302/jh06ubduyciizexxi4ep.png"
-                     alt="Pizza Recipe"/>
-                <img class="w-1/3 h-full object-cover"
-                     src="https://res.cloudinary.com/subframe/image/upload/v1724705689/uploads/302/wzbqe2n4hf3kwxr08izq.png"
-                     alt="Burger Recipe"/>
-                <img class="w-1/3 h-full object-cover"
-                     src="https://res.cloudinary.com/subframe/image/upload/v1711417515/shared/cdnbniyuqjnplaj2zbjw.png"
-                     alt="Pancakes Recipe"/>
-              </div>
-              <div class="flex items-center justify-between p-4">
-                <div>
-                  <h3 class="font-semibold text-primary">Mum's Recipes</h3>
-                  <p class="text-sm text-secondary">(20 recipes)</p>
-                </div>
-                <button class="btn btn-primary rounded flex" style="background: var(--gradient-primary);">
-                  View
-                </button>
-              </div>
+        <div class="glass rounded-2xl p-6 h-[30%] max-h-[30%]">
+          @if (currentUser) {
+            <div class="flex flex-row items-center mb-4 gap-2 cursor-pointer">
+              <h2 class="text-xl font-bold text-primary" [class.underline]="linkHover" (mouseenter)="linkHover = true" (mouseleave)="linkHover = false">
+                <a class="flex flex-row items-center gap-2" (click)="openMyCollections()">{{ t('revisit_collections') }}
+                  <i class="ti ti-caret-right-filled"></i>
+                </a>
+              </h2>
             </div>
+          } @else {
+            <h2 class="text-xl font-bold text-primary mb-6">{{ t('popular_collections') }}</h2>
+          }
 
-            <!-- Second Collection Card -->
-            <div class="glass rounded-xl overflow-hidden">
-              <div class="flex w-full h-32 items-center gap-2">
-                <img class="w-1/3 h-full object-cover"
-                     src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
-                     alt="Pasta Recipe"/>
-                <img class="w-1/3 h-full object-cover"
-                     src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
-                     alt="Thai Food"/>
-                <img class="w-1/3 h-full object-cover"
-                     src="https://res.cloudinary.com/subframe/image/upload/v1723780577/uploads/302/hhmv6ey0yajkadnmcp0a.png"
-                     alt="Salad Recipe"/>
-              </div>
-              <div class="flex items-center justify-between p-4">
-                <div>
-                  <h3 class="font-semibold text-primary">Grannie's Recipes</h3>
-                  <p class="text-sm text-secondary">(22 recipes)</p>
-                </div>
-                <button class="btn btn-primary rounded flex" style="background: var(--gradient-primary);">
-                  Ver
-                </button>
-              </div>
-            </div>
-
-            <!-- Third Collection Card -->
-            <div class="glass rounded-xl overflow-hidden">
-              <div class="flex w-full h-32 items-center gap-2">
-                <img class="w-1/2 h-full object-cover"
-                     src="https://res.cloudinary.com/subframe/image/upload/v1724690133/uploads/302/tswlwr0qfwwhkgbjwplw.png"
-                     alt="Pasta Recipe"/>
-                <img class="w-1/2 h-full object-cover"
-                     src="https://res.cloudinary.com/subframe/image/upload/v1724705396/uploads/302/wvpuc4kznngymxhsw1w5.png"
-                     alt="Thai Food"/>
-              </div>
-              <div class="flex items-center justify-between p-4">
-                <div>
-                  <h3 class="font-semibold text-primary">My essentials</h3>
-                  <p class="text-sm text-secondary">(2 recipes)</p>
-                </div>
-                <button class="btn btn-primary rounded flex" style="background: var(--gradient-primary);">
-                  View
-                </button>
-              </div>
-            </div>
+          <div class="max-h-[92%] overflow-y-auto overflow-x-hidden">
+            @if (collectionsLoading) {
+              <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-8 [&>svg]:max-w-20"></div>
+            } @else {
+              @if (currentUser) {
+                @if (userCollections.length === 0) {
+                  <div class="flex flex-col items-center justify-center py-8 gap-3">
+                    <i class="ti ti-folder-off text-5xl" style="color: var(--primary-400);"></i>
+                    <p class="text-secondary text-center font-medium">{{ t('cookbook_empty') }}</p>
+                    <p class="text-xs text-center" style="color: var(--primary-400);">{{ t('start_collecting') }}</p>
+                  </div>
+                } @else {
+                  @for (collection of userCollections; track collection.id) {
+                    <div class="glass rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-all m-6" (click)="viewCollection(collection)">
+                      <div class="flex w-full h-32 items-center gap-1">
+                        @for (img of getCollectionImages(collection); track $index) {
+                          <img class="h-full object-cover" [style.width]="(100 / getCollectionImages(collection).length) + '%'"
+                               [src]="img"
+                               alt="Recipe"/>
+                        }
+                        @if (getCollectionImages(collection).length === 0) {
+                          <div class="w-full h-full flex items-center justify-center" style="background: var(--primary-100-40)">
+                            <i class="ti ti-photo-off text-4xl" style="color: var(--primary-400);"></i>
+                          </div>
+                        }
+                      </div>
+                      <div class="flex items-center justify-between p-4">
+                        <div>
+                          <h3 class="font-semibold text-primary">{{ collection.title }}</h3>
+                          <p class="text-sm text-secondary">{{ t('by') }} <span class="font-medium cursor-pointer hover:underline" style="color: var(--primary-600);" (click)="navigateToUser(collection.author, $event)">{{ collection.author }}</span> · {{ collection.recipeCount }} {{ t('recipes') }}</p>
+                        </div>
+                        <button class="btn btn-primary rounded flex" style="background: var(--gradient-primary);">
+                          {{ t('view') }}
+                        </button>
+                      </div>
+                    </div>
+                  }
+                }
+              } @else {
+                @if (popularCollections.length === 0) {
+                  <div class="flex flex-col items-center justify-center py-8 gap-3">
+                    <i class="ti ti-soup-off text-5xl" style="color: var(--primary-400)"></i>
+                    <p class="text-secondary text-center font-medium">{{ t('nothing_cooking') }}</p>
+                    <p class="text-xs text-center" style="color: var(--primary-400)">{{ t('be_first_collection') }}</p>
+                  </div>
+                } @else {
+                  @for (collection of popularCollections.slice(0, 3); track collection.id) {
+                    <div class="glass rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-all m-4" (click)="viewCollection(collection)">
+                      <div class="flex w-full h-32 items-center gap-1">
+                        @for (img of getCollectionImages(collection); track $index) {
+                          <img class="h-full object-cover" [style.width]="(100 / getCollectionImages(collection).length) + '%'"
+                               [src]="img"
+                               alt="Recipe"/>
+                        }
+                        @if (getCollectionImages(collection).length === 0) {
+                          <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                            <i class="ti ti-photo-off text-4xl text-gray-400"></i>
+                          </div>
+                        }
+                      </div>
+                      <div class="flex items-center justify-between p-4">
+                        <div>
+                          <h3 class="font-semibold text-primary">{{ collection.title }}</h3>
+                          <p class="text-sm text-secondary">{{ t('by') }} <span class="font-medium cursor-pointer hover:underline" style="color: var(--primary-600);" (click)="navigateToUser(collection.author, $event)">{{ collection.author }}</span> · {{ collection.recipeCount }} {{ t('recipes') }}</p>
+                        </div>
+                        <button class="btn btn-primary rounded flex" style="background: var(--gradient-primary);">
+                          {{ t('view') }}
+                        </button>
+                      </div>
+                    </div>
+                  }
+                }
+              }
+            }
           </div>
         </div>
       </div>
 
       <!-- Sidebar column -->
       <div class="space-y-8 sidebar-column w-1/3">
-        <!-- My Lists Preview -->
+        <!-- Latest Activity -->
         <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-bold text-primary mb-4">Latest activity</h2>
-          <div class="space-y-3">
-            <!-- List Card 1 -->
-            <div class="list-card glass rounded-xl p-4 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-white-50 rounded-lg flex items-center justify-center">
-                  <i class="ti ti-basket text-xl text-orange-400"></i>
-                </div>
-                <div>
-                  <p><b>Admin</b> added ingredient <b>Tomato</b></p>
-                </div>
-              </div>
-              <span class="text-xs font-medium text-brand">View</span>
+          <h2 class="text-xl font-bold text-primary mb-4">{{ t('latest_activity') }}</h2>
+          @if (activities.length === 0) {
+            <div class="flex flex-col items-center justify-center py-8 gap-2">
+              <i class="ti ti-inbox text-3xl" style="color: var(--primary-400);"></i>
+              <p class="text-secondary text-center text-sm">{{ t('no_recent_activity') }}</p>
             </div>
-
-            <!-- List Card 2 -->
-            <div class="list-card glass rounded-xl p-4 flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-white-50 rounded-lg flex items-center justify-center">
-                  <i class="ti ti-chef-hat text-xl text-blue-400"></i>
+          } @else {
+            <div class="max-h-96 overflow-y-auto my-4">
+              @for (activity of activities; track activity.id) {
+                <div class="list-card glass rounded-xl p-3 m-4 flex items-center justify-between cursor-pointer hover:scale-105">
+                  <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-white-50 rounded-lg flex items-center justify-center">
+                      <i class="ti text-xl"
+                         [class.ti-chef-hat]="activity.activityType.includes('CREATE_RECIPE') || activity.activityType.includes('UPDATE_RECIPE')"
+                         [class.text-blue-400]="activity.activityType.includes('CREATE_RECIPE') || activity.activityType.includes('UPDATE_RECIPE')"
+                         [class.ti-stack-2]="activity.activityType.includes('CREATE_COLLECTION') || activity.activityType.includes('UPDATE_COLLECTION') || activity.activityType.includes('ADD_RECIPE_TO_COLLECTION')"
+                         [class.text-green-400]="activity.activityType.includes('CREATE_COLLECTION') || activity.activityType.includes('UPDATE_COLLECTION') || activity.activityType.includes('ADD_RECIPE_TO_COLLECTION')"
+                         [class.ti-stars]="activity.activityType.includes('CREATE_REVIEW') || activity.activityType.includes('UPDATE_REVIEW')"
+                         [class.text-orange-400]="activity.activityType.includes('CREATE_REVIEW') || activity.activityType.includes('UPDATE_REVIEW')"
+                         [class.ti-trash]="activity.activityType.includes('DELETE_COLLECTION') || activity.activityType.includes('DELETE_RECIPE') || activity.activityType.includes('DELETE_REVIEW')"
+                         [class.text-red-400]="activity.activityType.includes('DELETE_COLLECTION') || activity.activityType.includes('DELETE_RECIPE') || activity.activityType.includes('DELETE_REVIEW')"></i>
+                    </div>
+                    <div>
+                      <p><b><span class="font-medium cursor-pointer hover:underline" style="color: var(--primary-600);" (click)="navigateToUser(activity.username, $event)">{{ activity.username }}</span></b> <span [innerHTML]="activity.formattedDescription"></span></p>
+                    </div>
+                  </div>
+                  @if (activity.activityType.includes('CREATE_') || activity.activityType.includes('UPDATE_') || activity.activityType.includes('ADD_')) {
+                    <button class="btn btn-primary text-xs font-medium text-brand" style="background: var(--gradient-primary)" (click)="navigateToActivityTarget(activity)">{{ t('view') }}</button>
+                  }
                 </div>
-                <div>
-                  <p><b>Mackerel</b> shared recipe <b>Garlic Rabbit</b></p>
-                </div>
-              </div>
-              <span class="text-xs font-medium text-brand">View</span>
+              }
             </div>
-          </div>
+          }
         </div>
 
-        <!-- Recent Reviews -->
+        <!-- Latest Reviews -->
         <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-bold text-primary mb-4">Latest reviews</h2>
+          <h2 class="text-xl font-bold text-primary mb-4">{{ t('latest_reviews') }}</h2>
           <div class="space-y-4">
-            <!-- Review Card 1 -->
-            <div class="glass rounded-xl p-4">
-              <div class="flex items-center justify-between mb-2">
-                <p class="text-sm text-primary">
-                  <b>Zebra</b> rated
-                  <b>Vegetable Paella</b>
-                </p>
-                <div class="flex items-center gap-1">
-                  <span class="text-sm font-semibold text-yellow-600">5</span>
-                  <svg class="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
-                    <polygon
-                      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                  </svg>
-                </div>
+            @if (reviews.length === 0) {
+              <div class="flex flex-col items-center justify-center py-8 gap-2">
+                <i class="ti ti-inbox text-3xl" style="color: var(--primary-400);"></i>
+                <p class="text-secondary text-center text-sm">{{ t('no_recent_reviews') }}</p>
               </div>
-              <p class="text-sm text-secondary italic">"This is amazing! I will definitely repeat it."</p>
-            </div>
-
-            <!-- Review Card 2 -->
-            <div class="glass rounded-xl p-4">
-              <div class="flex items-center justify-between mb-2">
-                <p class="text-sm text-primary">
-                  <span class="font-semibold">Fox</span> rated
-                  <b>Classic Caesar Salad</b>
-                </p>
-                <div class="flex items-center gap-1">
-                  <span class="text-sm font-semibold text-yellow-600">4</span>
-                  <svg class="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
-                    <polygon
-                      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                  </svg>
+            } @else {
+              @for (review of reviews; track review.id) {
+                <div class="glass rounded-xl p-4 hover:scale-105 transition-all">
+                  <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm text-primary">
+                      <a routerLink="/user/{{review.author}}" class="font-bold hover:underline">{{ review.username }}</a> {{ t('rated') }}
+                      <a routerLink="/recipes/{{review.recipeId}}" class="font-bold hover:underline">{{ review.recipeName }}</a>
+                    </p>
+                    <div class="flex items-center gap-1">
+                      <span class="text-sm font-semibold text-yellow-600">{{ review.rating }}</span>
+                      <i class="ti ti-star-filled w-4 h-4 text-yellow-500 fill-yellow-500"></i>
+                    </div>
+                  </div>
+                  <p class="text-sm text-secondary italic">"{{ stripHtml(review.comment) }}"</p>
                 </div>
-              </div>
-              <p class="text-sm text-secondary italic">"This is a great recipe, very easy to follow!"</p>
-            </div>
+              }
+            }
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+@if (showAddToCollectionDialog && selectedRecipeId) {
+  <app-collection-card
+    [mode]="'add-dialog'"
+    [recipeId]="selectedRecipeId"
+    [showDialog]="showAddToCollectionDialog"
+    (onClose)="closeAddToCollection()"
+    (onAdded)="onRecipeAddedToCollection()">
+  </app-collection-card>
+}
+
+@if (showCollectionView && selectedCollection) {
+  <app-collection-card
+    [mode]="'view'"
+    [collection]="selectedCollection"
+    [showDialog]="showCollectionView"
+    [isOwner]="currentUser && selectedCollection.author === currentUser.username"
+    [collectionList]="userCollections"
+    (onClose)="closeCollectionView()">
+  </app-collection-card>
+}

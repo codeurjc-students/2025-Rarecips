@@ -13,6 +13,7 @@ export interface User {
   createdAt: Date;
   lastOnline: Date;
   recipes: Recipe[];
+  privateProfile: boolean;
   reviews: Review[];
   savedRecipes: string[];
 

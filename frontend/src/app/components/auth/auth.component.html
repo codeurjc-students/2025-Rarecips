@@ -1,11 +1,30 @@
+@if (showSuccessBanner || bannerAnimatingOut) {
+  <div class="fixed top-10 left-0 m-0 w-full z-50 flex justify-center" style="pointer-events: none;">
+    <div [ngClass]="{
+      'success-banner-anim-in': showSuccessBanner && !bannerAnimatingOut,
+      'success-banner-anim-out': bannerAnimatingOut
+    }"
+    class="bg-green-600 text-white p-0 rounded-2xl shadow-lg flex flex-col items-center w-full h-12 max-w-2xl"
+    style="pointer-events: auto;">
+      <div class="w-[95%] h-1 m-0 p-0 bg-green-800 rounded-full overflow-hidden">
+        <div class="h-full bg-green-300 transition-all duration-100" [style.width.%]="successBannerProgress"></div>
+      </div>
+      <div class="w-full flex justify-center items-center p-0 m-0">
+        <span class="font-semibold text-lg !mt-1 p-0">{{ successBannerMessage }}</span>
+      </div>
+
+    </div>
+  </div>
+}
+
 <div class="auth-container">
   <div class="auth-wrapper glass">
     <!-- Left Side - Branding -->
     <div class="branding-section">
-      <div class="branding-content">
-        <embed src="../../../assets/icons/Rarecips_Iconologo2.svg" alt="Rarecips Iconologo" class="logo"/>
+      <div class="branding-content h-full">
+        <div [innerHTML]="logos.get('Rarecips_Iconologo2')" class="iconologo"></div>
         <p class="brand-subtitle">
-          Discover, create, and share unique recipes that awaken your senses
+          {{ t('brand_subtitle') }}
         </p>
 
         <!-- Floating Recipe Cards -->
@@ -105,14 +124,14 @@
     <div class="auth-tab-container">
       <!-- Tab Navigation -->
       <div class="auth-tabs glass gap-2">
-        <button class="auth-tab" [class.active]="activeTab === 'login'" (click)="switchTab('login')">
+        <button class="auth-tab login-tab" [class.active]="activeTab === 'login'" (click)="switchTab('login')">
           <i class="ti ti-login text-xl" aria-hidden="true"></i>
-          Log in
+          {{ t('login') }}
         </button>
-        <button class="auth-tab" style="color: var(--primary-700)" [class.active]="activeTab === 'signup'"
+        <button class="auth-tab signup-tab" style="color: var(--primary-700)" [class.active]="activeTab === 'signup'"
                 (click)="switchTab('signup')">
           <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
-          Sign up
+          {{ t('register') }}
         </button>
       </div>
       <div class="auth-section">
@@ -123,36 +142,40 @@
                [class.hidden]="activeTab !== 'login'">
             <div class="form-header">
               <h2 class="form-title">
-                Welcome back!
+                {{ t('welcome_back') }}
               </h2>
               <p class="form-subtitle">
-                Log in to continue your culinary adventure
+                {{ t('login_subtitle') }}
               </p>
             </div>
 
-            <form class="form-content" (ngSubmit)="onLogin()">
+            <form class="form-content" (ngSubmit)="onLogin()" [attr.autocomplete]="localStorage.getItem('rememberMe') ? 'on' : 'off'">
               <div class="form-group">
-                <label for="login-username" class="form-label">Username</label>
-                <div class="input-wrapper">
+                <label for="login-username" class="form-label">{{ t('username') }}</label>
+                <div class="input-wrapper mb-3">
                   <i class="ti ti-at text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                   <input type="text" id="login-username" class="form-input glass-input"
-                         placeholder="Username" [(ngModel)]="loginForm.username" name="username" required>
+                         [placeholder]="t('username')" [(ngModel)]="loginForm.username" name="username" required
+                         autocomplete="username">
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="login-password" class="form-label">Password</label>
+                <label for="login-password" class="form-label">{{ t('password') }}</label>
                 <div class="input-wrapper">
                   <i class="ti ti-lock text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                   <input [type]="showLoginPassword ? 'text' : 'password'" id="login-password"
-                         class="form-input glass-input" placeholder="Your password"
-                         [(ngModel)]="loginForm.password" name="password" required>
-                  <button type="button" class="password-toggle"
-                          (click)="showLoginPassword = !showLoginPassword">
+                         class="form-input glass-input" [placeholder]="t('password_placeholder')"
+                         [(ngModel)]="loginForm.password" name="password" required
+                         autocomplete="password">
+                  <button type="button" class="password-toggle" tabindex="-1" aria-hidden="true"
+                          (mousedown)="holdLoginPassword()"
+                          (mouseup)="releaseLoginPassword()"
+                          (mouseleave)="releaseLoginPassword()">
                     @if (!showLoginPassword) {
                       <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
-                    @if (showLoginPassword) {
+                    @else {
                       <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
                   </button>
@@ -166,15 +189,19 @@
                   <input type="checkbox" class="form-checkbox" [(ngModel)]="loginForm.rememberMe"
                          name="rememberMe">
                   <span class="checkbox-custom glass-input"></span>
-                  <span class="checkbox-label">Remember me</span>
+                  <span class="checkbox-label">{{ t('remember_me') }}</span>
                 </label>
-                <a href="#" class="forgot-link" (click)="onForgotPassword($event)">Forgot your
-                  password?</a>
+                <a href="#" class="forgot-link" (click)="onForgotPassword($event)">{{ t('forgot_password') }}</a>
               </div>
 
               <button type="submit" class="form-submit glass-button" id="loginBut">
-                <i class="ti ti-login text-xl" aria-hidden="true"></i>
-                Log In
+                <div *ngIf="!loginLoad">
+                  <i class="ti ti-login text-xl" aria-hidden="true"></i>
+                  {{ t('login') }}
+                </div>
+                <div *ngIf="loginLoad" class="w-7 h-7">
+                  <div [innerHTML]="logos.get('Rarecips_Spinner')"></div>
+                </div>
               </button>
             </form>
           </div>
@@ -184,67 +211,68 @@
                [class.hidden]="activeTab !== 'signup'">
             <div class="form-header">
               <h2 class="form-title">
-                Join Rarecips!
+                {{ t('join_rarecips') }}
               </h2>
-              <p class="form-subtitle">Create your account and start exploring unique flavors</p>
+              <p class="form-subtitle">{{ t('signup_subtitle') }}</p>
             </div>
 
             <form class="form-content" (ngSubmit)="onSignup()">
               <div class="form-group">
-                <label for="signup-username" class="form-label">Username</label>
-                <div class="input-wrapper">
+                <label for="signup-username" class="form-label">{{ t('username') }}</label>
+                <div class="input-wrapper mb-2">
                   <i class="ti ti-at text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                   <input type="text" id="signup-username" class="form-input glass-input"
-                         placeholder="Your username" [(ngModel)]="signupForm.username"
+                         [placeholder]="t('username_placeholder')" [(ngModel)]="signupForm.username"
+                         (change)="onUsernameInput(signupUsernameInput.value)"
                          name="username" required
-                         #signupUsernameInput
-                         (input)="onUsernameInput(signupUsernameInput.value)">
+                         #signupUsernameInput>
                 </div>
-                <div class="username-status hidden absolute top-60 left-16">
+                <div class="username-status ml-8 hidden fixed mt-20">
                   @if (isUsernameAvailable != null) {
                     @if (isUsernameAvailable === true) {
-                      <small class="text-success" style="color: green;">Nickname available ✓</small>
+                      <small class="text-success" style="color: green;">{{ t('nickname_available') }}</small>
                     } @else {
-                      <small class="text-danger" style="color: red;">Nickname not available ✕</small>
+                      <small class="text-danger" style="color: red;">{{ t('nickname_not_available') }}</small>
                     }
                   } @else {
-                    <small class="text-muted" style="color: gray;">Checking availability...</small>
+                    <small class="text-muted" style="color: gray;">{{ t('checking_availability') }}</small>
                   }
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="signup-email" class="form-label">Email</label>
+                <label for="signup-email" class="form-label">{{ t('email') }}</label>
                 <div class="input-wrapper">
                   <i class="ti ti-mail text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                   <input type="email" id="signup-email" class="form-input glass-input"
-                         placeholder="your@email.com" [(ngModel)]="signupForm.email" name="email"
+                         [placeholder]="t('email_placeholder')" [(ngModel)]="signupForm.email" name="email"
                          required>
                 </div>
               </div>
 
-              <div class="emailErrorMsg text-red-500 flex justify-center absolute top-[21.5rem] left-28"></div>
+              <div class="emailErrorMsg text-red-500 flex justify-center absolute top-[21.5rem] left-16"></div>
 
               <div class="form-group">
-                <label for="signup-password" class="form-label">Password</label>
+                <label for="signup-password" class="form-label">{{ t('password') }}</label>
                 <div class="input-wrapper">
                   <i class="ti ti-lock text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                   <input [type]="showSignupPassword ? 'text' : 'password'" id="signup-password"
-                         class="form-input glass-input" placeholder="Choose a secure password"
-                         [(ngModel)]="signupForm.password" (ngModelChange)="onPasswordInput($event)" name="password"
-                         required>
-                  <button type="button" class="password-toggle"
-                          (click)="showSignupPassword = !showSignupPassword">
+                         class="form-input glass-input" [placeholder]="t('password_placeholder')"
+                         [(ngModel)]="signupForm.password" (ngModelChange)="onPasswordInput($event)" name="password" required>
+                  <button type="button" class="password-toggle" tabindex="-1" aria-hidden="true"
+                          (mousedown)="holdSignupPassword()"
+                          (mouseup)="releaseSignupPassword()"
+                          (mouseleave)="releaseSignupPassword()">
                     @if (!showSignupPassword) {
                       <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
-                    @if (showSignupPassword) {
+                    @else {
                       <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
                   </button>
                 </div>
 
-                <div class="password-strength-wrapper top-[calc(61%)] left-16"
+                <div class="password-strength-wrapper"
                      (mouseenter)="showPasswordRequirements = true" (mouseleave)="showPasswordRequirements = false">
                   <div class="flex flex-row items-center gap-4">
                     <div class="strength-track !w-2/4">
@@ -259,38 +287,39 @@
 
                   <div class="password-requirements" [class.visible]="showPasswordRequirements" role="dialog">
                     <ul>
-                      <li [class.ok]="strengthCriteria.length">Minimum 8 characters</li>
-                      <li [class.ok]="strengthCriteria.lower">Lowercase letter</li>
-                      <li [class.ok]="strengthCriteria.upper">Uppercase letter</li>
-                      <li [class.ok]="strengthCriteria.number">Number (0-9)</li>
-                      <li [class.ok]="strengthCriteria.special">Special character (e.g. !&commat;#$%)</li>
+                      <li [class.ok]="strengthCriteria.length">{{ t('min_8_chars') }}</li>
+                      <li [class.ok]="strengthCriteria.lower">{{ t('lowercase_letter') }}</li>
+                      <li [class.ok]="strengthCriteria.upper">{{ t('uppercase_letter') }}</li>
+                      <li [class.ok]="strengthCriteria.number">{{ t('number_0_9') }}</li>
+                      <li [class.ok]="strengthCriteria.special">{{ t('special_char') }}</li>
                     </ul>
                   </div>
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="signup-confirm-password" class="form-label">Confirm your
-                  Password</label>
+                <label for="signup-confirm-password" class="form-label">{{ t('confirm_password') }}</label>
                 <div class="input-wrapper">
                   <i class="ti ti-lock-check text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                   <input [type]="showConfirmPassword ? 'text' : 'password'"
                          id="signup-confirm-password" class="form-input glass-input"
-                         placeholder="Confirma tu contraseña" [(ngModel)]="signupForm.confirmPassword"
+                         [placeholder]="t('confirm_password_placeholder')" [(ngModel)]="signupForm.confirmPassword"
                          (ngModelChange)="onConfirmPasswordInput($event)"
                          name="confirmPassword" required>
-                  <button type="button" class="password-toggle"
-                          (click)="showConfirmPassword = !showConfirmPassword">
+                  <button type="button" class="password-toggle" tabindex="-1" aria-hidden="true"
+                          (mousedown)="holdConfirmPassword()"
+                          (mouseup)="releaseConfirmPassword()"
+                          (mouseleave)="releaseConfirmPassword()">
                     @if (!showConfirmPassword) {
                       <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
-                    @if (showConfirmPassword) {
+                    @else {
                       <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
                   </button>
                 </div>
                 <div class="password-status hidden absolute bottom-[calc(21%)] left-16">
-                  <small class="text-danger" style="color: red;">Passwords do not match ✕</small>
+                  <small class="text-danger" style="color: red;">{{ t('passwords_do_not_match') }}</small>
                 </div>
               </div>
 
@@ -300,15 +329,21 @@
                          name="acceptTerms" required>
                   <span class="checkbox-custom glass-input"></span>
                   <span class="checkbox-label">
-                                        I accept the <a href="#" class="terms-link">terms and conditions</a> and
-                                        <a href="#" class="terms-link">privacy policy</a>
-                                    </span>
+                    {{ t('accept_terms') }} <a href="#" class="terms-link">{{ t('terms_and_conditions') }}</a> {{ t('and') }}
+                    <a href="#" class="terms-link">{{ t('privacy_policy') }}</a>
+                  </span>
                 </label>
               </div>
 
-              <button type="submit" [disabled]="isSignupDisabled()" class="form-submit glass-button">
-                <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
-                Create Account
+              <button type="submit" [disabled]="isSignupDisabled()" id="signupBut" class="form-submit glass-button">
+                <div *ngIf="!signupLoad" class="flex flex-row gap-2 items-center justify-center">
+                  <i class="ti ti-user-plus text-xl" aria-hidden="true"></i>
+                  {{ t('create_account') }}
+                </div>
+                <div *ngIf="signupLoad">
+                  <div [innerHTML]="logos.get('Rarecips_Spinner')" class="flex flex-row w-7 h-7 items-center justify-center"></div>
+                </div>
+
               </button>
             </form>
           </div>
@@ -317,3 +352,53 @@
     </div>
   </div>
 </div>
+
+@if (showForgotPasswordModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center visibleBackdrop"
+       style="backdrop-filter: blur(10px); background: var(--primary-backdrop);">
+    <div class="w-96 rounded-3xl shadow-2xl p-8 relative" style="background: var(--primary-200);">
+      <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-700);">{{ t('change_password') }}</h2>
+      <form (submit)="onForgotPasswordSubmit($event)">
+        <div class="mb-4">
+          <label for="forgotEmail" class="block text-sm font-semibold mb-1" style="color: var(--primary-500);">{{ t('email') }}</label>
+          <input id="forgotEmail" type="email" class="w-full p-2 rounded border"
+                 style="background: var(--primary-100);" [(ngModel)]="forgotEmail" name="forgotEmail" required />
+        </div>
+        @if (forgotPasswordError) {
+          <div class="text-red-600 text-sm mb-2">{{ forgotPasswordError }}</div>
+        }
+        @if (forgotPasswordSuccess) {
+          <div class="text-green-600 text-sm mb-2">{{ forgotPasswordSuccess }}</div>
+        }
+        <div class="flex justify-end gap-4 mt-6">
+          <button type="button" class="btn btn-secondary" (click)="closeForgotPasswordModal($event)">{{ t('cancel') }}</button>
+          <button type="submit" class="btn btn-primary rounded-2xl text-white" style="background: var(--gradient-primary)">{{ t('send_link') }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<app-change-password-modal
+  [show]="showChangePasswordModal"
+  [requireCurrentPassword]="false"
+  [loading]="changePasswordLoading"
+  [error]="changePasswordError"
+  [success]="changePasswordSuccess"
+  [showPasswordRequirements]="showPasswordRequirements"
+  [strengthPercent]="strengthPercent"
+  [strengthColor]="strengthColor"
+  [strengthLabel]="strengthLabel"
+  [strengthCriteria]="strengthCriteria"
+  [showPasswordStatus]="showPasswordStatus"
+  [showNewPassword]="showNewPassword"
+  [showConfirmPassword]="showConfirmPassword"
+  [isChangePasswordDisabled]="isChangePasswordDisabled()"
+  (close)="closeChangePasswordModal()"
+  (submit)="onChangePasswordSubmit($event)"
+  (passwordInput)="onPasswordInput($event)"
+  (confirmPasswordInput)="onConfirmPasswordInput($event)"
+  (showNewPasswordChange)="showNewPassword = $event"
+  (showConfirmPasswordChange)="showConfirmPasswordChange = $event"
+  (showPasswordRequirementsChange)="showPasswordRequirements = $event"
+></app-change-password-modal>

@@ -150,3 +150,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment ###
+**.properties
+**.7z
+**.txt

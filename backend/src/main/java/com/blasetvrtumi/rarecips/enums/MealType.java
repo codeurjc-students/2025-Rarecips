@@ -1,14 +1,11 @@
 package com.blasetvrtumi.rarecips.enums;
 
 public enum MealType {
-    BREAKFAST("Breakfast"),
-    BRUNCH("Brunch"),
     LUNCH_DINNER("Lunch/Dinner"),
-    SNACK("Snack"),
-    TEATIME("Teatime"),
-    DESSERT("Dessert"),
-    APPETIZER("Appetizer"),
-    BEVERAGE("Beverage");
+    BREAKFAST("breakfast"),
+    BRUNCH("brunch"),
+    SNACK("snack"),
+    TEATIME("teatime");
 
     private final String displayName;
 
