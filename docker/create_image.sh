@@ -53,7 +53,7 @@ else
         COMMIT_SHA=$(git rev-parse --short HEAD 2>/dev/null)
 
         # Set mode to datetime-commit
-        MODE="${BRANCH_NAME}-$DATETIME-${LAST_COMMIT_SHA:0:7}"
+        MODE="${BRANCH_NAME}-$DATETIME-${COMMIT_SHA:0:7}"
     fi
 
     # Build container
