@@ -1,14 +1,29 @@
 name: Manual build Docker Image Push
+
 on:
   workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Commit SHA (optional)'
+        required: false
+        default: ''
+
 jobs:
   manual-image-push:
     name: Manual build Docker Image Push
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository (selected branch)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout specific commit in case provided
+        if: ${{ github.event.inputs.commit_sha != '' }}
+        run: |
+          echo "Checking out commit ${{ github.event.inputs.commit_sha }}"
+          git checkout ${{ github.event.inputs.commit_sha }}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -16,14 +31,14 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Run create_image script for manual push
+      - name: Run create_image script
         working-directory: ./docker
         env:
           DOCKERHUB_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           BRANCH: ${{ github.ref_name }}
-          DATETIME: ${{ github.event.workflow_dispatch.inputs.datetime || '' }}
-          COMMIT_SHA: ${{ github.event.workflow_dispatch.inputs.commit_sha || '' }}
+          COMMIT_SHA: ${{ github.event.inputs.commit_sha || github.sha }}
+          TERM: xterm
         run: |
           chmod +x ./create_image.sh
           ./create_image.sh build
