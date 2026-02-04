@@ -18,13 +18,6 @@ jobs:
           ref: ${{ github.event.inputs.commit_sha || github.ref }}
           fetch-depth: 0
 
-      - name: debug show checked out commit and inputs
-        run: |
-          echo "github.ref = ${{ github.ref }}"
-          echo "input commit_sha = '${{ github.event.inputs.commit_sha }}'"
-          git rev-parse HEAD
-          git rev-parse --short HEAD
-          git show -s --format="%H %an %ad" HEAD
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
