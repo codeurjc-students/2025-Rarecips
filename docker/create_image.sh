@@ -70,6 +70,6 @@ if [ "$MODE" != "build" ]; then
     docker compose -f $FILE -p rarecips publish --with-env -y "$DOCKERHUB_USER/rarecips:$MODE-compose"
 
     # OCI Compose up
-    docker compose -f oci://docker.io/$DOCKERHUB_USER/rarecips:$MODE-compose -p rarecips up
+    # docker compose -f oci://docker.io/$DOCKERHUB_USER/rarecips:$MODE-compose -p rarecips up
 
 fi
