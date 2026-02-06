@@ -129,21 +129,21 @@
 
                   <!-- Recipe Stats -->
                   <div class="flex flex-row justify-center md:grid-cols-4 gap-4">
-                    <div class="flex flex-col items-center p-4 glass h-full w-full"
+                    <div class="flex flex-col items-center p-4 glass h-auto w-full justify-center"
                          style="background: var(--primary-200-40);">
                       <i class="ti ti-clock text-2xl mb-2" style="color: var(--primary-500);"></i>
-                      <span class="text-sm font-semibold"
+                      <span class="text-sm font-semibold mx-auto w-max"
                             style="color: var(--primary-400);">{{ t('total_time') }}</span>
                       <span class="text-lg font-bold" style="color: var(--primary-700);">{{ recipe?.totalTime }} {{ t('min') }}</span>
                     </div>
-                    <div class="flex flex-col items-center p-4 glass h-full w-full"
+                    <div class="flex flex-col items-center p-4 glass h-auto w-full justify-center"
                          style="background: var(--primary-200-40);">
                       <i class="ti ti-users text-2xl mb-2" style="color: var(--primary-500);"></i>
                       <span class="text-sm font-semibold"
                             style="color: var(--primary-400);">{{ t('servings') }}</span>
                       <span class="text-lg font-bold" style="color: var(--primary-700);">{{ recipe?.people }}</span>
                     </div>
-                    <div class="flex flex-col items-center p-4 glass h-full w-full"
+                    <div class="flex flex-col items-center p-4 glass h-auto w-full justify-center"
                          style="background: var(--primary-200-40);">
                       <i class="ti ti-star text-2xl mb-2" style="color: var(--primary-500);"></i>
                       <span class="text-sm font-semibold"
@@ -151,7 +151,7 @@
                       <span class="text-lg font-bold"
                             style="color: var(--primary-700);">{{ recipe?.rating }}</span>
                     </div>
-                    <div class="flex flex-col items-center p-4 glass h-auto w-full"
+                    <div class="flex flex-col items-center p-4 glass h-auto w-full justify-center"
                          style="background: var(--primary-200-40);">
                       <div class="flex flex-row justify-center gap-0 mb-2">
                         @for (i of [1,2,3,4,5]; track i) {
@@ -492,12 +492,13 @@
                               </button>
                             </div>
 
-                          <textarea
+                          <div
                             contenteditable="true"
                             (input)="onCommentInput($event)"
+                            (change)="onCommentInput($event)"
                             class="w-full min-h-[150px] p-4 rounded-lg focus:outline-none reviewEditor"
                             style="background: var(--primary-100-40) !important; color: var(--primary-700); border: 2px solid var(--primary-300);"
-                            [placeholder]="t('share_experience')"></textarea>
+                            attr.placeholder="{{t('share_experience')}}"></div>
                         </div>
 
                           <div class="flex gap-3 mt-4">

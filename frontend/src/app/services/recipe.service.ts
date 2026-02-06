@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Recipe} from "../models/recipe.model";
 import {Router} from "@angular/router";
 import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
-import {catchError, map, Observable, throwError, tap} from "rxjs";
+import {catchError, map, Observable, throwError, tap, switchMap} from "rxjs";
 
 @Injectable({
   providedIn: "root"
@@ -151,8 +151,25 @@ export class RecipeService {
     } else {
       // Server-side error
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+      this.router.navigate(['/error'], { queryParams: { code: error.status, message: error.message } });
     }
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
+  }
+
+  getDefaultRecipeImageUrl() {
+    return this.httpClient.get('/assets/img/recipe.png', { responseType: 'blob' }).pipe(
+      switchMap(blob => {
+        return new Observable<string>(observer => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            observer.next(reader.result as string);
+            observer.complete();
+          };
+          reader.onerror = (err) => observer.error(err);
+          reader.readAsDataURL(blob);
+        });
+      })
+    );
   }
 }

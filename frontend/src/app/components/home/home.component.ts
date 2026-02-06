@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {forkJoin, Observable} from 'rxjs';
+import {BehaviorSubject, forkJoin, Observable} from 'rxjs';
 import {Recipe} from '../../models/recipe.model';
 import {RecipeService} from '../../services/recipe.service';
 import {RecipeCollectionService} from '../../services/recipe-collection.service';
@@ -34,7 +34,13 @@ export class HomeComponent implements OnInit {
 
   logos: Map<string, string> = new Map();
 
-  userCollections: RecipeCollection[] = [];
+  private userCollectionsSubject = new BehaviorSubject<RecipeCollection[]>([]);
+  public userCollections$ = this.userCollectionsSubject.asObservable();
+
+  get userCollections(): RecipeCollection[] {
+    return this.userCollectionsSubject.value;
+  }
+
   popularCollections: RecipeCollection[] = [];
   collectionsLoading: boolean = false;
 
@@ -124,10 +130,13 @@ export class HomeComponent implements OnInit {
     this.collectionsLoading = true;
     this.collectionService.getAllUserCollections(username).subscribe({
       next: (collections) => {
-        this.userCollections = collections.reverse().filter(c => !c.isFavorites).slice(0, 10);
+        const filtered = collections.reverse().filter(c => !c.isFavorites).slice(0, 10);
+        this.userCollectionsSubject.next(filtered);
         this.collectionsLoading = false;
+        this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading user collections:', err);
         this.collectionsLoading = false;
       }
     });

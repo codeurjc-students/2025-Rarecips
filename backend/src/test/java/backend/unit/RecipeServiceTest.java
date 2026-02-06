@@ -14,8 +14,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.User;
+import com.blasetvrtumi.rarecips.repository.RecipeCollectionRepository;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
+import com.blasetvrtumi.rarecips.service.ActivityService;
 import com.blasetvrtumi.rarecips.service.RecipeService;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,6 +28,12 @@ public class RecipeServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ActivityService activityService;
+
+    @Mock
+    private RecipeCollectionRepository recipeCollectionRepository;
 
     @InjectMocks
     private RecipeService recipeService;
@@ -48,8 +56,52 @@ public class RecipeServiceTest {
         verify(userRepository).findByUsername(author.getUsername());
     }
 
+    @Test
+    public void shouldUpdateRecipeSuccessfully() {
+        User author = createMockUser();
+        Recipe recipe = createMockRecipe(author);
+        recipe.setId(1L);
+        when(recipeRepository.findById(1L)).thenReturn(Optional.of(recipe));
+        recipe.setLabel("Updated Spaghetti");
+        when(recipeRepository.save(any(Recipe.class))).thenReturn(recipe);
+        Recipe result = recipeService.updateRecipe(1L, recipe, author.getUsername());
+        assertThat(result.getLabel()).isEqualTo("Updated Spaghetti");
+        verify(recipeRepository).save(any(Recipe.class));
+    }
+
+    @Test
+    public void shouldDeleteRecipeSuccessfully() {
+        User author = createMockUser();
+        Recipe recipe = createMockRecipe(author);
+        when(recipeRepository.findById(1L)).thenReturn(Optional.of(recipe));
+        when(recipeCollectionRepository.findAll()).thenReturn(new ArrayList<>());
+        doNothing().when(recipeRepository).delete(any(Recipe.class));
+        recipeService.deleteRecipe(1L, author.getUsername());
+        verify(recipeRepository).delete(any(Recipe.class));
+    }
+
+    @Test
+    public void shouldFindRecipeByIdSuccessfully() {
+        User author = createMockUser();
+        Recipe recipe = createMockRecipe(author);
+        when(recipeRepository.findById(1L)).thenReturn(Optional.of(recipe));
+        Recipe result = recipeService.findById(1L);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getLabel()).isEqualTo("Test Recipe");
+        verify(recipeRepository).findById(1L);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenRecipeNotFound() {
+        when(recipeRepository.findById(99L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> recipeService.findById(99L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Recipe not found");
+    }
+
     private User createMockUser() {
-        User user = new User(
+        return new User(
                 "testuser",           // username
                 "password",           // password
                 "test@example.com",   // email
@@ -58,7 +110,6 @@ public class RecipeServiceTest {
                 "Test description",   // description
                 "Test Bio"            // bio
         );
-        return user;
     }
 
     private Recipe createMockRecipe(User author) {

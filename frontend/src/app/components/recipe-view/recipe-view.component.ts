@@ -285,6 +285,7 @@ export class RecipeViewComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading recipe:', err);
+        this.router.navigate(['/error'], {state: {status: err.status, reason: err.message}});
       }
     });
   }
@@ -711,7 +712,7 @@ export class RecipeViewComponent implements OnInit {
     const startOffset = range?.startOffset || 0;
     const startContainer = range?.startContainer;
 
-    this.newReview.comment = target.value;
+    this.newReview.comment = target.innerText;
 
     setTimeout(() => {
       if (startContainer && this.selection && range) {

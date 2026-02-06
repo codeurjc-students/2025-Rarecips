@@ -1,4 +1,4 @@
-package frontend.e2e;
+package frontend.unit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,11 +14,11 @@ import com.blasetvrtumi.rarecips.RarecipsApplication;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = RarecipsApplication.class)
 @DirtiesContext
 @ActiveProfiles("test")
-public class BaseE2ETest {
+public class BaseUnitTest {
 
     protected WebDriver driver;
 
-    protected String baseUrl = "http://localhost:4200";
+    protected String baseUrl = "http://localhost:4200"; //Angular endpoint
 
     @BeforeEach
     public void setUp() {
@@ -38,4 +38,3 @@ public class BaseE2ETest {
     }
 
 }
-

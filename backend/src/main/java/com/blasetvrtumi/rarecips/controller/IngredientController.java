@@ -130,4 +130,16 @@ public class IngredientController {
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @Operation(summary = "Get ingredient by ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Ingredient found"),
+        @ApiResponse(responseCode = "404", description = "Ingredient not found")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<Ingredient> getIngredientById(@PathVariable Long id) {
+        return ingredientRepository.findById(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

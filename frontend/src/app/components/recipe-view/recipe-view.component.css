@@ -433,6 +433,12 @@
   box-shadow: 0 8px 25px rgba(79, 140, 255, 0.15);
 }
 
+[contenteditable=true]:empty:before{
+  content: attr(placeholder);
+  pointer-events: none;
+  color: var(--primary-300);
+}
+
 .reviews-preview {
   max-height: 400px;
   overflow-y: auto;

@@ -51,6 +51,8 @@ export class RecipeEditComponent implements OnInit {
   recipeId: number | null = null;
   isEditMode: boolean = false;
 
+  defaultImageUrl: string = '';
+
   title: string = '';
   description: string = '';
   prepTime: number = 0;
@@ -151,6 +153,13 @@ export class RecipeEditComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.recipeService.getDefaultRecipeImageUrl().subscribe({
+      next: (url) => {
+        this.defaultImageUrl = url;
+      },
+      error: (err) => console.error('Error loading default recipe image URL:', err)
+    })
+
     // Load enum values from backend
     this.loadEnumValues();
 
@@ -237,7 +246,7 @@ export class RecipeEditComponent implements OnInit {
               this.category = recipe.mealTypes[0];
             }
 
-            if (recipe.imageString) {
+            if (recipe.imageString && !this.defaultImageUrl.includes(recipe.imageString)) {
               if (!recipe.imageString.startsWith('data:image')) {
                 this.imagePreviewUrl = 'data:image/jpeg;base64,' + recipe.imageString;
               } else {

@@ -73,7 +73,11 @@ export class CollectionCardComponent implements OnInit, OnChanges {
     if (this.mode === 'list' && this.username) {
       this.loadCollections();
     } else if (this.mode === 'add-dialog' && this.showDialog) {
-      this.loadUserCollections();
+      if (this.collectionList.length > 0) {
+        this.collections = [...this.collectionList];
+      } else {
+        this.loadUserCollections();
+      }
     }
 
     this.translatorService.onChange(() => {
@@ -84,6 +88,16 @@ export class CollectionCardComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (this.mode === 'add-dialog' && this.showDialog && changes['showDialog']) {
       this.loadUserCollections();
+    }
+
+    if (changes['collectionList'] && changes['collectionList'].currentValue) {
+      if (this.mode === 'add-dialog') {
+        this.collections = [...changes['collectionList'].currentValue];
+      }
+    }
+
+    if (changes['collections'] && changes['collections'].currentValue) {
+      this.collections = [...changes['collections'].currentValue];
     }
   }
 
@@ -109,7 +123,10 @@ export class CollectionCardComponent implements OnInit, OnChanges {
 
     this.loading = true;
     this.collectionService.getAllUserCollections(this.sessionService.currentUser.username).subscribe({
-      next: () => {
+      next: (collections) => {
+        console.log('Loaded collections in collection-card:', collections.length);
+        this.collections = collections.filter(c => !c.isFavorites);
+        console.log('After filtering favorites:', this.collections.length);
         this.loading = false;
       },
       error: (error) => {

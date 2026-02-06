@@ -217,4 +217,8 @@ public class RecipeCollectionService {
         Pageable pageable = PageRequest.of(page, size);
         return recipeCollectionRepository.findByIsFavoritesFalse(pageable);
     }
+
+    public RecipeCollection updateCollection(RecipeCollection collection) {
+        return recipeCollectionRepository.save(collection);
+    }
 }

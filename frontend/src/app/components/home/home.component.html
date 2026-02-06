@@ -370,6 +370,8 @@
     [mode]="'add-dialog'"
     [recipeId]="selectedRecipeId"
     [showDialog]="showAddToCollectionDialog"
+    [collectionList]="userCollections"
+    [collections]="userCollections"
     (onClose)="closeAddToCollection()"
     (onAdded)="onRecipeAddedToCollection()">
   </app-collection-card>
@@ -382,6 +384,7 @@
     [showDialog]="showCollectionView"
     [isOwner]="currentUser && selectedCollection.author === currentUser.username"
     [collectionList]="userCollections"
+    [collections]="userCollections"
     (onClose)="closeCollectionView()">
   </app-collection-card>
 }

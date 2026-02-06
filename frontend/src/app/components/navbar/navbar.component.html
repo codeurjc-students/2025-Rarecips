@@ -188,7 +188,7 @@
       <label class="dropdown-trigger wrappableText" for="dropdownLangCheckbox" (click)="toggleLangDropdown()">
         <i class="flex items-center justify-center ti ti-language w-8 h-[2.75rem] text-[var(--primary-text)] text-body-bold text-xl" style="color: var(--primary-700);"></i>
         <span id="selectedLangText" class="ml-2 text-sm min-w-max" style="color: var(--primary-text)" [innerText]="currentLanguageText"></span>
-        <i id="dropdownLangIcon" class="flex items-center ti ti-caret-down-filled rotateCaret transition-all" [class.rotateCaret]="rotateLang" style="color: var(--primary-700);"></i>
+        <i id="dropdownLangIcon" class="flex items-center ti ti-caret-down-filled rotateCaret transition-all" [class.rotateCaret]="langDropdownOpen" style="color: var(--primary-700);"></i>
       </label>
       <div (click)="selectLanguage($event)" class="dropdown-menu mt-2 px-12" (focusout)="closeLangDropdown()" id="dropdownLangMenu" [class.open]="langDropdownOpen" style="background-color: var(--primary-50); transform: translateX(-1rem);">
         <button class="dropdown-item" data-lang="es" style="color: var(--primary-text)">Español</button>
