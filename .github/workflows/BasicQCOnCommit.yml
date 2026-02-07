@@ -42,6 +42,12 @@ jobs:
         run: |
           timeout 60 bash -c 'until curl -s http://localhost:4200 > /dev/null; do sleep 2; done' || echo "Frontend might not be fully ready"
 
+      - name: Create env.properties from secrets
+        working-directory: ./backend/src/main/resources
+        run: |
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
+
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
@@ -56,9 +62,9 @@ jobs:
       - name: Run Unit Tests
         working-directory: ./backend
         run: |
-          mvn test -Dtest="**/unit/**/*Test" -Dsurefire.failIfNoSpecifiedTests=false || \
-          mvn test -Dtest="**/*Test" -Dgroups="unit" -Dsurefire.failIfNoSpecifiedTests=false || \
-          mvn test -Dsurefire.failIfNoSpecifiedTests=false
+          mvn clean test -Dtest="**/unit/**/*Test" -Dsurefire.failIfNoSpecifiedTests=false || \
+          mvn clean test -Dtest="**/*Test" -Dgroups="unit" -Dsurefire.failIfNoSpecifiedTests=false || \
+          mvn clean test -Dsurefire.failIfNoSpecifiedTests=false
 
       - name: Stop Angular Frontend
         if: always()
