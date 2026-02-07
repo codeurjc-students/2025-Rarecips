@@ -37,6 +37,12 @@ jobs:
           java-version: "21"
           distribution: "temurin"
 
+      - name: Create env.properties from secrets
+        working-directory: ./backend/src/main/resources
+        run: |
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -76,11 +82,11 @@ jobs:
 
       - name: Run Unit Tests
         working-directory: ./backend
-        run: mvn test -Dtest="*/unit/*Test"
+        run: mvn clean test -Dtest="*/unit/*Test"
 
       - name: Run Integration Tests
         working-directory: ./backend
-        run: mvn test -Dtest="*/integration/*Test"
+        run: mvn clean test -Dtest="*/integration/*Test"
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
           SPRING_DATASOURCE_USERNAME: root
@@ -89,7 +95,7 @@ jobs:
 
       - name: Run System (E2E) Backend Tests
         working-directory: ./backend
-        run: mvn test -Dtest="backend.unit.*Test"
+        run: mvn clean test -Dtest="backend.unit.*Test"
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
           SPRING_DATASOURCE_USERNAME: root
@@ -123,6 +129,20 @@ jobs:
     name: Frontend Complete Testing
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: rarecips
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -155,9 +175,41 @@ jobs:
           java-version: "21"
           distribution: "temurin"
 
+      - name: Create env.properties from secrets
+        working-directory: ./backend/src/main/resources
+        run: |
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
+
+      - name: Wait for it
+        run: |
+          sleep 15
+          until mysql --host 127.0.0.1 --port 3306 -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"; do
+            echo "Waiting for MySQL to be ready..."
+            sleep 5
+          done
+
+      - name: Run Unit Tests
+        working-directory: ./backend
+        run: mvn clean test -Dtest="frontend.unit.*Test"
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+
+      - name: Run Integration Tests
+        working-directory: ./backend
+        run: mvn clean test -Dtest="frontend.integration.*Test"
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+
       - name: Run System (E2E) Frontend Tests
         working-directory: ./backend
-        run: mvn test -Dtest="frontend.unit.*Test"
+        run: mvn clean test -Dtest="frontend.e2e.*Test"
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
           SPRING_DATASOURCE_USERNAME: root

@@ -54,7 +54,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/public/**", "/swagger-ui/**", "/v3/api-docs/**")
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/public/**", "/swagger-ui/**", "/v3/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/recipes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/ingredients/**").permitAll()

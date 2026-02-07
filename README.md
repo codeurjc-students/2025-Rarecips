@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-   <img src="readme-resources/Iconologo.svg" width="50%"/>
+   <img src="readme-resources/Rarecips_Iconologo.png" width="50%"/>
 </p>
 
 <p align="center">
