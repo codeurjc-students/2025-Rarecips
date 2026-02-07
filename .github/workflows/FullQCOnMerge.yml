@@ -127,6 +127,20 @@ jobs:
     name: Frontend Complete Testing
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: rarecips
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -158,6 +172,14 @@ jobs:
         with:
           java-version: "21"
           distribution: "temurin"
+
+      - name: Wait for it
+        run: |
+          sleep 15
+          until mysql --host 127.0.0.1 --port 3306 -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"; do
+            echo "Waiting for MySQL to be ready..."
+            sleep 5
+          done
 
       - name: Run System (E2E) Frontend Tests
         working-directory: ./backend
