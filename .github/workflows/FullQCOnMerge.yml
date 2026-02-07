@@ -72,13 +72,19 @@ jobs:
             sleep 5
           done
 
+      - name: Create env.properties from secrets
+        working-directory: ./backend/src/main/resources
+        run: |
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
+
       - name: Run Unit Tests
         working-directory: ./backend
-        run: mvn test -Dtest="*/unit/*Test"
+        run: mvn clean test -Dtest="*/unit/*Test"
 
       - name: Run Integration Tests
         working-directory: ./backend
-        run: mvn test -Dtest="*/integration/*Test"
+        run: mvn clean test -Dtest="*/integration/*Test"
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
           SPRING_DATASOURCE_USERNAME: root
@@ -87,7 +93,7 @@ jobs:
 
       - name: Run System (E2E) Backend Tests
         working-directory: ./backend
-        run: mvn test -Dtest="backend.unit.*Test"
+        run: mvn clean test -Dtest="backend.unit.*Test"
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
           SPRING_DATASOURCE_USERNAME: root
@@ -155,7 +161,7 @@ jobs:
 
       - name: Run System (E2E) Frontend Tests
         working-directory: ./backend
-        run: mvn test -Dtest="frontend.unit.*Test"
+        run: mvn clean test -Dtest="frontend.unit.*Test"
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
           SPRING_DATASOURCE_USERNAME: root
