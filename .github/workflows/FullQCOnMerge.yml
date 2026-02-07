@@ -35,6 +35,12 @@ jobs:
           java-version: "21"
           distribution: "temurin"
 
+      - name: Create env.properties from secrets
+        working-directory: ./backend/src/main/resources
+        run: |
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -71,12 +77,6 @@ jobs:
             echo "Waiting for MySQL to be ready..."
             sleep 5
           done
-
-      - name: Create env.properties from secrets
-        working-directory: ./backend/src/main/resources
-        run: |
-          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
-          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
 
       - name: Run Unit Tests
         working-directory: ./backend
