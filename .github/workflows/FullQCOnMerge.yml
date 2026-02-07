@@ -173,6 +173,12 @@ jobs:
           java-version: "21"
           distribution: "temurin"
 
+      - name: Create env.properties from secrets
+        working-directory: ./backend/src/main/resources
+        run: |
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
+
       - name: Wait for it
         run: |
           sleep 15
@@ -181,9 +187,27 @@ jobs:
             sleep 5
           done
 
-      - name: Run System (E2E) Frontend Tests
+      - name: Run Unit Tests
         working-directory: ./backend
         run: mvn clean test -Dtest="frontend.unit.*Test"
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+
+      - name: Run Integration Tests
+        working-directory: ./backend
+        run: mvn clean test -Dtest="frontend.integration.*Test"
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+
+      - name: Run System (E2E) Frontend Tests
+        working-directory: ./backend
+        run: mvn clean test -Dtest="frontend.e2e.*Test"
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
           SPRING_DATASOURCE_USERNAME: root
