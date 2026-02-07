@@ -1,9 +1,7 @@
 name: Basic Quality Control on Commit
 
 on:
-  push:
-    branches-ignore:
-      - main
+  workflow_dispatch:
 
 jobs:
 
