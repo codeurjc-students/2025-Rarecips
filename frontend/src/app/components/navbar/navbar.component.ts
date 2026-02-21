@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {NavigationEnd, Router, RouterModule, RoutesRecognized} from '@angular/router';
 import {Subject, takeUntil, forkJoin, debounceTime, switchMap, of, filter} from 'rxjs';
-import {CommonModule} from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {SessionService} from '../../services/session.service';
 import {RecipeService} from '../../services/recipe.service';
 import {IngredientService} from '../../services/ingredient.service';
@@ -41,10 +41,19 @@ export class NavbarComponent implements OnInit {
   isAdmin = false;
   user: any = null;
   isLogoClicked: boolean = false;
+  anyActiveSections: boolean = false;
+  responsive: boolean = window.innerWidth <= 1366;
+  navExpanded: boolean = false;
+  isDragging: boolean = false;
+  startX: number = 0;
+  startTime: number = 0;
+  currentWidth: number = 0;
+  collapsedWidth: number = 0;
+  expandedWidth: number = 240;
 
   showCollectionView = false;
   selectedCollection: any = undefined;
-  navItem: string = 'home';
+  navItem: string = '';
 
   langDropdownOpen = false;
   rotateLang: boolean = false;
@@ -70,6 +79,7 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.logos = this.themeService.getLogos();
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -90,6 +100,9 @@ export class NavbarComponent implements OnInit {
       } else {
         this.navItem = undefined as any;
       }
+
+      let navbar = document.getElementById('navbar') as HTMLElement;
+      this.anyActiveSections = !!navbar.querySelector('.nav-item.active');
     });
 
     switch (this.currentLanguage) {
@@ -178,6 +191,12 @@ export class NavbarComponent implements OnInit {
       }
     });
 
+    this.sessionService.session$.subscribe(user => {
+      this.isAuthenticated = !!user;
+      this.user = user;
+      this.isAdmin = !!user && user.role === 'ADMIN';
+    });
+
     const selectedLangText = document.getElementById('selectedLangText');
     if (selectedLangText) {
       switch (this.currentLanguage) {
@@ -218,6 +237,276 @@ export class NavbarComponent implements OnInit {
     })
   }
 
+  onNavHover(hover: boolean) {
+    if (this.responsive) {
+      return;
+    }
+  }
+
+  toggleNav() {
+    if (this.responsive) {
+      this.navExpanded = !this.navExpanded;
+    }
+  }
+
+  closeNav() {
+    if (this.responsive) {
+      this.navExpanded = false;
+    }
+  }
+
+  onNavTouchStart(event: TouchEvent) {
+    if (window.innerWidth > 1024) return;
+
+    const target = event.target as HTMLElement;
+    if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
+      return;
+    }
+
+    this.isDragging = true;
+    this.startX = event.touches[0].clientX;
+    this.collapsedWidth = window.innerWidth * 0.20;
+    this.currentWidth = this.navExpanded ? this.expandedWidth : this.collapsedWidth;
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+
+    if (navbar) {
+      navbar.classList.add('dragging');
+    }
+
+    if (handle) {
+      handle.classList.add('dragging');
+    }
+  }
+
+  onNavTouchMove(event: TouchEvent) {
+    if (window.innerWidth > 1024 || !this.isDragging) return;
+
+    const target = event.target as HTMLElement;
+    if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const currentX = event.touches[0].clientX;
+    const deltaX = currentX - this.startX;
+    let newWidth = this.currentWidth + deltaX;
+
+    newWidth = Math.max(this.collapsedWidth, Math.min(this.expandedWidth, newWidth));
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+    const backdrop = document.querySelector('.nav-drag-backdrop') as HTMLElement;
+
+    if (navbar) {
+      navbar.style.setProperty('width', `${newWidth}px`, 'important');
+      navbar.style.setProperty('max-width', `${newWidth}px`, 'important');
+    }
+
+    if (handle) {
+      handle.style.left = `${newWidth - 2}px`;
+      const progress = (newWidth - this.collapsedWidth) / (this.expandedWidth - this.collapsedWidth);
+      const icon = handle.querySelector('i');
+      if (icon) {
+        (icon as HTMLElement).style.transform = `rotate(${progress * 180}deg)`;
+      }
+    }
+
+    if (backdrop) {
+      const progress = (newWidth - this.collapsedWidth) / (this.expandedWidth - this.collapsedWidth);
+      backdrop.style.opacity = `${progress}`;
+    }
+
+    const midPoint = (this.collapsedWidth + this.expandedWidth) / 2;
+    if (newWidth > midPoint) {
+      navbar?.classList.add('expanded');
+    } else {
+      navbar?.classList.remove('expanded');
+    }
+  }
+
+  onNavTouchEnd(event: TouchEvent) {
+    if (window.innerWidth > 1024 || !this.isDragging) return;
+
+    const target = event.target as HTMLElement;
+    if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
+      this.isDragging = false;
+      return;
+    }
+
+    const endX = event.changedTouches[0]?.clientX || this.startX;
+    const deltaX = endX - this.startX;
+    const finalWidth = this.currentWidth + deltaX;
+    const midPoint = (this.collapsedWidth + this.expandedWidth) / 2;
+    const shouldExpand = finalWidth > midPoint;
+
+    this.navExpanded = shouldExpand;
+    this.isDragging = false;
+    this.startX = 0;
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+    const backdrop = document.querySelector('.nav-drag-backdrop') as HTMLElement;
+
+    if (navbar != null) {
+      navbar.classList.remove('dragging');
+      navbar.style.width = '';
+      navbar.style.maxWidth = '';
+      if (shouldExpand) {
+        navbar.classList.add('expanded');
+      } else {
+        navbar.classList.remove('expanded');
+      }
+    }
+
+    if (handle) {
+      handle.classList.remove('dragging');
+      handle.style.left = '';
+      const icon = handle.querySelector('i');
+      if (icon) {
+        (icon as HTMLElement).style.transform = '';
+      }
+    }
+
+    if (backdrop) {
+      backdrop.style.opacity = '';
+    }
+  }
+
+  onHandleTouchStart(event: TouchEvent) {
+    if (window.innerWidth > 1024) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.isDragging = false;
+    this.startX = event.touches[0].clientX;
+    this.startTime = Date.now();
+    this.collapsedWidth = window.innerWidth * 0.20;
+    this.currentWidth = this.navExpanded ? this.expandedWidth : this.collapsedWidth;
+  }
+
+  onHandleTouchMove(event: TouchEvent) {
+    if (window.innerWidth > 1024) return;
+
+    const currentX = event.touches[0].clientX;
+    const deltaX = currentX - this.startX;
+
+    if (Math.abs(deltaX) > 5 && !this.isDragging) {
+      this.isDragging = true;
+      const navbar = document.getElementById('navbar');
+      const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+
+      if (navbar) {
+        navbar.classList.add('dragging');
+      }
+
+      if (handle) {
+        handle.classList.add('dragging');
+      }
+    }
+
+    if (!this.isDragging) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    let newWidth = this.currentWidth + deltaX;
+
+    newWidth = Math.max(this.collapsedWidth, Math.min(this.expandedWidth, newWidth));
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+    const backdrop = document.querySelector('.nav-drag-backdrop') as HTMLElement;
+
+    if (navbar) {
+      navbar.style.setProperty('width', `${newWidth}px`, 'important');
+      navbar.style.setProperty('max-width', `${newWidth}px`, 'important');
+    }
+
+    if (handle) {
+      handle.style.left = `${newWidth - 2}px`;
+      const progress = (newWidth - this.collapsedWidth) / (this.expandedWidth - this.collapsedWidth);
+      const icon = handle.querySelector('i');
+      if (icon) {
+        (icon as HTMLElement).style.transform = `rotate(${progress * 180}deg)`;
+      }
+    }
+
+    if (backdrop) {
+      const progress = (newWidth - this.collapsedWidth) / (this.expandedWidth - this.collapsedWidth);
+      backdrop.style.opacity = `${progress}`;
+    }
+
+    const midPoint = (this.collapsedWidth + this.expandedWidth) / 2;
+    if (newWidth > midPoint) {
+      navbar?.classList.add('expanded');
+    } else {
+      navbar?.classList.remove('expanded');
+    }
+  }
+
+  onHandleTouchEnd(event: TouchEvent) {
+    if (window.innerWidth > 1024) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    const endX = event.changedTouches[0]?.clientX || this.startX;
+    const deltaX = endX - this.startX;
+    const duration = Date.now() - this.startTime;
+
+    if (duration < 200 && Math.abs(deltaX) < 10) {
+      this.toggleNav();
+      this.isDragging = false;
+      this.startX = 0;
+      return;
+    }
+
+    if (!this.isDragging) {
+      this.startX = 0;
+      return;
+    }
+
+    const finalWidth = this.currentWidth + deltaX;
+    const midPoint = (this.collapsedWidth + this.expandedWidth) / 2;
+    const shouldExpand = finalWidth > midPoint;
+
+    this.navExpanded = shouldExpand;
+    this.isDragging = false;
+    this.startX = 0;
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+    const backdrop = document.querySelector('.nav-drag-backdrop') as HTMLElement;
+
+    if (navbar) {
+      navbar.classList.remove('dragging');
+      navbar.style.width = '';
+      navbar.style.maxWidth = '';
+      if (shouldExpand) {
+        navbar.classList.add('expanded');
+      } else {
+        navbar.classList.remove('expanded');
+      }
+    }
+
+    if (handle) {
+      handle.classList.remove('dragging');
+      handle.style.left = '';
+      const icon = handle.querySelector('i');
+      if (icon) {
+        (icon as HTMLElement).style.transform = '';
+      }
+    }
+
+    if (backdrop) {
+      backdrop.style.opacity = '';
+    }
+  }
+
   onQuickSearchFocus() {
     this.quickSearchActive = true;
     document.getElementsByTagName("html")[0].style.overflow = 'hidden';
@@ -230,6 +519,7 @@ export class NavbarComponent implements OnInit {
   onQuickSearchBlur() {
     setTimeout(() => {
       this.quickSearchActive = false;
+      document.getElementsByTagName("html")[0].style.overflow = 'auto';
     }, 200);
   }
 
@@ -241,11 +531,15 @@ export class NavbarComponent implements OnInit {
   clearQuickSearch() {
     this.quickSearchQuery = '';
     this.quickSearchResults = {recipes: [], ingredients: [], collections: [], users: []};
+    this.quickSearchActive = false;
+    document.getElementsByTagName("html")[0].style.overflow = 'auto';
   }
 
   goToExplore() {
     this.navigateTo('explore');
-    setTimeout(() => this.quickSearchActive = false, 100);
+    this.quickSearchActive = false;
+    this.quickSearchQuery = '';
+    document.getElementsByTagName("html")[0].style.overflow = 'auto';
   }
 
   showCollection(collection: any, event: Event) {
@@ -254,6 +548,8 @@ export class NavbarComponent implements OnInit {
     this.showCollectionView = true;
     this.selectedCollection = collection;
     this.quickSearchActive = false;
+    this.quickSearchQuery = '';
+    document.getElementsByTagName("html")[0].style.overflow = 'auto';
   }
 
   closeCollectionView(): void {
@@ -262,9 +558,21 @@ export class NavbarComponent implements OnInit {
   }
 
 
-  logoClicked(): void {
+  logoClicked(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
     if (!this.isLogoClicked) {
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      document.getElementsByTagName("html")[0].style.overflow = 'auto';
+
+      this.quickSearchActive = false;
+      this.quickSearchQuery = '';
+      this.quickSearchResults = {recipes: [], ingredients: [], collections: [], users: []};
+
+      document.body.scrollTo({top: 0, behavior: 'smooth'});
+
       this.isLogoClicked = true;
       setTimeout(() => this.isLogoClicked = false, 800);
     }
@@ -298,9 +606,11 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/' + route]);
 
     if (closeQuickSearch) {
-      setTimeout(() => this.quickSearchActive = false, 100);
+      this.quickSearchActive = false;
+      this.quickSearchQuery = '';
+      document.getElementsByTagName("html")[0].style.overflow = 'auto';
     }
-    let currentNavButton = (event?.target as HTMLElement).closest('.nav-item') as HTMLElement;
+    let currentNavButton = (event?.target as HTMLElement)?.closest('.nav-item') as HTMLElement;
     let navItems = document.querySelectorAll('.nav-item');
     navItems.forEach((item) => {
       if (item.classList.contains('active')) {
@@ -381,6 +691,26 @@ export class NavbarComponent implements OnInit {
 
   @HostListener('document:click', ['$event'])
   handleClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    const navbar = document.getElementById('navbar');
+    const isInsideNavbar = navbar && navbar.contains(target);
+    const isInsideDragHandle = target.closest('.nav-drag-handle');
+    const isInsideQuickSearch = target.closest('.quick-search-wrapper') || target.closest('.quick-search-dropdown');
+
+    if (this.responsive && isInsideNavbar && !this.isDragging && !isInsideQuickSearch) {
+      const isClickOnButton = target.closest('button') || target.closest('a') || target.closest('.nav-item') || target.closest('.dropdown-container') || target.closest('input');
+
+      if (!isClickOnButton && !this.navExpanded) {
+        this.navExpanded = true;
+        return;
+      }
+    }
+
+    if (this.responsive && this.navExpanded && !isInsideNavbar && !isInsideDragHandle && !this.isDragging && !isInsideQuickSearch) {
+      this.closeNav();
+    }
+
     // Close all dropdowns when clicking outside
     const dropdowns = document.querySelectorAll('.dropdown-container');
     dropdowns.forEach(container => {

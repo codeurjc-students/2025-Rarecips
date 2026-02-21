@@ -1,11 +1,11 @@
-import {Component, HostListener, OnInit, ViewChild, ElementRef} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {CommonModule} from '@angular/common';
-import {ActivatedRoute, Router} from '@angular/router';
-import {RecipeService} from '../../services/recipe.service';
-import {EnumService} from '../../services/enum.service';
-import {IngredientService} from '../../services/ingredient.service';
-import {IngredientIconService} from '../../services/ingredient-icon.service';
+import { Component, HostListener, OnInit, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { RecipeService } from '../../services/recipe.service';
+import { EnumService } from '../../services/enum.service';
+import { IngredientService } from '../../services/ingredient.service';
+import { IngredientIconService } from '../../services/ingredient-icon.service';
 import { TranslatorService } from '../../services/translator.service';
 
 interface Ingredient {
@@ -108,7 +108,7 @@ export class RecipeEditComponent implements OnInit {
 
   // Ingredients management
   ingredients: { name: string; quantity: string | undefined; unit: string | undefined }[] = [];
-  newIngredient: Ingredient = {name: '', quantity: '', unit: ''};
+  newIngredient: Ingredient = { name: '', quantity: '', unit: '' };
   draggedIngredientIndex: number | null = null;
 
   availableIngredients: string[] = [];
@@ -144,7 +144,8 @@ export class RecipeEditComponent implements OnInit {
     private enumService: EnumService,
     private ingredientService: IngredientService,
     public ingredientIconService: IngredientIconService,
-    private translatorService: TranslatorService
+    private translatorService: TranslatorService,
+    private ngZone: NgZone
   ) {
   }
 
@@ -332,7 +333,7 @@ export class RecipeEditComponent implements OnInit {
 
   // Difficulty methods
   getDifficultyLabel(): string {
-    switch(this.difficulty) {
+    switch (this.difficulty) {
       case 1: return this.t('very_easy');
       case 2: return this.t('easy');
       case 3: return this.t('medium');
@@ -611,18 +612,13 @@ export class RecipeEditComponent implements OnInit {
   }
 
   isValidIngredient(): boolean {
-    const nameValid = this.availableIngredients.includes(this.newIngredient.name.trim());
-
-    const quantityValid = this.newIngredient.quantity.trim() === '' ||
-                          (!isNaN(parseFloat(this.newIngredient.quantity)) && parseFloat(this.newIngredient.quantity) > 0);
-
-    return nameValid && quantityValid;
+    return !!this.newIngredient.name && this.newIngredient.name.trim().length > 0;
   }
 
   addIngredient(): void {
     if (this.isValidIngredient()) {
-      this.ingredients.push({...this.newIngredient});
-      this.newIngredient = {name: '', quantity: '', unit: ''};
+      this.ingredients.push({ ...this.newIngredient });
+      this.newIngredient = { name: '', quantity: '', unit: '' };
       this.showIngredientDropdown = false;
     }
   }
@@ -646,6 +642,170 @@ export class RecipeEditComponent implements OnInit {
       this.ingredients.splice(this.draggedIngredientIndex, 1);
       this.ingredients.splice(dropIndex, 0, draggedItem);
     }
+    this.draggedIngredientIndex = null;
+  }
+
+  private dragGhost: HTMLElement | null = null;
+  private dragGhostOffsetX: number = 0;
+  private dragGhostOffsetY: number = 0;
+  private dragRafId: number | null = null;
+  private dragX: number = 0;
+  private dragY: number = 0;
+
+  onIngredientTouchStart(index: number, event: TouchEvent): void {
+    if (event.cancelable) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const touch = event.touches[0];
+    this.startDrag(index, touch.clientX, touch.clientY, event.target as HTMLElement);
+
+    this.ngZone.runOutsideAngular(() => {
+      window.addEventListener('touchmove', this.boundTouchMove, { passive: false });
+      window.addEventListener('touchend', this.boundTouchEnd);
+    });
+  }
+
+  private boundTouchMove = (event: TouchEvent) => {
+    if (event.cancelable) event.preventDefault();
+    const touch = event.touches[0];
+    this.moveDrag(touch.clientX, touch.clientY);
+  };
+
+  private boundTouchEnd = (event: TouchEvent) => {
+    const touch = event.changedTouches[0];
+    this.endDrag(touch.clientX, touch.clientY);
+
+    window.removeEventListener('touchmove', this.boundTouchMove);
+    window.removeEventListener('touchend', this.boundTouchEnd);
+  };
+
+  onIngredientTouchMove(event: TouchEvent): void { }
+  onIngredientTouchEnd(event: TouchEvent): void { }
+
+
+  onIngredientMouseDown(index: number, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.startDrag(index, event.clientX, event.clientY, event.target as HTMLElement);
+
+    this.ngZone.runOutsideAngular(() => {
+      window.addEventListener('mousemove', this.boundMouseMove);
+      window.addEventListener('mouseup', this.boundMouseUp);
+    });
+  }
+
+  private boundMouseMove = (event: MouseEvent) => {
+    event.preventDefault();
+    this.moveDrag(event.clientX, event.clientY);
+  };
+
+  private boundMouseUp = (event: MouseEvent) => {
+    this.endDrag(event.clientX, event.clientY);
+
+    window.removeEventListener('mousemove', this.boundMouseMove);
+    window.removeEventListener('mouseup', this.boundMouseUp);
+  };
+
+
+  private startDrag(index: number, clientX: number, clientY: number, target: HTMLElement): void {
+    if (this.dragRafId) {
+      cancelAnimationFrame(this.dragRafId);
+      this.dragRafId = null;
+    }
+
+    this.draggedIngredientIndex = index;
+    const ingredientItem = target.closest('.ingredient-item') as HTMLElement;
+
+    if (ingredientItem) {
+      this.dragGhost = ingredientItem.cloneNode(true) as HTMLElement;
+      this.dragGhost.classList.add('dragging-ghost');
+      this.dragGhost.style.position = 'fixed';
+      this.dragGhost.style.zIndex = '1000';
+      this.dragGhost.style.pointerEvents = 'none';
+      this.dragGhost.style.width = `${ingredientItem.offsetWidth}px`;
+      this.dragGhost.style.opacity = '0.9';
+      this.dragGhost.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+      this.dragGhost.style.willChange = 'transform';
+      this.dragGhost.style.transition = 'none';
+      this.dragGhost.style.animation = 'none';
+      this.dragGhost.style.margin = '0';
+      this.dragGhost.style.left = '0';
+      this.dragGhost.style.top = '0';
+
+      const rect = ingredientItem.getBoundingClientRect();
+
+      this.dragGhostOffsetX = clientX - rect.left;
+      this.dragGhostOffsetY = clientY - rect.top;
+
+      this.dragGhost.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0) scale(1.05)`;
+
+      document.body.appendChild(this.dragGhost);
+      ingredientItem.classList.add('opacity-50');
+    }
+  }
+
+  private moveDrag(clientX: number, clientY: number): void {
+    if (this.draggedIngredientIndex === null || !this.dragGhost) return;
+
+    this.dragX = clientX;
+    this.dragY = clientY;
+
+    if (!this.dragRafId) {
+      this.dragRafId = requestAnimationFrame(() => {
+        this.updateDragPosition();
+      });
+    }
+  }
+
+  private updateDragPosition(): void {
+    if (!this.dragGhost) {
+      this.dragRafId = null;
+      return;
+    }
+
+    const x = this.dragX - this.dragGhostOffsetX;
+    const y = this.dragY - this.dragGhostOffsetY;
+
+    this.dragGhost.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.05)`;
+    this.dragRafId = null;
+  }
+
+  private endDrag(clientX: number, clientY: number): void {
+    if (this.draggedIngredientIndex === null) return;
+
+    if (this.dragRafId) {
+      cancelAnimationFrame(this.dragRafId);
+      this.dragRafId = null;
+    }
+
+    if (this.dragGhost) {
+      this.dragGhost.remove();
+      this.dragGhost = null;
+    }
+
+    const items = document.querySelectorAll('.ingredient-item');
+    items.forEach(item => item.classList.remove('opacity-50'));
+
+    const target = document.elementFromPoint(clientX, clientY);
+
+    if (target) {
+      const ingredientItem = target.closest('.ingredient-item');
+      if (ingredientItem) {
+        this.ngZone.run(() => {
+          const container = document.getElementById('ingredients-list');
+          if (container) {
+            const children = Array.from(container.querySelectorAll('.ingredient-item'));
+            const dropIndex = children.indexOf(ingredientItem as Element);
+
+            if (dropIndex !== -1 && dropIndex !== this.draggedIngredientIndex) {
+              this.onIngredientDrop(dropIndex);
+            }
+          }
+        });
+      }
+    }
+
     this.draggedIngredientIndex = null;
   }
 

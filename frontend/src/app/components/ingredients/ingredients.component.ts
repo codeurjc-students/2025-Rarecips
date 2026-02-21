@@ -27,7 +27,7 @@ export class IngredientsComponent implements OnInit {
   pageSize: number = 9;
   hasMore: boolean = false;
   loadingIngredients: boolean = false;
-  private isAuthenticated: boolean | undefined;
+  isAuthenticated: boolean | undefined;
   private user: User | undefined;
   userIngredients: Set<Ingredient> = new Set<Ingredient>();
   displayedUserIngredients: Ingredient[] = [];
@@ -91,8 +91,9 @@ export class IngredientsComponent implements OnInit {
 
         this.loadUserIngredients();
       },
-      error: () => {
+      error: (err) => {
         this.isAuthenticated = false;
+        this.router.navigate(['/error'], {state: {status: 500, reason: this.t('Error fetching user data')}});
       }
     });
   }
@@ -192,7 +193,7 @@ export class IngredientsComponent implements OnInit {
   addToPantry(ingredient: Ingredient): void {
 
     if (!this.isAuthenticated || !this.user) {
-      this.router.navigate(['/error'], {state: {status: 403, reason: this.t('must_be_logged_in_to_add_ingredient') }});
+      this.router.navigate(['/error'], {state: {status: 403, reason: this.t('You must be logged in to add ingredients') }});
       return;
     }
 
@@ -215,7 +216,7 @@ export class IngredientsComponent implements OnInit {
 
   removeFromPantry(ingredient: Ingredient): void {
     if (!this.isAuthenticated || !this.user) {
-      this.router.navigate(['/error'], {state: {status: 403, reason: this.t('must_be_logged_in_to_remove_ingredient') }});
+      this.router.navigate(['/error'], {state: {status: 403, reason: this.t('You must be an administrator to remove ingredients') }});
       return;
     }
 

@@ -1,4 +1,4 @@
-import {Component, AfterViewInit, OnInit, OnDestroy} from '@angular/core';
+import {Component, AfterViewInit, OnInit, OnDestroy, HostListener} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {filter, map, take, debounceTime, distinctUntilChanged, switchMap, catchError} from 'rxjs/operators';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
@@ -64,6 +64,9 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   showPasswordStatus = false;
   showNewPassword = false;
   showConfirmPasswordChange = false;
+
+  readonly localStorage = localStorage;
+  responsive: boolean = window.innerWidth <= 1024;
 
   loginForm: LoginForm = {
     username: '',
@@ -352,7 +355,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
       if (exists) {
         const emailInput = document.getElementById('signup-email') as HTMLInputElement;
         const emailErrorMsg = document.querySelector('.emailErrorMsg') as HTMLElement;
-        emailErrorMsg.innerText = this.t(('email_already_exits'))
+        emailErrorMsg.innerText = this.t('email_already_exists');
         emailErrorMsg.classList.remove('hidden');
         emailInput.style.borderColor = 'red';
         emailInput.style.background = 'rgba(255, 0, 0, 0.1)';
@@ -392,7 +395,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
               this.switchTab('login');
               signupBut.innerHTML = "<i class=\"ti ti-user-plus text-xl\" aria-hidden=\"true\"></i>" + this.t('create_account');
               this.signupLoad = false;
-              this.showRegistrationBanner("Registration successful, welcome to Rarecips! You can now log in.");
+              this.showRegistrationBanner(this.t('registration_success_banner'));
             }, 1200);
           }, 800);
         },
@@ -543,7 +546,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
         el.style.top = topPerc;
         el.style.transform = `rotate(${rotate}deg)`;
         el.style.animationDelay = (Math.random() * 3) + 's';
-
+        el.classList.add('positioned');
 
         out.push({left: leftPerc, top: topPerc, rotate});
       });
@@ -777,8 +780,6 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
   releaseSignupPassword() { this.showSignupPassword = false; }
   holdConfirmPassword() { this.showConfirmPassword = true; }
   releaseConfirmPassword() { this.showConfirmPassword = false; }
-
-  protected readonly localStorage = localStorage;
 
   t(key: string): string {
     return this.translator.translate(key);

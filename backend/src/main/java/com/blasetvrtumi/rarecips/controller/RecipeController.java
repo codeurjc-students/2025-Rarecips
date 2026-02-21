@@ -20,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +86,14 @@ public class RecipeController {
 
             HashMap<String, Object> response = new HashMap<>();
             response.put("recipe", recipe);
-            return ResponseEntity.status(201).body(response);
+
+            URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/v1/recipes/{id}")
+                .buildAndExpand(recipe.getId())
+                .toUri();
+
+            return ResponseEntity.status(201).header("Location", location.toString()).body(response);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(400).body("Error creating recipe: " + e.getMessage());
@@ -115,7 +124,14 @@ public class RecipeController {
             Recipe updatedRecipe = recipeService.updateRecipeFromMap(id, recipeData, username);
             HashMap<String, Object> response = new HashMap<>();
             response.put("recipe", updatedRecipe);
-            return ResponseEntity.ok(response);
+
+            URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/v1/recipes/{id}")
+                .buildAndExpand(updatedRecipe.getId())
+                .toUri();
+
+            return ResponseEntity.ok().header("Location", location.toString()).body(response);
         } catch (SecurityException e) {
             return ResponseEntity.status(403).body(e.getMessage());
         } catch (RuntimeException e) {

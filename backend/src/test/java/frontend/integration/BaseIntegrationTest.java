@@ -11,12 +11,17 @@ import org.junit.jupiter.api.BeforeEach;
  * Base class for integration tests that verify frontend services
  * interact correctly with the backend API.
  */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     classes = com.blasetvrtumi.rarecips.RarecipsApplication.class
 )
 @ActiveProfiles("test")
 public abstract class BaseIntegrationTest {
+
+  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @LocalServerPort
   protected int port;

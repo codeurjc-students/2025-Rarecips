@@ -1,11 +1,14 @@
 import {Component, OnInit} from "@angular/core";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, RouterLink} from "@angular/router";
 import {routes} from '../../app.routing.module';
 import { TranslatorService } from '../../services/translator.service';
 
 @Component({
   selector: "app-error",
   templateUrl: "./error.component.html",
+  imports: [
+    RouterLink
+  ],
   styleUrls: ["./error.component.css"]
 })
 export class ErrorComponent implements OnInit {

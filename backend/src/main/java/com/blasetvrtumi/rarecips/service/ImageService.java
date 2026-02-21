@@ -10,8 +10,12 @@ import java.util.Base64;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class ImageService {
+    private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
 
     public Blob updateImageFile(String imageString) {
         try {
@@ -45,7 +49,7 @@ public class ImageService {
                 buffer.close();
                 return imageBlob;
             } else {
-                System.out.println("Image not found: " + imagePath);
+                logger.warn("Image not found: {}", imagePath);
             }
         } catch (IOException | SQLException e) {
             e.printStackTrace();

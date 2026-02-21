@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,13 +126,27 @@ public class RecipeCollectionController {
             if (user.getRole().equals("ADMIN") && payload.get("username") != null) {
                 username = payload.get("username");
                 RecipeCollection collection = collectionService.createCollection(username, title, false);
-                return ResponseEntity.status(HttpStatus.CREATED).body(collection);
+
+                URI location = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/api/v1/collections/{id}")
+                    .buildAndExpand(collection.getId())
+                    .toUri();
+
+                return ResponseEntity.status(HttpStatus.CREATED).header("Location", location.toString()).body(collection);
             } else if (!authentication.isAuthenticated() && !user.getRole().equals("ADMIN")) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be logged in to create collections");
             }
 
             RecipeCollection collection = collectionService.createCollection(username, title, false);
-            return ResponseEntity.status(HttpStatus.CREATED).body(collection);
+
+            URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/v1/collections/{id}")
+                .buildAndExpand(collection.getId())
+                .toUri();
+
+            return ResponseEntity.status(HttpStatus.CREATED).header("Location", location.toString()).body(collection);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -201,7 +217,14 @@ public class RecipeCollectionController {
                 } else {
                     collection = collectionService.addRecipeToCollection(id, recipeId);
                 }
-                return ResponseEntity.ok(collection);
+
+                URI location = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/api/v1/collections/{id}")
+                    .buildAndExpand(collection.getId())
+                    .toUri();
+
+                return ResponseEntity.ok().header("Location", location.toString()).body(collection);
             }
 
             if (payload != null && payload.containsKey("title")) {
@@ -210,7 +233,14 @@ public class RecipeCollectionController {
                     return ResponseEntity.badRequest().body("Title cannot be empty");
                 }
                 RecipeCollection collection = collectionService.updateCollectionTitle(id, newTitle);
-                return ResponseEntity.ok(collection);
+
+                URI location = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/api/v1/collections/{id}")
+                    .buildAndExpand(collection.getId())
+                    .toUri();
+
+                return ResponseEntity.ok().header("Location", location.toString()).body(collection);
             }
 
             return ResponseEntity.badRequest().body("Missing recipeId (query param) or title (body)");

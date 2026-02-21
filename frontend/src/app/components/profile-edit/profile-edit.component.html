@@ -2,14 +2,14 @@
   <!-- Main Content -->
   <div
     class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
-    <div class="flex max-w-7xl w-[70rem] min-h-full flex-col items-center gap-8">
+    <div class="content flex max-w-7xl w-[70rem] min-h-full flex-col items-center gap-8">
 
       <!-- Edit Profile Form -->
       <div class="gap-8 max-w-7xl w-full glass p-8">
         <div class="flex justify-between gap-8">
           <div class="flex flex-col gap-8 w-1/2">
             <!-- Profile Picture Section -->
-            <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+            <div class="profileEditCard flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
                  style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
               <div class="flex flex-col items-center gap-6 w-full">
@@ -114,7 +114,7 @@
             </div>
 
             <!-- Personal Information Section -->
-            <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+            <div class="profileEditCard flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
                  style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
@@ -171,7 +171,7 @@
           </div>
           <div class="flex flex-col w-1/2 gap-8">
             <!-- Bio Section -->
-            <div class="flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+            <div class="profileEditCard flex w-full h-fit flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
                  style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
@@ -204,7 +204,7 @@
               </div>
             </div>
             <!-- Privacy & Security Section -->
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+            <div class="profileEditCard flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
                  style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
               <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
@@ -214,7 +214,7 @@
 
               <div class="flex flex-col gap-4">
                 <!-- Privacy Settings -->
-                <div class="flex items-center justify-between p-4 rounded-2xl"
+                <div class="switchOption flex items-center justify-between p-4 rounded-2xl"
                      style="background: var(--primary-100-40);">
                   <div class="flex items-center gap-3">
                     <i class="ti ti-eye text-xl" style="color: var(--primary-500);"></i>
@@ -230,7 +230,7 @@
                   </label>
                 </div>
 
-                <div class="flex items-center justify-between p-4 rounded-2xl"
+                <div class="switchOption flex items-center justify-between p-4 rounded-2xl"
                      style="background: var(--primary-100-40);">
                   <div class="flex items-center gap-3 max-w-72 w-full">
                     <i class="ti ti-mail text-xl" style="color: var(--primary-500);"></i>
@@ -257,7 +257,7 @@
               </div>
             </div>
             <!-- DANGER ZONE -->
-            <div class="flex flex-col gap-4 rounded-3xl border-2 border-red-400 p-6 mt-1.5 shadow-md" style="background: color-mix(in srgb, color-mix(in srgb, indianred 70%, var(--primary-400) 30%) 30%, transparent 70%);">
+            <div class="profileEditCard flex flex-col gap-4 rounded-3xl border-2 border-red-400 p-6 mt-1.5 shadow-md" style="background: color-mix(in srgb, color-mix(in srgb, indianred 70%, var(--primary-400) 30%) 30%, transparent 70%);">
               <h3 class="text-xl font-bold text-red-700 flex items-center gap-2">
                 <i class="ti ti-alert-triangle text-2xl"></i>
                 {{ t('danger_zone') }}
@@ -268,9 +268,13 @@
                   class="px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 transition-all w-fit flex items-center gap-2 select-none relative overflow-hidden"
                   [ngStyle]="deleteHoldActive && confirmDeleteMode ? {'background': 'linear-gradient(to right, #dc2626 ' + deleteHoldProgress + '%, #b91c1c ' + deleteHoldProgress + '%)'} : {}"
                   (click)="activateConfirmDelete()"
-                  (mousedown)="startDeleteHold()"
-                  (mouseup)="cancelDeleteHold()"
-                  (mouseleave)="cancelDeleteHold()"
+                  (pointerdown)="startDeleteHold()"
+                  (pointerup)="cancelDeleteHold()"
+                  (pointerleave)="cancelDeleteHold()"
+                  (pointercancel)="cancelDeleteHold()"
+                  tabindex="0"
+                  (blur)="cancelDeleteHold()"
+                  (focusout)="cancelDeleteHold()"
                   [disabled]="deleteInProgress">
                   <i [ngClass]="confirmDeleteMode ? (deleteHoldActive ? 'ti ti-hourglass' : 'ti ti-user-x') : 'ti ti-user-x'" class="ti-anim"></i>
                   @if (!confirmDeleteMode) {
@@ -291,14 +295,14 @@
         <!-- Action Buttons -->
         <div class="flex z-0 w-full justify-center gap-4 pt-8">
           <button
-            class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+            class="cancelBut px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
             style="background: var(--primary-300-40); color: var(--primary-700);"
             (click)="cancelChanges()">
             <i class="ti ti-x mt-[1px]"></i>
             {{ t('cancel') }}
           </button>
           <button
-            class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+            class="confirmBut px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
             style="background: var(--gradient-primary); color: white;"
             [class.disabled]="formValid()"
             (click)="saveChanges()">

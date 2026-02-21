@@ -3,19 +3,21 @@
   <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
     <div class="flex max-w-7xl w-[70rem] min-h-full flex-col items-center gap-8">
 
-      <!-- Tab Navigation -->
-      <div class="flex w-full">
-        <div class="tabs glass text-nowrap w-full">
-          <button class="tab" [class.active]="activeTab === 'ingredients'" (click)="setActiveTab('ingredients')">
-            <i class="ti ti-carrot text-xl" aria-hidden="true"></i>
-            {{ t('ingredients') }}
-          </button>
-          <button class="tab" [class.active]="activeTab === 'pantry'" (click)="setActiveTab('pantry')">
-            <i class="ti ti-cooker text-xl" aria-hidden="true"></i>
-            {{ t('my_pantry') }}
-          </button>
+      @if (isAuthenticated) {
+        <!-- Tab Navigation -->
+        <div class="flex w-full">
+          <div class="tabs glass text-nowrap w-full">
+            <button class="tab" [class.active]="activeTab === 'ingredients'" (click)="setActiveTab('ingredients')">
+              <i class="ti ti-carrot text-xl" aria-hidden="true"></i>
+              {{ t('ingredients') }}
+            </button>
+            <button class="tab" [class.active]="activeTab === 'pantry'" (click)="setActiveTab('pantry')">
+              <i class="ti ti-cooker text-xl" aria-hidden="true"></i>
+              {{ t('my_pantry') }}
+            </button>
+          </div>
         </div>
-      </div>
+      }
 
       <!-- Ingredients Tab -->
       <div class="w-full ingredientList" [class.active]="activeTab === 'ingredients'" [class.hidden]="activeTab !== 'ingredients'">
@@ -73,9 +75,11 @@
                   <h3 class="ingredient-name" style="color: var(--primary-700);">{{ingredient.food}}</h3>
                   <span class="ingredient-category">{{ingredient.category}}</span>
                 </div>
-                <button class="add-more-btn min-h-12" (click)="addToPantry(ingredient)">
-                  @if (!hasIngredient(ingredient)) { <i class="ti ti-plus"></i>{{ t('add_to_my_pantry') }} } @else { <i class="ti ti-check"></i> }
-                </button>
+                @if (isAuthenticated) {
+                  <button class="add-more-btn min-h-12" (click)="addToPantry(ingredient)">
+                    @if (!hasIngredient(ingredient)) { <i class="ti ti-plus"></i>{{ t('add_to_my_pantry') }} } @else { <i class="ti ti-check"></i> }
+                  </button>
+                }
               </div>
             </div>
             }
@@ -104,10 +108,10 @@
 
       <!-- Pantry Tab -->
       <div class="w-full cart" [class.active]="activeTab === 'pantry'" [class.hidden]="activeTab !== 'pantry'">
-        <div class="gap-8 max-w-7xl w-full glass p-8">
+        <div class="ingredientCont gap-8 max-w-7xl w-full glass p-8">
 
           @if (displayedUserIngredients.length > 0) {
-            <div class="flex items-center justify-between mb-6">
+            <div class="options flex items-center justify-between mb-6">
               <h2 class="text-2xl font-bold" style="color: var(--primary-700);">
                 {{ userIngredients.size }} {{ t('items') }}
               </h2>
@@ -133,7 +137,7 @@
             <!-- grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               @for (ingredient of displayedUserIngredients; track ingredient.id) {
-                <div class="flex items-center justify-between p-4 rounded-2xl border-2"
+                <div class="ingredient flex items-center justify-between p-4 rounded-2xl border-2"
                      style="background: var(--primary-100-40); border-color: var(--primary-100);">
                   <div class="flex items-center gap-4">
                     <img [src]="ingredient.imageString || ingredient.image || 'assets/img/ingredient.png'"

@@ -1,3 +1,7 @@
+:host {
+  max-width: 100vw;
+}
+
 /* Recipe Editor Specific Styles */
 
 .container {
@@ -59,10 +63,10 @@ input[type="number"] {
   outline: none;
   cursor: pointer;
   background: linear-gradient(to right,
-    #22c55e 0%,
-    #eab308 40%,
-    #f97316 60%,
-    #ef4444 100%);
+      #22c55e 0%,
+      #eab308 40%,
+      #f97316 60%,
+      #ef4444 100%);
 }
 
 .difficulty-slider::-webkit-slider-thumb {
@@ -133,6 +137,7 @@ input[type="number"] {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -157,6 +162,7 @@ input[type="number"] {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -174,6 +180,15 @@ input[type="number"] {
   cursor: grabbing;
 }
 
+.dragging-ghost {
+  opacity: 0.9 !important;
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2) !important;
+  background: var(--primary-200) !important;
+  z-index: 9999 !important;
+  cursor: grabbing !important;
+}
+
 /* Image upload area */
 .image-upload-area {
   transition: all 0.3s ease;
@@ -183,7 +198,7 @@ input[type="number"] {
 
 .image-upload-area:hover {
   border-color: var(--primary-300) !important;
-  background: var(--primary-100-60) !important;
+  background: var(--primary-100-40) !important;
 }
 
 .image-upload-area.dragover {
@@ -313,6 +328,7 @@ select.invalid {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -339,6 +355,7 @@ select.invalid {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -379,6 +396,7 @@ select.invalid {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+
   .ingredient-item,
   .instruction-item {
     flex-direction: column;
@@ -470,8 +488,7 @@ select {
   position: absolute;
 }
 
-.dropdown-force-top {
-}
+.dropdown-force-top {}
 
 .dropdown-up {
   margin-bottom: 8px;
@@ -536,3 +553,315 @@ select {
   z-index: -1;
 }
 
+@media (max-width: 1024px) {
+  :host {
+    max-width: 75vw;
+    margin-left: 25vw !important;
+  }
+
+  .container {
+    padding: 1rem !important;
+    margin-top: 6rem !important;
+  }
+
+  form {
+    padding: 1.5rem !important;
+    min-width: unset !important;
+    width: 100%;
+  }
+
+  form > div.flex-row {
+    flex-direction: column !important;
+  }
+
+  form > div.flex-row > div.w-1\/2 {
+    width: 100% !important;
+  }
+
+  .grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .flex-row.md\:grid-cols-3 {
+    flex-direction: column !important;
+    display: flex !important;
+  }
+
+  .ingredient-autocomplete-container {
+    width: 100% !important;
+  }
+
+  .category-dropdown-container input,
+  .multiselect-dropdown-container input,
+  .difficulty-dropdown-container input,
+  input[name="title"],
+  textarea[name="description"],
+  input[name="prepTime"],
+  input[name="servings"] {
+    padding-right: 1.5rem !important;
+    font-size: 0.7rem !important;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .multiselect-dropdown-container .flex-wrap {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .tabs {
+    flex-direction: column !important;
+    height: auto !important;
+    gap: 0.5rem;
+  }
+
+  .tab {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    padding: 0.75rem 1rem !important;
+    height: auto !important;
+  }
+
+  .ingredients-input {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+    height: auto !important;
+  }
+
+  .ingredients-input input,
+  .ingredient-autocomplete-container {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  .ingredient-autocomplete-container {
+    height: 2rem !important;
+  }
+
+  .ingredients-input input {
+    height: 2rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  input[name="newIngredientUnit"]+button {
+    width: 100% !important;
+    height: 2rem !important;
+    flex: none !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-top: 0.2rem !important;
+  }
+
+  input[name="newIngredientUnit"]+button i {
+    font-size: 1.2rem !important;
+  }
+
+  input::placeholder {
+    font-size: 0.8rem !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  input[name="newIngredientName"]::placeholder {
+    font-size: 0.6rem !important;
+  }
+
+  .ingredient-item,
+  .instruction-item {
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.3rem !important;
+    padding: 0.2rem 0.1rem !important;
+    width: 100% !important;
+  }
+
+  .instruction-item {
+    align-items: flex-start !important;
+    padding: 0.5rem !important;
+  }
+
+  .instruction-item > div:first-child {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    min-width: 1.5rem !important;
+    flex: 0 0 1.5rem !important;
+    font-size: 0.75rem !important;
+    margin-top: 0.1rem !important;
+    border-radius: 0.5rem !important;
+  }
+
+  .instruction-item p,
+  textarea[name="newInstruction"] {
+    font-size: 0.8rem !important;
+    line-height: 1.3 !important;
+  }
+
+  textarea[name="newInstruction"] {
+    padding: 0.4rem !important;
+    min-height: 2.5rem !important;
+  }
+
+  .instruction-item .delete-button,
+  textarea[name="newInstruction"]+button {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    min-width: 1.5rem !important;
+    font-size: 0.9rem !important;
+    margin-top: 0.1rem !important;
+    border-radius: 0.5rem !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .instruction-item .delete-button i,
+  textarea[name="newInstruction"]+button i {
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+  }
+
+  .ingredients-input {
+    padding: 0.5rem !important;
+  }
+
+  .instruction-item {
+    align-items: center !important;
+  }
+
+  .ingredient-item > .flex-1,
+  .instruction-item > .flex-1 {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .ingredient-item span.flex-1 {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 2rem !important;
+    max-width: 45vw !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    word-break: break-all !important;
+    line-height: 1.1 !important;
+    margin-right: 0.1rem !important;
+  }
+
+  .ingredient-item span.flex-1::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .ingredient-item span.rounded-xl {
+    padding: 0.1rem 0.3rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 1 !important;
+    max-width: 25vw !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .ingredient-item span,
+  .ingredient-item div {
+    font-size: 0.55rem !important;
+  }
+
+  .ingredient-item .grip-handle,
+  .ingredient-item .delete-button {
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+    min-width: 1.1rem !important;
+    flex: 0 0 1.1rem !important;
+  }
+
+  .ingredient-item .rounded-full {
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+    padding: 0 !important;
+    flex: 0 0 1.1rem !important;
+    min-width: 1.1rem !important;
+  }
+
+  .ingredient-item i {
+    font-size: 0.55rem !important;
+  }
+
+  .tabs .tab {
+    padding: 0.5rem 0.5rem !important;
+    font-size: 0.8rem !important;
+    gap: 0.3rem !important;
+    height: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .tabs .tab i {
+    font-size: 1.1rem !important;
+  }
+
+  .publishBut button {
+    padding: 0.5rem 1.5rem !important;
+    font-size: 0.9rem !important;
+    border-radius: 0.75rem !important;
+    height: auto !important;
+  }
+
+  .publishBut button i {
+    font-size: 1rem !important;
+  }
+
+  .publishBut {
+    padding-top: 1rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .tabs {
+    padding: 0.2rem !important;
+  }
+
+  .nutrition-grid {
+    gap: 0.5rem !important;
+  }
+
+  .glass h3 {
+    font-size: 1rem !important;
+  }
+
+  .nutrition-grid label {
+    font-size: 0.6rem !important;
+    margin-bottom: 0.1rem !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+  }
+
+  .nutrition-grid > div:nth-child(4) label {
+    font-size: 0.55rem !important;
+    white-space: normal !important;
+    line-height: 0.9 !important;
+  }
+
+  .nutrition-grid input {
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.5rem !important;
+    height: 2rem !important;
+    border-radius: 0.5rem !important;
+  }
+
+  .nutrition-grid i {
+    font-size: 0.75rem !important;
+  }
+
+  .dragging-ghost {
+    max-width: 80vw !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+  }
+}

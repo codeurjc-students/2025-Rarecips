@@ -1,16 +1,16 @@
 @if (showSuccessBanner || bannerAnimatingOut) {
-  <div class="fixed top-10 left-0 m-0 w-full z-50 flex justify-center" style="pointer-events: none;">
+  <div class="successBanner fixed top-10 left-0 m-0 w-full z-50 flex justify-center" style="pointer-events: none;">
     <div [ngClass]="{
       'success-banner-anim-in': showSuccessBanner && !bannerAnimatingOut,
       'success-banner-anim-out': bannerAnimatingOut
     }"
-    class="bg-green-600 text-white p-0 rounded-2xl shadow-lg flex flex-col items-center w-full h-12 max-w-2xl"
+    class="bg-green-600 text-white p-0 rounded-2xl shadow-lg flex flex-col items-center w-full h-12 max-w-2xl align-center"
     style="pointer-events: auto;">
       <div class="w-[95%] h-1 m-0 p-0 bg-green-800 rounded-full overflow-hidden">
         <div class="h-full bg-green-300 transition-all duration-100" [style.width.%]="successBannerProgress"></div>
       </div>
-      <div class="w-full flex justify-center items-center p-0 m-0">
-        <span class="font-semibold text-lg !mt-1 p-0">{{ successBannerMessage }}</span>
+      <div class="successMessage w-full flex justify-center items-center p-0 m-0">
+        <span class=" font-semibold text-lg !mt-1 p-0">{{ successBannerMessage }}</span>
       </div>
 
     </div>
@@ -22,8 +22,8 @@
     <!-- Left Side - Branding -->
     <div class="branding-section">
       <div class="branding-content h-full">
-        <div [innerHTML]="logos.get('Rarecips_Iconologo2')" class="iconologo"></div>
-        <p class="brand-subtitle">
+        <div *ngIf="!responsive" [innerHTML]="logos.get('Rarecips_Iconologo2')" class="logo"></div>
+        <p *ngIf="!responsive" class="brand-subtitle">
           {{ t('brand_subtitle') }}
         </p>
 
@@ -140,6 +140,7 @@
           <!-- Login Form -->
           <div class="auth-form glass" [class.active]="activeTab === 'login'"
                [class.hidden]="activeTab !== 'login'">
+            <div *ngIf="responsive" [innerHTML]="logos.get('Rarecips_Iconologo2')" class="logo flex justify-center w-full max-h-[8rem] [&>svg]:max-w-[8rem]"></div>
             <div class="form-header">
               <h2 class="form-title">
                 {{ t('welcome_back') }}
@@ -168,14 +169,15 @@
                          class="form-input glass-input" [placeholder]="t('password_placeholder')"
                          [(ngModel)]="loginForm.password" name="password" required
                          autocomplete="password">
-                  <button type="button" class="password-toggle" tabindex="-1" aria-hidden="true"
-                          (mousedown)="holdLoginPassword()"
-                          (mouseup)="releaseLoginPassword()"
-                          (mouseleave)="releaseLoginPassword()">
+                  <button type="button" class="password-toggle"
+                    (pointerdown)="showLoginPassword = true"
+                    (pointerup)="showLoginPassword = false"
+                    (pointerleave)="showLoginPassword = false"
+                    (pointercancel)="showLoginPassword = false">
                     @if (!showLoginPassword) {
                       <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
-                    @else {
+                    @if (showLoginPassword) {
                       <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
                   </button>
@@ -210,6 +212,7 @@
           <div class="auth-form glass" [class.active]="activeTab === 'signup'"
                [class.hidden]="activeTab !== 'signup'">
             <div class="form-header">
+              <div *ngIf="responsive" [innerHTML]="logos.get('Rarecips_Iconologo2')" class="logo flex justify-center w-full max-h-[8rem] [&>svg]:max-w-[8rem]"></div>
               <h2 class="form-title">
                 {{ t('join_rarecips') }}
               </h2>
@@ -259,14 +262,15 @@
                   <input [type]="showSignupPassword ? 'text' : 'password'" id="signup-password"
                          class="form-input glass-input" [placeholder]="t('password_placeholder')"
                          [(ngModel)]="signupForm.password" (ngModelChange)="onPasswordInput($event)" name="password" required>
-                  <button type="button" class="password-toggle" tabindex="-1" aria-hidden="true"
-                          (mousedown)="holdSignupPassword()"
-                          (mouseup)="releaseSignupPassword()"
-                          (mouseleave)="releaseSignupPassword()">
+                  <button type="button" class="password-toggle"
+  (pointerdown)="showSignupPassword = true"
+  (pointerup)="showSignupPassword = false"
+  (pointerleave)="showSignupPassword = false"
+  (pointercancel)="showSignupPassword = false">
                     @if (!showSignupPassword) {
                       <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
-                    @else {
+                    @if (showSignupPassword) {
                       <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
                   </button>
@@ -306,19 +310,20 @@
                          [placeholder]="t('confirm_password_placeholder')" [(ngModel)]="signupForm.confirmPassword"
                          (ngModelChange)="onConfirmPasswordInput($event)"
                          name="confirmPassword" required>
-                  <button type="button" class="password-toggle" tabindex="-1" aria-hidden="true"
-                          (mousedown)="holdConfirmPassword()"
-                          (mouseup)="releaseConfirmPassword()"
-                          (mouseleave)="releaseConfirmPassword()">
+                  <button type="button" class="password-toggle"
+                    (pointerdown)="showConfirmPassword = true"
+                    (pointerup)="showConfirmPassword = false"
+                    (pointerleave)="showConfirmPassword = false"
+                    (pointercancel)="showConfirmPassword = false">
                     @if (!showConfirmPassword) {
                       <i class="ti ti-eye text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
-                    @else {
+                    @if (showConfirmPassword) {
                       <i class="ti ti-eye-off text-xl" style="color: var(--primary-700)" aria-hidden="true"></i>
                     }
                   </button>
                 </div>
-                <div class="password-status hidden absolute bottom-[calc(21%)] left-16">
+                <div class="password-status hidden absolute bottom-[calc(19%)] left-16">
                   <small class="text-danger" style="color: red;">{{ t('passwords_do_not_match') }}</small>
                 </div>
               </div>
@@ -356,7 +361,7 @@
 @if (showForgotPasswordModal) {
   <div class="fixed inset-0 z-50 flex items-center justify-center visibleBackdrop"
        style="backdrop-filter: blur(10px); background: var(--primary-backdrop);">
-    <div class="w-96 rounded-3xl shadow-2xl p-8 relative" style="background: var(--primary-200);">
+    <div class="modal w-96 rounded-3xl shadow-2xl p-8 relative" style="background: var(--primary-200);">
       <h2 class="text-2xl font-bold mb-4" style="color: var(--primary-700);">{{ t('change_password') }}</h2>
       <form (submit)="onForgotPasswordSubmit($event)">
         <div class="mb-4">

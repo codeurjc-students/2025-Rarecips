@@ -11,7 +11,7 @@
           <div class="flex w-full flex-col items-center gap-12">
             @if (isOwnProfile || isAdmin) {
               <button
-                class="absolute top-7 right-7 w-12 h-12 flex items-center justify-center rounded-xl"
+                class="userEditBut absolute top-7 right-7 w-12 h-12 flex items-center justify-center rounded-xl"
                 style="background: var(--gradient-primary); color: white;"
                 (click)="navigateToEditProfile()">
                 <i class="ti ti-user-edit text-primary-700 text-xl"></i>
@@ -233,7 +233,7 @@
                   <div class="flex w-full flex-col gap-4 glass rounded-3xl p-6"
                        style="background: var(--primary-200-40);">
                     <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
+                      <div class="flex items-center gap-3" [class.flex-col]="responsive">
                         <div class="flex gap-1">
                           @for (star of [1,2,3,4,5]; track star) {
                             <i class="ti text-xl"
@@ -242,7 +242,7 @@
                                [style.color]="star <= review.rating ? 'var(--warning)' : 'var(--primary-400)'"></i>
                           }
                         </div>
-                        <span class="text-sm" style="color: var(--primary-500);">
+                        <span class="text-sm" style="color: var(--primary-500);" [class.self-start]="responsive">
                           {{ review.createdAt | date:'mediumDate' }}
                         </span>
                       </div>
@@ -315,7 +315,7 @@
               } @else if (ingredients.length === 0) {
                 <div class="flex w-full flex-col items-center justify-center py-12 gap-4">
                   <i class="ti ti-basket-off text-6xl" style="color: var(--primary-400);"></i>
-                  <span class="text-xl font-semibold" style="color: var(--primary-700);">{{ t('no_ingredients_yet') }}</span>
+                  <span class="text-xl font-semibold text-center" style="color: var(--primary-700);">{{ t('no_ingredients_yet') }}</span>
                 </div>
               } @else {
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

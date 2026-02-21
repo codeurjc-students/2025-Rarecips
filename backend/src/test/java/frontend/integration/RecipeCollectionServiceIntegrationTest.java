@@ -27,7 +27,7 @@ public class RecipeCollectionServiceIntegrationTest extends BaseIntegrationTest 
       }
 
     } catch (Exception e) {
-      System.out.println("Get collections by user test note: " + e.getMessage());
+      logger.info("Get collections by user test note: {}", e.getMessage());
     }
   }
 
@@ -44,7 +44,7 @@ public class RecipeCollectionServiceIntegrationTest extends BaseIntegrationTest 
                  response.getStatusCode() == HttpStatus.UNAUTHORIZED);
 
     } catch (Exception e) {
-      System.out.println("Get collection by ID test note: " + e.getMessage());
+      logger.info("Get collection by ID test note: {}", e.getMessage());
     }
   }
 
@@ -61,7 +61,7 @@ public class RecipeCollectionServiceIntegrationTest extends BaseIntegrationTest 
                  response.getStatusCode() == HttpStatus.UNAUTHORIZED);
 
     } catch (Exception e) {
-      System.out.println("Get collection recipes test note: " + e.getMessage());
+      logger.info("Get collection recipes test note: {}", e.getMessage());
     }
   }
 
@@ -98,7 +98,7 @@ public class RecipeCollectionServiceIntegrationTest extends BaseIntegrationTest 
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Get public collections test note: " + e.getMessage());
+      logger.info("Get public collections test note: {}", e.getMessage());
     }
   }
 }

@@ -66,6 +66,8 @@ export class ProfileViewComponent implements OnInit {
   count: number = -1;
   animationClass = '';
 
+  responsive: boolean = window.innerWidth < 1024;
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,

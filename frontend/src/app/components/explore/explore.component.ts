@@ -207,6 +207,12 @@ export class ExploreComponent implements OnInit {
   showSortDropdown: boolean = false;
   showCollectionSortDropdown: boolean = false;
 
+  responsive: boolean = window.innerWidth < 1024;
+
+  isQuickFiltersExpanded: boolean = !this.responsive;
+  isFiltersExpanded: boolean = !this.responsive;
+  isUserFiltersExpanded: boolean = !this.responsive;
+
   sortingOptions = [
     { value: 'date_desc', label: 'sort_newest', icon: 'clock-down' },
     { value: 'date_asc', label: 'sort_oldest', icon: 'clock-up' },
@@ -1182,6 +1188,7 @@ export class ExploreComponent implements OnInit {
   openViewCollectionModal(collection: any): void {
     this.viewingCollection = collection;
     this.showViewCollectionModal = true;
+    document.getElementsByTagName("html")[0].style.overflow = 'hidden';
     this.viewModalClosing = false;
     this.collectionRecipesLimit = 4;
   }
@@ -1403,6 +1410,18 @@ export class ExploreComponent implements OnInit {
 
   t(key: string): string {
     return this.translatorService.translate(key);
+  }
+
+  toggleQuickFilters(): void {
+    this.isQuickFiltersExpanded = !this.isQuickFiltersExpanded;
+  }
+
+  toggleFilters(): void {
+    this.isFiltersExpanded = !this.isFiltersExpanded;
+  }
+
+  toggleUserFilters() {
+    this.isUserFiltersExpanded = !this.isUserFiltersExpanded;
   }
 }
 

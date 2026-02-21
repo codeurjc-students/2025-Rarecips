@@ -40,7 +40,7 @@ export class RecipeCollectionService {
   }
 
   removeRecipeFromCollection(collectionId: number, recipeId: number): Observable<RecipeCollection> {
-    return this.http.delete<RecipeCollection>(`${this.apiUrl}/${collectionId}?recipeId=${recipeId}`);
+    return this.http.put<RecipeCollection>(`${this.apiUrl}/${collectionId}?recipeId=${recipeId}&remove=true`, {});
   }
 
   deleteCollection(id: number): Observable<void> {

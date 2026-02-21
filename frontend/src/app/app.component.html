@@ -6,9 +6,9 @@
 <!-- Background always goes here -->
 <div class="tiled-background" style="background-color: var(--primary-200-40);"></div>
 
-<div class="flex flex-row justify-center">
+<div class="flex flex-row appCont justify-center w-full max-w-full overflow-x-hidden">
   @if (backButton) {
-    <div class="fixed left-40 flex items-center justify-center mt-[11.4rem] w-fit h-fit p-4 gap-2">
+    <div class="fixed left-4 z-10 flex items-center justify-center mt-[11.4rem] w-fit h-fit p-4 gap-2 back-nav-buttons">
       <div
         class="flex items-center justify-center !rounded-t-2xl !rounded-b-2xl !rounded-l-2xl !rounded-r-sm glass w-12 h-14 cursor-pointer"
         (click)="goBack()">
@@ -22,6 +22,5 @@
     </div>
   }
 
-  <router-outlet></router-outlet> <!-- Page content goes here -->
-  <!--<app-footer></app-footer>--> <!-- Footer always goes here -->
+  <router-outlet></router-outlet>
 </div>

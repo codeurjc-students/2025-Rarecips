@@ -28,7 +28,7 @@ public class UserServiceIntegrationTest extends BaseIntegrationTest {
       }
 
     } catch (Exception e) {
-      System.out.println("Get user test note: " + e.getMessage());
+      logger.info("Get user test note: {}", e.getMessage());
     }
   }
 
@@ -44,7 +44,7 @@ public class UserServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode() == HttpStatus.NOT_FOUND);
 
     } catch (Exception e) {
-      System.out.println("Get user profile test note: " + e.getMessage());
+      logger.info("Get user profile test note: {}", e.getMessage());
     }
   }
 
@@ -61,7 +61,7 @@ public class UserServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode() == HttpStatus.UNAUTHORIZED);
 
     } catch (Exception e) {
-      System.out.println("Get current user test note: " + e.getMessage());
+      logger.info("Get current user test note: {}", e.getMessage());
     }
   }
 
@@ -100,7 +100,7 @@ public class UserServiceIntegrationTest extends BaseIntegrationTest {
       }
 
     } catch (Exception e) {
-      System.out.println("Get user recipes test note: " + e.getMessage());
+      logger.info("Get user recipes test note: {}", e.getMessage());
     }
   }
 
@@ -116,7 +116,7 @@ public class UserServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode() == HttpStatus.NOT_FOUND);
 
     } catch (Exception e) {
-      System.out.println("Get user collections test note: " + e.getMessage());
+      logger.info("Get user collections test note: {}", e.getMessage());
     }
   }
 
@@ -133,7 +133,7 @@ public class UserServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode() == HttpStatus.FORBIDDEN);
 
     } catch (Exception e) {
-      System.out.println("Get saved recipes test note: " + e.getMessage());
+      logger.info("Get saved recipes test note: {}", e.getMessage());
     }
   }
 
@@ -149,7 +149,7 @@ public class UserServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Search users test note: " + e.getMessage());
+      logger.info("Search users test note: {}", e.getMessage());
     }
   }
 }

@@ -1,3 +1,7 @@
+:host {
+  max-width: 100vw;
+}
+
 :root {
   --primary-10: #fff7ed;
   --primary-50: #fff7ed;
@@ -48,7 +52,6 @@
   overflow: hidden;
 }
 
-/* Kitchen Tile Animation (working version) */
 .kitchen-tile {
   position: absolute;
   width: 80px;
@@ -148,13 +151,17 @@
   padding: 2rem;
 }
 
+.form-content {
+  gap: 0.75rem !important;
+}
+
 .auth-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
   max-width: 1200px;
   width: 100%;
-  max-height: 80vh;
-  min-height: 80vh;
+  max-height: 90vh !important;
+  min-height: 90vh !important;
   border-radius: 2rem;
   overflow: hidden;
   background: var(--primary-200-40);
@@ -612,6 +619,7 @@
 /* Auth Section */
 .auth-section {
   padding: 3rem;
+  margin-top: -1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -926,62 +934,128 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-  .auth-wrapper {
-    grid-template-columns: 1fr;
-    min-height: auto;
-  }
+@media (max-width: 1024px) {
 
   .branding-section {
-    order: 2;
-    padding: 2rem;
+    position: absolute;
+    margin-bottom: 2rem;
+    min-width: 100%;
+    min-height: 80%;
+    align-self: end;
+    z-index: -1;
+    padding: 0;
+  }
+
+  .floating-preview-cards {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    overflow: visible;
+  }
+
+  .form-title {
+    font-size: 1rem;
+  }
+
+  .form-header {
+    margin-bottom: 0;
+  }
+
+  .auth-wrapper {
+    grid-template-columns: 1fr;
+    overflow-y: hidden !important;
+    min-height: 0 !important;
+    max-height: fit-content;
+    align-self: flex-start;
   }
 
   .auth-section {
-    order: 1;
-    padding: 2rem;
+    height: 100%;
+    max-height: fit-content;
+    padding: 0;
+  }
+
+  .username-status {
+    margin-top: 4.5rem;
+  }
+
+  .input-wrapper {
+    margin-bottom: 0;
+  }
+
+  .auth-tab {
+    text-wrap-mode: nowrap;
+  }
+
+  .auth-tabs {
+    margin: 0 !important;
+  }
+
+  .auth-tab-container {
+    padding: 1rem;
+  }
+
+  .auth-tab-container > div {
+    transform: scale(0.9);
+  }
+
+  .form-subtitle {
+    font-size: 0.65rem;
   }
 
   .form-row {
     grid-template-columns: 1fr;
   }
 
-  .floating-preview-cards {
-    height: 380px;
-    padding: 35px;
-    overflow: visible;
-  }
-
   .preview-card {
-    width: 110px;
-    padding: 0.75rem;
-  }
-
-  .preview-card:nth-child(n+5) {
-    display: none;
-    /* Hide extra cards on tablet */
+    width: 100px;
+    padding: 0.6rem;
   }
 
   .preview-image {
-    height: 60px;
+    height: 55px;
   }
 
-  .brand-title {
-    font-size: 2rem;
+  .preview-content h4 {
+    font-size: 0.7rem;
+  }
+
+  .preview-rating {
+    gap: 0.2rem;
+  }
+
+  .stars,
+  .rating-text {
+    font-size: 0.6rem;
+  }
+
+  [name="acceptTerms"] ~ span, [name="acceptTerms"] ~ span > * {
+    font-size: 0.7rem;
+  }
+
+  .checkbox-wrapper {
+    margin-top: 0.7rem;
+  }
+
+  .password-status {
+    bottom: calc(19%);
   }
 
   .auth-container {
     padding: 1rem;
   }
-}
 
-@media (max-width: 480px) {
   .auth-forms-container {
+    height: 100%;
     max-width: none;
   }
 
   .auth-form {
     padding: 1.5rem;
+    height: 100%;
   }
 
   .social-buttons {
@@ -993,42 +1067,37 @@
     align-items: flex-start;
   }
 
-  /* Very spread random small mobile positions */
-  .floating-preview-cards {
-    height: 280px;
-    padding: 20px;
+  .successBanner {
+    justify-self: anchor-center;
   }
 
+  .successBanner > div {
+    max-width: 90vw;
+  }
+
+  .successMessage {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .successMessage > span {
+    font-size: 0.7rem;
+  }
+
+}
+
+@media (max-width: 600px) {
   .preview-card {
-    width: 90px;
+    width: 85px;
     padding: 0.5rem;
   }
 
-  .preview-card:nth-child(n+4) {
-    display: none;
-    /* Show only 3 cards on small mobile */
-  }
-
-  .floating-preview-cards {
-    height: 200px;
-  }
-
-  .preview-card {
-    width: 100px;
-    padding: 0.5rem;
+  .preview-image {
+    height: 50px;
   }
 
   .preview-content h4 {
-    font-size: 0.8rem;
-  }
-
-  .preview-rating {
-    gap: 0.25rem;
-  }
-
-  .stars,
-  .rating-text {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 }
 

@@ -1,7 +1,7 @@
 import {User} from "../models/user.model";
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {catchError, map, Observable, of, throwError} from "rxjs";
+import {BehaviorSubject, catchError, map, Observable, of, throwError} from "rxjs";
 
 @Injectable({
   providedIn: "root"
@@ -13,11 +13,17 @@ export class SessionService {
   isLogged: boolean = false;
   currentUser: User | undefined;
 
+  session$ = new BehaviorSubject<User|null>(null);
+
   constructor(private httpClient: HttpClient) {
   }
 
   login(user: { username: string, password: string, rememberMe: boolean }): Observable<any> {
     return this.httpClient.put(this.baseUrl + "login", user, {withCredentials: true}).pipe(
+      map((res: any) => {
+        this.session$.next(res.user || null);
+        return res;
+      }),
       catchError(error => this.handleError(error))
     );
   }
@@ -32,6 +38,7 @@ export class SessionService {
   logout(): Observable<any> {
     // Update last seen before logging out
     this.httpClient.put(this.userUrl + "me/last-online", {}, {withCredentials: true}).subscribe();
+    this.session$.next(null);
     return this.httpClient.put(this.baseUrl + "logout", {}, {withCredentials: true}).pipe(
       catchError(error => this.handleError(error))
     );
@@ -39,6 +46,10 @@ export class SessionService {
 
   getLoggedUser(): Observable<User> {
     return this.httpClient.get<User>(this.userUrl + "me", {withCredentials: true}).pipe(
+      map(user => {
+        this.session$.next(user);
+        return user;
+      }),
       catchError(error => this.handleError(error))
     );
   }

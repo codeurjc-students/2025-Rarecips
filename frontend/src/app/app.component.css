@@ -20,10 +20,17 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .tiled-background {
+    width: 100%;
+    max-width: 100vw;
+  }
 }
 
 .kitchen-tile {
@@ -94,4 +101,23 @@ app-navbar,
 router-outlet > * {
   z-index: 1;
 }
+
+@media (max-width: 1024px) {
+  .tiled-background {
+    width: 100%;
+    max-width: 100vw;
+    min-height: 100vh !important;
+  }
+
+  .back-nav-buttons {
+    left: calc(43%) !important;
+    margin-top: 1rem !important;
+  }
+
+  router-outlet + * {
+    max-width: 100vw !important;
+  }
+}
+
+
 

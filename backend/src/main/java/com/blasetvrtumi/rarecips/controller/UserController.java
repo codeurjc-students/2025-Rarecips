@@ -8,6 +8,7 @@ import com.blasetvrtumi.rarecips.service.MailService;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import java.security.Principal;
+import java.net.URI;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -173,8 +175,13 @@ public class UserController {
                     .body("You are not authorized to update this user's information.");
         }
 
+        URI location = ServletUriComponentsBuilder
+            .fromCurrentContextPath()
+            .path("/api/v1/users/{username}")
+            .buildAndExpand(username)
+            .toUri();
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().header("Location", location.toString()).build();
     }
 
     @Operation(summary = "Update own's last online timestamp")

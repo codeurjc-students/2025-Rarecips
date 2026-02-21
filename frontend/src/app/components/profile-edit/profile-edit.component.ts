@@ -317,9 +317,10 @@ export class ProfileEditComponent implements OnInit {
 
   deleteAccount() {
     if (!this.isAdmin) {
+      this.sessionService.logout();
+
       this.userService.deleteCurrentUser().subscribe({
         next: () => {
-          this.sessionService.logout();
           this.router.navigate(['/']);
           this.resetDeleteState();
         },
@@ -331,7 +332,6 @@ export class ProfileEditComponent implements OnInit {
     } else {
       this.userService.deleteUserByUsername(this.usernamePath).subscribe({
         next: () => {
-          this.sessionService.logout();
           this.router.navigate(['/']);
           this.resetDeleteState();
         },

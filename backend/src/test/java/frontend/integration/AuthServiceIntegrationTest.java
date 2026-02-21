@@ -40,7 +40,7 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       // Test might fail if user doesn't exist - that's ok for integration test
-      System.out.println("Login test note: " + e.getMessage());
+      logger.info("Login test note: {}", e.getMessage());
     }
   }
 
@@ -73,7 +73,7 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode().is3xxRedirection());
 
     } catch (Exception e) {
-      System.out.println("Signup test note: " + e.getMessage());
+      logger.info("Signup test note: {}", e.getMessage());
     }
   }
 
@@ -91,7 +91,7 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode().is3xxRedirection());
 
     } catch (Exception e) {
-      System.out.println("Logout test note: " + e.getMessage());
+      logger.info("Logout test note: {}", e.getMessage());
     }
   }
 
@@ -108,7 +108,7 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Check username test note: " + e.getMessage());
+      logger.info("Check username test note: {}", e.getMessage());
     }
   }
 
@@ -125,7 +125,7 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Check email test note: " + e.getMessage());
+      logger.info("Check email test note: {}", e.getMessage());
     }
   }
 
@@ -144,7 +144,7 @@ public class AuthServiceIntegrationTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       // Expected to fail without valid session
-      System.out.println("Refresh token test note: " + e.getMessage());
+      logger.info("Refresh token test note: {}", e.getMessage());
     }
   }
 }

@@ -68,7 +68,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.themeService.changeTheme(localStorage.getItem('selectedTheme') as any);
     this.themeService.setFavicon(`Iconotipo_${localStorage.getItem('selectedTheme')}` || 'Iconotipo_tangerine-light');
 
-
     this.initializeTiledBackground();
     this.startTileAnimation();
 

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.blasetvrtumi.rarecips.security.jwt.AuthResponse;
 import com.blasetvrtumi.rarecips.security.jwt.AuthService;
 import com.blasetvrtumi.rarecips.service.UserService;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -85,7 +87,20 @@ public class AuthController {
                             "Password must meet at least 4 of these criteria: lowercase letter, uppercase letter, number, special character (@$!%*?&#), or be 6+ characters long"));
         }
 
-        return authService.signup(signupRequest);
+        ResponseEntity<AuthResponse> response = authService.signup(signupRequest);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null
+            && response.getBody().getStatus() == AuthResponse.Status.SUCCESS) {
+            URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/v1/users/{username}")
+                .buildAndExpand(signupRequest.getUsername())
+                .toUri();
+
+            return ResponseEntity.ok().header("Location", location.toString()).body(response.getBody());
+        }
+
+        return response;
     }
 
     @Operation(summary = "Refresh token")

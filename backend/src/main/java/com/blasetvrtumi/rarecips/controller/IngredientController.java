@@ -14,7 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,7 +109,14 @@ public class IngredientController {
             return ResponseEntity.status(403).build();
         }
         Ingredient saved = ingredientRepository.save(ingredient);
-        return ResponseEntity.status(201).body(saved);
+
+        URI location = ServletUriComponentsBuilder
+            .fromCurrentContextPath()
+            .path("/api/v1/ingredients/{id}")
+            .buildAndExpand(saved.getId())
+            .toUri();
+
+        return ResponseEntity.status(201).header("Location", location.toString()).body(saved);
     }
 
     @Operation(summary = "Update an existing ingredient (admin only)")
@@ -126,7 +135,14 @@ public class IngredientController {
                     ingredient.setFood(ingredientDetails.getFood());
                     ingredient.setImageString(ingredientDetails.getImageString());
                     Ingredient updatedIngredient = ingredientRepository.save(ingredient);
-                    return ResponseEntity.ok(updatedIngredient);
+
+                    URI location = ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("/api/v1/ingredients/{id}")
+                        .buildAndExpand(updatedIngredient.getId())
+                        .toUri();
+
+                    return ResponseEntity.ok().header("Location", location.toString()).body(updatedIngredient);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

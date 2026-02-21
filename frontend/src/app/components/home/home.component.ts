@@ -1,17 +1,17 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {Router, RouterLink} from '@angular/router';
-import {CommonModule} from '@angular/common';
-import {BehaviorSubject, forkJoin, Observable} from 'rxjs';
-import {Recipe} from '../../models/recipe.model';
-import {RecipeService} from '../../services/recipe.service';
-import {RecipeCollectionService} from '../../services/recipe-collection.service';
-import {SessionService} from '../../services/session.service';
-import {RecipeCollection} from '../../models/recipe-collection.model';
-import {ActivityService} from '../../services/activity.service';
-import {CollectionCardComponent} from '../shared/collection-card/collection-card.component';
-import {TranslatorService} from '../../services/translator.service';
-import {DomSanitizer} from '@angular/platform-browser';
-import {ThemeService} from '../../services/theme.service';
+import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
+import { Recipe } from '../../models/recipe.model';
+import { RecipeService } from '../../services/recipe.service';
+import { RecipeCollectionService } from '../../services/recipe-collection.service';
+import { SessionService } from '../../services/session.service';
+import { RecipeCollection } from '../../models/recipe-collection.model';
+import { ActivityService } from '../../services/activity.service';
+import { CollectionCardComponent } from '../shared/collection-card/collection-card.component';
+import { TranslatorService } from '../../services/translator.service';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-home',
@@ -53,6 +53,20 @@ export class HomeComponent implements OnInit {
   public currentUser: any = null;
   public linkHover: boolean = false;
   hoverRecipeId: number | undefined = undefined;
+  responsive: boolean = window.innerWidth <= 1024;
+  currentCarouselIndex: number = 0;
+  isDraggingCarousel: boolean = false;
+  carouselStartX: number = 0;
+  carouselCurrentX: number = 0;
+  carouselTranslate: number = 0;
+
+  get carouselCards(): string[] {
+    if (this.currentUser) {
+      return ['quick-actions', 'collections', 'activity', 'reviews'];
+    } else {
+      return ['collections', 'activity', 'reviews'];
+    }
+  }
 
   constructor(
     private recipeService: RecipeService,
@@ -285,7 +299,7 @@ export class HomeComponent implements OnInit {
 
   navigateToCreateRecipe(): void {
     if (this.sessionService.currentUser) {
-      this.router.navigate(['/recipes/new']);
+      this.router.navigate(['/recipes/create']);
     } else {
       this.router.navigate(['/login']);
     }
@@ -293,7 +307,7 @@ export class HomeComponent implements OnInit {
 
   navigateToEditProfile(): void {
     if (this.sessionService.currentUser) {
-      this.router.navigate(['/profile/edit']);
+      this.router.navigate(['/users', this.sessionService.currentUser.username, 'edit']);
     } else {
       this.router.navigate(['/login']);
     }
@@ -414,7 +428,7 @@ export class HomeComponent implements OnInit {
           this.showCollectionView = true;
         },
         error: (err) => {
-          this.router.navigate(['/error'], {state: {status: err.status, reason: err.message}});
+          this.router.navigate(['/error'], { state: { status: err.status, reason: err.message } });
         }
       });
       return;
@@ -431,5 +445,71 @@ export class HomeComponent implements OnInit {
 
   stripHtml(comment: string) {
     return comment.replace(/<[^>]*>/g, '');
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.responsive = window.innerWidth <= 1024;
+  }
+
+  nextCarouselCard() {
+    this.currentCarouselIndex = (this.currentCarouselIndex + 1) % this.carouselCards.length;
+  }
+
+  prevCarouselCard() {
+    this.currentCarouselIndex = (this.currentCarouselIndex - 1 + this.carouselCards.length) % this.carouselCards.length;
+  }
+
+  goToCarouselCard(index: number) {
+    this.currentCarouselIndex = index;
+  }
+
+  carouselStartY: number = 0;
+
+  onCarouselTouchStart(event: TouchEvent) {
+    if (!this.responsive) return;
+    const target = event.target as HTMLElement;
+
+    this.isDraggingCarousel = true;
+    this.carouselStartX = event.touches[0].clientX;
+    this.carouselStartY = event.touches[0].clientY;
+    this.carouselCurrentX = this.carouselStartX;
+  }
+
+  onCarouselTouchMove(event: TouchEvent) {
+    if (!this.isDraggingCarousel || !this.responsive) return;
+
+    const deltaX = event.touches[0].clientX - this.carouselStartX;
+    const deltaY = event.touches[0].clientY - this.carouselStartY;
+
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      this.isDraggingCarousel = false;
+      this.carouselTranslate = 0;
+      return;
+    }
+
+    event.stopPropagation();
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+
+    this.carouselCurrentX = event.touches[0].clientX;
+    this.carouselTranslate = this.carouselCurrentX - this.carouselStartX;
+  }
+
+  onCarouselTouchEnd(event: TouchEvent) {
+    if (!this.isDraggingCarousel || !this.responsive) return;
+
+    const deltaX = this.carouselCurrentX - this.carouselStartX;
+    const threshold = 50;
+
+    if (deltaX > threshold) {
+      this.prevCarouselCard();
+    } else if (deltaX < -threshold) {
+      this.nextCarouselCard();
+    }
+
+    this.isDraggingCarousel = false;
+    this.carouselTranslate = 0;
   }
 }

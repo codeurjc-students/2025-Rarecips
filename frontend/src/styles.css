@@ -38,11 +38,23 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
   height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .container {
   overflow: visible !important;
-  width: 100vh;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .line-clamp-2 {
@@ -436,12 +448,13 @@ body {
   border: 1px solid var(--glass-border);
   box-shadow: 0 8px 10px rgba(0, 0, 0, 0.1);
   border-radius: 1.5rem;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .btn
 
-  /* Primary button for generic purpose */
-{
+/* Primary button for generic purpose */
+  {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -485,7 +498,8 @@ button.disabled {
 }
 
 .tab {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -533,12 +547,12 @@ button.disabled {
   transition: all 0.3s ease;
 }
 
-.form-checkbox:checked + .checkbox-custom {
+.form-checkbox:checked+.checkbox-custom {
   background: var(--gradient-primary);
   border-color: var(--primary-500);
 }
 
-.form-checkbox:checked + .checkbox-custom::after {
+.form-checkbox:checked+.checkbox-custom::after {
   content: '✓';
   position: absolute;
   top: 50%;
@@ -614,7 +628,8 @@ button.disabled {
   background-color: rgba(255, 255, 255, 0.5);
 }
 
-input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
   color: var(--primary-400);
 }
 
@@ -700,9 +715,12 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
 
 /* Animated border for drag over state */
 @keyframes pulse-border {
-  0%, 100% {
+
+  0%,
+  100% {
     border-color: var(--primary-600);
   }
+
   50% {
     border-color: var(--primary-400);
   }
@@ -712,6 +730,7 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -722,9 +741,12 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
 }
 
 @keyframes bounce-upload {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -735,10 +757,27 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease-in forwards;
 }
 
 @keyframes slideLeftIn {
@@ -746,6 +785,7 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -757,6 +797,7 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -795,6 +836,10 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
   color: var(--text-primary);
   font-size: 0.95rem;
   transition: all 0.3s ease;
+}
+
+.input-wrapper {
+  margin-bottom: 0.5rem;
 }
 
 .glass-input {
@@ -923,7 +968,8 @@ input::placeholder {
   transition: transform 0.3s ease;
 }
 
-.tab.active, .auth-tab.active {
+.tab.active,
+.auth-tab.active {
   transition: all 0.3s ease-in-out;
   transform: scale(0.9);
   color: white;
@@ -931,7 +977,8 @@ input::placeholder {
   box-shadow: 0 4px 12px var(--primary-300);
 }
 
-.tab:not(.active), .auth-tab:not(.active) {
+.tab:not(.active),
+.auth-tab:not(.active) {
   transition: all 0.3s ease-in-out;
   transform: scale(1);
   color: var(--primary-text);
@@ -944,7 +991,7 @@ input::placeholder {
   opacity: 1;
 }
 
-.visibleBackdrop > div {
+.visibleBackdrop>div {
   animation: growIn 0.3s ease forwards;
   transform: scale(1);
 }
@@ -954,33 +1001,59 @@ input::placeholder {
   opacity: 0;
 }
 
-:not(.visibleBackdrop)[style*="backdrop-filter"] > div {
+:not(.visibleBackdrop)[style*="backdrop-filter"]>div {
   animation: shrinkOut 0.3s ease forwards;
   transform: scale(0.5);
 }
 
 @keyframes growIn {
-  from { transform: scale(0.5); }
-  to { transform: scale(1); }
+  from {
+    transform: scale(0.5);
+  }
+
+  to {
+    transform: scale(1);
+  }
 }
 
 @keyframes shrinkOut {
-  from { transform: scale(1); }
-  to { transform: scale(0.5); }
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(0.5);
+  }
 }
 
 @keyframes fadeInBackdrop {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOutBackdrop {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+
+  .actionButtons {
+    top: unset !important;
+    bottom: 1rem !important;
+  }
+
   .drag-drop-area {
     padding: 1.5rem;
   }
@@ -992,6 +1065,15 @@ input::placeholder {
   .drag-drop-area .ti-cloud-upload {
     font-size: 1.5rem;
   }
+
+  .modal {
+    max-width: 80%;
+  }
+
+  .visibleBackdrop {
+    z-index: 1000000;
+  }
+
 }
 
 ul {

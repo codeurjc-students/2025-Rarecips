@@ -25,7 +25,7 @@ public class IngredientServiceIntegrationTest extends BaseIntegrationTest {
                  response.getBody().contains("ingredients"));
 
     } catch (Exception e) {
-      System.out.println("Get all ingredients test note: " + e.getMessage());
+      logger.info("Get all ingredients test note: {}", e.getMessage());
     }
   }
 
@@ -47,7 +47,7 @@ public class IngredientServiceIntegrationTest extends BaseIntegrationTest {
       }
 
     } catch (Exception e) {
-      System.out.println("Get ingredient by ID test note: " + e.getMessage());
+      logger.info("Get ingredient by ID test note: {}", e.getMessage());
     }
   }
 
@@ -63,7 +63,7 @@ public class IngredientServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Search ingredients test note: " + e.getMessage());
+      logger.info("Search ingredients test note: {}", e.getMessage());
     }
   }
 
@@ -79,7 +79,7 @@ public class IngredientServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode() == HttpStatus.NOT_FOUND);
 
     } catch (Exception e) {
-      System.out.println("Get ingredient by name test note: " + e.getMessage());
+      logger.info("Get ingredient by name test note: {}", e.getMessage());
     }
   }
 
@@ -95,7 +95,7 @@ public class IngredientServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Get ingredients pagination test note: " + e.getMessage());
+      logger.info("Get ingredients pagination test note: {}", e.getMessage());
     }
   }
 

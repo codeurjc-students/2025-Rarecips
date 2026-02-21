@@ -1,18 +1,355 @@
 <div class="container content-layer min-w-fit">
-  <div class="space-y-8 ml-16 mr-16">
+  <div class="space-y-8 ml-16 mr-16 page-content">
     <!-- Header -->
     <div class="mt-32">
       @if (!currentUser) {
-        <span class="flex gap-2 text-4xl font-body text-primary">{{ t('welcome_to') }} <b>Rarecips</b> <div *ngIf="translator.getLang() === 'ja'">へ</div>!</span>
-        <p class="text-lg text-secondary">{{ t('landing_subtitle') }}</p>
+        <span class="flex gap-2 text-4xl font-body text-primary header-text">{{ t('welcome_to') }} <b>Rarecips</b> <div *ngIf="translator.getLang() === 'ja'">へ</div>!</span>
+        <p class="text-lg text-secondary subtitle-text">{{ t('landing_subtitle') }}</p>
       } @else {
-        <h1 class="text-4xl font-body text-primary">{{ t('welcome_back') }}, <b>{{currentUser.username}}</b>@if (translator.getLang() === 'ja') {さん!} @else {!}</h1>
-        <p class="text-lg text-secondary">{{ t('landing_ready') }}</p>
+        <h1 class="text-4xl font-body text-primary header-text">{{ t('welcome_back') }}, <b>{{currentUser.username}}</b>@if (translator.getLang() === 'ja') {さん!} @else {!}</h1>
+        <p class="text-lg text-secondary subtitle-text">{{ t('landing_ready') }}</p>
       }
     </div>
 
-    <!-- Dashboard Grid -->
-    <div class="flex flex-col gap-8 dashboard-container">
+    <!-- Cardrousel for responsiveness -->
+    @if (responsive) {
+      <div class="carousel-container glass rounded-2xl p-6">
+        <div class="carousel-wrapper"
+             (touchstart)="onCarouselTouchStart($event)"
+             (touchmove)="onCarouselTouchMove($event)"
+             (touchend)="onCarouselTouchEnd($event)">
+          <div class="carousel-track"
+               [style.transform]="'translateX(calc(-' + currentCarouselIndex * 100 + '% + ' + carouselTranslate + 'px))'">
+
+            @if (currentUser) {
+              <div class="carousel-card">
+                <h2 class="text-xl font-bold text-primary mb-4">{{ t('whats_next') }}</h2>
+                <div class="actions-grid">
+                  <div class="action-card-mini glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer"
+                       (click)="navigateToCreateRecipe()">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center bg-green-500 mb-2">
+                      <i class="ti ti-replace-user text-white text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-primary text-sm">{{ t('share_first_recipe') }}</h3>
+                    <p class="text-xs text-secondary mt-1">{{ t('share_first_recipe_desc') }}</p>
+                  </div>
+
+                  <div class="action-card-mini glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer"
+                       (click)="navigateToEditProfile()">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center bg-blue-500 mb-2">
+                      <i class="ti ti-user-edit text-white text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-primary text-sm">{{ t('edit_profile') }}</h3>
+                    <p class="text-xs text-secondary mt-1">{{ t('edit_profile_desc') }}</p>
+                  </div>
+
+                  <div class="action-card-mini glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer"
+                       (click)="navigateToExploreRecipes()">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center bg-purple-500 mb-2">
+                      <i class="ti ti-pencil-star text-white text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-primary text-sm">{{ t('leave_review') }}</h3>
+                    <p class="text-xs text-secondary mt-1">{{ t('leave_review_desc') }}</p>
+                  </div>
+
+                  <div class="action-card-mini glass rounded-xl p-4 flex flex-col items-center text-center cursor-pointer"
+                       (click)="navigateToIngredients()">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center bg-red-500 mb-2">
+                      <i class="ti ti-basket-question text-white text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-primary text-sm">{{ t('check_basket') }}</h3>
+                    <p class="text-xs text-secondary mt-1">{{ t('check_basket_desc') }}</p>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <div class="carousel-card">
+              @if (currentUser) {
+                <div class="flex flex-row items-center mb-4 gap-2 cursor-pointer">
+                  <h2 class="text-xl font-bold text-primary" [class.underline]="linkHover" (mouseenter)="linkHover = true" (mouseleave)="linkHover = false">
+                    <a class="flex flex-row items-center gap-2" (click)="openMyCollections()">{{ t('revisit_collections') }}
+                      <i class="ti ti-caret-right-filled"></i>
+                    </a>
+                  </h2>
+                </div>
+              } @else {
+                <h2 class="text-xl font-bold text-primary mb-4">{{ t('popular_collections') }}</h2>
+              }
+
+              <div class="carousel-card-content">
+                @if (collectionsLoading) {
+                  <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-8 [&>svg]:max-w-20"></div>
+                } @else {
+                  @if (currentUser) {
+                    @if (userCollections.length === 0) {
+                      <div class="flex flex-col items-center justify-center py-8 gap-3">
+                        <i class="ti ti-folder-off text-5xl" style="color: var(--primary-400);"></i>
+                        <p class="text-secondary text-center font-medium">{{ t('cookbook_empty') }}</p>
+                        <p class="text-xs text-center" style="color: var(--primary-400);">{{ t('start_collecting') }}</p>
+                      </div>
+                    } @else {
+                      @for (collection of userCollections.slice(0, 2); track collection.id) {
+                        <div class="glass rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-all mb-4" (click)="viewCollection(collection)">
+                          <div class="flex w-full h-24 items-center gap-1">
+                            @for (img of getCollectionImages(collection); track $index) {
+                              <img class="h-full object-cover" [style.width]="(100 / getCollectionImages(collection).length) + '%'"
+                                   [src]="img"
+                                   alt="Recipe"/>
+                            }
+                            @if (getCollectionImages(collection).length === 0) {
+                              <div class="w-full h-full flex items-center justify-center" style="background: var(--primary-100-40)">
+                                <i class="ti ti-photo-off text-4xl" style="color: var(--primary-400);"></i>
+                              </div>
+                            }
+                          </div>
+                          <div class="flex items-center justify-between p-4">
+                            <div>
+                              <h3 class="font-semibold text-primary text-sm">{{ collection.title }}</h3>
+                              <p class="text-xs text-secondary">{{ collection.recipeCount }} {{ t('recipes') }}</p>
+                            </div>
+                            <button class="btn btn-primary rounded flex text-xs" style="background: var(--gradient-primary);">
+                              {{ t('view') }}
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    }
+                  } @else {
+                    @if (popularCollections.length === 0) {
+                      <div class="flex flex-col items-center justify-center py-8 gap-3">
+                        <i class="ti ti-soup-off text-5xl" style="color: var(--primary-400)"></i>
+                        <p class="text-secondary text-center font-medium">{{ t('nothing_cooking') }}</p>
+                      </div>
+                    } @else {
+                      @for (collection of popularCollections.slice(0, 2); track collection.id) {
+                        <div class="glass rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-all mb-4" (click)="viewCollection(collection)">
+                          <div class="flex w-full h-24 items-center gap-1">
+                            @for (img of getCollectionImages(collection); track $index) {
+                              <img class="h-full object-cover" [style.width]="(100 / getCollectionImages(collection).length) + '%'"
+                                   [src]="img"
+                                   alt="Recipe"/>
+                            }
+                            @if (getCollectionImages(collection).length === 0) {
+                              <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                                <i class="ti ti-photo-off text-4xl text-gray-400"></i>
+                              </div>
+                            }
+                          </div>
+                          <div class="flex items-center justify-between p-4">
+                            <div>
+                              <h3 class="font-semibold text-primary text-sm">{{ collection.title }}</h3>
+                              <p class="text-xs text-secondary">{{ collection.recipeCount }} {{ t('recipes') }}</p>
+                            </div>
+                            <button class="btn btn-primary rounded flex text-xs" style="background: var(--gradient-primary);">
+                              {{ t('view') }}
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    }
+                  }
+                }
+              </div>
+            </div>
+
+            <div class="carousel-card">
+              <h2 class="text-xl font-bold text-primary mb-4">{{ t('latest_activity') }}</h2>
+              @if (activities.length === 0) {
+                <div class="flex flex-col items-center justify-center py-8 gap-2">
+                  <i class="ti ti-inbox text-3xl" style="color: var(--primary-400);"></i>
+                  <p class="text-secondary text-center text-sm">{{ t('no_recent_activity') }}</p>
+                </div>
+              } @else {
+                <div class="carousel-card-content">
+                  @for (activity of activities.slice(0, 3); track activity.id) {
+                    <div class="list-card glass rounded-xl p-3 mb-3 flex items-center justify-between cursor-pointer">
+                      <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-white-50 rounded-lg flex items-center justify-center">
+                          <i class="ti text-xl"
+                             [class.ti-chef-hat]="activity.activityType.includes('CREATE_RECIPE') || activity.activityType.includes('UPDATE_RECIPE')"
+                             [class.text-blue-400]="activity.activityType.includes('CREATE_RECIPE') || activity.activityType.includes('UPDATE_RECIPE')"
+                             [class.ti-stack-2]="activity.activityType.includes('CREATE_COLLECTION') || activity.activityType.includes('UPDATE_COLLECTION') || activity.activityType.includes('ADD_RECIPE_TO_COLLECTION')"
+                             [class.text-green-400]="activity.activityType.includes('CREATE_COLLECTION') || activity.activityType.includes('UPDATE_COLLECTION') || activity.activityType.includes('ADD_RECIPE_TO_COLLECTION')"
+                             [class.ti-stars]="activity.activityType.includes('CREATE_REVIEW') || activity.activityType.includes('UPDATE_REVIEW')"
+                             [class.text-orange-400]="activity.activityType.includes('CREATE_REVIEW') || activity.activityType.includes('UPDATE_REVIEW')"
+                             [class.ti-trash]="activity.activityType.includes('DELETE_COLLECTION') || activity.activityType.includes('DELETE_RECIPE') || activity.activityType.includes('DELETE_REVIEW')"
+                             [class.text-red-400]="activity.activityType.includes('DELETE_COLLECTION') || activity.activityType.includes('DELETE_RECIPE') || activity.activityType.includes('DELETE_REVIEW')"></i>
+                        </div>
+                        <div class="text-sm">
+                          <p><b><span class="font-medium cursor-pointer hover:underline" style="color: var(--primary-600);" (click)="navigateToUser(activity.username, $event)">{{ activity.username }}</span></b> <span [innerHTML]="activity.formattedDescription"></span></p>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="carousel-card">
+              <h2 class="text-xl font-bold text-primary mb-4">{{ t('latest_reviews') }}</h2>
+              <div class="carousel-card-content">
+                @if (reviews.length === 0) {
+                  <div class="flex flex-col items-center justify-center py-8 gap-2">
+                    <i class="ti ti-inbox text-3xl" style="color: var(--primary-400);"></i>
+                    <p class="text-secondary text-center text-sm">{{ t('no_recent_reviews') }}</p>
+                  </div>
+                } @else {
+                  @for (review of reviews.slice(0, 3); track review.id) {
+                    <div class="glass rounded-xl p-4 hover:scale-105 transition-all mb-3">
+                      <div class="flex items-center justify-between mb-2">
+                        <p class="text-sm text-primary">
+                          <a routerLink="/user/{{review.author}}" class="font-bold hover:underline">{{ review.username }}</a>
+                        </p>
+                        <div class="flex items-center gap-1">
+                          <span class="text-sm font-semibold text-yellow-600">{{ review.rating }}</span>
+                          <i class="ti ti-star-filled w-4 h-4 text-yellow-500 fill-yellow-500"></i>
+                        </div>
+                      </div>
+                      <p class="text-sm text-secondary italic line-clamp-2">"{{ stripHtml(review.comment) }}"</p>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="carousel-indicators">
+          @for (card of carouselCards; track $index) {
+            <div class="indicator"
+                 [class.active]="currentCarouselIndex === $index"
+                 (click)="goToCarouselCard($index)">
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (responsive) {
+      <div class="glass rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-primary mb-4">{{ t('based_on_preferences') }}</h2>
+        <div class="grid grid-cols-1 gap-6">
+          @for (recipe of recipeList; track recipe.id) {
+            <div class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm hover:scale-105"
+                 (click)="viewRecipe(recipe.id)">
+              <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"></div>
+
+              <div class="imageCont relative aspect-43 overflow-hidden" (mouseover)="hoverRecipeId = recipe.id" (mouseout)="hoverRecipeId = undefined">
+                <img
+                  src="data:image/png;base64,{{recipe.imageUrl}}"
+                  alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;"
+                  [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
+
+                <div class="absolute inset-0 gradient-overlay"></div>
+
+                @if (currentUser) {
+                  <div class="actionButtons absolute top-4 right-4 flex gap-2">
+                    <button
+                      (click)="toggleFavorite(recipe.id, $event)"
+                      class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110"
+                      [class.favorites-active]="isRecipeInFavorites(recipe.id)">
+                      <i [ngClass]="isRecipeInFavorites(recipe.id) ? 'ti ti-heart-filled' : 'ti ti-heart'" class="w-4 h-4 heart-icon"></i>
+                    </button>
+                    <button
+                      (click)="openAddToCollection(recipe.id, $event)"
+                      class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110">
+                      <i class="ti ti-bookmark w-4 h-4"></i>
+                    </button>
+                  </div>
+                }
+
+                <div class="absolute top-4 left-4">
+                  <span class="badge badge-dark text-xs px-3 py-1">{{ recipe.mealTypes[0] }}</span>
+                </div>
+
+                <div class="absolute bottom-4 left-4">
+                  @if (recipe.difficulty < 3) {
+                    <div class="badge badge-green text-xs font-medium backdrop-blur-sm">
+                      <span>{{ t('easy') }}</span>
+                    </div>
+                  } @else if (recipe.difficulty === 3) {
+                    <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">
+                      <span>{{ t('medium') }}</span>
+                    </div>
+                  } @else {
+                    <div class="badge badge-red text-xs font-medium backdrop-blur-sm">
+                      <span>{{ t('hard') }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="p-6 space-y-4 h-full flex flex-1 flex-col justify-between">
+                <div class="space-y-2">
+                  <h3 class="text-xl font-bold text-primary line-clamp-2 recipe-title">{{ recipe.title }}</h3>
+
+                  <div class="flex items-center justify-between">
+                    <div class="star-rating flex items-center">
+                      <ng-container *ngFor="let star of [1,2,3,4,5]">
+                        @if (recipe.rating >= star) {
+                          <i class="ti ti-star-filled text-lg text-yellow-500 hover:scale-110 transition-all"></i>
+                        } @else if (recipe.rating >= star - 0.5) {
+                          <i class="ti ti-star-half-filled text-lg text-yellow-500 hover:scale-110 transition-all"></i>
+                        } @else {
+                          <i class="ti ti-star text-lg hover:scale-110 transition-all" style="color: var(--primary-text)"></i>
+                        }
+                      </ng-container>
+                      <span class="text-secondary text-sm ml-2">{{ recipe.rating | number:'1.1-1' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
+                  {{ recipe.description }}
+                </p>
+
+                <div class="flex items-center gap-4 text-secondary text-sm">
+                  <div class="flex items-center gap-1">
+                    <i class="ti ti-clock"></i>
+                    <span>{{ recipe.totalTime }} {{ t('min') }}</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <i class="ti ti-users"></i>
+                    <span>{{ recipe.people }} {{ t('people') }}</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <span *ngIf="recipe.dishTypes.length" class="text-xs px-2 py-1 rounded-full text-secondary hover:scale-110 transition-all"
+                        style="background-color: var(--primary-300);">{{ recipe.dishTypes[0] }}</span>
+                  <span *ngIf="recipe.dietLabels.length" class="text-xs px-2 py-1 rounded-full text-secondary hover:scale-110 transition-all"
+                        style="background-color: var(--primary-300);">{{ recipe.dietLabels[0] }}</span>
+                  <span *ngIf="recipe.healthLabels.length" class="text-xs px-2 py-1 rounded-full text-secondary hover:scale-110 transition-all"
+                        style="background-color: var(--primary-300);">{{ recipe.healthLabels[0] }}</span>
+                </div>
+
+                <div class="rounded flex hover:scale-110 transition-all" style="background: var(--gradient-primary);">
+                  <button class="btn btn-primary w-full view-recipe-btn" (click)="viewRecipe(recipe.id)">
+                    <i class="ti ti-eye mr-2"></i>
+                    {{ t('view_recipe') }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        @if (!isLoading && hasMore) {
+          <div class="text-center mt-6 rounded-2xl" style="background: var(--gradient-primary);">
+            <button class="btn btn-primary w-full" (click)="loadMoreRecipes()">
+              <i class="ti ti-refresh mr-2"></i>
+              {{ t('load_more') }}
+            </button>
+          </div>
+        }
+        @if (isLoading) {
+          <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-8 [&>svg]:max-w-20"></div>
+        }
+      </div>
+    }
+
+    <div class="flex flex-col gap-8 dashboard-container" [class.desktop-only]="responsive">
       <!-- Main column -->
       <div class="w-2/3 flex-1 space-y-8 main-column">
         <!-- Recommended Actions -->
@@ -87,19 +424,21 @@
                     <div class="absolute inset-0 gradient-overlay"></div>
 
                     <!-- Top Right Actions -->
-                    <div class="absolute top-4 right-4 flex gap-2">
-                      <button
-                        (click)="toggleFavorite(recipe.id, $event)"
-                        class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110"
-                        [class.favorites-active]="isRecipeInFavorites(recipe.id)">
-                        <i [ngClass]="isRecipeInFavorites(recipe.id) ? 'ti ti-heart-filled' : 'ti ti-heart'" class="w-4 h-4 heart-icon"></i>
-                      </button>
-                      <button
-                        (click)="openAddToCollection(recipe.id, $event)"
-                        class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110">
-                        <i class="ti ti-bookmark w-4 h-4"></i>
-                      </button>
-                    </div>
+                    @if (currentUser) {
+                      <div class="absolute top-4 right-4 flex gap-2">
+                        <button
+                          (click)="toggleFavorite(recipe.id, $event)"
+                          class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110"
+                          [class.favorites-active]="isRecipeInFavorites(recipe.id)">
+                          <i [ngClass]="isRecipeInFavorites(recipe.id) ? 'ti ti-heart-filled' : 'ti ti-heart'" class="w-4 h-4 heart-icon"></i>
+                        </button>
+                        <button
+                          (click)="openAddToCollection(recipe.id, $event)"
+                          class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110">
+                          <i class="ti ti-bookmark w-4 h-4"></i>
+                        </button>
+                      </div>
+                    }
 
                     <!-- Category Badge -->
                     <div class="absolute top-4 left-4">
@@ -202,7 +541,7 @@
 
       <!-- Sidebar column -->
       <div class="w-1/3 space-y-8 sidebar-column">
-        <div class="glass rounded-2xl p-6 h-[30%] max-h-[30%]">
+        <div class="glass overflow-y-auto rounded-2xl p-6 h-fit max-h-[30%]">
           @if (currentUser) {
             <div class="flex flex-row items-center mb-4 gap-2 cursor-pointer">
               <h2 class="text-xl font-bold text-primary" [class.underline]="linkHover" (mouseenter)="linkHover = true" (mouseleave)="linkHover = false">

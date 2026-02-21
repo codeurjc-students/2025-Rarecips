@@ -16,8 +16,12 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Entity
 public class User {
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
 
     public interface BasicInfo {
     }
@@ -125,7 +129,7 @@ public class User {
             }
         } catch (IOException | SQLException e) {
             this.profileImageFile = null;
-            System.out.println("Error loading profile image for user " + this.username + ": " + e.getMessage());
+            logger.error("Error loading profile image for user {}: {}", this.username, e.getMessage());
         }
     }
 
@@ -150,7 +154,7 @@ public class User {
                 buffer.close();
                 return imageBlob;
             } else {
-                System.out.println("Image not found: " + imagePath);
+                logger.warn("Image not found: {}", imagePath);
             }
         } catch (IOException | SQLException e) {
             e.printStackTrace();

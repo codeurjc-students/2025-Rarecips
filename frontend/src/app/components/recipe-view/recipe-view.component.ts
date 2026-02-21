@@ -1,23 +1,23 @@
-import {Component, OnInit, SecurityContext} from '@angular/core';
-import {RecipeService} from '../../services/recipe.service';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Recipe} from '../../models/recipe.model';
-import {Review} from '../../models/review.model';
-import {CommonModule} from '@angular/common';
-import {IngredientIconService} from '../../services/ingredient-icon.service';
-import {firstValueFrom, Subject, takeUntil} from 'rxjs';
-import {SessionService} from '../../services/session.service';
-import {UserService} from '../../services/user.service';
-import {FormsModule} from '@angular/forms';
-import {ReviewService} from '../../services/review.service';
-import {Ingredient} from '../../models/ingredient.model';
-import {RecipeCollectionService} from '../../services/recipe-collection.service';
-import {RecipeCollection} from '../../models/recipe-collection.model';
-import {CollectionCardComponent} from '../shared/collection-card/collection-card.component';
-import {DomSanitizer} from '@angular/platform-browser';
+import { Component, HostListener, OnInit, SecurityContext } from '@angular/core';
+import { RecipeService } from '../../services/recipe.service';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Recipe } from '../../models/recipe.model';
+import { Review } from '../../models/review.model';
+import { CommonModule } from '@angular/common';
+import { IngredientIconService } from '../../services/ingredient-icon.service';
+import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { SessionService } from '../../services/session.service';
+import { UserService } from '../../services/user.service';
+import { FormsModule } from '@angular/forms';
+import { ReviewService } from '../../services/review.service';
+import { Ingredient } from '../../models/ingredient.model';
+import { RecipeCollectionService } from '../../services/recipe-collection.service';
+import { RecipeCollection } from '../../models/recipe-collection.model';
+import { CollectionCardComponent } from '../shared/collection-card/collection-card.component';
+import { DomSanitizer } from '@angular/platform-browser';
 import { TranslatorService } from '../../services/translator.service';
-import {ThemeService} from '../../services/theme.service';
-import {ActivityService} from '../../services/activity.service';
+import { ThemeService } from '../../services/theme.service';
+import { ActivityService } from '../../services/activity.service';
 
 
 @Component({
@@ -55,7 +55,7 @@ export class RecipeViewComponent implements OnInit {
 
   focusMode: boolean = false;
   focusModeClosing: boolean = false;
-  nextLabel:  string = "Next";
+  nextLabel: string = "Next";
 
   originalServings: number = 1;
   currentServings: number = 1;
@@ -70,41 +70,49 @@ export class RecipeViewComponent implements OnInit {
   selectedRecipeId: number | undefined = -1;
   showAddToCollectionDialog: boolean = false;
 
-    openDeleteModal() {
-      this.showDeleteModal = true;
-      document.getElementsByTagName("html")[0].style.overflow = 'hidden';
-    }
+  responsive: boolean = window.innerWidth <= 1024;
+  currentCarouselIndex: number = 0;
+  isDraggingCarousel: boolean = false;
+  carouselStartX: number = 0;
+  carouselCurrentX: number = 0;
+  carouselTranslate: number = 0;
+  carouselCards: string[] = ['recipe', 'ingredients'];
 
-    closeDeleteModal(event: Event) {
-      ((event?.target as HTMLElement).closest('.visibleBackdrop')?.classList.remove('visibleBackdrop'));
-      setTimeout(() => this.showDeleteModal = false, 500);
-    }
+  openDeleteModal() {
+    this.showDeleteModal = true;
+    document.getElementsByTagName("html")[0].style.overflow = 'hidden';
+  }
 
-    onDeleteBackdropClick(event: MouseEvent) {
-      if (event.target === event.currentTarget) {
-        this.closeDeleteModal(event);
-      }
-    }
+  closeDeleteModal(event: Event) {
+    ((event?.target as HTMLElement).closest('.visibleBackdrop')?.classList.remove('visibleBackdrop'));
+    setTimeout(() => this.showDeleteModal = false, 500);
+  }
 
-    async confirmDeleteRecipe(event: Event) {
-      const id: number = this.activatedRoute.snapshot.params['id'];
-        this.recipeService.deleteRecipe(id).subscribe({
-        next: () => {
-          this.router.navigate(["/"])
-        },
-        error: (error) => {
-          this.router.navigate(['/error'], {state: {status: error.status, reason: error.message}});
-        }
-      })
+  onDeleteBackdropClick(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
       this.closeDeleteModal(event);
     }
+  }
+
+  async confirmDeleteRecipe(event: Event) {
+    const id: number = this.activatedRoute.snapshot.params['id'];
+    this.recipeService.deleteRecipe(id).subscribe({
+      next: () => {
+        this.router.navigate(["/"])
+      },
+      error: (error) => {
+        this.router.navigate(['/error'], { state: { status: error.status, reason: error.message } });
+      }
+    })
+    this.closeDeleteModal(event);
+  }
   newReview: {
     rating: number;
     comment: string;
   } = {
-    rating: 0,
-    comment: ''
-  };
+      rating: 0,
+      comment: ''
+    };
   reviewHoverRating: number = 0;
   private selection: Selection | null = null;
   animationMode: string = '';
@@ -144,7 +152,7 @@ export class RecipeViewComponent implements OnInit {
     private activityService: ActivityService,
     private sanitizer: DomSanitizer,
     private translatorService: TranslatorService
-  ) {}
+  ) { }
 
   t(key: string): string {
     return this.translatorService.translate(key);
@@ -285,7 +293,7 @@ export class RecipeViewComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading recipe:', err);
-        this.router.navigate(['/error'], {state: {status: err.status, reason: err.message}});
+        this.router.navigate(['/error'], { state: { status: err.status, reason: err.message } });
       }
     });
   }
@@ -306,7 +314,7 @@ export class RecipeViewComponent implements OnInit {
 
   getDifficultyLabel(): string {
     if (!this.recipe) return this.t('medium');
-    switch(this.recipe.difficulty) {
+    switch (this.recipe.difficulty) {
       case 1: return this.t('very_easy');
       case 2: return this.t('easy');
       case 3: return this.t('medium');
@@ -525,7 +533,7 @@ export class RecipeViewComponent implements OnInit {
 
   toggleReviewForm() {
     if (!this.isAuthenticated) {
-      this.router.navigate(['/error'], {state: {status: 403, reason: "You must be logged in to write a review"}});
+      this.router.navigate(['/error'], { state: { status: 403, reason: "You must be logged in to write a review" } });
       return;
     }
     this.showReviewForm = !this.showReviewForm;
@@ -573,7 +581,7 @@ export class RecipeViewComponent implements OnInit {
     };
 
     if (!this.isAuthenticated) {
-      this.router.navigate(['/error'], {state: {status: 403, reason: "You must be logged in to write a review"}});
+      this.router.navigate(['/error'], { state: { status: 403, reason: "You must be logged in to write a review" } });
       return;
     }
 
@@ -618,7 +626,7 @@ export class RecipeViewComponent implements OnInit {
             try {
               let user: any;
               if (r.authorUsername) user = await firstValueFrom(this.userService.getUserByUsername(r.authorUsername));
-              r.authorPfp = "data:image/png;base64," + user?.profileImageString;
+              if (user) r.authorPfp = "data:image/png;base64," + user?.profileImageString; else r.authorPfp = '/assets/img/user.png';
             } catch {
               r.authorPfp = '/assets/img/user.png';
             }
@@ -771,7 +779,7 @@ export class RecipeViewComponent implements OnInit {
 
   toggleFavorite(): void {
     if (!this.isAuthenticated) {
-      this.router.navigate(['/error'], {state: {status: 403, reason: "You must be logged in to add favorites"}});
+      this.router.navigate(['/error'], { state: { status: 403, reason: "You must be logged in to add favorites" } });
       return;
     }
 
@@ -800,13 +808,9 @@ export class RecipeViewComponent implements OnInit {
     this.collectionService.addRecipeToCollection(this.favoritesCollection.id, this.recipe.id).subscribe({
       next: () => {
         this.isInFavorites = true;
-        if (this.user?.username) {
-          this.loadUserCollections(this.user.username);
-        }
       },
       error: (error) => {
         console.error('Error adding to favorites:', error);
-        alert('Error adding to favorites. Please try again.');
       }
     });
   }
@@ -817,15 +821,79 @@ export class RecipeViewComponent implements OnInit {
     this.collectionService.removeRecipeFromCollection(this.favoritesCollection.id, this.recipe.id).subscribe({
       next: () => {
         this.isInFavorites = false;
-        if (this.user?.username) {
-          this.loadUserCollections(this.user.username);
-        }
       },
       error: (error) => {
         console.error('Error removing from favorites:', error);
-        alert('Error removing from favorites. Please try again.');
       }
     });
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.responsive = window.innerWidth <= 1024;
+  }
+
+  nextCarouselCard() {
+    this.currentCarouselIndex = (this.currentCarouselIndex + 1) % this.carouselCards.length;
+  }
+
+  prevCarouselCard() {
+    this.currentCarouselIndex = (this.currentCarouselIndex - 1 + this.carouselCards.length) % this.carouselCards.length;
+  }
+
+  goToCarouselCard(index: number) {
+    this.currentCarouselIndex = index;
+  }
+
+  carouselStartY: number = 0;
+
+  onCarouselTouchStart(event: TouchEvent) {
+    if (!this.responsive) return;
+
+    const target = event.target as HTMLElement;
+
+    this.isDraggingCarousel = true;
+    this.carouselStartX = event.touches[0].clientX;
+    this.carouselStartY = event.touches[0].clientY;
+    this.carouselCurrentX = this.carouselStartX;
+  }
+
+  onCarouselTouchMove(event: TouchEvent) {
+    if (!this.isDraggingCarousel || !this.responsive) return;
+
+    const deltaX = event.touches[0].clientX - this.carouselStartX;
+    const deltaY = event.touches[0].clientY - this.carouselStartY;
+
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      this.isDraggingCarousel = false;
+      this.carouselTranslate = 0;
+      return;
+    }
+
+    event.stopPropagation();
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+
+
+    this.carouselCurrentX = event.touches[0].clientX;
+    this.carouselTranslate = this.carouselCurrentX - this.carouselStartX;
+  }
+
+  onCarouselTouchEnd(event: TouchEvent) {
+    if (!this.isDraggingCarousel || !this.responsive) return;
+
+    const deltaX = this.carouselCurrentX - this.carouselStartX;
+    const threshold = 50;
+
+    if (deltaX > threshold) {
+      this.prevCarouselCard();
+    } else if (deltaX < -threshold) {
+      this.nextCarouselCard();
+    }
+
+    this.isDraggingCarousel = false;
+    this.carouselTranslate = 0;
   }
 
   closeCollectionModal(): void {
@@ -858,6 +926,18 @@ export class RecipeViewComponent implements OnInit {
         error: (error) => {
           console.error('Error adding to collection:', error);
         }
+      });
+    }
+  }
+
+  shareRecipe() {
+    if (navigator.share) {
+      navigator.share({
+        title: this.recipe?.title,
+        text: `${this.t('share_recipe_desc')} ${this.recipe?.title}`,
+        url: window.location.href
+      }).catch((error) => {
+        console.error('Error sharing:', error);
       });
     }
   }

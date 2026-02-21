@@ -1,93 +1,80 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
   <!-- Main Content -->
-  <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 px-4 py-12 mt-24">
-    <div class="flex w-full min-h-full flex-col items-center gap-8">
+  <div
+    class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 px-4 py-12 mt-24">
+    <div class="flex w-full min-h-full flex-col items-center gap-6">
 
       <!-- Recipe Form -->
       <form class="flex flex-col glass p-8 min-w-[100vh]">
-        <div class="flex flex-row w-full max-w-7xl gap-8">
+        <div class="flex flex-row w-full max-w-7xl gap-6">
           <!-- Col 1 -->
-          <div class="flex flex-col gap-8 w-1/2">
+          <div class="flex flex-col gap-6 w-1/2">
             <!-- Basic Information -->
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass z-[1]"
-                 style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
+            <div class="flex w-full flex-col gap-5 rounded-3xl border border-solid px-6 py-6 shadow-sm glass z-[1]"
+              style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
 
-              <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+              <h3 class="text-lg font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-info-circle mr-2"></i>
                 {{ t('basic_information') }}
               </h3>
 
               <!-- Recipe Title -->
               <div class="flex flex-col gap-2">
-                <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                <label class="text-sm font-medium" style="color: var(--primary-400);">
                   {{ t('recipe_title') }} *
                 </label>
                 <div class="relative">
-                  <input type="text"
-                         [(ngModel)]="title"
-                         name="title"
-                         class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
-                         id="recipeLabel"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                         placeholder="Your recipe title" required/>
+                  <input type="text" [(ngModel)]="title" name="title"
+                    class="w-full px-3 py-2 rounded-2xl border-2 transition-all focus:outline-none" id="recipeLabel"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
+                    placeholder="Your recipe title" required />
                   <i class="ti ti-edit absolute right-3 top-1/2 transform -translate-y-1/2"
-                     style="color: var(--primary-400);"></i>
+                    style="color: var(--primary-400);"></i>
                 </div>
               </div>
 
               <!-- Description -->
               <div class="flex flex-col gap-2">
-                <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                <label class="text-sm font-medium" style="color: var(--primary-400);">
                   {{ t('brief_description') }} *
                 </label>
                 <div class="relative">
-                  <textarea rows="3"
-                            [(ngModel)]="description"
-                            name="description"
-                            class="w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none resize-none"
-                            id="recipeDesc"
-                            style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
-                            placeholder="{{ t('describe_recipe') }}" required></textarea>
-                  <i class="ti ti-message absolute right-3 top-3"
-                     style="color: var(--primary-400);"></i>
+                  <textarea rows="3" [(ngModel)]="description" name="description"
+                    class="w-full px-3 py-2 rounded-2xl border-2 transition-all focus:outline-none resize-none"
+                    id="recipeDesc"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"
+                    placeholder="{{ t('describe_recipe') }}" required></textarea>
+                  <i class="ti ti-message absolute right-3 top-3" style="color: var(--primary-400);"></i>
                 </div>
               </div>
 
               <!-- Recipe Metadata -->
-              <div class="flex flex-row md:grid-cols-3 gap-6 w-full">
+              <div class="flex flex-row md:grid-cols-3 gap-5 w-full">
                 <!-- Prep Time -->
                 <div class="flex flex-col gap-2 w-full">
-                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                  <label class="text-sm font-medium" style="color: var(--primary-400);">
                     {{ t('preparation_time') }}
                   </label>
                   <div class="relative">
                     <div
-                      class="flex justify-between items-center w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                      class="flex justify-between items-center w-full px-3 py-2 rounded-2xl border-2 transition-all focus:outline-none"
                       style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
                       <input type="number" min="0" [(ngModel)]="prepTime" name="prepTime"
-                             class="w-full h-full bg-transparent focus:outline-none"
-                             style="color: var(--primary-700);"/>
+                        class="w-full h-full bg-transparent focus:outline-none" style="color: var(--primary-700);" />
                       <i class="absolute right-12 top-1/2 transform -translate-y-1/2 ti ti-clock"
-                         style="color: var(--primary-400);"></i>
+                        style="color: var(--primary-400);"></i>
                       <div class="flex flex-col gap-0">
-                        <button type="button"
-                                (click)="incrementValue('prepTime')"
-                                (mousedown)="startIncrement('prepTime')"
-                                (mouseup)="stopChange()"
-                                (mouseleave)="stopChange()"
-                                class="ti ti-caret-up-filled cursor-pointer hover:opacity-70 text-xs leading-none"
-                                style="color: var(--primary-700);"></button>
-                        <button type="button"
-                                (click)="decrementValue('prepTime')"
-                                (mousedown)="startDecrement('prepTime')"
-                                (mouseup)="stopChange()"
-                                (mouseleave)="stopChange()"
-                                class="ti ti-caret-down-filled cursor-pointer hover:opacity-70 text-xs leading-none"
-                                style="color: var(--primary-700);"></button>
+                        <button type="button" (click)="incrementValue('prepTime')"
+                          (mousedown)="startIncrement('prepTime')" (mouseup)="stopChange()" (mouseleave)="stopChange()"
+                          class="ti ti-caret-up-filled cursor-pointer hover:opacity-70 text-xs leading-none"
+                          style="color: var(--primary-700);"></button>
+                        <button type="button" (click)="decrementValue('prepTime')"
+                          (mousedown)="startDecrement('prepTime')" (mouseup)="stopChange()" (mouseleave)="stopChange()"
+                          class="ti ti-caret-down-filled cursor-pointer hover:opacity-70 text-xs leading-none"
+                          style="color: var(--primary-700);"></button>
                       </div>
                     </div>
-                    <span
-                      class="flex items-center gap-2 absolute right-20 top-1/2 transform -translate-y-1/2 text-sm"
+                    <span class="flex items-center gap-2 absolute right-20 top-1/2 transform -translate-y-1/2 text-sm"
                       style="color: var(--primary-400);">{{ t('min') }}
                     </span>
                   </div>
@@ -95,57 +82,44 @@
 
                 <!-- Servings -->
                 <div class="flex flex-col gap-2 w-full">
-                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                  <label class="text-sm font-medium" style="color: var(--primary-400);">
                     {{ t('servings') }}
                   </label>
                   <div class="relative">
                     <div
-                      class="flex justify-between items-center w-full px-4 py-3 rounded-2xl border-2 transition-all focus:outline-none"
+                      class="flex justify-between items-center w-full px-3 py-2 rounded-2xl border-2 transition-all focus:outline-none"
                       style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
                       <input type="number" min="1" [(ngModel)]="servings" name="servings"
-                             class="w-full h-full bg-transparent focus:outline-none"
-                             style="color: var(--primary-700);"/>
+                        class="w-full h-full bg-transparent focus:outline-none" style="color: var(--primary-700);" />
                       <div class="flex flex-col gap-0">
-                        <button type="button"
-                                (click)="incrementValue('servings')"
-                                (mousedown)="startIncrement('servings')"
-                                (mouseup)="stopChange()"
-                                (mouseleave)="stopChange()"
-                                class="ti ti-caret-up-filled cursor-pointer hover:opacity-70 text-xs leading-none"
-                                style="color: var(--primary-700);"></button>
-                        <button type="button"
-                                (click)="decrementValue('servings')"
-                                (mousedown)="startDecrement('servings')"
-                                (mouseup)="stopChange()"
-                                (mouseleave)="stopChange()"
-                                class="ti ti-caret-down-filled cursor-pointer hover:opacity-70 text-xs leading-none"
-                                style="color: var(--primary-700);"></button>
+                        <button type="button" (click)="incrementValue('servings')"
+                          (mousedown)="startIncrement('servings')" (mouseup)="stopChange()" (mouseleave)="stopChange()"
+                          class="ti ti-caret-up-filled cursor-pointer hover:opacity-70 text-xs leading-none"
+                          style="color: var(--primary-700);"></button>
+                        <button type="button" (click)="decrementValue('servings')"
+                          (mousedown)="startDecrement('servings')" (mouseup)="stopChange()" (mouseleave)="stopChange()"
+                          class="ti ti-caret-down-filled cursor-pointer hover:opacity-70 text-xs leading-none"
+                          style="color: var(--primary-700);"></button>
                       </div>
                     </div>
                     <i class="absolute right-12 top-1/2 transform -translate-y-1/2 ti ti-users"
-                       style="color: var(--primary-400);"></i>
+                      style="color: var(--primary-400);"></i>
                   </div>
                 </div>
               </div>
 
               <!-- Difficulty & Category -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <!-- Difficulty -->
                 <div class="flex flex-col gap-2">
-                  <label class="text-sm font-semibold flex items-center gap-2" style="color: var(--primary-400);">
+                  <label class="text-sm font-medium flex items-center gap-2" style="color: var(--primary-400);">
                     <i class="ti ti-brand-speedtest"></i>
                     {{ t('difficulty') }}: <span style="color: var(--primary-700);">{{ getDifficultyLabel() }}</span>
                   </label>
                   <div class="difficulty-slider-container px-4 py-4 rounded-2xl border-2"
-                       style="background: var(--primary-100-40); border-color: var(--primary-100);">
-                    <input type="range"
-                           [(ngModel)]="difficulty"
-                           name="difficulty"
-                           min="1"
-                           max="5"
-                           step="1"
-                           class="difficulty-slider w-full transition-all"
-                           [attr.data-difficulty]="difficulty"/>
+                    style="background: var(--primary-100-40); border-color: var(--primary-100);">
+                    <input type="range" [(ngModel)]="difficulty" name="difficulty" min="1" max="5" step="1"
+                      class="difficulty-slider w-full transition-all" [attr.data-difficulty]="difficulty" />
                     <div class="flex justify-between mt-2 text-xs" style="color: var(--primary-400);">
                       <span>{{ t('easy') }}</span>
                       <span>{{ t('medium') }}</span>
@@ -156,51 +130,44 @@
 
                 <!-- Category -->
                 <div class="flex flex-col gap-2 relative category-dropdown-container">
-                  <label class="text-sm font-semibold" style="color: var(--primary-400);">
+                  <label class="text-sm font-medium" style="color: var(--primary-400);">
                     {{ t('category') }}
                   </label>
                   <div
-                    class="w-full px-4 py-3 rounded-2xl border-2 focus-within:border-primary-500 flex justify-between items-center relative"
+                    class="w-full px-3 py-2 rounded-2xl border-2 focus-within:border-primary-500 flex justify-between items-center relative"
                     style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700); transition: border-color 0.2s;">
-                    <input type="text"
-                           [(ngModel)]="category"
-                           name="category"
-                           (input)="onCategoryInput($event)"
-                           (focus)="showCategoryDropdown = true"
-                           placeholder="Select category..."
-                           class="bg-transparent w-full focus:outline-none"
-                           style="color: var(--primary-700);"/>
-                    <i class="ti ti-category mr-2"
-                       style="color: var(--primary-400);"></i>
-                    <button type="button"
-                            (click)="toggleCategoryDropdown()"
-                            class="ti ti-caret-down-filled cursor-pointer hover:opacity-70"
-                            [class.rotate-180]="showCategoryDropdown"
-                            style="color: var(--primary-700); transition: transform 0.2s;"></button>
+                    <input type="text" [(ngModel)]="category" name="category" (input)="onCategoryInput($event)"
+                      (focus)="showCategoryDropdown = true" placeholder="Select category..."
+                      class="bg-transparent w-full focus:outline-none" style="color: var(--primary-700);" />
+                    <i class="ti ti-category mr-2" style="color: var(--primary-400);"></i>
+                    <button type="button" (click)="toggleCategoryDropdown()"
+                      class="ti ti-caret-down-filled cursor-pointer hover:opacity-70"
+                      [class.rotate-180]="showCategoryDropdown"
+                      style="color: var(--primary-700); transition: transform 0.2s;"></button>
                   </div>
 
                   <!-- Dropdown menu -->
                   @if (showCategoryDropdown && filteredCategoryOptions.length > 0) {
-                    <div [style.z-index]="showCategoryDropdown ? 1 : 0" class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-0"
-                         style="background: var(--primary-50); border-color: var(--primary-100);">
-                      @for (option of filteredCategoryOptions; track option) {
-                        <div (click)="selectCategory(option)"
-                             class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100"
-                             [class.bg-primary-200]="option === category"
-                             style="color: var(--primary-700);">
-                          {{ option }}
-                        </div>
-                      }
+                  <div [style.z-index]="showCategoryDropdown ? 1 : 0"
+                    class="dropdown-menu dropdown-menu-animate dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-0"
+                    style="background: var(--primary-50); border-color: var(--primary-100);">
+                    @for (option of filteredCategoryOptions; track option) {
+                    <div (click)="selectCategory(option)"
+                      class="px-3 py-2 cursor-pointer transition-all hover:bg-primary-100"
+                      [class.bg-primary-200]="option === category" style="color: var(--primary-700);">
+                      {{ option }}
                     </div>
+                    }
+                  </div>
                   }
                 </div>
               </div>
             </div>
             <!-- Tags and Characteristics -->
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass z-0"
-                 style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
+            <div class="flex w-full flex-col gap-5 rounded-3xl border border-solid px-6 py-6 shadow-sm glass z-0"
+              style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
 
-              <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+              <h3 class="text-lg font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-tags mr-2"></i>
                 {{ t('tags_and_characteristics') }}
               </h3>
@@ -209,313 +176,295 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 <!-- Dietary Characteristics Dropdown -->
-                <div [style.z-index]="showDietaryDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
-                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                <div [style.z-index]="showDietaryDropdown ? 1 : 0"
+                  class="relative multiselect-dropdown-container z-[0]">
+                  <label class="text-sm font-medium mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-leaf mr-1"></i>
                     {{ t('dietary') }}
                   </label>
                   <div class="relative">
-                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
-                      <input type="text"
-                             [(ngModel)]="dietarySearchTerm"
-                             name="dietarySearch"
-                             placeholder="{{ t('search_or_select') }}"
-                             (click)="toggleDietaryDropdown()"
-                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
-                             style="color: var(--primary-700);">
+                    <div class="w-full px-3 py-2 rounded-2xl border-2 flex flex-col gap-2 min-h-[40px]"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text" [(ngModel)]="dietarySearchTerm" name="dietarySearch"
+                        placeholder="{{ t('search_or_select') }}" (click)="toggleDietaryDropdown()"
+                        class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                        style="color: var(--primary-700);">
                       @if (dietaryCharacteristics.length > 0) {
-                        <div class="flex flex-wrap gap-1">
-                          @for (item of dietaryCharacteristics; track item) {
-                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                                  style="background: var(--primary-500); color: white;">
-                              {{ item }}
-                              <i (click)="removeDietary(item); $event.stopPropagation()"
-                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
-                            </span>
-                          }
-                        </div>
-                      }
-                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
-                         [class.rotate-180]="showDietaryDropdown"
-                         (click)="toggleDietaryDropdown()"
-                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
-                    </div>
-                    @if (showDietaryDropdown) {
-                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-[1]"
-                           style="background: var(--primary-50); border-color: var(--primary-100);">
-                        @for (option of getFilteredDietaryOptions(); track option) {
-                          <div (click)="toggleDietary(option)"
-                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
-                               [class.bg-primary-200]="isDietarySelected(option)"
-                               style="color: var(--primary-700);">
-                            <span>{{ option }}</span>
-                            @if (isDietarySelected(option)) {
-                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
-                            }
-                          </div>
+                      <div class="flex flex-wrap gap-1">
+                        @for (item of dietaryCharacteristics; track item) {
+                        <span class="px-1.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1"
+                          style="background: var(--primary-500); color: white;">
+                          {{ item }}
+                          <i (click)="removeDietary(item); $event.stopPropagation()"
+                            class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                        </span>
                         }
                       </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4" [class.rotate-180]="showDietaryDropdown"
+                        (click)="toggleDietaryDropdown()"
+                        style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showDietaryDropdown) {
+                    <div
+                      class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-[1]"
+                      style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (option of getFilteredDietaryOptions(); track option) {
+                      <div (click)="toggleDietary(option)"
+                        class="px-3 py-2 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                        [class.bg-primary-200]="isDietarySelected(option)" style="color: var(--primary-700);">
+                        <span>{{ option }}</span>
+                        @if (isDietarySelected(option)) {
+                        <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                        }
+                      </div>
+                      }
+                    </div>
                     }
                   </div>
                 </div>
 
                 <!-- Cuisine Type Dropdown -->
-                <div [style.z-index]="showCuisineDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
-                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                <div [style.z-index]="showCuisineDropdown ? 1 : 0"
+                  class="relative multiselect-dropdown-container z-[0]">
+                  <label class="text-sm font-medium mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-flag mr-1"></i>
                     {{ t('cuisine') }}
                   </label>
                   <div class="relative">
-                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
-                      <input type="text"
-                             [(ngModel)]="cuisineSearchTerm"
-                             name="cuisineSearch"
-                             placeholder="{{ t('search_or_select') }}"
-                             (click)="toggleCuisineDropdown()"
-                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
-                             style="color: var(--primary-700);">
+                    <div class="w-full px-3 py-2 rounded-2xl border-2 flex flex-col gap-2 min-h-[40px]"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text" [(ngModel)]="cuisineSearchTerm" name="cuisineSearch"
+                        placeholder="{{ t('search_or_select') }}" (click)="toggleCuisineDropdown()"
+                        class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                        style="color: var(--primary-700);">
                       @if (cuisineTypes.length > 0) {
-                        <div class="flex flex-wrap gap-1">
-                          @for (item of cuisineTypes; track item) {
-                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                                  style="background: var(--primary-500); color: white;">
-                              {{ item }}
-                              <i (click)="removeCuisine(item); $event.stopPropagation()"
-                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
-                            </span>
-                          }
-                        </div>
-                      }
-                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
-                         [class.rotate-180]="showCuisineDropdown"
-                         (click)="toggleCuisineDropdown()"
-                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
-                    </div>
-                    @if (showCuisineDropdown) {
-                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
-                           style="background: var(--primary-50); border-color: var(--primary-100);">
-                        @for (option of getFilteredCuisineOptions(); track option) {
-                          <div (click)="toggleCuisineType(option)"
-                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
-                               [class.bg-primary-200]="isCuisineTypeSelected(option)"
-                               style="color: var(--primary-700);">
-                            <span>{{ option }}</span>
-                            @if (isCuisineTypeSelected(option)) {
-                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
-                            }
-                          </div>
+                      <div class="flex flex-wrap gap-1">
+                        @for (item of cuisineTypes; track item) {
+                        <span class="px-1.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1"
+                          style="background: var(--primary-500); color: white;">
+                          {{ item }}
+                          <i (click)="removeCuisine(item); $event.stopPropagation()"
+                            class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                        </span>
                         }
                       </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4" [class.rotate-180]="showCuisineDropdown"
+                        (click)="toggleCuisineDropdown()"
+                        style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showCuisineDropdown) {
+                    <div
+                      class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                      style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (option of getFilteredCuisineOptions(); track option) {
+                      <div (click)="toggleCuisineType(option)"
+                        class="px-3 py-2 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                        [class.bg-primary-200]="isCuisineTypeSelected(option)" style="color: var(--primary-700);">
+                        <span>{{ option }}</span>
+                        @if (isCuisineTypeSelected(option)) {
+                        <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                        }
+                      </div>
+                      }
+                    </div>
                     }
                   </div>
                 </div>
 
                 <!-- Cautions Dropdown -->
-                <div [style.z-index]="showCautionsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
-                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                <div [style.z-index]="showCautionsDropdown ? 1 : 0"
+                  class="relative multiselect-dropdown-container z-[0]">
+                  <label class="text-sm font-medium mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-alert-triangle mr-1"></i>
                     {{ t('allergens') }}
                   </label>
                   <div class="relative">
-                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
-                      <input type="text"
-                             [(ngModel)]="cautionsSearchTerm"
-                             name="cautionsSearch"
-                             placeholder="{{ t('search_or_select') }}"
-                             (click)="toggleCautionsDropdown()"
-                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
-                             style="color: var(--primary-700);">
+                    <div class="w-full px-3 py-2 rounded-2xl border-2 flex flex-col gap-2 min-h-[40px]"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text" [(ngModel)]="cautionsSearchTerm" name="cautionsSearch"
+                        placeholder="{{ t('search_or_select') }}" (click)="toggleCautionsDropdown()"
+                        class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                        style="color: var(--primary-700);">
                       @if (cautions.length > 0) {
-                        <div class="flex flex-wrap gap-1">
-                          @for (item of cautions; track item) {
-                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                                  style="background: var(--primary-500); color: white;">
-                              {{ item }}
-                              <i (click)="removeCaution(item); $event.stopPropagation()"
-                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
-                            </span>
-                          }
-                        </div>
-                      }
-                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
-                         [class.rotate-180]="showCautionsDropdown"
-                         (click)="toggleCautionsDropdown()"
-                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
-                    </div>
-                    @if (showCautionsDropdown) {
-                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
-                           style="background: var(--primary-50); border-color: var(--primary-100);">
-                        @for (option of getFilteredCautionOptions(); track option) {
-                          <div (click)="toggleCaution(option)"
-                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
-                               [class.bg-primary-200]="isCautionSelected(option)"
-                               style="color: var(--primary-700);">
-                            <span>{{ option }}</span>
-                            @if (isCautionSelected(option)) {
-                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
-                            }
-                          </div>
+                      <div class="flex flex-wrap gap-1">
+                        @for (item of cautions; track item) {
+                        <span class="px-1.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1"
+                          style="background: var(--primary-500); color: white;">
+                          {{ item }}
+                          <i (click)="removeCaution(item); $event.stopPropagation()"
+                            class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                        </span>
                         }
                       </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                        [class.rotate-180]="showCautionsDropdown" (click)="toggleCautionsDropdown()"
+                        style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showCautionsDropdown) {
+                    <div
+                      class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                      style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (option of getFilteredCautionOptions(); track option) {
+                      <div (click)="toggleCaution(option)"
+                        class="px-3 py-2 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                        [class.bg-primary-200]="isCautionSelected(option)" style="color: var(--primary-700);">
+                        <span>{{ option }}</span>
+                        @if (isCautionSelected(option)) {
+                        <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                        }
+                      </div>
+                      }
+                    </div>
                     }
                   </div>
                 </div>
 
                 <!-- Diet Labels Dropdown -->
-                <div [style.z-index]="showDietLabelsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
-                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                <div [style.z-index]="showDietLabelsDropdown ? 1 : 0"
+                  class="relative multiselect-dropdown-container z-[0]">
+                  <label class="text-sm font-medium mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-salad mr-1"></i>
                     {{ t('diet_labels') }}
                   </label>
                   <div class="relative">
-                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
-                      <input type="text"
-                             [(ngModel)]="dietLabelsSearchTerm"
-                             name="dietLabelsSearch"
-                             placeholder="{{ t('search_or_select') }}"
-                             (click)="toggleDietLabelsDropdown()"
-                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
-                             style="color: var(--primary-700);">
+                    <div class="w-full px-3 py-2 rounded-2xl border-2 flex flex-col gap-2 min-h-[40px]"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text" [(ngModel)]="dietLabelsSearchTerm" name="dietLabelsSearch"
+                        placeholder="{{ t('search_or_select') }}" (click)="toggleDietLabelsDropdown()"
+                        class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                        style="color: var(--primary-700);">
                       @if (dietLabels.length > 0) {
-                        <div class="flex flex-wrap gap-1">
-                          @for (item of dietLabels; track item) {
-                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                                  style="background: var(--primary-500); color: white;">
-                              {{ item }}
-                              <i (click)="removeDietLabel(item); $event.stopPropagation()"
-                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
-                            </span>
-                          }
-                        </div>
-                      }
-                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
-                         [class.rotate-180]="showDietLabelsDropdown"
-                         (click)="toggleDietLabelsDropdown()"
-                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
-                    </div>
-                    @if (showDietLabelsDropdown) {
-                      <div class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
-                           style="background: var(--primary-50); border-color: var(--primary-100);">
-                        @for (option of getFilteredDietLabelOptions(); track option) {
-                          <div (click)="toggleDietLabel(option)"
-                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
-                               [class.bg-primary-200]="isDietLabelSelected(option)"
-                               style="color: var(--primary-700);">
-                            <span>{{ option }}</span>
-                            @if (isDietLabelSelected(option)) {
-                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
-                            }
-                          </div>
+                      <div class="flex flex-wrap gap-1">
+                        @for (item of dietLabels; track item) {
+                        <span class="px-1.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1"
+                          style="background: var(--primary-500); color: white;">
+                          {{ item }}
+                          <i (click)="removeDietLabel(item); $event.stopPropagation()"
+                            class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                        </span>
                         }
                       </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                        [class.rotate-180]="showDietLabelsDropdown" (click)="toggleDietLabelsDropdown()"
+                        style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showDietLabelsDropdown) {
+                    <div
+                      class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                      style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (option of getFilteredDietLabelOptions(); track option) {
+                      <div (click)="toggleDietLabel(option)"
+                        class="px-3 py-2 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                        [class.bg-primary-200]="isDietLabelSelected(option)" style="color: var(--primary-700);">
+                        <span>{{ option }}</span>
+                        @if (isDietLabelSelected(option)) {
+                        <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                        }
+                      </div>
+                      }
+                    </div>
                     }
                   </div>
                 </div>
 
                 <!-- Dish Types Dropdown -->
-                <div [style.z-index]="showDishTypesDropdown ? 1 : 0"class="relative multiselect-dropdown-container z-[0]">
-                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                <div [style.z-index]="showDishTypesDropdown ? 1 : 0"
+                  class="relative multiselect-dropdown-container z-[0]">
+                  <label class="text-sm font-medium mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-tools-kitchen-2 mr-1"></i>
                     {{ t('dish_type') }}
                   </label>
                   <div class="relative">
-                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
-                      <input type="text"
-                             [(ngModel)]="dishTypesSearchTerm"
-                             name="dishTypesSearch"
-                             placeholder="{{ t('search_or_select') }}"
-                             (click)="toggleDishTypesDropdown()"
-                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
-                             style="color: var(--primary-700);">
+                    <div class="w-full px-3 py-2 rounded-2xl border-2 flex flex-col gap-2 min-h-[40px]"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text" [(ngModel)]="dishTypesSearchTerm" name="dishTypesSearch"
+                        placeholder="{{ t('search_or_select') }}" (click)="toggleDishTypesDropdown()"
+                        class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                        style="color: var(--primary-700);">
                       @if (dishTypes.length > 0) {
-                        <div class="flex flex-wrap gap-1">
-                          @for (item of dishTypes; track item) {
-                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                                  style="background: var(--primary-500); color: white;">
-                              {{ item }}
-                              <i (click)="removeDishType(item); $event.stopPropagation()"
-                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
-                            </span>
-                          }
-                        </div>
-                      }
-                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
-                         [class.rotate-180]="showDishTypesDropdown"
-                         (click)="toggleDishTypesDropdown()"
-                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
-                    </div>
-                    @if (showDishTypesDropdown) {
-                      <div class="dropdown-menu dropdown-force-top dropdown-up absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
-                           style="background: var(--primary-50); border-color: var(--primary-100);">
-                        @for (option of getFilteredDishTypeOptions(); track option) {
-                          <div (click)="toggleDishType(option)"
-                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
-                               [class.bg-primary-200]="isDishTypeSelected(option)"
-                               style="color: var(--primary-700);">
-                            <span>{{ option }}</span>
-                            @if (isDishTypeSelected(option)) {
-                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
-                            }
-                          </div>
+                      <div class="flex flex-wrap gap-1">
+                        @for (item of dishTypes; track item) {
+                        <span class="px-1.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1"
+                          style="background: var(--primary-500); color: white;">
+                          {{ item }}
+                          <i (click)="removeDishType(item); $event.stopPropagation()"
+                            class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                        </span>
                         }
                       </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                        [class.rotate-180]="showDishTypesDropdown" (click)="toggleDishTypesDropdown()"
+                        style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showDishTypesDropdown) {
+                    <div
+                      class="dropdown-menu dropdown-force-top dropdown-up absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                      style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (option of getFilteredDishTypeOptions(); track option) {
+                      <div (click)="toggleDishType(option)"
+                        class="px-3 py-2 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                        [class.bg-primary-200]="isDishTypeSelected(option)" style="color: var(--primary-700);">
+                        <span>{{ option }}</span>
+                        @if (isDishTypeSelected(option)) {
+                        <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                        }
+                      </div>
+                      }
+                    </div>
                     }
                   </div>
                 </div>
 
                 <!-- Health Labels Dropdown -->
-                <div [style.z-index]="showHealthLabelsDropdown ? 1 : 0" class="relative multiselect-dropdown-container z-[0]">
-                  <label class="text-sm font-semibold mb-2 block" style="color: var(--primary-400);">
+                <div [style.z-index]="showHealthLabelsDropdown ? 1 : 0"
+                  class="relative multiselect-dropdown-container z-[0]">
+                  <label class="text-sm font-medium mb-2 block" style="color: var(--primary-400);">
                     <i class="ti ti-heart-plus mr-1"></i>
                     {{ t('health_labels') }}
                   </label>
                   <div class="relative">
-                    <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
-                      <input type="text"
-                             [(ngModel)]="healthLabelsSearchTerm"
-                             name="healthLabelsSearch"
-                             placeholder="{{ t('search_or_select') }}"
-                             (click)="toggleHealthLabelsDropdown()"
-                             class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
-                             style="color: var(--primary-700);">
+                    <div class="w-full px-3 py-2 rounded-2xl border-2 flex flex-col gap-2 min-h-[40px]"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                      <input type="text" [(ngModel)]="healthLabelsSearchTerm" name="healthLabelsSearch"
+                        placeholder="{{ t('search_or_select') }}" (click)="toggleHealthLabelsDropdown()"
+                        class="w-full bg-transparent focus:outline-none text-sm w-[80%]"
+                        style="color: var(--primary-700);">
                       @if (healthLabels.length > 0) {
-                        <div class="flex flex-wrap gap-1">
-                          @for (item of healthLabels; track item) {
-                            <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                                  style="background: var(--primary-500); color: white;">
-                              {{ item }}
-                              <i (click)="removeHealthLabel(item); $event.stopPropagation()"
-                                 class="ti ti-x cursor-pointer hover:opacity-70"></i>
-                            </span>
-                          }
-                        </div>
-                      }
-                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
-                         [class.rotate-180]="showHealthLabelsDropdown"
-                         (click)="toggleHealthLabelsDropdown()"
-                         style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
-                    </div>
-                    @if (showHealthLabelsDropdown) {
-                      <div class="dropdown-menu dropdown-force-top dropdown-up absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
-                           style="background: var(--primary-50); border-color: var(--primary-100);">
-                        @for (option of getFilteredHealthLabelOptions(); track option) {
-                          <div (click)="toggleHealthLabel(option)"
-                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
-                               [class.bg-primary-200]="isHealthLabelSelected(option)"
-                               style="color: var(--primary-700);">
-                            <span>{{ option }}</span>
-                            @if (isHealthLabelSelected(option)) {
-                              <i class="ti ti-check" style="color: var(--primary-500);"></i>
-                            }
-                          </div>
+                      <div class="flex flex-wrap gap-1">
+                        @for (item of healthLabels; track item) {
+                        <span class="px-1.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1"
+                          style="background: var(--primary-500); color: white;">
+                          {{ item }}
+                          <i (click)="removeHealthLabel(item); $event.stopPropagation()"
+                            class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                        </span>
                         }
                       </div>
+                      }
+                      <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                        [class.rotate-180]="showHealthLabelsDropdown" (click)="toggleHealthLabelsDropdown()"
+                        style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                    </div>
+                    @if (showHealthLabelsDropdown) {
+                    <div
+                      class="dropdown-menu dropdown-force-top dropdown-up absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                      style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (option of getFilteredHealthLabelOptions(); track option) {
+                      <div (click)="toggleHealthLabel(option)"
+                        class="px-3 py-2 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                        [class.bg-primary-200]="isHealthLabelSelected(option)" style="color: var(--primary-700);">
+                        <span>{{ option }}</span>
+                        @if (isHealthLabelSelected(option)) {
+                        <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                        }
+                      </div>
+                      }
+                    </div>
                     }
                   </div>
                 </div>
@@ -524,27 +473,29 @@
             </div>
           </div>
           <!-- Col 2-->
-          <div class="flex flex-col justify-start gap-8 w-1/2 h-full">
+          <div class="flex flex-col justify-start gap-6 w-1/2 h-full">
             <!-- Recipe Image -->
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <div class="flex w-full flex-col gap-5 rounded-3xl border border-solid px-6 py-6 shadow-sm glass"
+              style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
-              <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+              <h3 class="text-lg font-semibold" style="color: var(--primary-700);">
                 <i class="ti ti-photo mr-2"></i>
                 {{ t('recipe_image') }}
               </h3>
 
               <div class="flex flex-col items-center gap-2 w-full">
                 @if (imagePreviewUrl) {
-                  <img [src]="imagePreviewUrl" alt="Recipe preview" class="h-[10.5rem] w-[10.5rem] flex-none border-2 object-cover rounded-xl" style="border-color: var(--primary-300)">
-                  <button type="button"
-                          (click)="removeImage()"
-                          class="absolute mt-4 px-3 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex gap-2 ml-24"
-                          style="background: var(--primary-500); color: white; border-color: var(--primary-300)">
-                    <i class="ti ti-trash"></i>
-                  </button>
+                <img [src]="imagePreviewUrl" alt="Recipe preview"
+                  class="h-[10.5rem] w-[10.5rem] flex-none border-2 object-cover rounded-xl"
+                  style="border-color: var(--primary-300)">
+                <button type="button" (click)="removeImage()"
+                  class="absolute mt-4 px-3 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-105 flex gap-2 ml-24"
+                  style="background: var(--primary-500); color: white; border-color: var(--primary-300)">
+                  <i class="ti ti-trash"></i>
+                </button>
                 } @else {
-                  <img alt="Recipe" class="h-[10.5rem] w-[10.5rem] flex-none object-cover border-2 rounded-xl" style="border-color: var(--primary-300); background: var(--primary-300)" src="/assets/img/recipe.png">
+                <img alt="Recipe" class="h-[10.5rem] w-[10.5rem] flex-none object-cover border-2 rounded-xl"
+                  style="border-color: var(--primary-300); background: var(--primary-300)" src="/assets/img/recipe.png">
                 }
               </div>
               <div class="w-full">
@@ -555,29 +506,21 @@
                   (drop)="onDrop($event)">
                   <div class="flex flex-col items-center gap-4">
                     <div class="w-16 h-16 rounded-full flex items-center justify-center"
-                         style="background: var(--primary-300);">
-                      <i class="ti ti-cloud-upload text-2xl"
-                         style="color: var(--primary-500);"></i>
+                      style="background: var(--primary-300);">
+                      <i class="ti ti-cloud-upload text-2xl" style="color: var(--primary-500);"></i>
                     </div>
 
                     <div class="flex flex-col gap-2">
-                      <h4 class="font-semibold text-lg"
-                          style="color: var(--primary-700);">
+                      <h4 class="font-semibold text-lg" style="color: var(--primary-700);">
                         {{ t('drag_image_here') }}
                       </h4>
                       <p class="flex flex-row items-center justify-center text-sm gap-2"
-                         style="color: var(--primary-500);">
+                        style="color: var(--primary-500);">
                         {{ t('or') }}
-                        <input
-                          #fileInput
-                          type="file"
-                          accept="image/*"
-                          (change)="onFileSelected($event)"
+                        <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)"
                           style="display: none;">
-                        <button
-                          class="px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2"
-                          style="background: var(--gradient-primary); color: white;"
-                          (click)="fileInput.click()">
+                        <button class="px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-2"
+                          style="background: var(--gradient-primary); color: white;" (click)="fileInput.click()">
                           <i class="ti ti-photo"></i>
                           {{ t('select') }}
                         </button>
@@ -586,8 +529,7 @@
 
                     <!-- Image Requirements -->
                     <div class="w-full text-left">
-                      <div class="text-xs font-medium mb-2"
-                           style="color: var(--primary-600);">
+                      <div class="text-xs font-medium mb-2" style="color: var(--primary-600);">
                         {{ t('image_requirements') }}
                       </div>
                       <ul class="text-xs space-y-1" style="color: var(--primary-400);">
@@ -611,26 +553,28 @@
                     </div>
 
                     <!-- Hidden file input -->
-                    <input type="file" class="hidden"
-                           accept="image/jpeg,image/png,image/webp" multiple="false">
+                    <input type="file" class="hidden" accept="image/jpeg,image/png,image/webp" multiple="false">
                   </div>
                 </div>
               </div>
 
             </div>
 
-            <div class="flex flex-col w-full h-full gap-8">
+            <div class="flex flex-col w-full h-full gap-6">
               <div class="flex w-full">
                 <div class="tabs glass text-nowrap w-full">
-                  <button type="button" class="tab" [class.active]="activeTab === 'ingredients'" (click)="setActiveTab('ingredients')">
+                  <button type="button" class="tab" [class.active]="activeTab === 'ingredients'"
+                    (click)="setActiveTab('ingredients')">
                     <i class="ti ti-basket text-2xl" aria-hidden="true"></i>
                     {{ t('ingredients') }}
                   </button>
-                  <button type="button" class="tab" [class.active]="activeTab === 'instructions'" (click)="setActiveTab('instructions')">
+                  <button type="button" class="tab" [class.active]="activeTab === 'instructions'"
+                    (click)="setActiveTab('instructions')">
                     <i class="ti ti-list-details text-2xl" aria-hidden="true"></i>
                     {{ t('instructions') }}
                   </button>
-                  <button type="button" class="tab" [class.active]="activeTab === 'nutrition'" (click)="setActiveTab('nutrition')">
+                  <button type="button" class="tab" [class.active]="activeTab === 'nutrition'"
+                    (click)="setActiveTab('nutrition')">
                     <i class="ti ti-report text-2xl" aria-hidden="true"></i>
                     {{ t('nutrition') }}
                   </button>
@@ -639,66 +583,57 @@
 
               <!-- Ingredients -->
               @if (activeTab === 'ingredients') {
-              <div class="flex w-full h-full justify-around flex-col gap-1 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-                   style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
+              <div
+                class="flex w-full h-full justify-around flex-col gap-1 rounded-3xl border border-solid px-6 py-6 shadow-sm glass"
+                style="border-color: var(--primary-100-40); background: var(--primary-200-40); position: relative;">
 
                 <div class="flex justify-between items-center">
-                  <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                  <h3 class="text-lg font-semibold" style="color: var(--primary-700);">
                     <i class="ti ti-basket mr-2"></i>
                     {{ t('ingredients') }}
                   </h3>
                 </div>
 
                 <!-- Add new ingredient form -->
-                <div class="flex items-center gap-4 p-4 glass rounded-2xl relative"
-                     style="background: var(--primary-100-40);">
+                <div class="ingredients-input flex items-center gap-4 p-4 glass rounded-2xl relative"
+                  style="background: var(--primary-100-40);">
                   <!-- Ingredient name with autocomplete -->
                   <div class="flex-1 relative ingredient-autocomplete-container">
-                    <input type="text"
-                           [(ngModel)]="newIngredient.name"
-                           name="newIngredientName"
-                           (input)="onIngredientNameInput($event)"
-                           (focus)="onIngredientNameInput($event)"
-                           placeholder="{{ t('ingredient_name') }}"
-                           class="w-full px-3 py-2 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="text" [(ngModel)]="newIngredient.name" name="newIngredientName"
+                      (input)="onIngredientNameInput($event)" (focus)="onIngredientNameInput($event)"
+                      placeholder="{{ t('ingredient_name') }}"
+                      class="w-full px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
 
                     <!-- Autocomplete dropdown -->
                     @if (showIngredientDropdown && filteredIngredients.length > 0) {
-                      <div class="absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-50"
-                           style="background: var(--primary-50); border-color: var(--primary-100);">
-                        @for (ingredient of filteredIngredients; track ingredient) {
-                          <div (click)="selectIngredient(ingredient)"
-                               class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100"
-                               [class.bg-primary-200]="ingredient === newIngredient.name"
-                               style="color: var(--primary-700);">
-                            <i class="ti {{ ingredientIconService.getIconForIngredient(ingredient) }} mr-2"></i>
-                            {{ ingredient }}
-                          </div>
-                        }
+                    <div
+                      class="absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-50"
+                      style="background: var(--primary-50); border-color: var(--primary-100);">
+                      @for (ingredient of filteredIngredients; track ingredient) {
+                      <div (click)="selectIngredient(ingredient)"
+                        class="px-3 py-2 cursor-pointer transition-all hover:bg-primary-100"
+                        [class.bg-primary-200]="ingredient === newIngredient.name" style="color: var(--primary-700);">
+                        <i class="ti {{ ingredientIconService.getIconForIngredient(ingredient) }} mr-2"></i>
+                        {{ ingredient }}
                       </div>
+                      }
+                    </div>
                     }
                   </div>
 
-                  <input type="text"
-                         [(ngModel)]="newIngredient.quantity"
-                         name="newIngredientQuantity"
-                         placeholder="{{ t('qty') }}"
-                         class="px-3 py-2 w-24 rounded-xl border transition-all focus:outline-none"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
-                  <input type="text"
-                         [(ngModel)]="newIngredient.unit"
-                         name="newIngredientUnit"
-                         placeholder="{{ t('unit') }}"
-                         class="px-3 py-2 w-24 rounded-xl border transition-all focus:outline-none"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
-                  <button type="button"
-                          (click)="addIngredient()"
-                          [disabled]="!isValidIngredient()"
-                          [class.opacity-50]="!isValidIngredient()"
-                          [class.cursor-not-allowed]="!isValidIngredient()"
-                          class="px-2 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105 flex items-center gap-2"
-                          style="background: var(--gradient-primary); color: white;">
+                  <input type="text" [(ngModel)]="newIngredient.quantity" name="newIngredientQuantity"
+                    placeholder="{{ t('qty') }}"
+                    class="px-3 py-2 w-24 rounded-xl border transition-all focus:outline-none"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
+                  <input type="text" [(ngModel)]="newIngredient.unit" name="newIngredientUnit"
+                    placeholder="{{ t('unit') }}"
+                    class="px-3 py-2 w-24 rounded-xl border transition-all focus:outline-none"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
+                  <button type="button" (click)="addIngredient()" [disabled]="!isValidIngredient()"
+                    [class.opacity-50]="!isValidIngredient()" [class.cursor-not-allowed]="!isValidIngredient()"
+                    class="px-2 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105 flex items-center gap-2"
+                    style="background: var(--gradient-primary); color: white;">
                     <i class="ti ti-plus"></i>
                   </button>
                 </div>
@@ -706,72 +641,66 @@
                 <!-- Ingredients list with drag and drop -->
                 <div class="flex flex-col gap-4 mt-3 z-[-1]" id="ingredients-list">
                   @if (ingredients.length === 0) {
-                    <div class="text-center py-2" style="color: var(--primary-400);">
-                      <i class="ti ti-basket-off text-4xl mb-2"></i>
-                      <p>{{ t('no_ingredients_added') }}</p>
-                    </div>
+                  <div class="text-center py-2" style="color: var(--primary-400);">
+                    <i class="ti ti-basket-off text-4xl mb-2"></i>
+                    <p>{{ t('no_ingredients_added') }}</p>
+                  </div>
                   }
                   @for (ingredient of ingredients; track $index; let i = $index) {
-                    <div class="flex items-center gap-4 p-4 ingredient-item glass rounded-2xl cursor-move"
-                         style="background: var(--primary-300-40);"
-                         draggable="true"
-                         (dragstart)="onIngredientDragStart(i)"
-                         (dragover)="onIngredientDragOver($event)"
-                         (drop)="onIngredientDrop(i)">
-                      <div class="flex h-10 w-10 items-center justify-center rounded-xl grip-handle"
-                           style="background: var(--gradient-primary); cursor: grab;">
-                        <i class="ti ti-grip-vertical text-white"></i>
-                      </div>
-                      <div class="flex-1 flex flex-row items-center gap-4">
-                        <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
-                             style="background: var(--primary-100-40);">
-                          <i class="ti {{ ingredientIconService.getIconForIngredient(ingredient.name) }} text-xl" style="color: var(--primary-700)"></i>
-                        </div>
-                        <span class="flex-1 font-medium" style="color: var(--primary-700);">
-                          {{ ingredient.name }}
-                        </span>
-                        <span class="px-3 py-1 rounded-xl" style="background: var(--primary-100-40); color: var(--primary-700);">
-                          {{ ingredient.quantity }} {{ ingredient.unit }}
-                        </span>
-                      </div>
-                      <button type="button"
-                              (click)="removeIngredient(i)"
-                              class="delete-button w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style="background: var(--primary-100);">
-                        <i class="ti ti-trash text-red-500"></i>
-                      </button>
+                  <div class="flex items-center gap-4 p-4 ingredient-item glass rounded-2xl"
+                    style="background: var(--primary-300-40);">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-xl grip-handle"
+                      style="background: var(--gradient-primary); cursor: grab;"
+                      (touchstart)="onIngredientTouchStart(i, $event)" (touchmove)="onIngredientTouchMove($event)"
+                      (touchend)="onIngredientTouchEnd($event)" (mousedown)="onIngredientMouseDown(i, $event)">
+                      <i class="ti ti-grip-vertical text-white"></i>
                     </div>
+                    <div class="flex-1 flex flex-row items-center gap-4">
+                      <div class="flex items-center justify-center p-2 rounded-full h-[30px] w-[30px]"
+                        style="background: var(--primary-100-40);">
+                        <i class="ti {{ ingredientIconService.getIconForIngredient(ingredient.name) }} text-lg"
+                          style="color: var(--primary-700)"></i>
+                      </div>
+                      <span class="flex-1 font-medium" style="color: var(--primary-700);">
+                        {{ ingredient.name }}
+                      </span>
+                      <span class="px-2 py-0.5 rounded-xl"
+                        style="background: var(--primary-100-40); color: var(--primary-700);">
+                        {{ ingredient.quantity }} {{ ingredient.unit }}
+                      </span>
+                    </div>
+                    <button type="button" (click)="removeIngredient(i)"
+                      class="delete-button w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                      style="background: var(--primary-100);">
+                      <i class="ti ti-trash text-red-500"></i>
+                    </button>
+                  </div>
                   }
                 </div>
               </div>
               }
 
-            <!-- Instructions -->
-            @if (activeTab === 'instructions') {
-            <div class="flex w-full h-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+              <!-- Instructions -->
+              @if (activeTab === 'instructions') {
+              <div class="flex w-full h-full flex-col gap-5 rounded-3xl border border-solid px-6 py-6 shadow-sm glass"
                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
                 <div class="flex items-center justify-between">
-                    <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                        <i class="ti ti-list-numbers mr-2"></i>
-                        {{ t('instructions') }}
-                    </h3>
+                  <h3 class="text-lg font-semibold" style="color: var(--primary-700);">
+                    <i class="ti ti-list-numbers mr-2"></i>
+                    {{ t('instructions') }}
+                  </h3>
                 </div>
 
                 <!-- Add new instruction form -->
-                <div class="flex items-center gap-4 p-4 glass rounded-2xl"
-                     style="background: var(--primary-100-40);">
-                  <textarea rows="2"
-                         [(ngModel)]="newInstruction"
-                         name="newInstruction"
-                         placeholder="{{ t('describe_step') }}"
-                         maxlength="500"
-                         class="px-3 py-2 flex-1 rounded-xl border transition-all focus:outline-none resize-none"
-                         style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"></textarea>
-                  <button type="button"
-                          (click)="addInstruction()"
-                          class="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
-                          style="background: var(--gradient-primary); color: white;">
+                <div class="flex items-center gap-4 p-4 glass rounded-2xl" style="background: var(--primary-100-40);">
+                  <textarea rows="2" [(ngModel)]="newInstruction" name="newInstruction"
+                    placeholder="{{ t('describe_step') }}" maxlength="500"
+                    class="px-3 py-2 flex-1 rounded-xl border transition-all focus:outline-none resize-none"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"></textarea>
+                  <button type="button" (click)="addInstruction()"
+                    class="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
+                    style="background: var(--gradient-primary); color: white;">
                     <i class="ti ti-plus"></i>
                   </button>
                 </div>
@@ -779,57 +708,52 @@
                 <!-- Instructions List -->
                 <div class="space-y-4" id="instructions-list">
                   @for (instruction of instructions; track instruction.step; let i = $index) {
-                    <div class="flex gap-4 p-4 items-start rounded-2xl instruction-item"
-                        style="background: var(--primary-100-40);">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
-                            style="background: var(--primary-500); color: white;">
-                            {{ instruction.step }}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="px-3 py-2 break-words whitespace-pre-wrap" style="color: var(--primary-700); word-break: break-word; overflow-wrap: break-word;">
-                              {{ instruction.description }}
-                            </p>
-                        </div>
-                        <button type="button"
-                            (click)="removeInstruction(i)"
-                            class="delete-button w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
-                            style="background: var(--primary-100); color: var(--primary-700);">
-                            <i class="ti ti-trash text-red-500"></i>
-                        </button>
+                  <div class="flex gap-4 p-4 items-start rounded-2xl instruction-item"
+                    style="background: var(--primary-100-40);">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-xl flex-shrink-0"
+                      style="background: var(--primary-500); color: white;">
+                      {{ instruction.step }}
                     </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="px-3 py-2 break-words whitespace-pre-wrap"
+                        style="color: var(--primary-700); word-break: break-word; overflow-wrap: break-word;">
+                        {{ instruction.description }}
+                      </p>
+                    </div>
+                    <button type="button" (click)="removeInstruction(i)"
+                      class="delete-button w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:scale-110 flex-shrink-0"
+                      style="background: var(--primary-100); color: var(--primary-700);">
+                      <i class="ti ti-trash text-red-500"></i>
+                    </button>
+                  </div>
                   }
                 </div>
-            </div>
-            }
+              </div>
+              }
 
-            <!-- Nutrition -->
-            @if (activeTab === 'nutrition') {
-            <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+              <!-- Nutrition -->
+              @if (activeTab === 'nutrition') {
+              <div class="flex w-full flex-col gap-5 rounded-3xl border border-solid px-6 py-6 shadow-sm glass"
                 style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
                 <div class="flex items-center justify-between">
-                    <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                        <i class="ti ti-report mr-2"></i>
-                        {{ t('nutritional_information') }}
-                    </h3>
-                    <span class="text-sm" style="color: var(--primary-600);">{{ t('per_serving') }}</span>
+                  <h3 class="text-lg font-semibold" style="color: var(--primary-700);">
+                    <i class="ti ti-report mr-2"></i>
+                    {{ t('nutritional_information') }}
+                  </h3>
+                  <span class="text-sm" style="color: var(--primary-600);">{{ t('per_serving') }}</span>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 nutrition-grid">
                   <!-- Total Weight -->
                   <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium" style="color: var(--primary-700);">
                       <i class="ti ti-weight mr-1"></i>
                       {{ t('total_weight') }} (g)
                     </label>
-                    <input type="number"
-                           [(ngModel)]="totalWeight"
-                           name="totalWeight"
-                           min="0"
-                           step="1"
-                           placeholder="0"
-                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="number" [(ngModel)]="totalWeight" name="totalWeight" min="0" step="1" placeholder="0"
+                      class="px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
                   </div>
 
                   <!-- Calories -->
@@ -838,13 +762,9 @@
                       <i class="ti ti-flame mr-1"></i>
                       {{ t('calories') }} (kcal)
                     </label>
-                    <input type="number"
-                           [(ngModel)]="calories"
-                           name="calories"
-                           min="0"
-                           placeholder="0"
-                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="number" [(ngModel)]="calories" name="calories" min="0" placeholder="0"
+                      class="px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
                   </div>
 
                   <!-- Protein -->
@@ -853,14 +773,9 @@
                       <i class="ti ti-meat mr-1"></i>
                       {{ t('protein') }} (g)
                     </label>
-                    <input type="number"
-                           [(ngModel)]="protein"
-                           name="protein"
-                           min="0"
-                           step="0.1"
-                           placeholder="0"
-                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="number" [(ngModel)]="protein" name="protein" min="0" step="0.1" placeholder="0"
+                      class="px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
                   </div>
 
                   <!-- Carbs -->
@@ -869,14 +784,9 @@
                       <i class="ti ti-bread mr-1"></i>
                       {{ t('carbohydrates') }} (g)
                     </label>
-                    <input type="number"
-                           [(ngModel)]="carbs"
-                           name="carbs"
-                           min="0"
-                           step="0.1"
-                           placeholder="0"
-                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="number" [(ngModel)]="carbs" name="carbs" min="0" step="0.1" placeholder="0"
+                      class="px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
                   </div>
 
                   <!-- Fat -->
@@ -885,14 +795,9 @@
                       <i class="ti ti-droplet mr-1"></i>
                       {{ t('fat') }} (g)
                     </label>
-                    <input type="number"
-                           [(ngModel)]="fat"
-                           name="fat"
-                           min="0"
-                           step="0.1"
-                           placeholder="0"
-                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="number" [(ngModel)]="fat" name="fat" min="0" step="0.1" placeholder="0"
+                      class="px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
                   </div>
 
                   <!-- Fiber -->
@@ -901,14 +806,9 @@
                       <i class="ti ti-plant mr-1"></i>
                       {{ t('fiber') }} (g)
                     </label>
-                    <input type="number"
-                           [(ngModel)]="fiber"
-                           name="fiber"
-                           min="0"
-                           step="0.1"
-                           placeholder="0"
-                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="number" [(ngModel)]="fiber" name="fiber" min="0" step="0.1" placeholder="0"
+                      class="px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
                   </div>
 
                   <!-- Sugar -->
@@ -917,14 +817,9 @@
                       <i class="ti ti-candy mr-1"></i>
                       {{ t('sugar') }} (g)
                     </label>
-                    <input type="number"
-                           [(ngModel)]="sugar"
-                           name="sugar"
-                           min="0"
-                           step="0.1"
-                           placeholder="0"
-                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="number" [(ngModel)]="sugar" name="sugar" min="0" step="0.1" placeholder="0"
+                      class="px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
                   </div>
 
                   <!-- Sodium -->
@@ -933,18 +828,13 @@
                       <i class="ti ti-salt mr-1"></i>
                       {{ t('sodium') }} (mg)
                     </label>
-                    <input type="number"
-                           [(ngModel)]="sodium"
-                           name="sodium"
-                           min="0"
-                           step="1"
-                           placeholder="0"
-                           class="px-4 py-3 rounded-xl border transition-all focus:outline-none"
-                           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);"/>
+                    <input type="number" [(ngModel)]="sodium" name="sodium" min="0" step="1" placeholder="0"
+                      class="px-3 py-2 rounded-xl border transition-all focus:outline-none"
+                      style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);" />
                   </div>
                 </div>
-            </div>
-            }
+              </div>
+              }
 
             </div>
 
@@ -952,11 +842,9 @@
         </div>
         <!-- Action Buttons -->
         <div class="publishBut flex w-full justify-center gap-4 pt-8 z-[-1]">
-          <button type="button"
-                  (click)="saveRecipe()"
-                  [class.disabled]="checkFields()"
-                  class="disabled px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
-                  style="background: var(--gradient-primary); color: white;">
+          <button type="button" (click)="saveRecipe()" [class.disabled]="checkFields()"
+            class="disabled px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+            style="background: var(--gradient-primary); color: white;">
             <i class="ti ti-send"></i>
             {{ isEditMode ? t('update_recipe') : t('publish_recipe') }}
           </button>

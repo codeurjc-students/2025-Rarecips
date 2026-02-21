@@ -25,7 +25,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       assertTrue(response.getBody().startsWith("[") || response.getBody().contains("recipes"));
 
     } catch (Exception e) {
-      System.out.println("Get recipes test note: " + e.getMessage());
+      logger.info("Get recipes test note: {}", e.getMessage());
     }
   }
 
@@ -49,7 +49,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       }
 
     } catch (Exception e) {
-      System.out.println("Get recipe by ID test note: " + e.getMessage());
+      logger.info("Get recipe by ID test note: {}", e.getMessage());
     }
   }
 
@@ -65,7 +65,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Search recipes test note: " + e.getMessage());
+      logger.info("Search recipes test note: {}", e.getMessage());
     }
   }
 
@@ -81,7 +81,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Filter recipes test note: " + e.getMessage());
+      logger.info("Filter recipes test note: {}", e.getMessage());
     }
   }
 
@@ -97,7 +97,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Filter by meal type test note: " + e.getMessage());
+      logger.info("Filter by meal type test note: {}", e.getMessage());
     }
   }
 
@@ -117,7 +117,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       }
 
     } catch (Exception e) {
-      System.out.println("Get recipes by user test note: " + e.getMessage());
+      logger.info("Get recipes by user test note: {}", e.getMessage());
     }
   }
 
@@ -133,7 +133,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Get top rated recipes test note: " + e.getMessage());
+      logger.info("Get top rated recipes test note: {}", e.getMessage());
     }
   }
 
@@ -149,7 +149,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       assertNotNull(response.getBody());
 
     } catch (Exception e) {
-      System.out.println("Get recent recipes test note: " + e.getMessage());
+      logger.info("Get recent recipes test note: {}", e.getMessage());
     }
   }
 
@@ -198,7 +198,7 @@ public class RecipeServiceIntegrationTest extends BaseIntegrationTest {
       // We just verify both requests succeed
 
     } catch (Exception e) {
-      System.out.println("Recipe pagination test note: " + e.getMessage());
+      logger.info("Recipe pagination test note: {}", e.getMessage());
     }
   }
 }

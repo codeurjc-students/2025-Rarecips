@@ -55,6 +55,8 @@ export class CollectionCardComponent implements OnInit, OnChanges {
   confirmDeleteId: number | null = null;
   locale: string = localStorage.getItem("lang") ?? navigator.language;
 
+  responsive: boolean = window.innerWidth < 1024;
+
   constructor(
     private collectionService: RecipeCollectionService,
     public sessionService: SessionService,
@@ -124,9 +126,7 @@ export class CollectionCardComponent implements OnInit, OnChanges {
     this.loading = true;
     this.collectionService.getAllUserCollections(this.sessionService.currentUser.username).subscribe({
       next: (collections) => {
-        console.log('Loaded collections in collection-card:', collections.length);
         this.collections = collections.filter(c => !c.isFavorites);
-        console.log('After filtering favorites:', this.collections.length);
         this.loading = false;
       },
       error: (error) => {

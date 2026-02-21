@@ -7,7 +7,7 @@
     } @else {
       @if (isOwner) {
         <button
-          class="w-full py-4 rounded-xl flex items-center justify-center gap-2 transition hover:scale-105"
+          class="w-full p-4 rounded-xl flex items-center justify-center gap-2 transition hover:scale-105"
           style="background: var(--gradient-primary); color: white;"
           (click)="openCreateModal()">
           <i class="ti ti-plus text-xl"></i>
@@ -49,7 +49,7 @@
       @if (collections.length === 0 && !showCreateNew) {
         <div class="flex w-full flex-col items-center justify-center py-12 gap-4">
           <i class="ti ti-folder-off text-6xl" style="color: var(--primary-400);"></i>
-          <span class="text-xl font-semibold" style="color: var(--primary-700);">{{ t('no_collections_yet') }}</span>
+          <span class="text-xl font-semibold text-center" style="color: var(--primary-700);">{{ t('no_collections_yet') }}</span>
           @if (isOwner) {
             <span class="text-sm" style="color: var(--primary-400);">{{ t('create_first_collection') }}</span>
           }
@@ -86,7 +86,7 @@
                 <div class="flex w-full flex-col items-start gap-4 glass rounded-3xl p-6 hover:shadow-lg transition-all cursor-pointer"
                      style="background: var(--primary-200-40);"
                      (click)="viewCollection(collection)">
-                  <div class="flex w-full items-center justify-between">
+                  <div class="flex w-full items-center justify-between" [class.flex-col]="responsive" [style.gap.rem]="responsive ? 1 : null">
                     <div class="flex items-center gap-3">
                       @if (collection.isFavorites) {
                         <i class="ti ti-heart-filled text-2xl" style="color: var(--primary-700);"></i>
@@ -97,7 +97,7 @@
                       <span *ngIf="!collection.isFavorites" class="text-xl font-semibold" style="color: var(--primary-700);">{{ collection.title }}</span>
                     </div>
                     @if ((isOwner && !collection.isFavorites) || (isAdmin && !collection.isFavorites)) {
-                      <div class="flex gap-2" (click)="$event.stopPropagation()">
+                      <div class="flex gap-2" [class.self-end]="responsive" (click)="$event.stopPropagation()">
                         <button
                           class="w-8 h-8 rounded-full flex items-center justify-center transition hover:scale-110"
                           style="background: var(--primary-100);"
@@ -114,7 +114,7 @@
                     }
                   </div>
 
-                  <div class="flex w-full items-center gap-4">
+                  <div class="collectionCard flex w-full items-center gap-4">
                     @if (getCollectionImage(collection)) {
                       <img
                         class="h-20 w-28 flex-none rounded-md object-cover"

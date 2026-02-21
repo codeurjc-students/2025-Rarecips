@@ -26,7 +26,7 @@ public class ReviewServiceIntegrationTest extends BaseIntegrationTest {
       }
 
     } catch (Exception e) {
-      System.out.println("Get reviews by recipe test note: " + e.getMessage());
+      logger.info("Get reviews by recipe test note: {}", e.getMessage());
     }
   }
 
@@ -42,7 +42,7 @@ public class ReviewServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode() == HttpStatus.NOT_FOUND);
 
     } catch (Exception e) {
-      System.out.println("Get review by ID test note: " + e.getMessage());
+      logger.info("Get review by ID test note: {}", e.getMessage());
     }
   }
 
@@ -58,7 +58,7 @@ public class ReviewServiceIntegrationTest extends BaseIntegrationTest {
                  response.getStatusCode() == HttpStatus.NOT_FOUND);
 
     } catch (Exception e) {
-      System.out.println("Get reviews by user test note: " + e.getMessage());
+      logger.info("Get reviews by user test note: {}", e.getMessage());
     }
   }
 
@@ -105,7 +105,7 @@ public class ReviewServiceIntegrationTest extends BaseIntegrationTest {
       }
 
     } catch (Exception e) {
-      System.out.println("Get average rating test note: " + e.getMessage());
+      logger.info("Get average rating test note: {}", e.getMessage());
     }
   }
 
@@ -125,7 +125,7 @@ public class ReviewServiceIntegrationTest extends BaseIntegrationTest {
       }
 
     } catch (Exception e) {
-      System.out.println("Get review count test note: " + e.getMessage());
+      logger.info("Get review count test note: {}", e.getMessage());
     }
   }
 }

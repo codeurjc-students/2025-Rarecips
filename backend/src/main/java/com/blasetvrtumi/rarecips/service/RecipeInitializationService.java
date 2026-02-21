@@ -18,8 +18,12 @@ import java.sql.Blob;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class RecipeInitializationService {
+    private static final Logger logger = LoggerFactory.getLogger(RecipeInitializationService.class);
 
     @Autowired
     private IngredientRepository ingredientRepository;
@@ -183,9 +187,9 @@ public class RecipeInitializationService {
                 recipeRepository.save(recipe);
 
             }
-            System.out.println("Recipes initialized from JSON file successfully.");
+            logger.info("Recipes initialized from JSON file successfully.");
         } else {
-            System.out.println("No recipes found in the JSON file.");
+            logger.warn("No recipes found in the JSON file.");
         }
     }
 
