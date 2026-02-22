@@ -7,8 +7,9 @@ import {OnInit} from '@angular/core';
 import {NgClass, NgIf, NgStyle} from '@angular/common';
 import {ChangePasswordModalComponent} from '../shared/change-password-modal/change-password-modal.component';
 import {User} from '../../models/user.model';
-import { TranslatorService } from '../../services/translator.service';
+import {TranslatorService} from '../../services/translator.service';
 import {NavbarComponent} from '../navbar/navbar.component';
+import {Title} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-profile-edit',
@@ -87,11 +88,21 @@ export class ProfileEditComponent implements OnInit {
     private userService: UserService,
     private sessionService: SessionService,
     private usernameValidationService: UsernameValidationService,
-    private translatorService: TranslatorService
+    private translatorService: TranslatorService,
+    private titleService: Title
   ) {
   }
 
+  updateTitle() {
+    this.titleService.setTitle(this.t('title_user_edit'));
+  }
+
   ngOnInit() {
+    this.updateTitle();
+    this.translatorService.onChange(() => {
+      this.updateTitle();
+    });
+
     this.userService.getDefaultPfp().subscribe({
       next: (data) => this.defaultPfp = data
     });

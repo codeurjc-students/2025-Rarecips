@@ -45,6 +45,7 @@ export class NavbarComponent implements OnInit {
   responsive: boolean = window.innerWidth <= 1366;
   navExpanded: boolean = false;
   isDragging: boolean = false;
+  isHandlePressed: boolean = false;
   startX: number = 0;
   startTime: number = 0;
   currentWidth: number = 0;
@@ -97,6 +98,8 @@ export class NavbarComponent implements OnInit {
         this.navItem = 'explore';
       } else if (event.url.includes('/ingredients')) {
         this.navItem = 'ingredients';
+      } else if (event.url.includes('/health')) {
+        this.navItem = 'health';
       } else {
         this.navItem = undefined as any;
       }
@@ -256,7 +259,7 @@ export class NavbarComponent implements OnInit {
   }
 
   onNavTouchStart(event: TouchEvent) {
-    if (window.innerWidth > 1024) return;
+    if (window.innerWidth > 1366) return;
 
     const target = event.target as HTMLElement;
     if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
@@ -265,7 +268,7 @@ export class NavbarComponent implements OnInit {
 
     this.isDragging = true;
     this.startX = event.touches[0].clientX;
-    this.collapsedWidth = window.innerWidth * 0.20;
+    this.collapsedWidth = 80;
     this.currentWidth = this.navExpanded ? this.expandedWidth : this.collapsedWidth;
 
     const navbar = document.getElementById('navbar');
@@ -281,7 +284,7 @@ export class NavbarComponent implements OnInit {
   }
 
   onNavTouchMove(event: TouchEvent) {
-    if (window.innerWidth > 1024 || !this.isDragging) return;
+    if (window.innerWidth > 1366 || !this.isDragging) return;
 
     const target = event.target as HTMLElement;
     if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
@@ -328,7 +331,7 @@ export class NavbarComponent implements OnInit {
   }
 
   onNavTouchEnd(event: TouchEvent) {
-    if (window.innerWidth > 1024 || !this.isDragging) return;
+    if (window.innerWidth > 1366 || !this.isDragging) return;
 
     const target = event.target as HTMLElement;
     if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
@@ -375,27 +378,30 @@ export class NavbarComponent implements OnInit {
     }
   }
 
-  onHandleTouchStart(event: TouchEvent) {
-    if (window.innerWidth > 1024) return;
+  onHandleTouchStart(event: TouchEvent | MouseEvent) {
+    if (window.innerWidth > 1366) return;
 
     event.stopPropagation();
     event.preventDefault();
 
     this.isDragging = false;
-    this.startX = event.touches[0].clientX;
+    this.isHandlePressed = true;
+    this.startX = 'touches' in event ? event.touches[0].clientX : event.clientX;
     this.startTime = Date.now();
-    this.collapsedWidth = window.innerWidth * 0.20;
+    this.collapsedWidth = 80;
     this.currentWidth = this.navExpanded ? this.expandedWidth : this.collapsedWidth;
   }
 
-  onHandleTouchMove(event: TouchEvent) {
-    if (window.innerWidth > 1024) return;
+  onHandleTouchMove(event: TouchEvent | MouseEvent) {
+    if (window.innerWidth > 1366) return;
 
-    const currentX = event.touches[0].clientX;
-    const deltaX = currentX - this.startX;
+    const currentX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+    let deltaX = currentX - this.startX;
 
     if (Math.abs(deltaX) > 5 && !this.isDragging) {
       this.isDragging = true;
+      this.startX = currentX;
+      deltaX = 0;
       const navbar = document.getElementById('navbar');
       const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
 
@@ -448,25 +454,27 @@ export class NavbarComponent implements OnInit {
     }
   }
 
-  onHandleTouchEnd(event: TouchEvent) {
-    if (window.innerWidth > 1024) return;
+  onHandleTouchEnd(event: TouchEvent | MouseEvent) {
+    if (window.innerWidth > 1366) return;
 
     event.stopPropagation();
     event.preventDefault();
 
-    const endX = event.changedTouches[0]?.clientX || this.startX;
+    const endX = 'changedTouches' in event ? event.changedTouches[0]?.clientX : event.clientX;
     const deltaX = endX - this.startX;
     const duration = Date.now() - this.startTime;
 
     if (duration < 200 && Math.abs(deltaX) < 10) {
       this.toggleNav();
       this.isDragging = false;
+      this.isHandlePressed = false;
       this.startX = 0;
       return;
     }
 
     if (!this.isDragging) {
       this.startX = 0;
+      this.isHandlePressed = false;
       return;
     }
 
@@ -476,6 +484,7 @@ export class NavbarComponent implements OnInit {
 
     this.navExpanded = shouldExpand;
     this.isDragging = false;
+    this.isHandlePressed = false;
     this.startX = 0;
 
     const navbar = document.getElementById('navbar');
@@ -723,6 +732,23 @@ export class NavbarComponent implements OnInit {
         }
       }
     });
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onDocumentMouseMove(event: MouseEvent) {
+    if (this.isHandlePressed) {
+      if (Math.abs(event.clientX - this.startX) > 5) {
+        event.preventDefault();
+      }
+      this.onHandleTouchMove(event);
+    }
+  }
+
+  @HostListener('document:mouseup', ['$event'])
+  onDocumentMouseUp(event: MouseEvent) {
+    if (this.isHandlePressed) {
+      this.onHandleTouchEnd(event);
+    }
   }
 
   @HostListener('document:keydown', ['$event'])

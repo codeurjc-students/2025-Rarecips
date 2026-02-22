@@ -18,8 +18,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { TranslatorService } from '../../services/translator.service';
 import { ThemeService } from '../../services/theme.service';
 import { ActivityService } from '../../services/activity.service';
-
-
+import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-recipe-view',
   templateUrl: './recipe-view.component.html',
@@ -151,7 +150,8 @@ export class RecipeViewComponent implements OnInit {
     public ingredientIconService: IngredientIconService,
     private activityService: ActivityService,
     private sanitizer: DomSanitizer,
-    private translatorService: TranslatorService
+    private translatorService: TranslatorService,
+    private titleService: Title
   ) { }
 
   t(key: string): string {
@@ -171,8 +171,17 @@ export class RecipeViewComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.translatorService.onChange(() => {
+      this.updateTitle();
+    });
     await this.initAll();
     this.uniqueReviews = this.getUniqueReviewsArray();
+  }
+
+  updateTitle() {
+    if (this.recipe?.title) {
+      this.titleService.setTitle(this.t('title_rarecips') + this.recipe.title);
+    }
   }
 
   private async initAll() {
@@ -257,6 +266,7 @@ export class RecipeViewComponent implements OnInit {
     this.recipeService.getRecipeById(id).subscribe({
       next: (recipe) => {
         this.recipe = recipe;
+        this.updateTitle();
         if (this.recipe?.people) {
           this.originalServings = this.recipe.people;
           this.currentServings = this.recipe.people;

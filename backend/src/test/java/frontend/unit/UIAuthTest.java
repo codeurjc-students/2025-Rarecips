@@ -21,7 +21,7 @@ public class UIAuthTest extends BaseUnitTest {
   @Test
   public void testLogin() {
     driver.get(baseUrl + "/login");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.manage().window().setSize(new Dimension(1920, 1080));
 
     driver.findElement(By.id("login-username")).click();
     driver.findElement(By.id("login-username")).sendKeys("testuser");
@@ -37,7 +37,7 @@ public class UIAuthTest extends BaseUnitTest {
   @Test
   public void testSignup() {
     driver.get(baseUrl + "/signup");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.manage().window().setSize(new Dimension(1920, 1080));
 
     driver.findElement(By.id("signup-username")).click();
     driver.findElement(By.id("signup-username")).sendKeys("testuser");

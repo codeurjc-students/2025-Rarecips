@@ -25,8 +25,8 @@ public class UIRecipeTest extends BaseUnitTest {
     js = (JavascriptExecutor) driver;
 
     // Login with admin user
-    driver.get("http://localhost:4200/login");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/login");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
     driver.findElement(By.id("login-username")).click();
     driver.findElement(By.id("login-username")).sendKeys("admin");
     js.executeScript("window.scrollTo(0,100)");
@@ -34,7 +34,7 @@ public class UIRecipeTest extends BaseUnitTest {
     driver.findElement(By.id("loginBut")).click();
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    wait.until(ExpectedConditions.urlToBe("http://localhost:4200/"));
+    wait.until(ExpectedConditions.urlToBe("https://localhost:8443/"));
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
 
@@ -50,8 +50,8 @@ public class UIRecipeTest extends BaseUnitTest {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     // ========== CREATE RECIPE ==========
-    driver.get("http://localhost:4200/");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".w-max > span"))).click();
     wait.until(ExpectedConditions.elementToBeClickable(By.id("recipeLabel"))).click();
@@ -88,8 +88,8 @@ public class UIRecipeTest extends BaseUnitTest {
     }
 
     // ========== EDIT RECIPE ==========
-    driver.get("http://localhost:4200/");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
 
     try {
       Thread.sleep(1000);
@@ -149,8 +149,8 @@ public class UIRecipeTest extends BaseUnitTest {
     }
 
     // ========== DELETE RECIPE ==========
-    driver.get("http://localhost:4200/");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
 
     js.executeScript("window.scrollTo(0,283)");
 

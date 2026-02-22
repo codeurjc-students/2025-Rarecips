@@ -564,7 +564,7 @@ button:focus {
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 1024px) {
+@media (max-width: 1366px) {
   .nav-item span {
     display: none;
   }
@@ -680,6 +680,15 @@ button:focus {
     opacity: 0 !important;
     transform: translateX(-10px);
     transition: opacity 0.2s ease, transform 0.2s ease, display 0.2s allow-discrete !important;
+  }
+
+  #navbar > div:nth-child(2) > div {
+    justify-content: center;
+  }
+
+  #navbar {
+    top: 1.5rem !important;
+    bottom: 0 !important;
   }
 
 }
@@ -823,7 +832,7 @@ button:focus {
     opacity: 1;
     overflow: hidden;
     position: fixed;
-    left: 20vw;
+    left: 5rem;
     top: 50%;
     transform: translateY(-50%);
     width: 24px;
@@ -889,10 +898,10 @@ button:focus {
   nav#navbar {
     position: fixed !important;
     left: 0 !important;
-    top: 50vw !important;
-    bottom: 50vw !important;
-    width: 20vw !important;
-    max-width: 20vw;
+    top: 50vw;
+    bottom: 50vw;
+    width: 6.25rem !important;
+    max-width: 5rem ;
     transform: translateY(0);
     align-self: anchor-center;
     height: 90svh !important;
@@ -907,8 +916,8 @@ button:focus {
   }
 
   nav#navbar.expanded {
-    width: 240px !important;
-    max-width: 240px !important;
+    width: 15rem !important;
+    max-width: 15rem !important;
     z-index: 100001 !important;
   }
 

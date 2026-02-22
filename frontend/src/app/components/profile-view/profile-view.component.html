@@ -55,7 +55,7 @@
                 <span class="w-full text-xs font-semibold" style="color: var(--primary-400);">{{ t('recipes') }}</span>
                 <div class="flex flex-col items-start gap-4">
                                   <span class="text-base" style="color: var(--primary-700);">
-                                      {{ recipes.length || 0 }}
+                                      {{ totalRecipes || 0 }}
                                   </span>
                 </div>
               </div>
@@ -367,9 +367,9 @@
           </div>
         </div>
       } @else {
-        <div class="absolute flex justify-center items-center flex-col glass rounded-3xl w-3/4 h-3/4"
+        <div class="flex justify-center items-center flex-col glass rounded-3xl w-full h-full"
              style="background: var(--primary-200-40);">
-          <div class="w-64 h-64 glass !rounded-full z-0 cursor-pointer" style="background: var(--primary-300);" (click)="animateMoodX()">
+          <div class="moodCont w-64 h-64 glass !rounded-full z-0 cursor-pointer" style="background: var(--primary-300);" (click)="animateMoodX()">
             <div class="flex items-center justify-center text-9xl h-[inherit] ml-7"
                  style="color: var(--primary-500)">
               <div class="iconCont fixed">
@@ -378,8 +378,8 @@
               <i class="ti ti-hand-finger text-[5rem] rotate-180 scale-y-[0.8] mr-32 mt-24"></i>
             </div>
           </div>
-          <span class="mt-4 font-extrabold text-4xl z-0">Hold on there!</span>
-          <span class="mt-2 font-bold text-lg z-0">This user doesn't allow their profile to be viewed. Sorry about that!</span>
+          <span class="mt-4 font-extrabold text-4xl z-0">{{ t('private_profile_title') }}</span>
+          <span class="mt-2 font-bold text-lg z-0">{{ t('private_profile_desc') }}</span>
         </div>
       }
     </div>

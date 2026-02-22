@@ -7,6 +7,7 @@ import { EnumService } from '../../services/enum.service';
 import { IngredientService } from '../../services/ingredient.service';
 import { IngredientIconService } from '../../services/ingredient-icon.service';
 import { TranslatorService } from '../../services/translator.service';
+import { Title } from '@angular/platform-browser';
 
 interface Ingredient {
   name: string;
@@ -145,7 +146,8 @@ export class RecipeEditComponent implements OnInit {
     private ingredientService: IngredientService,
     public ingredientIconService: IngredientIconService,
     private translatorService: TranslatorService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private titleService: Title
   ) {
   }
 
@@ -153,7 +155,20 @@ export class RecipeEditComponent implements OnInit {
     return this.translatorService.translate(key);
   }
 
+  updateTitle() {
+    if (this.isEditMode) {
+      this.titleService.setTitle(this.t('title_recipe_edit'));
+    } else {
+      this.titleService.setTitle(this.t('title_recipe_create'));
+    }
+  }
+
   ngOnInit(): void {
+    this.updateTitle();
+    this.translatorService.onChange(() => {
+      this.updateTitle();
+    });
+
     this.recipeService.getDefaultRecipeImageUrl().subscribe({
       next: (url) => {
         this.defaultImageUrl = url;
@@ -171,6 +186,7 @@ export class RecipeEditComponent implements OnInit {
       const id = params['id'];
       this.recipeId = id ? +id : null;
       this.isEditMode = this.recipeId !== null;
+      this.updateTitle();
 
       if (this.isEditMode) {
         this.loadRecipe();

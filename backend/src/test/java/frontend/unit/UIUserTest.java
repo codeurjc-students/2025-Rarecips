@@ -21,8 +21,8 @@ public class UIUserTest extends BaseUnitTest {
     js = (JavascriptExecutor) driver;
 
     // Login with admin user
-    driver.get("http://localhost:4200/login");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/login");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
     driver.findElement(By.id("login-username")).click();
     driver.findElement(By.id("login-username")).sendKeys("admin");
     js.executeScript("window.scrollTo(0,100)");
@@ -30,7 +30,7 @@ public class UIUserTest extends BaseUnitTest {
     driver.findElement(By.id("loginBut")).click();
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    wait.until(ExpectedConditions.urlToBe("http://localhost:4200/"));
+    wait.until(ExpectedConditions.urlToBe("https://localhost:8443/"));
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
 
@@ -46,10 +46,23 @@ public class UIUserTest extends BaseUnitTest {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     // ========== EDIT PROFILE ==========
-    driver.get("http://localhost:4200/");
+    driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1923, 944));
 
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".aspect-square"))).click();
+
+    try {
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".top-7"))).click();
 
     {
@@ -79,16 +92,24 @@ public class UIUserTest extends BaseUnitTest {
     }
 
     // ========== DELETE PROFILE ==========
-    driver.get("http://localhost:4200/");
+    driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(2047, 944));
+
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".aspect-square"))).click();
 
-    {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".icon-btn")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).perform();
+    try {
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
+
+
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".top-7"))).click();
 

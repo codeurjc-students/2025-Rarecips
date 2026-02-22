@@ -1319,7 +1319,7 @@
               </div>
               <div class="text-center">
                 <div class="font-bold text-lg" style="color: var(--primary-700);">
-                  {{ user.savedRecipesCount || 0 }}
+                  {{ user.collectionsCount || 0 }}
                 </div>
                 <div class="text-xs" style="color: var(--primary-500);">
                   {{ t('collections') }}
@@ -1388,7 +1388,7 @@
                 </div>
                 <div class="text-center">
                   <div class="font-bold text-lg" style="color: var(--primary-700);">
-                    {{ user.savedRecipesCount || 0 }}
+                    {{ user.collectionsCount || 0 }}
                   </div>
                   <div class="text-xs" style="color: var(--primary-500);">
                     {{ t('collections') }}
@@ -1406,8 +1406,8 @@
             </div>
           </div>
           }
-          }
-          }
+        }
+      }
         </div>
 
         @if (hasMoreUsers && !loadingMoreUsers) {

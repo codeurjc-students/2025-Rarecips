@@ -18,7 +18,7 @@ public class HomePageTest extends BaseE2ETest {
                 .until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
 
         String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("localhost:4200"));
+        assertTrue(currentUrl.contains("localhost:8443"));
     }
 
     @Test

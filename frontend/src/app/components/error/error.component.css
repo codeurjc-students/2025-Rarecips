@@ -1,5 +1,5 @@
 .container {
-  max-width: 95vw;
+  max-width: 80%;
 }
 
 .egg {
@@ -53,6 +53,10 @@
   :host {
     max-width: 75vw;
     margin-left: 25vw;
+  }
+
+  :host > div {
+    margin: 0;
   }
 
   .container {

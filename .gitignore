@@ -82,6 +82,9 @@ replay_pid*
 */npm-debug.log
 */yarn-error.log
 
+# Angular
+/backend/src/main/resources/public/
+
 # IDEs and editors
 */.idea/
 */.project

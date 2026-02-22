@@ -133,9 +133,9 @@ of processes, optimization, testing and feedback.
 
 ```
 ┌─────────────────┐    HTTP/HTTPS    ┌─────────────────┐    JDBC    ┌─────────────────┐
-│   Angular SPA   │ ──────────────→  │  Spring Boot    │ ────────→  │     MySQL       │
-│   (Frontend)    │                  │   (Backend)     │            │   (Database)    │
-│   Port: 4200    │ ←──────────────  │   Port: 8443    │            │   Port: 3306    │
+│    Angular      │ ──────────────→  │  Spring Boot    │ ────────→  │     MySQL       │
+│   static SPA    │                  │   (Backend)     │            │   (Database)    │
+│   Port: 8443    │ ←──────────────  │   Port: 8443    │            │   Port: 3306    │
 └─────────────────┘    REST API      └─────────────────┘            └─────────────────┘
 ```
 
@@ -240,7 +240,8 @@ cd backend
 # Install dependencies and run
 mvn spring-boot:run
 
-# Backend will be available at http://localhost:8443
+# Backend will be available at http://localhost:8443/api/v1
+# Frontend will be available at http://localhost:8443
 ```
 
 #### Frontend Execution
@@ -252,13 +253,13 @@ npm install
 
 # Start development server
 ng serve
-start http://localhost:4200
+start https://localhost:4200
 ```
 
 #### Full Application Access
 
-- **Web Application:** http://localhost:4200
-- **API Endpoint:** http://localhost:4200/api
+- **Web Application:** https://localhost:8443
+- **API Endpoint:** https://localhost:8443/api-v1
 - **API Documentation:** http://localhost:8443/swagger-ui.html
 - **Database:** http://localhost:3306 (if using local MySQL)
 

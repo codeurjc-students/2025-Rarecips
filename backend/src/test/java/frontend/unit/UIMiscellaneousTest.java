@@ -30,7 +30,7 @@ public class UIMiscellaneousTest extends BaseUnitTest {
   public void changelanguage() {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-    driver.get("http://localhost:4200/");
+    driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
     try {
@@ -62,7 +62,7 @@ public class UIMiscellaneousTest extends BaseUnitTest {
   public void changetheme() {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-    driver.get("http://localhost:4200/");
+    driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
     try {
@@ -94,7 +94,7 @@ public class UIMiscellaneousTest extends BaseUnitTest {
   public void searchsomething() {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-    driver.get("http://localhost:4200/");
+    driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
@@ -105,7 +105,7 @@ public class UIMiscellaneousTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    driver.get("http://localhost:4200/explore");
+    driver.get("https://localhost:8443/explore");
 
     try {
       Thread.sleep(1000);
@@ -149,7 +149,7 @@ public class UIMiscellaneousTest extends BaseUnitTest {
   public void filtersomething() {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-    driver.get("http://localhost:4200/");
+    driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
@@ -160,7 +160,7 @@ public class UIMiscellaneousTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    driver.get("http://localhost:4200/explore");
+    driver.get("https://localhost:8443/explore");
 
     try {
       Thread.sleep(1000);

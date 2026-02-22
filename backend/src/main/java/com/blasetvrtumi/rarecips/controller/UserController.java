@@ -42,7 +42,7 @@ public class UserController {
     @Autowired
     private MailService mailService;
 
-    @Value("${app.frontend.url:http://localhost:4200}")
+    @Value("${app.frontend.url:https://localhost:8443}")
     private String frontendUrl;
 
     @Operation(summary = "Get current logged-in user info")

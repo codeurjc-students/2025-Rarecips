@@ -649,8 +649,6 @@ button.glass-strong.favorites-active .heart-icon path {
 }
 
 .recipe-list-item img {
-  width: 4.5rem;
-  height: 3.2rem;
   object-fit: cover;
 }
 

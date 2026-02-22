@@ -14,6 +14,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
@@ -38,7 +39,13 @@ public class MailService {
 
     public void sendChangePasswordEmail(String to, String token, String baseUrl, String lang, String theme, String username, String passwordChangeLink) {
         try {
-            String template = loadTemplate("passwordchange_mail_template.mustache");
+            ClassPathResource resource = new ClassPathResource("templates/passwordchange_mail_template.mustache");
+            String template;
+        
+            try (InputStream inputStream = resource.getInputStream()) {
+                template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+
             Map<String, String> themeVars = getThemeVars(theme);
             Map<String, String> translations = getTranslatedStrings(lang, "passwordchange", username);
             Map<String, Object> context = new HashMap<>();
@@ -63,7 +70,14 @@ public class MailService {
     }
     public void sendWelcomeEmail(String to, String baseUrl, String language, String theme, String username) {
         try {
-            String template = loadTemplate("welcome_mail_template.mustache");
+
+            ClassPathResource resource = new ClassPathResource("templates/welcome_mail_template.mustache");
+            String template;
+        
+            try (InputStream inputStream = resource.getInputStream()) {
+                template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+
             Map<String, String> translations = getTranslatedStrings(language, "welcome", username);
             Map<String, String> themeVars = getThemeVars(theme);
             List<Recipe> recipes = recipeService.getRecipes("updatedAt", 3, 0).getContent();

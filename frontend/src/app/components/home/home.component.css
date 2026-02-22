@@ -147,7 +147,7 @@ button.glass-strong.favorites-active .heart-icon path {
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 1024px) {
+@media (max-width: 1366px) {
 
   :host {
     max-width: 75vw;
@@ -244,6 +244,10 @@ button.glass-strong.favorites-active .heart-icon path {
 
   .carousel-card-content::-webkit-scrollbar-thumb:hover {
     background: var(--primary-600);
+  }
+
+  .actions {
+    flex-wrap: wrap;
   }
 
   .actions-grid {

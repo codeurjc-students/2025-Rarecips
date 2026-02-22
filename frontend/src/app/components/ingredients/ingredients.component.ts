@@ -11,6 +11,7 @@ import {Router} from '@angular/router';
 import {UserService} from '../../services/user.service';
 import { TranslatorService } from '../../services/translator.service';
 import {ThemeService} from '../../services/theme.service';
+import {Title} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ingredients',
@@ -60,7 +61,8 @@ export class IngredientsComponent implements OnInit {
               private themeService: ThemeService,
               private userService: UserService,
               private router: Router,
-              public translatorService: TranslatorService) {
+              public translatorService: TranslatorService,
+              private titleService: Title) {
     this.t = this.t.bind(this);
   }
 
@@ -68,10 +70,16 @@ export class IngredientsComponent implements OnInit {
     return this.translatorService.translate(key);
   }
 
+  updateTitle() {
+    this.titleService.setTitle(this.t('title_ingredients'));
+  }
+
   ngOnInit(): void {
+    this.updateTitle();
     this.logos = this.themeService.getLogos();
 
     this.translatorService.onChange(() => {
+      this.updateTitle();
       this.ingredients = [...this.ingredients];
       this.displayedUserIngredients = [...this.displayedUserIngredients];
     });

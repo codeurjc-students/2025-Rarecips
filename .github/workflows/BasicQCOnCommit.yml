@@ -43,34 +43,28 @@ jobs:
           echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
           echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install Frontend Dependencies
-        working-directory: ./frontend
-        run: npm install
-
-      - name: Start Angular Frontend in Background
-        working-directory: ./frontend
-        run: |
-          npm start &
-          echo $! > angular.pid
-          sleep 30
-
-      - name: Wait for Frontend to be Ready
-        run: |
-          timeout 60 bash -c 'until curl -s http://localhost:4200 > /dev/null; do sleep 2; done' || echo "Frontend might not be fully ready"
-
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
+      - name: Set up Node.js for Frontend Build
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Frontend and Copy to Backend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          cd ..
+          mkdir -p backend/src/main/resources/public
+          cp -R frontend/dist/rarecips/browser/* backend/src/main/resources/public/
 
       - name: Compile Backend
         working-directory: ./backend
@@ -80,15 +74,6 @@ jobs:
         working-directory: ./backend
         run: |
           mvn clean test -Dtest="**/unit/**/*Test"
-
-      - name: Stop Angular Frontend
-        if: always()
-        working-directory: ./frontend
-        run: |
-          if [ -f angular.pid ]; then
-            kill $(cat angular.pid) || true
-            rm angular.pid
-          fi
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4

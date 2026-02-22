@@ -13,6 +13,7 @@ import {RecipeCollectionService} from '../../services/recipe-collection.service'
 import {CollectionCardComponent} from '../shared/collection-card/collection-card.component';
 import { TranslatorService } from '../../services/translator.service';
 import {ThemeService} from '../../services/theme.service';
+import {Title} from '@angular/platform-browser';
 
 interface Recipe {
   id: string;
@@ -286,11 +287,20 @@ export class ExploreComponent implements OnInit {
     private ingredientIconService: IngredientIconService,
     private collectionService: RecipeCollectionService,
     private cdr: ChangeDetectorRef,
-    public translatorService: TranslatorService
+    public translatorService: TranslatorService,
+    private titleService: Title
   ) {
   }
 
+  updateTitle() {
+    this.titleService.setTitle(this.translatorService.translate('title_explore'));
+  }
+
   ngOnInit(): void {
+    this.updateTitle();
+    this.translatorService.onChange(() => {
+      this.updateTitle();
+    });
     this.logos = this.themeService.getLogos();
 
 
@@ -979,6 +989,18 @@ export class ExploreComponent implements OnInit {
         this.userResults = result.users;
         this.totalUsers = result.total;
         this.hasMoreUsers = this.userResults.length < this.totalUsers;
+
+        this.userResults.forEach(u => {
+          this.userService.getUserCollections(u.username, 0, 1).subscribe({
+            next: (res) => {
+              u.collectionsCount = res.total;
+            },
+            error: () => {
+              u.collectionsCount = 0;
+            }
+          });
+        });
+
         this.userLoading = false;
       },
       error: (error) => {
@@ -1006,7 +1028,19 @@ export class ExploreComponent implements OnInit {
 
     this.userService.filterUsers(filterParams, this.currentUserPage, this.userPageSize).subscribe({
       next: (result) => {
-        this.userResults = [...this.userResults, ...result.users];
+        const newUsers = result.users;
+        newUsers.forEach((u: any) => {
+          this.userService.getUserCollections(u.username, 0, 1).subscribe({
+            next: (res) => {
+              u.collectionsCount = res.total;
+            },
+            error: () => {
+              u.collectionsCount = 0;
+            }
+          });
+        });
+        
+        this.userResults = [...this.userResults, ...newUsers];
         this.totalUsers = result.total;
         this.hasMoreUsers = this.userResults.length < this.totalUsers;
         this.loadingMoreUsers = false;

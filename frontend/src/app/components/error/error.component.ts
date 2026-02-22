@@ -2,6 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {routes} from '../../app.routing.module';
 import { TranslatorService } from '../../services/translator.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: "app-error",
@@ -15,13 +16,25 @@ export class ErrorComponent implements OnInit {
   status: number | null = null;
   reason: string | null = null;
 
-  constructor(private activatedRoute: ActivatedRoute, private translator: TranslatorService) {}
+  constructor(
+    private activatedRoute: ActivatedRoute, 
+    private translator: TranslatorService,
+    private titleService: Title
+  ) {}
 
   t(key: string): string {
     return this.translator.translate(key);
   }
 
+  updateTitle() {
+    this.titleService.setTitle(this.t('title_error'));
+  }
+
   ngOnInit() {
+    this.updateTitle();
+    this.translator.onChange(() => {
+      this.updateTitle();
+    });
     this.activatedRoute.queryParams.subscribe(params => {
       this.status = history.state.status || null;
       this.reason = history.state.reason || null;

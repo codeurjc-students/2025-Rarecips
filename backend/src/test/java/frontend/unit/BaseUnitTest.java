@@ -12,18 +12,18 @@ import org.springframework.test.context.ActiveProfiles;
 import com.blasetvrtumi.rarecips.RarecipsApplication;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = RarecipsApplication.class)
-@DirtiesContext
 @ActiveProfiles("test")
 public class BaseUnitTest {
 
     protected WebDriver driver;
 
-    protected String baseUrl = "http://localhost:4200"; //Angular endpoint
+    protected String baseUrl = "https://localhost:8443"; //Angular endpoint
 
     @BeforeEach
     public void setUp() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
+        options.setAcceptInsecureCerts(true);
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--window-size=1920,1080");

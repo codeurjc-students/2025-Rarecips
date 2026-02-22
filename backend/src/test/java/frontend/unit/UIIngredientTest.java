@@ -25,8 +25,8 @@ public class UIIngredientTest extends BaseUnitTest {
     js = (JavascriptExecutor) driver;
 
     // Login with admin user
-    driver.get("http://localhost:4200/login");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/login");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
     driver.findElement(By.id("login-username")).click();
     driver.findElement(By.id("login-username")).sendKeys("admin");
     js.executeScript("window.scrollTo(0,100)");
@@ -34,7 +34,7 @@ public class UIIngredientTest extends BaseUnitTest {
     driver.findElement(By.id("loginBut")).click();
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    wait.until(ExpectedConditions.urlToBe("http://localhost:4200/"));
+    wait.until(ExpectedConditions.urlToBe("https://localhost:8443/"));
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
 
@@ -50,7 +50,7 @@ public class UIIngredientTest extends BaseUnitTest {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     // ========== CREATE INGREDIENT ==========
-    driver.get("http://localhost:4200/ingredients");
+    driver.get("https://localhost:8443/ingredients");
     driver.manage().window().setSize(new Dimension(2047, 944));
 
     try {
@@ -87,7 +87,7 @@ public class UIIngredientTest extends BaseUnitTest {
     }
 
     // ========== EDIT INGREDIENT ==========
-    driver.get("http://localhost:4200/ingredients");
+    driver.get("https://localhost:8443/ingredients");
     driver.manage().window().setSize(new Dimension(2047, 944));
 
     try {
@@ -98,7 +98,7 @@ public class UIIngredientTest extends BaseUnitTest {
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".grid")));
 
-    WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".top-14 > .ti")));
+    WebElement editBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".top-14 > .ti")));
     jsClick(editBtn);
 
     try {
@@ -121,7 +121,7 @@ public class UIIngredientTest extends BaseUnitTest {
     }
 
     // ========== DELETE INGREDIENT ==========
-    driver.get("http://localhost:4200/ingredients");
+    driver.get("https://localhost:8443/ingredients");
     driver.manage().window().setSize(new Dimension(2047, 944));
 
     try {

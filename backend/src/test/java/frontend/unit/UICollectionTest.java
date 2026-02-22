@@ -25,8 +25,8 @@ public class UICollectionTest extends BaseUnitTest {
     js = (JavascriptExecutor) driver;
 
     // Login with admin user
-    driver.get("http://localhost:4200/login");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/login");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
     driver.findElement(By.id("login-username")).click();
     driver.findElement(By.id("login-username")).sendKeys("admin");
     js.executeScript("window.scrollTo(0,100)");
@@ -34,7 +34,7 @@ public class UICollectionTest extends BaseUnitTest {
     driver.findElement(By.id("loginBut")).click();
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    wait.until(ExpectedConditions.urlToBe("http://localhost:4200/"));
+    wait.until(ExpectedConditions.urlToBe("https://localhost:8443/"));
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
 
@@ -51,8 +51,8 @@ public class UICollectionTest extends BaseUnitTest {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     // ========== CREATE COLLECTION ==========
-    driver.get("http://localhost:4200/");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
 
     js.executeScript("window.scrollTo(0,24)");
 
@@ -101,8 +101,8 @@ public class UICollectionTest extends BaseUnitTest {
     }
 
     // ========== ADD RECIPE TO COLLECTION ==========
-    driver.get("http://localhost:4200/");
-    driver.manage().window().setSize(new Dimension(1094, 944));
+    driver.get("https://localhost:8443/");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
 
     js.executeScript("window.scrollTo(0,246)");
 
@@ -133,10 +133,22 @@ public class UICollectionTest extends BaseUnitTest {
     }
 
     // ========== EDIT COLLECTION ==========
-    driver.get("http://localhost:4200/");
+    driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
+    try {
+      Thread.sleep(1500);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".aspect-square"))).click();
+
+    try {
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
 
     js.executeScript("window.scrollTo(0,200)");
 
@@ -170,7 +182,7 @@ public class UICollectionTest extends BaseUnitTest {
     }
 
     // ========== DELETE COLLECTION ==========
-    driver.get("http://localhost:4200/");
+    driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
     try {

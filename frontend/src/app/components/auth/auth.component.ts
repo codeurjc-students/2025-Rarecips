@@ -11,6 +11,7 @@ import {NgClass, Location, NgIf} from '@angular/common';
 import {ChangePasswordModalComponent} from '../shared/change-password-modal/change-password-modal.component';
 import { TranslatorService } from '../../services/translator.service';
 import {ThemeService} from '../../services/theme.service';
+import {Title} from '@angular/platform-browser';
 
 interface LoginForm {
   username: string;
@@ -121,14 +122,24 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     private sessionService: SessionService,
     private userService: UserService,
     private usernameValidationService: UsernameValidationService,
-    public translator: TranslatorService
+    public translator: TranslatorService,
+    private titleService: Title
   ) {
     setTimeout(() => {
       this.restoreCardPositions();
     }, 1000);
     this.switchTab(this.activatedRoute.snapshot.routeConfig?.path === 'signup' ? 'signup' : 'login');
     this.translator.onChange(() => {
+      this.updateTitle();
     });
+  }
+
+  updateTitle() {
+    if (this.activeTab === 'login') {
+      this.titleService.setTitle(this.t('title_login'));
+    } else {
+      this.titleService.setTitle(this.t('title_signup'));
+    }
   }
 
   async ngOnInit(): Promise<void> {
@@ -246,6 +257,7 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     if (tabElement) tabElement.click()
     this.location.replaceState(`/` + tab);
     this.resetForms();
+    this.updateTitle();
   }
 
   onLogin(): void {

@@ -5,14 +5,12 @@ WORKDIR /frontend
 #Copy the files needed to build with nod the angular appplication
 COPY /frontend/package.json /frontend/package-lock.json /frontend/angular.json /frontend/tsconfig.app.json /frontend/tsconfig.json /frontend/tsconfig.spec.json /frontend/
 
-RUN npm install && npm install -g @angular/cli@18
+RUN npm install && npm install -g @angular/cli@19.2.15
 
 #Copy source files from the frontend folder to the container
-COPY frontend/src /frontend/src
+COPY frontend/ ./
 
 RUN ng build --configuration production
-
-COPY frontend/dist/frontend/browser /frontend/dist/new
 
 FROM eclipse-temurin:23-jdk AS build
 
@@ -26,13 +24,15 @@ COPY backend/pom.xml /app/
 
 COPY backend/src/ /app/src
 
+# Clean static frontend contents
+RUN rm -rf /app/src/main/resources/public
+
 #Copy production files to resources
-#COPY --from=frontend /frontend/dist/new /app/src/main/resources/public/new
+COPY --from=frontend /frontend/dist/rarecips/browser ./src/main/resources/public/
 
 COPY docs/api /docs/api
 
 RUN mvn clean package -DskipTests
-
 
 FROM amazoncorretto:21
 

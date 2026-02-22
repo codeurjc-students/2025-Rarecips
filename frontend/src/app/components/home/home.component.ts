@@ -10,7 +10,7 @@ import { RecipeCollection } from '../../models/recipe-collection.model';
 import { ActivityService } from '../../services/activity.service';
 import { CollectionCardComponent } from '../shared/collection-card/collection-card.component';
 import { TranslatorService } from '../../services/translator.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, Title } from '@angular/platform-browser';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
@@ -77,7 +77,8 @@ export class HomeComponent implements OnInit {
     private activityService: ActivityService,
     private cdr: ChangeDetectorRef,
     public sanitizer: DomSanitizer,
-    public translator: TranslatorService
+    public translator: TranslatorService,
+    private titleService: Title
   ) {
   }
 
@@ -85,9 +86,11 @@ export class HomeComponent implements OnInit {
     this.logos = this.themeService.getLogos();
     this.cdr.detectChanges();
 
+    this.updateTitle();
     this.translator.onChange(() => {
-      this.loadActivities()
-    })
+      this.updateTitle();
+      this.loadActivities();
+    });
 
     this.loadActivities();
 
@@ -112,6 +115,10 @@ export class HomeComponent implements OnInit {
       this.loadPopularCollections();
     });
 
+  }
+
+  updateTitle(): void {
+    this.titleService.setTitle(this.t('title_home'));
   }
 
   loadActivities(): void {

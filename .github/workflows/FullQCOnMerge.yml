@@ -43,34 +43,28 @@ jobs:
           echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
           echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install Frontend Dependencies
-        working-directory: ./frontend
-        run: npm install
-
-      - name: Start Angular Frontend in Background
-        working-directory: ./frontend
-        run: |
-          npm start &
-          echo $! > angular.pid
-          sleep 30
-
-      - name: Wait for Frontend to be Ready
-        run: |
-          timeout 60 bash -c 'until curl -s http://localhost:4200 > /dev/null; do sleep 2; done' || echo "Frontend might not be fully ready"
-
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
+      - name: Set up Node.js for Frontend Build
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Frontend and Copy to Backend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          cd ..
+          mkdir -p backend/src/main/resources/public
+          cp -R frontend/dist/rarecips/browser/* backend/src/main/resources/public/
 
       - name: Wait for it
         run: |
@@ -106,15 +100,6 @@ jobs:
         working-directory: ./backend
         run: mvn surefire-report:report
 
-      - name: Stop Angular Frontend
-        if: always()
-        working-directory: ./frontend
-        run: |
-          if [ -f angular.pid ]; then
-            kill $(cat angular.pid) || true
-            rm angular.pid
-          fi
-
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()
@@ -147,28 +132,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install Node.js dependencies
-        working-directory: ./frontend
-        run: npm install
-
-      - name: Start Angular Frontend in Background
-        working-directory: ./frontend
-        run: |
-          npm start &
-          echo $! > angular.pid
-          sleep 30
-
-      - name: Wait for Frontend to be Ready
-        run: |
-          timeout 60 bash -c 'until curl -s http://localhost:4200 > /dev/null; do sleep 2; done' || echo "Frontend might not be fully ready"
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -180,6 +143,22 @@ jobs:
         run: |
           echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
           echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
+
+      - name: Set up Node.js for Frontend Build
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Frontend and Copy to Backend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          cd ..
+          mkdir -p backend/src/main/resources/public
+          cp -R frontend/dist/rarecips/browser/* backend/src/main/resources/public/
 
       - name: Wait for it
         run: |
@@ -215,12 +194,3 @@ jobs:
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
-
-      - name: Stop Angular Frontend
-        if: always()
-        working-directory: ./frontend
-        run: |
-          if [ -f angular.pid ]; then
-            kill $(cat angular.pid) || true
-            rm angular.pid
-          fi

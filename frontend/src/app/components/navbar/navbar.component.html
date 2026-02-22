@@ -27,8 +27,8 @@
   <div class="w-full">
     <div class="flex flex-row flex-start">
       <div class="flex items-center gap-2">
-        <div class="nav-item section px-3 py-4 active" (click)="navigateTo('', $event)" [class.active]="navItem === '' || !anyActiveSections">
-          <i class="flex items-center justify-end ti w-4 h-4 text-xl" [class.ti-chef-hat-filled]="!anyActiveSections || navItem === ''" [class.ti-chef-hat]="!navItem || anyActiveSections || navItem != ''"></i>
+        <div class="nav-item section px-3 py-4" (click)="navigateTo('', $event)" [class.active]="navItem === ''">
+          <i class="flex items-center justify-end ti w-4 h-4 text-xl" [ngClass]="navItem === '' ? 'ti-chef-hat-filled' : 'ti-chef-hat'"></i>
           <span class="text-lg font-semibold">{{ t('home') }}</span>
         </div>
         @if (isAdmin) {
@@ -45,6 +45,12 @@
           <i class="flex items-center ti w-4 h-4 text-xl" [ngClass]="navItem === 'ingredients' ? 'ti-basket-filled': 'ti-basket'"></i>
           <span class="text-lg">{{ t('ingredients') }}</span>
         </div>
+        @if (isAuthenticated) {
+          <div class="nav-item section px-3 py-4" (click)="navigateTo('health', $event)" [class.active]="navItem === 'health'">
+            <i class="flex items-center ti ti-chart-donut w-4 h-4 text-xl" [ngClass]="navItem === 'health' ? 'ti-chart-donut-filled': 'ti-chart-donut'"></i>
+            <span class="text-lg">{{ t('health') }}</span>
+          </div>
+        }
       </div>
     </div>
   </div>
@@ -252,6 +258,7 @@
      (touchstart)="!quickSearchActive && onHandleTouchStart($event)"
      (touchmove)="!quickSearchActive && onHandleTouchMove($event)"
      (touchend)="!quickSearchActive && onHandleTouchEnd($event)"
+     (mousedown)="!quickSearchActive && onHandleTouchStart($event)"
      (click)="!quickSearchActive && toggleNav()">
   <i class="ti ti-chevron-right"></i>
 </div>

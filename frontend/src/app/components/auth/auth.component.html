@@ -169,7 +169,7 @@
                          class="form-input glass-input" [placeholder]="t('password_placeholder')"
                          [(ngModel)]="loginForm.password" name="password" required
                          autocomplete="password">
-                  <button type="button" class="password-toggle"
+                  <button type="button" class="password-toggle" tabindex="-1"
                     (pointerdown)="showLoginPassword = true"
                     (pointerup)="showLoginPassword = false"
                     (pointerleave)="showLoginPassword = false"
@@ -262,7 +262,7 @@
                   <input [type]="showSignupPassword ? 'text' : 'password'" id="signup-password"
                          class="form-input glass-input" [placeholder]="t('password_placeholder')"
                          [(ngModel)]="signupForm.password" (ngModelChange)="onPasswordInput($event)" name="password" required>
-                  <button type="button" class="password-toggle"
+                  <button type="button" class="password-toggle" tabindex="-1"
   (pointerdown)="showSignupPassword = true"
   (pointerup)="showSignupPassword = false"
   (pointerleave)="showSignupPassword = false"
@@ -310,7 +310,7 @@
                          [placeholder]="t('confirm_password_placeholder')" [(ngModel)]="signupForm.confirmPassword"
                          (ngModelChange)="onConfirmPasswordInput($event)"
                          name="confirmPassword" required>
-                  <button type="button" class="password-toggle"
+                  <button type="button" class="password-toggle" tabindex="-1"
                     (pointerdown)="showConfirmPassword = true"
                     (pointerup)="showConfirmPassword = false"
                     (pointerleave)="showConfirmPassword = false"
