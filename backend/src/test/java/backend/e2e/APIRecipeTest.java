@@ -3,9 +3,9 @@ package backend.e2e;
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.RarecipsApplication;
-import com.blasetvrtumi.rarecips.entity.Ingredient;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
+import com.blasetvrtumi.rarecips.service.RecipeService;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 
@@ -16,18 +16,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.sql.Blob;
-import java.util.ArrayList;
-import static io.restassured.RestAssured.*;
+
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = RarecipsApplication.class)
 @DirtiesContext
+@org.springframework.test.context.ActiveProfiles("test")
 public class APIRecipeTest {
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private RecipeRepository recipeRepository;
@@ -35,7 +40,10 @@ public class APIRecipeTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User testUser = new User("testuser", "testpassword", "testuser@example.com", null, "Test User",
+    @Autowired
+    private RecipeService recipeService;
+
+    private final User testUser = new User("testuser", "testpassword", "test@example.com", null, "Test User",
             "This is a test user.", "");
 
     private Recipe testRecipe1;
@@ -44,60 +52,56 @@ public class APIRecipeTest {
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
-        RestAssured.baseURI = "http://localhost:8443/api";
+        RestAssured.baseURI = "https://localhost";
+        RestAssured.basePath = "/api/v1";
+        RestAssured.useRelaxedHTTPSValidation();
 
         userRepository.save(testUser);
 
-        testRecipe1 = new Recipe(
-                "Spaghetti Bolognese", // label
-                "Classic Italian pasta", // description
-                new ArrayList<>(), // dietLabels
-                new ArrayList<>(), // healthLabels
-                new ArrayList<>(), // cautions
-                4, // people
-                new ArrayList<>(), // ingredients (vacía)
-                1, // difficulty (int)
-                new ArrayList<>(), // dishTypes
-                new ArrayList<>(), // mealTypes
-                new ArrayList<>(), // cuisineType
-                45.0f, // totalTime
-                500.0f, // totalWeight
-                650.0f, // calories
-                testUser, // author (null por simplicidad)
-                new ArrayList<>() // steps
-        );
+        Authentication auth = new UsernamePasswordAuthenticationToken(testUser.getUsername(), testUser.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
-        testRecipe2 = new Recipe(
-                "Chicken Curry", // label
-                "Spicy Indian curry", // description
-                new ArrayList<>(), // dietLabels
-                new ArrayList<>(), // healthLabels
-                new ArrayList<>(), // cautions
-                4, // people
-                new ArrayList<>(), // ingredients (vacía)
-                1, // difficulty (int)
-                new ArrayList<>(), // dishTypes
-                new ArrayList<>(), // mealTypes
-                new ArrayList<>(), // cuisineType
-                30.0f, // totalTime
-                600.0f, // totalWeight
-                520.0f, // calories
-                testUser, // author (null por simplicidad)
-                new ArrayList<>() // steps
-        );
+        Map<String, Object> recipe1Data = new HashMap<>();
+        recipe1Data.put("label", "Spaghetti Bolognese");
+        recipe1Data.put("description", "Classic Italian pasta");
+        recipe1Data.put("people", 4);
+        recipe1Data.put("totalTime", 45.0f);
+        recipe1Data.put("totalWeight", 500.0f);
+        recipe1Data.put("calories", 650.0f);
+        recipe1Data.put("difficulty", 1);
 
-        recipeRepository.save(testRecipe1);
-        recipeRepository.save(testRecipe2);
+        Map<String, Object> recipe2Data = new HashMap<>();
+        recipe2Data.put("label", "Chicken Curry");
+        recipe2Data.put("description", "Spicy Indian curry");
+        recipe2Data.put("people", 4);
+        recipe2Data.put("totalTime", 30.0f);
+        recipe2Data.put("totalWeight", 600.0f);
+        recipe2Data.put("calories", 520.0f);
+        recipe2Data.put("difficulty", 1);
+
+        testRecipe1 = recipeService.createRecipeFromMap(recipe1Data, testUser.getUsername());
+        testRecipe2 = recipeService.createRecipeFromMap(recipe2Data, testUser.getUsername());
     }
 
     @AfterEach
     public void tearDown() {
-        recipeRepository.delete(testRecipe1);
-        recipeRepository.delete(testRecipe2);
+        if (testRecipe1 != null && testRecipe1.getId() != null) {
+            recipeRepository.deleteById(testRecipe1.getId());
+        }
+        if (testRecipe2 != null && testRecipe2.getId() != null) {
+            recipeRepository.deleteById(testRecipe2.getId());
+        }
+
+        User user = userRepository.findByUsername(testUser.getUsername());
+        if (user != null) {
+            userRepository.delete(user);
+        }
+
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    public void testGetRecipeById() {
+    public void testGetRecipesList() {
         RestAssured
                 .given()
                 .log().all()
@@ -110,8 +114,23 @@ public class APIRecipeTest {
                 .then()
                 .log().all()
                 .statusCode(200)
-                .body("size()", greaterThan(0))
-                .body("size()", lessThanOrEqualTo(4));
+                .body("recipes", notNullValue())
+                .body("total", greaterThan(0));
+    }
+
+    @Test
+    public void testGetRecipeByIdEndpoint() {
+        long recipeId = testRecipe1.getId();
+
+        RestAssured
+                .given()
+                .when()
+                .get("/recipes/{id}", recipeId)
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("recipe.label", equalTo(testRecipe1.getLabel()))
+                .body("recipe.description", equalTo(testRecipe1.getDescription()));
     }
 
     @Test
@@ -141,20 +160,20 @@ public class APIRecipeTest {
 
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(testRecipe1.getLabel(), response1.getString("recipe.label")),
-            () -> Assertions.assertEquals(testRecipe1.getDescription(), response1.getString("recipe.description")),
-            () -> Assertions.assertEquals(testRecipe1.getPeople(), response1.getInt("recipe.people")),
-            () -> Assertions.assertEquals(testRecipe1.getTotalTime(), response1.getFloat("recipe.totalTime")),
-            () -> Assertions.assertEquals(testRecipe1.getTotalWeight(), response1.getFloat("recipe.totalWeight")),
-            () -> Assertions.assertEquals(testUser.getUsername(), response1.getString("recipe.author")),
-            () -> Assertions.assertEquals(testRecipe1.getCalories(), response1.getFloat("recipe.calories")),
-            () -> Assertions.assertEquals(testRecipe2.getLabel(), response2.getString("recipe.label")),
-            () -> Assertions.assertEquals(testRecipe2.getDescription(), response2.getString("recipe.description")),
-            () -> Assertions.assertEquals(testRecipe2.getPeople(), response2.getInt("recipe.people")),
-            () -> Assertions.assertEquals(testRecipe2.getTotalTime(), response2.getFloat("recipe.totalTime")),
-            () -> Assertions.assertEquals(testRecipe2.getTotalWeight(), response2.getFloat("recipe.totalWeight")),
-            () -> Assertions.assertEquals(testUser.getUsername(), response2.getString("recipe.author")),
-            () -> Assertions.assertEquals(testRecipe2.getCalories(), response2.getFloat("recipe.calories"))
+                () -> Assertions.assertEquals(testRecipe1.getLabel(), response1.getString("recipe.label")),
+                () -> Assertions.assertEquals(testRecipe1.getDescription(), response1.getString("recipe.description")),
+                () -> Assertions.assertEquals(testRecipe1.getPeople(), response1.getInt("recipe.people")),
+                () -> Assertions.assertEquals(testRecipe1.getTotalTime(), response1.getFloat("recipe.totalTime")),
+                () -> Assertions.assertEquals(testRecipe1.getTotalWeight(), response1.getFloat("recipe.totalWeight")),
+                () -> Assertions.assertEquals(testUser.getUsername(), response1.getString("recipe.author")),
+                () -> Assertions.assertEquals(testRecipe1.getCalories(), response1.getFloat("recipe.calories")),
+                () -> Assertions.assertEquals(testRecipe2.getLabel(), response2.getString("recipe.label")),
+                () -> Assertions.assertEquals(testRecipe2.getDescription(), response2.getString("recipe.description")),
+                () -> Assertions.assertEquals(testRecipe2.getPeople(), response2.getInt("recipe.people")),
+                () -> Assertions.assertEquals(testRecipe2.getTotalTime(), response2.getFloat("recipe.totalTime")),
+                () -> Assertions.assertEquals(testRecipe2.getTotalWeight(), response2.getFloat("recipe.totalWeight")),
+                () -> Assertions.assertEquals(testUser.getUsername(), response2.getString("recipe.author")),
+                () -> Assertions.assertEquals(testRecipe2.getCalories(), response2.getFloat("recipe.calories"))
         );
 
     }

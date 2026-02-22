@@ -1,0 +1,162 @@
+package com.blasetvrtumi.rarecips.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import com.blasetvrtumi.rarecips.security.jwt.AuthResponse;
+import com.blasetvrtumi.rarecips.security.jwt.AuthService;
+import com.blasetvrtumi.rarecips.service.UserService;
+import com.blasetvrtumi.rarecips.security.jwt.AuthRequest;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+public class AuthController {
+
+    @Autowired
+    private AuthService authService;
+
+    @Autowired
+    private UserService userService;
+
+    @Operation(summary = "User login endpoint")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication successful", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid credentials"),
+    })
+    @PutMapping("/login")
+    public ResponseEntity<AuthResponse> login(
+            @CookieValue(name = "accessToken", required = false) String accessToken,
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            @RequestBody AuthRequest loginRequest) {
+
+        return authService.login(loginRequest, accessToken, refreshToken);
+    }
+
+    @Operation(summary = "User registration endpoint")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Registration successful", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid registration data"),
+    })
+    @PutMapping("/signup")
+    public ResponseEntity<AuthResponse> signup(@RequestBody AuthRequest signupRequest) {
+        if (signupRequest.getUsername() == null || signupRequest.getEmail() == null ||
+                signupRequest.getPassword() == null) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE, "Invalid registration data"));
+        } else if (userService.existsByUsername(signupRequest.getUsername())) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE, "Username already taken"));
+        } else if (userService.existsByEmail(signupRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE, "Email already in use"));
+        } else if (signupRequest.getPassword().length() < 8 || signupRequest.getPassword().length() > 64) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE, "Password must be between 8 and 64 characters"));
+        }
+
+        String password = signupRequest.getPassword();
+        int strengthScore = 0;
+
+        if (password.matches(".*[a-z].*")) strengthScore++;
+        if (password.matches(".*[A-Z].*")) strengthScore++;
+        if (password.matches(".*\\d.*")) strengthScore++;
+        if (password.matches(".*[@$!%*?&#_\\-].*")) strengthScore++;
+        if (password.length() >= 6) strengthScore++;
+
+        if (strengthScore < 4) {
+            return ResponseEntity.badRequest().body(
+                    new AuthResponse(AuthResponse.Status.FAILURE,
+                            "Password must meet at least 4 of these criteria: lowercase letter, uppercase letter, number, special character (@$!%*?&#), or be 6+ characters long"));
+        }
+
+        ResponseEntity<AuthResponse> response = authService.signup(signupRequest);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null
+            && response.getBody().getStatus() == AuthResponse.Status.SUCCESS) {
+            URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/v1/users/{username}")
+                .buildAndExpand(signupRequest.getUsername())
+                .toUri();
+
+            return ResponseEntity.ok().header("Location", location.toString()).body(response.getBody());
+        }
+
+        return response;
+    }
+
+    @Operation(summary = "Refresh token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token refreshed", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid token"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
+    @PutMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
+
+        return authService.refresh(refreshToken);
+    }
+
+    @Operation(summary = "Index all users' usernames for validation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usernames retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request")
+    })
+    @GetMapping("/usernames")
+    public ResponseEntity<String[]> getAllUsernames() {
+        String[] usernames = userService.getAllUsernames();
+        return ResponseEntity.ok(usernames);
+    }
+
+    @Operation(summary = "Index all users' emails for validation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Emails retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))
+            })
+    })
+    @GetMapping("/emails")
+    public ResponseEntity<Boolean> getAllEmails(@RequestParam String email) {
+        boolean exists = userService.existsByEmail(email);
+        return ResponseEntity.ok(exists);
+    }
+
+    @Operation(summary = "Logout")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logout successful", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid token"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
+    @PutMapping("/logout")
+    public ResponseEntity<AuthResponse> logOut(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        if (!authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(new AuthResponse(AuthResponse.Status.FAILURE, "Unauthorized access"));
+        }
+        return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS, authService.logout(request, response)));
+    }
+
+}

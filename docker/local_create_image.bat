@@ -1,0 +1,24 @@
+@echo off
+REM Move to angular folder
+cd "frontend"
+
+REM Install angular cli globally
+npm "install" "-g" "@angular\cli"
+
+REM Install dependencies
+npm "install"
+
+REM Create production build
+ng "build" "--configuration" "production"
+
+REM Move to docker folder
+cd "docker"
+
+REM Build container
+docker build -t blasetvrtumi/rarecips:dev -f Dockerfile ../
+
+REM Push image to dev tag
+docker push blasetvrtumi/rarecips:dev
+
+REM Up compose
+docker compose --env-file .env -f docker-compose-dev.yml -p rarecips up -d

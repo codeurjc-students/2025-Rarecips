@@ -1,946 +1,1452 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
-    <!-- Main Content -->
-    <div
-        class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-8 py-12 mt-32">
-
-        <!-- Search Tabs -->
-        <div class="flex w-full max-w-7xl align-middle justify-center">
-            <div class="tabs glass text-nowrap w-full">
-                <button class="tab active">
-                    <i class="ti ti-chef-hat text-xl" aria-hidden="true"></i>
-                    Recipes
-                </button>
-                <button class="tab">
-                    <i class="ti ti-basket text-xl" aria-hidden="true"></i>
-                    Ingredients
-                </button>
-                <button class="tab">
-                    <i class="ti ti-cards text-xl" aria-hidden="true"></i>
-                    Collections
-                </button>
-                <button class="tab">
-                    <i class="ti ti-users text-xl" aria-hidden="true"></i>
-                    Users
-                </button>
-            </div>
-        </div>
-
-        <div id="search-results" class="flex w-full max-w-7xl flex-col items-start gap-8 glass p-8">
-
-            <!-- Search Header -->
-            <div class="flex w-full flex-col items-center gap-6 mb-8">
-
-                <!-- Search Bar -->
-                <div class="flex flex-row w-full max-w-3xl relative gap-4 items-center">
-                    <div class="w-full">
-                        <input type="text" placeholder="Search recipes..."
-                            class="w-full px-6 py-4 pl-14 pr-20 rounded-3xl border-2 transition-all focus:outline-none text-lg border-solid"
-                            style="background: var(--primary-300-40); border-color: var(--primary-100); color: var(--primary-700);" />
-                        <i class="ti ti-search absolute left-5 top-1/2 transform -translate-y-1/2 text-xl"
-                            style="color: var(--primary-400);"></i>
-                    </div>
-                    <div class="flex h-min align-middle justify-center">
-                        <button
-                            class="flex items-center right-3 top-1/2 px-4 py-2 text-sm font-semibold transition-all hover:scale-105 rounded-3xl whitespace-nowrap"
-                            style="background: var(--gradient-primary); color: white;">
-                            Search
-                            <i class="ti ti-arrow-right ml-2"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Quick Filters -->
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter selected"
-                        style="background: var(--gradient-primary); color: white;">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-star mr-1 text-xl"></i>
-                        </div>
-                        Popular
-                    </button>
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-brand-speedtest mr-1 text-xl"></i>
-                        </div>
-                        Quick
-                    </button>
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-leaf mr-1 text-xl"></i>
-                        </div>
-                        Healthy
-                    </button>
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-ladle mr-1 text-xl"></i>
-                        </div>
-                        Traditional
-                    </button>
-                    <button
-                        class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
-                        style="background: var(--primary-300-40); color: var(--primary-700);">
-                        <div class="flex flex-rows items-center min-w-[2rem]">
-                            <i class="absolute ti ti-heart mr-1 text-xl"></i>
-                        </div>
-                        Favorites
-                    </button>
-                </div>
-            </div>
-
-            <!-- Content Based on Active Tab -->
-            <!-- Filters & Results Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
-
-                <!-- Filters Sidebar -->
-                <div class="lg:col-span-1">
-                    <div class="flex flex-col gap-6 rounded-3xl border border-solid px-6 py-8 shadow-sm glass sticky top-8"
-                        style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                                <i class="ti ti-adjustments mr-2"></i>
-                                Filters
-                            </h3>
-                            <button class="text-sm font-medium transition-all hover:scale-105"
-                                style="color: var(--primary-500);">
-                                Clear
-                            </button>
-                        </div>
-
-                        <!-- Category Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Category</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Main Dishes</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full"
-                                        style="background: var(--primary-100); color: var(--primary-700);">245</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Appetizers</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full"
-                                        style="background: var(--primary-100); color: var(--primary-700);">156</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Desserts</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full"
-                                        style="background: var(--primary-100); color: var(--primary-700);">89</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Beverages</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full"
-                                        style="background: var(--primary-100); color: var(--primary-700);">34</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Difficulty Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Difficulty</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Easy</span>
-                                    <div class="ml-auto flex">
-                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                                    </div>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Medium</span>
-                                    <div class="ml-auto flex gap-1">
-                                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                    </div>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Hard</span>
-                                    <div class="ml-auto flex gap-1">
-                                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Time Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Preparation Time</h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <input type="range" min="0" max="180" value="60"
-                                        class="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style="background: var(--primary-100); accent-color: var(--primary-500);">
-                                    <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
-                                        <span>0 min</span>
-                                        <span class="font-semibold" style="color: var(--primary-700);">60 min</span>
-                                        <span>180 min</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Dietary Restrictions -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Dietary Restrictions</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <i class="ti ti-leaf text-green-600"></i>
-                                    <span style="color: var(--primary-600);">Vegetarian</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <i class="ti ti-plant text-green-600"></i>
-                                    <span style="color: var(--primary-600);">Vegan</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <i class="ti ti-wheat-off text-orange-600"></i>
-                                    <span style="color: var(--primary-600);">Gluten Free</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <i class="ti ti-milk-off text-blue-600"></i>
-                                    <span style="color: var(--primary-600);">Lactose Free</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Cuisine Type -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Cuisine Type</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter selected"
-                                    style="background: var(--primary-500); color: white;">
-                                    Spanish
-                                </button>
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    Italian
-                                </button>
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    Asian
-                                </button>
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    Mexican
-                                </button>
-                                <button
-                                    class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 cuisine-filter"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    French
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Rating Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Minimum Rating</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="radio" name="rating" class="w-4 h-4"
-                                        style="accent-color: var(--primary-500);">
-                                    <div class="flex">
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                    </div>
-                                    <span class="text-sm" style="color: var(--primary-600);">5 stars</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="radio" name="rating" class="w-4 h-4"
-                                        style="accent-color: var(--primary-500);">
-                                    <div class="flex">
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star text-gray-300"></i>
-                                    </div>
-                                    <span class="text-sm" style="color: var(--primary-600);">4+ stars</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="radio" name="rating" class="w-4 h-4"
-                                        style="accent-color: var(--primary-500);">
-                                    <div class="flex">
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star-filled text-yellow-500"></i>
-                                        <i class="ti ti-star text-gray-300"></i>
-                                        <i class="ti ti-star text-gray-300"></i>
-                                    </div>
-                                    <span class="text-sm" style="color: var(--primary-600);">3+ stars</span>
-                                </label>
-                            </div>
-                        </div>
-                        <!-- End Dietary Restrictions, Cuisine Type, and Rating Filter -->
-                    </div>
-                </div>
-
-                <!-- Results Section -->
-                <div class="lg:col-span-3">
-                    <div class="flex flex-col gap-6">
-
-                        <!-- Results Header -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <h2 class="text-xl font-bold" style="color: var(--primary-700);">
-                                    1,247 matching results
-                                </h2>
-                            </div>
-
-                            <div class="flex items-center gap-4">
-                                <!-- Sort Options -->
-                                <div class="flex gap-2 px-4 py-2 rounded-xl text-sm font-medium border-none items-center justify-around"
-                                    style="background: var(--primary-300-40); color: var(--primary-700);">
-                                    Order
-                                    <i class="ti ti-caret-down-filled"></i>
-                                </div>
-
-                                <!-- View Toggle -->
-                                <div class="flex rounded-xl overflow-hidden" style="background: var(--primary-300-40);">
-                                    <button class="p-2 transition-all view-toggle active"
-                                        style="background: var(--primary-500); color: white;">
-                                        <i class="ti ti-grid-3x3"></i>
-                                    </button>
-                                    <button class="p-2 transition-all view-toggle" style="color: var(--primary-700);">
-                                        <i class="ti ti-list"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Recipe Grid -->
-                        <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
-                            <!-- Recipe Card 1 -->
-                            <div
-                                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                                <!-- Glass Reflection Effect -->
-                                <div
-                                    class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                                </div>
-
-                                <!-- Image Container -->
-                                <div class="relative aspect-[4/3] overflow-hidden">
-                                    <img src="https://res.cloudinary.com/subframe/image/upload/v1724705396/uploads/302/wvpuc4kznngymxhsw1w5.png"
-                                        alt="Spicy Thai Basil Chicken" class="recipe-image"
-                                        style="height: -webkit-fill-available;">
-
-                                    <!-- Gradient Overlay -->
-                                    <div class="absolute inset-0 gradient-overlay"></div>
-
-                                    <!-- Top Right Actions -->
-                                    <div class="absolute top-4 right-4 flex gap-2">
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4 fill-orange-500 text-orange-500" viewBox="0 0 24 24">
-                                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Category Badge -->
-                                    <div class="absolute top-4 left-4">
-                                        <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
-                                    </div>
-
-                                    <!-- Difficulty Badge -->
-                                    <div class="absolute bottom-4 left-4">
-                                        <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌
-                                            ‌ ‌ ‌ </div>
-                                    </div>
-                                </div>
-
-                                <!-- Content -->
-                                <div class="p-6 space-y-4">
-                                    <!-- Title and Rating -->
-                                    <div class="space-y-2">
-                                        <h3 class="text-xl font-bold text-primary line-clamp-2">Spicy Thai Basil Chicken
-                                        </h3>
-
-                                        <div class="flex items-center justify-between">
-                                            <div class="star-rating">
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <span class="text-secondary text-sm ml-2">4.8 (34)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Description -->
-                                    <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                                        A delicious and aromatic Thai dish with fresh basil and perfectly balanced
-                                        spices that will transport you straight to Bangkok.
-                                    </p>
-
-                                    <!-- Meta Information -->
-                                    <div class="flex items-center gap-4 text-secondary text-sm">
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <polyline points="12,6 12,12 16,14" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                            <span>35 min</span>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                            <span>4 people</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tags -->
-                                    <div class="flex flex-wrap gap-2">
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Spicy</span>
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Asian</span>
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Quick</span>
-                                    </div>
-
-                                    <!-- View Button -->
-                                    <div class="glass rounded flex" style="background: var(--gradient-primary);">
-                                        <button class="btn btn-primary w-full">
-                                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                            </svg>
-                                            View Recipe
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Recipe Card 2 -->
-                            <div
-                                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                                <!-- Glass Reflection Effect -->
-                                <div
-                                    class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                                </div>
-
-                                <!-- Image Container -->
-                                <div class="relative aspect-[4/3] overflow-hidden">
-                                    <img src="https://res.cloudinary.com/subframe/image/upload/v1723780577/uploads/302/hhmv6ey0yajkadnmcp0a.png"
-                                        alt="Classic Caesar Salad" class="recipe-image"
-                                        style="height: -webkit-fill-available;">
-
-                                    <!-- Gradient Overlay -->
-                                    <div class="absolute inset-0 gradient-overlay"></div>
-
-                                    <!-- Top Right Actions -->
-                                    <div class="absolute top-4 right-4 flex gap-2">
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Category Badge -->
-                                    <div class="absolute top-4 left-4">
-                                        <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
-                                    </div>
-
-                                    <!-- Difficulty Badge -->
-                                    <div class="absolute bottom-4 left-4">
-                                        <div class="badge badge-green text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌ ‌
-                                            ‌ ‌ </div>
-                                    </div>
-                                </div>
-
-                                <!-- Content -->
-                                <div class="p-6 space-y-4">
-                                    <!-- Title and Rating -->
-                                    <div class="space-y-2">
-                                        <h3 class="text-xl font-bold text-primary line-clamp-2">Classic Caesar Salad
-                                        </h3>
-
-                                        <div class="flex items-center justify-between">
-                                            <div class="star-rating">
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <span class="text-secondary text-sm ml-2">4.5 (28)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Description -->
-                                    <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                                        Fresh romaine lettuce with homemade Caesar dressing, parmesan cheese, and crispy
-                                        croutons.
-                                    </p>
-
-                                    <!-- Meta Information -->
-                                    <div class="flex items-center gap-4 text-secondary text-sm">
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <polyline points="12,6 12,12 16,14" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                            <span>15 min</span>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                            <span>2 people</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tags -->
-                                    <div class="flex flex-wrap gap-2">
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Classic</span>
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Salad</span>
-                                        <span class="text-xs px-2 py-1 rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Vegetarian</span>
-                                    </div>
-
-                                    <!-- View Button -->
-                                    <div class="glass rounded flex" style="background: var(--gradient-primary);">
-                                        <button class="btn btn-primary w-full">
-                                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                            </svg>
-                                            View Recipe
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Recipe Card 1 -->
-                            <div
-                                class="recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm">
-                                <!-- Glass Reflection Effect -->
-                                <div
-                                    class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
-                                </div>
-
-                                <!-- Image Container -->
-                                <div class="relative aspect-[4/3] overflow-hidden">
-                                    <img src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
-                                        alt="Spicy Thai Basil Chicken" class="recipe-image"
-                                        style="height: -webkit-fill-available;">
-
-                                    <!-- Gradient Overlay -->
-                                    <div class="absolute inset-0 gradient-overlay"></div>
-
-                                    <!-- Top Right Actions -->
-                                    <div class="absolute top-4 right-4 flex gap-2">
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                        <button class="btn btn-ghost btn-icon glass-strong text-primary">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Category Badge -->
-                                    <div class="absolute top-4 left-4">
-                                        <span class="badge badge-dark text-xs px-3 py-1">‌‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ </span>
-                                    </div>
-
-                                    <!-- Difficulty Badge -->
-                                    <div class="absolute bottom-4 left-4">
-                                        <div class="badge badge-red text-xs font-medium backdrop-blur-sm">‌‌ ‌ ‌ ‌ ‌ ‌ ‌
-                                            ‌ </div>
-                                    </div>
-                                </div>
-
-                                <!-- Content -->
-                                <div class="p-6 space-y-4">
-                                    <!-- Title and Rating -->
-                                    <div class="space-y-2">
-                                        <h3 class="text-xl font-bold text-primary line-clamp-2">Oatmeal Banana Pancakes
-                                        </h3>
-
-                                        <div class="flex items-center justify-between">
-                                            <div class="star-rating">
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <svg class="star star-filled" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                                                </svg>
-                                                <span class="text-secondary text-sm ml-2">4.8 (34)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Description -->
-                                    <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
-                                        Fluffy oat and banana pancakes, perfect
-                                        for a healthy and delicious breakfast.
-                                    </p>
-
-                                    <!-- Meta Information -->
-                                    <div class="flex items-center gap-4 text-secondary text-sm">
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <polyline points="12,6 12,12 16,14" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                            <span>15 min</span>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                            <span>2 people</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tags -->
-                                    <div class="flex flex-wrap gap-2">
-                                        <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Classic</span>
-                                        <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Dessert</span>
-                                        <span class="text-xs px-2 py-1 glass rounded-full text-secondary"
-                                            style="background-color: var(--primary-300);">#Vegetarian</span>
-                                    </div>
-
-                                    <!-- View Button -->
-                                    <div class="glass rounded flex" style="background: var(--gradient-primary);">
-                                        <button class="btn btn-primary w-full">
-                                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" fill="none" />
-                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
-                                                    fill="none" />
-                                            </svg>
-                                            View Recipe
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div class="flex justify-center items-center gap-4 mt-8">
-                            <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                style="background: var(--primary-300-40); color: var(--primary-700);">
-                                <i class="ti ti-chevron-left mr-1"></i>
-                                Previous
-                            </button>
-
-                            <div class="flex gap-2">
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                    style="background: var(--primary-300-40); color: white;">
-                                    1
-                                </button>
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                    style="background: var(--primary-300-40); color: var(--primary-700);">
-                                    2
-                                </button>
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                    style="background: var(--primary-300-40); color: var(--primary-700);">
-                                    3
-                                </button>
-                                <span class="w-10 h-10 flex items-center justify-center"
-                                    style="color: var(--primary-400);">...</span>
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                    style="background: var(--primary-300-40); color: var(--primary-700);">
-                                    25
-                                </button>
-                            </div>
-
-                            <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                style="background: var(--primary-300-40); color: var(--primary-700);">
-                                Next
-                                <i class="ti ti-chevron-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
-
-                <!-- User Filters Sidebar -->
-                <div class="lg:col-span-1">
-                    <div class="flex flex-col gap-6 rounded-3xl border border-solid px-6 py-8 shadow-sm glass sticky top-8"
-                        style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-                                <i class="ti ti-adjustments mr-2"></i>
-                                User Filters
-                            </h3>
-                            <button class="text-sm font-medium transition-all hover:scale-105"
-                                style="color: var(--primary-500);">
-                                Clear
-                            </button>
-                        </div>
-
-                        <!-- Verified Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Status</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-3 cursor-pointer filter-option">
-                                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
-                                        style="accent-color: var(--primary-500);">
-                                    <span class="checkbox-custom glass-input"></span>
-                                    <span style="color: var(--primary-600);">Verified</span>
-                                    <i class="ti ti-badge-filled text-primary-500 ml-auto" title="Verified user"></i>
-                                </label>
-                            </div>
-                        </div>
-
-
-                        <!-- Followers Range -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Followers</h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <input type="range" min="0" max="50000"
-                                        class="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style="background: var(--primary-100); accent-color: var(--primary-500);">
-                                    <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
-                                        <span>0</span>
-                                        <span class="font-semibold" style="color: var(--primary-700);">0+</span>
-                                        <span>50k+</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Recipe Count Range -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Published Recipes</h4>
-                            <div class="space-y-4">
-                                <div>
-                                    <input type="range" min="0" max="200"
-                                        class="w-full h-2 rounded-lg appearance-none cursor-pointer"
-                                        style="background: var(--primary-100); accent-color: var(--primary-500);">
-                                    <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
-                                        <span>0</span>
-                                        <span class="font-semibold" style="color: var(--primary-700);">0+</span>
-                                        <span>200+</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Rating Filter -->
-                        <div class="space-y-3">
-                            <h4 class="font-semibold" style="color: var(--primary-700);">Minimum Rating</h4>
-                            <div class="flex gap-2">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Users Results -->
-                <div class="lg:col-span-3">
-                    <div class="flex flex-col gap-6">
-
-                        <!-- Results Header -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <h2 class="text-xl font-bold" style="color: var(--primary-700);">
-                                    Users Found
-                                </h2>
-                            </div>
-
-                            <div class="flex items-center gap-4">
-                                <select class="px-4 py-2 rounded-xl border-0 text-sm font-medium"
-                                    style="background: var(--primary-100); color: var(--primary-700);">
-                                    <option>Sort Option</option>
-                                </select>
-
-                                <div class="flex border rounded-xl overflow-hidden" style="border-color: var(--primary-200);">
-                                    <button class="p-2 transition-all hover:scale-105">
-                                        <i class="ti ti-grid-dots text-lg"></i>
-                                    </button>
-                                    <button class="p-2 transition-all hover:scale-105">
-                                        <i class="ti ti-list text-lg"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Users Grid -->
-                        <div class="grid gap-6">
-                        </div>
-
-                        <!-- User Pagination -->
-                        <div class="flex justify-center items-center gap-4 mt-8">
-                            <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                style="background: var(--primary-100); color: var(--primary-700);">
-                                <i class="ti ti-chevron-left mr-1"></i>
-                                Previous
-                            </button>
-                            <div class="flex gap-2">
-                                <button class="w-10 h-10 rounded-xl text-sm font-medium transition-all hover:scale-105">
-                                </button>
-                            </div>
-                            <button class="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                                style="background: var(--primary-100); color: var(--primary-700);">
-                                Next
-                                <i class="ti ti-chevron-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Main Content -->
+  <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-8 py-12 mt-32">
+
+    <!-- Search Tabs -->
+    <div class="flex w-full max-w-7xl align-middle justify-center">
+      <div class="tabs glass text-nowrap w-full">
+        <button class="tab" [class.active]="activeSearchTab === 'recipes'" (click)="setActiveTab('recipes')">
+          <i class="ti ti-chef-hat text-xl" aria-hidden="true"></i>
+          {{ t('recipes') }}
+        </button>
+        <button class="tab" [class.active]="activeSearchTab === 'ingredients'" (click)="setActiveTab('ingredients')">
+          <i class="ti ti-basket text-xl" aria-hidden="true"></i>
+          {{ t('ingredients') }}
+        </button>
+        <button class="tab" [class.active]="activeSearchTab === 'collections'" (click)="setActiveTab('collections')">
+          <i class="ti ti-cards text-xl" aria-hidden="true"></i>
+          {{ t('collections') }}
+        </button>
+        <button class="tab" [class.active]="activeSearchTab === 'users'" (click)="setActiveTab('users')">
+          <i class="ti ti-users text-xl" aria-hidden="true"></i>
+          {{ t('users') }}
+        </button>
+      </div>
     </div>
+
+    <div id="search-results"
+      [ngClass]="['flex', 'w-full', 'max-w-7xl', 'flex-col', 'items-start', 'gap-8', 'glass', 'p-8', animationClass]">
+
+      <!-- Search Header -->
+      <div class="flex w-full flex-col items-center gap-6 mb-8">
+
+        <!-- Search Bar -->
+        <div class="flex flex-row w-full max-w-3xl relative gap-4 items-center">
+          <div class="w-full">
+            <input type="text"
+              [placeholder]="activeSearchTab === 'recipes' ? t('search_recipes') : activeSearchTab === 'users' ? t('search_users') : activeSearchTab === 'ingredients' ? t('search_ingredients') : t('search')"
+              [(ngModel)]="searchQuery" (keyup.enter)="performSearch()"
+              class="w-full px-6 py-4 pl-14 pr-20 rounded-3xl border-2 transition-all focus:outline-none text-lg border-solid"
+              style="background: var(--primary-300-40); border-color: var(--primary-100); color: var(--primary-700);" />
+            <i class="ti ti-search absolute left-5 top-1/2 transform -translate-y-1/2 text-xl"
+              style="color: var(--primary-400);"></i>
+          </div>
+          <div class="flex h-min align-middle justify-center">
+            <button (click)="performSearch()"
+              class="flex items-center right-3 top-1/2 px-4 py-2 text-sm font-semibold transition-all hover:scale-105 rounded-3xl whitespace-nowrap"
+              style="background: var(--gradient-primary); color: white;">
+              {{ t('search') }}
+              <i class="ti ti-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+
+        @if (activeSearchTab === 'recipes') {
+        <!-- Quick Filters -->
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between px-4">
+            <h3 class="text-lg font-semibold" style="color: var(--primary-700);">
+              {{ t('quick_filters') }}
+            </h3>
+            <button (click)="toggleQuickFilters()" class="p-2 rounded-full transition-all hover:bg-opacity-50"
+              [style.background]="'var(--primary-200-40)'" [style.color]="'var(--primary-700)'"
+              [title]="isQuickFiltersExpanded ? t('collapse') : t('expand')">
+              <i class="ti transition-transform duration-300" [class.ti-chevron-up]="isQuickFiltersExpanded"
+                [class.ti-chevron-down]="!isQuickFiltersExpanded"></i>
+            </button>
+          </div>
+          <div class="quickFilters overflow-hidden transition-all duration-300 ease-in-out"
+            [style.max-height]="isQuickFiltersExpanded ? '500px' : '0px'"
+            [style.opacity]="isQuickFiltersExpanded ? '1' : '0'">
+            <div class="flex flex-wrap gap-3 justify-center">
+              <button (click)="applyQuickFilter('popular')" [class.selected]="activeQuickFilter === 'popular'"
+                class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+                [style.background]="activeQuickFilter === 'popular' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
+                [style.color]="activeQuickFilter === 'popular' ? 'white' : 'var(--primary-700)'">
+                <div class="flex flex-rows items-center min-w-[2rem]">
+                  <i class="absolute ti ti-star mr-1 text-xl"></i>
+                </div>
+                {{ t('quick_filter_popular') }}
+              </button>
+              <button (click)="applyQuickFilter('quick')" [class.selected]="activeQuickFilter === 'quick'"
+                class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+                [style.background]="activeQuickFilter === 'quick' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
+                [style.color]="activeQuickFilter === 'quick' ? 'white' : 'var(--primary-700)'">
+                <div class="flex flex-rows items-center min-w-[2rem]">
+                  <i class="absolute ti ti-brand-speedtest mr-1 text-xl"></i>
+                </div>
+                {{ t('quick_filter_quick') }}
+              </button>
+              <button (click)="applyQuickFilter('healthy')" [class.selected]="activeQuickFilter === 'healthy'"
+                class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+                [style.background]="activeQuickFilter === 'healthy' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
+                [style.color]="activeQuickFilter === 'healthy' ? 'white' : 'var(--primary-700)'">
+                <div class="flex flex-rows items-center min-w-[2rem]">
+                  <i class="absolute ti ti-leaf mr-1 text-xl"></i>
+                </div>
+                {{ t('quick_filter_healthy') }}
+              </button>
+              <button (click)="applyQuickFilter('traditional')" [class.selected]="activeQuickFilter === 'traditional'"
+                class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+                [style.background]="activeQuickFilter === 'traditional' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
+                [style.color]="activeQuickFilter === 'traditional' ? 'white' : 'var(--primary-700)'">
+                <div class="flex flex-rows items-center min-w-[2rem]">
+                  <i class="absolute ti ti-ladle mr-1 text-xl"></i>
+                </div>
+                {{ t('quick_filter_traditional') }}
+              </button>
+              <button (click)="applyQuickFilter('easy')" [class.selected]="activeQuickFilter === 'easy'"
+                class="flex flex-row items-center px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 quick-filter"
+                [style.background]="activeQuickFilter === 'easy' ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
+                [style.color]="activeQuickFilter === 'easy' ? 'white' : 'var(--primary-700)'">
+                <div class="flex flex-rows items-center min-w-[2rem]">
+                  <i class="absolute ti ti-mood-smile mr-1 text-xl"></i>
+                </div>
+                {{ t('quick_filter_easy') }}
+              </button>
+            </div>
+          </div>
+        </div>
+        }
+
+        @if ((activeSearchTab === 'recipes' && filters.query) || (activeSearchTab === 'users' && userFilters.query) ||
+        (activeSearchTab === 'ingredients' && ingredientSearchQuery) || (activeSearchTab === 'collections' &&
+        searchQuery)) {
+        <div class="flex items-center gap-2 px-4 py-2 rounded-full"
+          style="background: var(--primary-200); color: var(--primary-700);">
+          <i class="ti ti-search text-lg"></i>
+          <span class="text-sm font-medium"> {{ t('searching_for') }}: "{{ activeSearchTab === 'recipes' ? filters.query
+            : activeSearchTab === 'users' ? userFilters.query : activeSearchTab === 'ingredients' ?
+            ingredientSearchQuery : searchQuery }}
+            "</span>
+          <button (click)="clearSearch()"
+            class="ml-2 hover:bg-white hover:bg-opacity-50 rounded-full p-1 transition-all">
+            <i class="ti ti-x text-sm"></i>
+          </button>
+        </div>
+        }
+      </div>
+
+      <!-- Content Based on Active Tab -->
+      <!-- Recipes Section -->
+      @if (activeSearchTab === 'recipes') {
+      <!-- Filters & Results Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
+
+        <!-- Filters Sidebar -->
+        <div class="lg:col-span-1">
+          <div
+            class="filtersCont flex flex-col gap-6 rounded-3xl border border-solid pl-6 pr-4 py-8 shadow-sm glass sticky top-8 max-h-[calc(100vh-6rem)] filters-sidebar"
+            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <div class="flex flex-col gap-6 overflow-y-auto p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+                  <i class="ti ti-adjustments mr-2"></i>
+                  {{ t('recipe_filters') }}
+                </h3>
+                <div class="flex items-center gap-2 filtersButtons" [class.!flex-col]="responsive">
+                  <button (click)="toggleFilters()" class="p-2 rounded-full transition-all hover:bg-opacity-50"
+                    [style.background]="'var(--primary-200-40)'" [style.color]="'var(--primary-700)'"
+                    [title]="isFiltersExpanded ? t('collapse') : t('expand')">
+                    <i class="ti transition-transform duration-300" [class.ti-chevron-up]="isFiltersExpanded"
+                      [class.ti-chevron-down]="!isFiltersExpanded"></i>
+                  </button>
+                  <button class="text-sm font-medium transition-all hover:scale-105" (click)="clearFilters()"
+                    style="color: var(--primary-500);">
+                    {{ t('clear') }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="filters overflow-auto pr-3 transition-all duration-300 ease-in-out space-y-6"
+                [style.max-height]="isFiltersExpanded ? '5000px' : '0px'"
+                [style.opacity]="isFiltersExpanded ? '1' : '0'">
+
+                <!-- cookable with user ingredients (authenticated) -->
+                @if (isAuthenticated) {
+                <div class="space-y-3">
+                  <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('my_pantry') }}</h4>
+                  <label class="flex items-center gap-3 cursor-pointer filter-option">
+                    <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                      [(ngModel)]="filters.onlyUserIngredients" style="accent-color: var(--primary-500);">
+                    <span class="checkbox-custom glass-input"></span>
+                    <i class="ti ti-shopping-cart text-green-600"></i>
+                    <span style="color: var(--primary-600);">{{ t('recipes_i_can_cook') }}</span>
+                  </label>
+                </div>
+                }
+
+                <div class="space-y-3">
+                  <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('meal_type') }}</h4>
+                  <div class="space-y-2">
+                    @for (category of mealTypeCategories; track category.value) {
+                    <label class="flex items-center gap-3 cursor-pointer filter-option">
+                      <input type="checkbox" class="w-4 h-4 rounded form-checkbox"
+                        [checked]="isMealTypeSelected(category.value)" (change)="toggleMealType(category.value)"
+                        style="accent-color: var(--primary-500);">
+                      <span class="checkbox-custom glass-input"></span>
+                      <span style="color: var(--primary-600);">{{ category.name }}</span>
+                      <span class="ml-auto text-xs px-2 py-1 rounded-full"
+                        style="background: var(--primary-100); color: var(--primary-700);">{{ category.count }}</span>
+                    </label>
+                    }
+                  </div>
+                </div>
+
+                <!-- Difficulty Filter -->
+                <div class="space-y-3">
+                  <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('difficulty') }}</h4>
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm" style="color: var(--primary-600);">
+                        {{ filters.difficulties.length > 0 ? filters.difficulties.length + ' ' + t('selected') :
+                        t('all_levels') }}
+                      </span>
+                      @if (filters.difficulties.length > 0) {
+                      <button (click)="filters.difficulties = []"
+                        class="text-xs px-2 py-1 rounded-full transition-all hover:scale-105"
+                        style="background: var(--primary-100); color: var(--primary-700);">
+                        {{ t('clear') }}
+                      </button>
+                      }
+                    </div>
+                    <div class="flex gap-2 max-w-fit flex-wrap justify-center">
+                      @for (level of difficultyLevels; track level.value) {
+                      <button (click)="toggleDifficulty(level.value)"
+                        [class.selected]="isDifficultySelected(level.value)"
+                        class="flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all hover:scale-105 difficulty-btn max-w-fit"
+                        [style.background]="isDifficultySelected(level.value) ? 'var(--gradient-primary)' : 'var(--primary-300-40)'"
+                        [style.color]="isDifficultySelected(level.value) ? 'white' : 'var(--primary-700)'">
+                        <div class="flex flex-col items-center gap-1">
+                          <div class="flex gap-1">
+                            @for (star of [1, 2, 3, 4, 5]; track star) {
+                            @if (star <= level.value) { <div class="w-1.5 h-1.5 rounded-full"
+                              [style.background]="isDifficultySelected(level.value) ? 'white' : 'var(--primary-500)'">
+                          </div>
+                          }
+                          }
+                        </div>
+                    </div>
+                    </button>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Time Filter -->
+              <div class="space-y-3">
+                <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('preparation_time') }}</h4>
+                <div class="space-y-4">
+                  <div class="relative pt-2 pb-2">
+                    <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
+                      <div class="absolute h-2 rounded-lg"
+                        [style.left.%]="(Math.min(minTime, filters.maxTime) / 300) * 100"
+                        [style.right.%]="100 - (Math.max(minTime, filters.maxTime) / 300) * 100"
+                        style="background: var(--primary-500);"></div>
+                    </div>
+                    <input type="range" min="0" max="300" step="5" [(ngModel)]="minTime"
+                      class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
+                      style="background: transparent; pointer-events: none;">
+                    <input type="range" min="0" max="300" step="5" value="300" [(ngModel)]="filters.maxTime"
+                      class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
+                      style="background: transparent; pointer-events: none;">
+                    <div class="flex justify-between text-xs mt-6" style="color: var(--primary-600);">
+                      <span class="font-semibold" style="color: var(--primary-700);">{{ minTime <= filters.maxTime ?
+                          minTime : filters.maxTime }} {{ t('min') }}</span>
+                          <span class="font-semibold" style="color: var(--primary-700);">{{ minTime <= filters.maxTime ?
+                              filters.maxTime : minTime }} {{ t('min') }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Health Labels -->
+              <div class="space-y-3">
+                <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('health_labels') }}</h4>
+
+                <div class="relative multiselect-dropdown-container">
+                  <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                    <input type="text" [(ngModel)]="healthLabelSearchTerm" name="healthLabelSearch"
+                      placeholder="{{ t('search_or_select') }}" (click)="toggleHealthLabelDropdown()"
+                      class="w-full bg-transparent focus:outline-none text-sm" style="color: var(--primary-700);">
+                    @if (filters.healthLabels.length > 0) {
+                    <div class="flex flex-wrap gap-1">
+                      @for (item of filters.healthLabels; track item) {
+                      <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                        style="background: var(--primary-500); color: white;">
+                        {{ item }}
+                        <i (click)="removeHealthLabel(item); $event.stopPropagation()"
+                          class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                      </span>
+                      }
+                    </div>
+                    }
+                    <i class="ti ti-caret-down-filled absolute right-4 top-4"
+                      [class.rotate-180]="showHealthLabelDropdown" (click)="toggleHealthLabelDropdown()"
+                      style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                  </div>
+                  @if (showHealthLabelDropdown) {
+                  <div
+                    class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-10"
+                    style="background: var(--primary-50); border-color: var(--primary-100);">
+                    @for (option of getFilteredHealthLabelOptions(); track option) {
+                    <div (click)="toggleHealthLabel(option)"
+                      class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                      [class.bg-primary-200]="isHealthLabelSelected(option)" style="color: var(--primary-700);">
+                      <span>{{ option }}</span>
+                      @if (isHealthLabelSelected(option)) {
+                      <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                      }
+                    </div>
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Cuisine Type -->
+              <div class="space-y-3">
+                <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('cuisine_type') }}</h4>
+
+                <div class="relative multiselect-dropdown-container">
+                  <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                    <input type="text" [(ngModel)]="cuisineSearchTerm" name="cuisineSearch"
+                      placeholder="{{ t('search_or_select') }}" (click)="toggleCuisineDropdown()"
+                      class="w-full bg-transparent focus:outline-none text-sm" style="color: var(--primary-700);">
+                    @if (filters.cuisines.length > 0) {
+                    <div class="flex flex-wrap gap-1">
+                      @for (item of filters.cuisines; track item) {
+                      <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                        style="background: var(--primary-500); color: white;">
+                        {{ item }}
+                        <i (click)="removeCuisine(item); $event.stopPropagation()"
+                          class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                      </span>
+                      }
+                    </div>
+                    }
+                    <i class="ti ti-caret-down-filled absolute right-4 top-4" [class.rotate-180]="showCuisineDropdown"
+                      (click)="toggleCuisineDropdown()"
+                      style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                  </div>
+                  @if (showCuisineDropdown) {
+                  <div
+                    class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-10"
+                    style="background: var(--primary-50); border-color: var(--primary-100);">
+                    @for (option of getFilteredCuisineOptions(); track option) {
+                    <div (click)="toggleCuisine(option)"
+                      class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                      [class.bg-primary-200]="isCuisineSelected(option)" style="color: var(--primary-700);">
+                      <span>{{ option }}</span>
+                      @if (isCuisineSelected(option)) {
+                      <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                      }
+                    </div>
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Dish Type -->
+              <div class="space-y-3">
+                <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('dish_type') }}</h4>
+
+                <div class="relative multiselect-dropdown-container">
+                  <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                    <input type="text" [(ngModel)]="dishTypeSearchTerm" name="dishTypeSearch"
+                      placeholder="{{ t('search_or_select') }}" (click)="toggleDishTypeDropdown()"
+                      class="w-full bg-transparent focus:outline-none text-sm" style="color: var(--primary-700);">
+                    @if (filters.dishTypes.length > 0) {
+                    <div class="flex flex-wrap gap-1">
+                      @for (item of filters.dishTypes; track item) {
+                      <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                        style="background: var(--primary-500); color: white;">
+                        {{ item }}
+                        <i (click)="removeDishType(item); $event.stopPropagation()"
+                          class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                      </span>
+                      }
+                    </div>
+                    }
+                    <i class="ti ti-caret-down-filled absolute right-4 top-4" [class.rotate-180]="showDishTypeDropdown"
+                      (click)="toggleDishTypeDropdown()"
+                      style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                  </div>
+                  @if (showDishTypeDropdown) {
+                  <div
+                    class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-10"
+                    style="background: var(--primary-50); border-color: var(--primary-100);">
+                    @for (option of getFilteredDishTypeOptions(); track option) {
+                    <div (click)="toggleDishType(option)"
+                      class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                      [class.bg-primary-200]="isDishTypeSelected(option)" style="color: var(--primary-700);">
+                      <span>{{ option }}</span>
+                      @if (isDishTypeSelected(option)) {
+                      <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                      }
+                    </div>
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('diet_information') }}</h4>
+
+                <div class="relative multiselect-dropdown-container">
+                  <div class="w-full px-4 py-3 rounded-2xl border-2 flex flex-col gap-2 min-h-[48px]"
+                    style="background: var(--primary-100-40); border-color: var(--primary-100); transition: border-color 0.2s;">
+                    <input type="text" [(ngModel)]="dietLabelSearchTerm" name="dietLabelSearch"
+                      placeholder="{{ t('search_or_select') }}" (click)="toggleDietLabelDropdown()"
+                      class="w-full bg-transparent focus:outline-none text-sm" style="color: var(--primary-700);">
+                    @if (filters.dietLabels.length > 0) {
+                    <div class="flex flex-wrap gap-1">
+                      @for (item of filters.dietLabels; track item) {
+                      <span class="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                        style="background: var(--primary-500); color: white;">
+                        {{ item }}
+                        <i (click)="removeDietLabel(item); $event.stopPropagation()"
+                          class="ti ti-x cursor-pointer hover:opacity-70"></i>
+                      </span>
+                      }
+                    </div>
+                    }
+                    <i class="ti ti-caret-down-filled absolute right-4 top-4" [class.rotate-180]="showDietLabelDropdown"
+                      (click)="toggleDietLabelDropdown()"
+                      style="color: var(--primary-700); transition: transform 0.2s; cursor: pointer;"></i>
+                  </div>
+                  @if (showDietLabelDropdown) {
+                  <div
+                    class="dropdown-menu dropdown-force-top absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-lg overflow-hidden max-h-60 overflow-y-auto z-10"
+                    style="background: var(--primary-50); border-color: var(--primary-100);">
+                    @for (option of getFilteredDietLabelOptions(); track option) {
+                    <div (click)="toggleDietLabel(option)"
+                      class="px-4 py-3 cursor-pointer transition-all hover:bg-primary-100 flex items-center justify-between"
+                      [class.bg-primary-200]="isDietLabelSelected(option)" style="color: var(--primary-700);">
+                      <span>{{ option }}</span>
+                      @if (isDietLabelSelected(option)) {
+                      <i class="ti ti-check" style="color: var(--primary-500);"></i>
+                      }
+                    </div>
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('nutritional_information') }}</h4>
+
+                <div class="space-y-2">
+                  <label class="text-sm font-medium" style="color: var(--primary-600);">{{ t('calories_kcal') }}</label>
+                  <div class="space-y-4">
+                    <div class="relative pt-2 pb-2">
+                      <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
+                        <div class="absolute h-2 rounded-lg"
+                          [style.left.%]="(Math.min(filters.minCalories, filters.maxCalories) / 10000) * 100"
+                          [style.right.%]="100 - (Math.max(filters.minCalories, filters.maxCalories) / 10000) * 100"
+                          style="background: var(--primary-500);"></div>
+                      </div>
+                      <input type="range" min="0" max="10000" step="100" [(ngModel)]="filters.minCalories"
+                        class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
+                        style="background: transparent; pointer-events: none;">
+                      <input type="range" min="0" max="10000" step="100" [(ngModel)]="filters.maxCalories"
+                        class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
+                        style="background: transparent; pointer-events: none;">
+                      <div class="flex justify-between text-xs mt-6" style="color: var(--primary-600);">
+                        <span class="font-semibold" style="color: var(--primary-700);">{{ filters.minCalories <=
+                            filters.maxCalories ? filters.minCalories : filters.maxCalories }} kcal</span>
+                            <span class="font-semibold" style="color: var(--primary-700);">{{ filters.minCalories <=
+                                filters.maxCalories ? filters.maxCalories : filters.minCalories }} kcal</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="text-sm font-medium" style="color: var(--primary-600);">{{ t('total_weight_g')
+                    }}</label>
+                  <div class="space-y-4">
+                    <div class="relative pt-2 pb-2">
+                      <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
+                        <div class="absolute h-2 rounded-lg"
+                          [style.left.%]="(Math.min(filters.minWeight, filters.maxWeight) / 20000) * 100"
+                          [style.right.%]="100 - (Math.max(filters.minWeight, filters.maxWeight) / 20000) * 100"
+                          style="background: var(--primary-500);"></div>
+                      </div>
+                      <input type="range" min="0" max="20000" step="200" [(ngModel)]="filters.minWeight"
+                        class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
+                        style="background: transparent; pointer-events: none;">
+                      <input type="range" min="0" max="20000" step="200" [(ngModel)]="filters.maxWeight"
+                        class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
+                        style="background: transparent; pointer-events: none;">
+                      <div class="flex justify-between text-xs mt-6" style="color: var(--primary-600);">
+                        <span class="font-semibold" style="color: var(--primary-700);">{{ filters.minWeight <=
+                            filters.maxWeight ? filters.minWeight : filters.maxWeight }} g</span>
+                            <span class="font-semibold" style="color: var(--primary-700);">{{ filters.minWeight <=
+                                filters.maxWeight ? filters.maxWeight : filters.minWeight }} g</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="text-sm font-medium" style="color: var(--primary-600);">{{ t('servings_people')
+                    }}</label>
+                  <div class="space-y-4">
+                    <div class="relative pt-2 pb-2">
+                      <div class="relative h-2 rounded-lg" style="background: var(--primary-100);">
+                        <div class="absolute h-2 rounded-lg"
+                          [style.left.%]="(Math.min(filters.minPeople, filters.maxPeople) / 20) * 100"
+                          [style.right.%]="100 - (Math.max(filters.minPeople, filters.maxPeople) / 20) * 100"
+                          style="background: var(--primary-500);"></div>
+                      </div>
+                      <input type="range" min="1" max="20" step="1" [(ngModel)]="filters.minPeople"
+                        class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
+                        style="background: transparent; pointer-events: none;">
+                      <input type="range" min="1" max="20" step="1" [(ngModel)]="filters.maxPeople"
+                        class="absolute top-2 w-full h-2 appearance-none cursor-pointer range-slider-thumb"
+                        style="background: transparent; pointer-events: none;">
+                      <div class="flex justify-between text-xs mt-6" style="color: var(--primary-600);">
+                        <span class="font-semibold" style="color: var(--primary-700);">{{ filters.minPeople <=
+                            filters.maxPeople ? filters.minPeople : filters.maxPeople }} {{ t('people') }}</span>
+                            <span class="font-semibold" style="color: var(--primary-700);">{{ filters.minPeople <=
+                                filters.maxPeople ? filters.maxPeople : filters.minPeople }} {{ t('people') }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('minimum_rating') }}</h4>
+                <div class="space-y-4">
+                  <div>
+                    <input type="range" min="0" max="5" step="0.5" [(ngModel)]="filters.minRating"
+                      class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                      style="background: var(--primary-100); accent-color: var(--primary-500);">
+                    <div class="flex justify-between items-center text-sm mt-2">
+                      <span style="color: var(--primary-400);">0</span>
+                      <div class="flex items-center gap-1">
+                        <span class="font-semibold text-lg" style="color: var(--primary-700);">{{ filters.minRating
+                          }}</span>
+                        @for (star of [1, 2, 3, 4, 5]; track star) {
+                        @if (star <= filters.minRating) { <i class="ti ti-star-filled text-lg text-yellow-500"></i>
+                          } @else if (star - 0.5 === filters.minRating) {
+                          <i class="ti ti-star-half-filled text-lg text-yellow-500"></i>
+                          } @else {
+                          <i class="ti ti-star text-lg" style="color: var(--primary-text)"></i>
+                          }
+                          }
+                      </div>
+                      <span style="color: var(--primary-400);">5</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Dietary Restrictions, Cuisine Type, and Rating Filter -->
+
+            <!-- Apply filters but -->
+            <div class="pt-4 border-t" style="border-color: var(--primary-100);">
+              <button (click)="applyManualFilters()" [disabled]="recipeLoading"
+                class="w-full px-6 py-3 rounded-2xl font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style="background: var(--gradient-primary);">
+                @if (recipeLoading) {
+                <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:h-5"></div>
+                <span>{{ t('loading') }}...</span>
+                } @else {
+                <i class="ti ti-filter-check"></i>
+                <span>{{ t('apply_filters') }}</span>
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="lg:col-span-3">
+        <div class="flex flex-col gap-6">
+
+          <!-- Results Header -->
+          <div class="filterOptions flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <h2 class="text-xl font-bold" style="color: var(--primary-700);">
+                {{ totalRecipes }} {{ t('recipes_found') }}
+              </h2>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <!-- Sort Options -->
+              <div class="relative sort-dropdown-container">
+                <button (click)="toggleSortDropdown()"
+                  class="flex gap-2 px-4 py-2 rounded-xl text-sm font-medium border-none items-center justify-around transition-all hover:scale-105"
+                  style="background: var(--primary-300-40); color: var(--primary-700);">
+                  {{ getCurrentSortLabel() }}
+                  <i class="ti ti-caret-down-filled transition-transform" [class.rotate-180]="showSortDropdown"></i>
+                </button>
+
+                @if (showSortDropdown) {
+                <div class="absolute right-0 top-full mt-2 w-56 rounded-2xl shadow-lg z-50 overflow-hidden"
+                  style="background: var(--primary-100);">
+                  @for (option of sortingOptions; track option.value) {
+                  <button (click)="changeSortOrder(option.value)"
+                    class="w-full px-4 py-3 text-left text-sm font-medium transition-all hover:scale-[1.02] flex items-center gap-3"
+                    [class.selected]="filters.sortBy === option.value"
+                    [style.background]="filters.sortBy === option.value ? 'var(--primary-500)' : 'transparent'"
+                    [style.color]="filters.sortBy === option.value ? 'white' : 'var(--primary-700)'">
+                    <i class="ti ti-{{ option.icon }} text-lg"></i>
+                    {{ t(option.label) }}
+                    @if (filters.sortBy === option.value) {
+                    <i class="ti ti-check ml-auto"></i>
+                    }
+                  </button>
+                  }
+                </div>
+                }
+              </div>
+
+              <!-- View Toggle -->
+              <div class="flex rounded-xl overflow-hidden" style="background: var(--primary-300-40);">
+                <button (click)="toggleViewMode('grid')" class="p-2 transition-all view-toggle"
+                  [class.active]="viewMode === 'grid'"
+                  [style.background]="viewMode === 'grid' ? 'var(--primary-500)' : 'transparent'"
+                  [style.color]="viewMode === 'grid' ? 'white' : 'var(--primary-700)'">
+                  <i class="ti ti-grid-3x3"></i>
+                </button>
+                <button (click)="toggleViewMode('list')" class="p-2 transition-all view-toggle"
+                  [class.active]="viewMode === 'list'"
+                  [style.background]="viewMode === 'list' ? 'var(--primary-500)' : 'transparent'"
+                  [style.color]="viewMode === 'list' ? 'white' : 'var(--primary-700)'">
+                  <i class="ti ti-list"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recipe Grid/List -->
+          <div [class]="viewMode === 'grid' ? 'grid grid-cols-3 md:grid-cols-3 gap-6' : 'flex flex-col gap-4'">
+            @if (recipeLoading && recipeList.length === 0) {
+            <div [class]="viewMode === 'grid' ? 'col-span-3' : ''"
+              class="flex flex-col items-center justify-center py-20">
+              <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:w-24 [&>svg]:h-24 [&>svg]:mb-4"></div>
+              <p class="text-lg font-medium" style="color: var(--primary-600);">{{ t('loading_recipes') }}...</p>
+            </div>
+            } @else if (!recipeList || recipeList.length === 0) {
+            <div [class]="viewMode === 'grid' ? 'col-span-3' : ''"
+              class="flex flex-col items-center justify-center py-20">
+              <div class="w-24 h-24 rounded-full flex items-center justify-center mb-4"
+                style="background: var(--primary-100);">
+                <i class="ti ti-chef-hat-off text-5xl" style="color: var(--primary-400);"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-2" style="color: var(--primary-700);">{{ t('no_recipes_found') }}
+                "{{searchQuery}}"</h3>
+              <p class="text-sm" style="color: var(--primary-600);">{{ t('try_adjusting_your_filters') }}</p>
+            </div>
+            } @else {
+            @for (recipe of recipeList; track recipe.id) {
+            @if (viewMode === 'grid') {
+            <div
+              class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm hover:scale-105 hover:[transform:perspective(900px)_rotateY(5deg)_rotateX(-5deg)_rotateZ(-2deg)] hover-skew-x-1">
+              <div
+                class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">
+              </div>
+
+              <div class="imageCont relative aspect-43 overflow-hidden">
+                <img src="data:image/png;base64,{{recipe.imageUrl}}" alt="{{recipe.title}}" class="recipe-image"
+                  style="height: -webkit-fill-available;">
+
+                <div class="absolute inset-0 gradient-overlay"></div>
+
+                @if (isAuthenticated) {
+                <div class="actionButtons absolute top-4 right-4 flex gap-2">
+                  <button (click)="toggleFavorite(recipe.id, $event)"
+                    class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110"
+                    [class.favorites-active]="isRecipeInFavorites(recipe.id)">
+                    <i [ngClass]="isRecipeInFavorites(recipe.id) ? 'ti ti-heart-filled' : 'ti ti-heart'"
+                      class="w-4 h-4 heart-icon"></i>
+                  </button>
+                  <button (click)="openAddToCollection(recipe.id, $event)"
+                    class="btn btn-icon glass-strong text-primary transition-transform hover:scale-110">
+                    <i class="ti ti-bookmark w-4 h-4"></i>
+                  </button>
+                </div>
+                }
+
+                <div class="absolute top-4 left-4">
+                  <span class="badge badge-dark text-xs px-3 py-1">{{ recipe.mealTypes[0] }}</span>
+                </div>
+
+                <div class="absolute bottom-4 left-4">
+                  @if (recipe.difficulty < 3) { <div class="badge badge-green text-xs font-medium backdrop-blur-sm">
+                    <span>{{ t('easy') }}</span>
+                </div>
+                } @else if (recipe.difficulty === 3) {
+                <div class="badge badge-yellow text-xs font-medium backdrop-blur-sm">
+                  <span>{{ t('medium') }}</span>
+                </div>
+                } @else {
+                <div class="badge badge-red text-xs font-medium backdrop-blur-sm">
+                  <span>{{ t('hard') }}</span>
+                </div>
+                }
+              </div>
+            </div>
+
+            <div class="p-6 space-y-4 h-full flex flex-1 flex-col justify-between">
+              <div class="space-y-2">
+                <h3 class="text-xl font-bold text-primary line-clamp-2 recipe-title">{{ recipe.title }}</h3>
+
+                <div class="flex items-center justify-between">
+                  <div class="star-rating flex items-center">
+                    @for (star of [1,2,3,4,5]; track star) {
+                    @if (recipe.rating >= star) {
+                    <i class="ti ti-star-filled text-lg text-yellow-500"></i>
+                    } @else if (recipe.rating >= star - 0.5 && recipe.rating < star) { <i
+                      class="ti ti-star-half-filled text-lg text-yellow-500"></i>
+                      } @else {
+                      <i class="ti ti-star text-lg" style="color: var(--primary-text)"></i>
+                      }
+                      }
+                      <span class="text-secondary text-sm ml-2">{{ recipe.rating | number:'1.1-1' }} ({{
+                        recipe.reviews.length }})</span>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-secondary text-sm line-clamp-2 leading-relaxed">
+                {{ recipe.description }}
+              </p>
+
+              <div class="flex items-center gap-4 text-secondary text-sm">
+                <div class="flex items-center gap-1">
+                  <i class="ti ti-clock"></i>
+                  <span>{{ recipe.totalTime }} {{ t('min') }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <i class="ti ti-users"></i>
+                  <span>{{ recipe.people }} {{ t('people') }}</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                  style="background-color: var(--primary-300);">{{ recipe.dishTypes[0] }}</span>
+                <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                  style="background-color: var(--primary-300);">{{ recipe.dietLabels[0] }}</span>
+                <span class="text-xs px-2 py-1 rounded-full text-secondary"
+                  style="background-color: var(--primary-300);">{{ recipe.healthLabels[0] }}</span>
+              </div>
+
+              <div class="rounded flex" style="background: var(--gradient-primary);">
+                <button class="btn btn-primary w-full view-recipe-btn" (click)="viewRecipe(recipe.id)">
+                  <i class="ti ti-eye mr-2"></i>
+                  {{ t('view_recipe') }}
+                </button>
+              </div>
+            </div>
+          </div>
+          } @else {
+          <div
+            class="recipe-list-item flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm p-4 gap-4"
+            (click)="viewRecipe(recipe.id)">
+            <div class="relative w-48 h-32 rounded-2xl overflow-hidden flex-shrink-0">
+              <img src="data:image/png;base64,{{recipe.imageUrl}}" alt="{{recipe.title}}"
+                class="w-full h-full object-cover">
+              <div class="absolute inset-0 gradient-overlay"></div>
+            </div>
+            <div class="flex-1 flex flex-col justify-center">
+              <h3 class="font-bold text-base text-primary line-clamp-1">{{ recipe.title }}</h3>
+            </div>
+          </div>
+          }
+          }
+          }
+        </div>
+
+        @if (hasMoreRecipes && !loadingMore) {
+        <div class="flex justify-center items-center mt-8">
+          <button (click)="loadMoreRecipes()"
+            class="px-8 py-3 rounded-xl font-semibold transition-all hover:scale-105 flex items-center gap-2"
+            style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <i class="ti ti-refresh"></i>
+            {{ t('load_more') }}
+          </button>
+        </div>
+        }
+
+        @if (loadingMore) {
+        <div class="flex justify-center mt-8">
+          <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:w-16 [&>svg]:h-16"></div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Ingredients Section -->
+  @if (activeSearchTab === 'ingredients') {
+  <div class="w-full">
+
+    @if (!ingredientLoading) {
+    <div class="flex items-center mb-6 justify-between">
+      <div class="flex items-center gap-4">
+        <h2 class="text-xl font-bold" style="color: var(--primary-700);">
+          {{ totalIngredients }} {{ t('ingredients_found') }}
+        </h2>
+      </div>
+      <div class="min-w-fit flex rounded-xl overflow-hidden" style="background: var(--primary-300-40);">
+        <button (click)="toggleIngredientViewMode('grid')" class="p-2 transition-all view-toggle"
+          [class.active]="ingredientViewMode === 'grid'"
+          [style.background]="ingredientViewMode === 'grid' ? 'var(--primary-500)' : 'transparent'"
+          [style.color]="ingredientViewMode === 'grid' ? 'white' : 'var(--primary-700)'">
+          <i class="ti ti-grid-3x3"></i>
+        </button>
+        <button (click)="toggleIngredientViewMode('list')" class="p-2 transition-all view-toggle"
+          [class.active]="ingredientViewMode === 'list'"
+          [style.background]="ingredientViewMode === 'list' ? 'var(--primary-500)' : 'transparent'"
+          [style.color]="ingredientViewMode === 'list' ? 'white' : 'var(--primary-700)'">
+          <i class="ti ti-list"></i>
+        </button>
+      </div>
+    </div>
+    }
+
+    @if (ingredientLoading) {
+    <div class="flex items-center justify-center py-16">
+      <div class="flex flex-col items-center gap-4">
+        <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:h-7"></div>
+        <p class="text-lg font-semibold" style="color: var(--primary-700);">{{ t('loading_ingredients') }}...</p>
+      </div>
+    </div>
+    }
+
+    @if (!ingredientLoading) {
+    <div
+      [class]="ingredientViewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'">
+      @for (ingredient of ingredientResults; track ingredient.id) {
+      @if (ingredientViewMode === 'grid') {
+      <div class="ingredient-card glass-strong rounded-2xl overflow-hidden transition-all hover:scale-[1.02]">
+        <div class="ingredient-image relative h-48">
+
+          <img [src]="ingredient.image || ingredient.imageString || 'assets/img/ingredient.png'" [alt]="ingredient.food"
+            class="w-full h-full object-cover">
+          <div class="ingredient-icon">
+            <i class="ti {{ingredient.icon}}" style="color: var(--primary-700);"></i>
+          </div>
+        </div>
+        <div class="ingredient-content p-4">
+          <div class="ingredient-header mb-3">
+            <h3 class="ingredient-name" style="color: var(--primary-700);">{{ ingredient.food }}</h3>
+            <span class="ingredient-category">{{ ingredient.category }}</span>
+          </div>
+          @if (isAuthenticated) {
+          <button class="add-more-btn min-h-12" (click)="addToPantry(ingredient)"
+            [disabled]="!isAuthenticated && hasIngredient(ingredient)">
+            @if (!hasIngredient(ingredient)) {
+            <i class="ti ti-plus"></i>{{ t('add_to_my_pantry') }}
+            } @else {
+            <i class="ti ti-check"></i>{{ t('in_pantry') }}
+            }
+          </button>
+          }
+        </div>
+      </div>
+      } @else {
+      <div
+        class="flex items-center justify-between p-4 gap-8 rounded-2xl glass-strong !bg-[var(--primary-200-40)] transition-all hover:scale-[1.01] hover:translate-x-4"
+        [class.flex-col]="responsive">
+        <div class="flex items-center gap-4">
+          <div class="relative w-20 h-20 rounded-xl overflow-hidden min-w-fit">
+            <img [src]="ingredient.image || ingredient.imageString || 'assets/img/ingredient.png'"
+              [alt]="ingredient.food" class="w-full h-full object-cover aspect-square min-w-min">
+            <div
+              class="absolute top-1 right-1 w-8 h-8 rounded-full flex items-center justify-center border-2 border-[var(--primary-200)]"
+              style="background: var(--primary-200-40);">
+              <i class="ti {{ingredient.icon}} text-sm" style="color: var(--primary-700);"></i>
+            </div>
+          </div>
+          <div>
+            <h3 class="font-semibold text-lg" style="color: var(--primary-700);">{{ ingredient.food }}</h3>
+            <span class="text-sm" style="color: var(--primary-500);">{{ ingredient.category }}</span>
+          </div>
+        </div>
+        @if (isAuthenticated) {
+        <button class="add-more-btn max-w-max" (click)="addToPantry(ingredient)"
+          [disabled]="!isAuthenticated && hasIngredient(ingredient)">
+          @if (!hasIngredient(ingredient)) {
+          <i class="ti ti-plus"></i>{{ t('add_to_my_pantry') }}
+          } @else {
+          <i class="ti ti-check"></i>{{ t('in_pantry') }}
+          }
+        </button>
+        }
+      </div>
+      }
+      }
+    </div>
+
+    @if (ingredientSearchHasMore) {
+    <div class="flex justify-center mt-8">
+      <button
+        class="px-8 py-4 rounded-2xl w-full max-w-md h-12 font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2"
+        style="background: var(--gradient-primary); color: white;" (click)="loadMoreIngredientResults()"
+        [disabled]="ingredientSearchLoading">
+        @if (ingredientSearchLoading) {
+        <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:h-5"></div>
+        {{ t('loading') }}...
+        } @else {
+        <i class="ti ti-refresh"></i>
+        {{ t('load_more_ingredients') }}
+        }
+      </button>
+    </div>
+    }
+    }
+
+    @if (!ingredientLoading && ingredientResults.length === 0) {
+    <div class="flex flex-col items-center justify-center gap-4 py-16">
+      <div class="w-24 h-24 rounded-full flex items-center justify-center" style="background: var(--primary-100);">
+        <i class="ti ti-basket-off text-5xl" style="color: var(--primary-400);"></i>
+      </div>
+      <p class="text-lg flex flex-col items-center" style="color: var(--primary-500);">
+        @if (ingredientSearchQuery) {
+      <h3 class="text-xl font-bold mb-2" style="color: var(--primary-700);">{{ t('no_ingredients_found') }}
+        "{{searchQuery}}"</h3>
+      <p class="text-sm" style="color: var(--primary-600);">{{ t('try_adjusting_your_filters') }}</p>
+      } @else {
+      {{ t('no_ingredients_available') }}
+      }
+      </p>
+    </div>
+    }
+
+  </div>
+  }
+
+  @if (activeSearchTab === 'collections') {
+  <div class="w-full">
+
+    <div class="filterOptions flex items-center justify-between mb-8">
+      <div class="flex items-center gap-4">
+        <h2 class="text-xl font-bold" style="color: var(--primary-700);">
+          {{ collections.length }} {{ t('collections_found') }}
+        </h2>
+      </div>
+
+      <div class="flex items-center gap-4">
+
+        <div class="relative sort-dropdown-container">
+          <button (click)="toggleCollectionSortDropdown()"
+            class="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all hover:scale-105"
+            style="background: var(--primary-300-40); color: var(--primary-700);">
+            {{ getCurrentCollectionSortLabel() }}
+            <i class="ti ti-caret-down-filled transition-transform" [class.rotate-180]="showCollectionSortDropdown"></i>
+          </button>
+
+          @if (showCollectionSortDropdown) {
+          <div class="absolute right-0 top-full mt-2 w-56 rounded-2xl shadow-lg z-50 overflow-hidden"
+            style="background: var(--primary-100);">
+            @for (option of collectionSortOptions; track option.value) {
+            <button (click)="changeCollectionSortOrder(option.value)"
+              class="w-full px-4 py-3 text-left text-sm font-medium transition-all hover:scale-[1.02] flex items-center gap-3"
+              [class.selected]="collectionSortBy === option.value"
+              [style.background]="collectionSortBy === option.value ? 'var(--primary-500)' : 'transparent'"
+              [style.color]="collectionSortBy === option.value ? 'white' : 'var(--primary-700)'">
+              <i class="ti {{ option.icon }} text-lg"></i>
+              {{ t(option.label) }}
+              @if (collectionSortBy === option.value) {
+              <i class="ti ti-check ml-auto"></i>
+              }
+            </button>
+            }
+          </div>
+          }
+        </div>
+
+        <div class="flex rounded-xl overflow-hidden" style="background: var(--primary-300-40);">
+          <button (click)="toggleCollectionViewMode('grid')" class="p-2 transition-all view-toggle"
+            [class.active]="collectionViewMode === 'grid'"
+            [style.background]="collectionViewMode === 'grid' ? 'var(--primary-500)' : 'transparent'"
+            [style.color]="collectionViewMode === 'grid' ? 'white' : 'var(--primary-700)'">
+            <i class="ti ti-grid-3x3"></i>
+          </button>
+          <button (click)="toggleCollectionViewMode('list')" class="p-2 transition-all view-toggle"
+            [class.active]="collectionViewMode === 'list'"
+            [style.background]="collectionViewMode === 'list' ? 'var(--primary-500)' : 'transparent'"
+            [style.color]="collectionViewMode === 'list' ? 'white' : 'var(--primary-700)'">
+            <i class="ti ti-list"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    @if (collectionLoading) {
+    <div class="flex flex-col items-center justify-center py-20">
+      <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:w-20 [&>svg]:h-20 [&>svg]:mb-4"></div>
+      <p class="text-lg font-medium" style="color: var(--primary-600);">{{ t('loading_collections') }}...</p>
+    </div>
+    } @else if (!collections || collections.length === 0) {
+    <div class="flex flex-col items-center justify-center py-20">
+      <div class="w-24 h-24 rounded-full flex items-center justify-center mb-4" style="background: var(--primary-100);">
+        <i class="ti ti-notes-off text-5xl" style="color: var(--primary-400);"></i>
+      </div>
+      <h3 class="text-xl font-bold mb-2" style="color: var(--primary-700);">{{ t('no_collections_found') }}
+        "{{searchQuery}}"</h3>
+      <p class="text-sm" style="color: var(--primary-600);">{{ t('try_adjusting_your_filters') }}</p>
+    </div>
+    } @else {
+    @if (collectionViewMode === 'grid') {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (col of collections; track col.id) {
+      <div
+        class="collection-card glass rounded-2xl overflow-hidden p-4 cursor-pointer shadow-sm hover:translate-y-[-0.5rem] transition-all"
+        (click)="openViewCollectionModal(col)">
+        <div class="flex flex-col h-full">
+          <div class="w-full h-40 overflow-hidden rounded-lg mb-4 bg-gray-100 flex items-center justify-center">
+            @if (col.recipes && col.recipes.length > 0 && col.recipes[0].imageString) {
+            <img src="{{ 'data:image/jpeg;base64,' + col.recipes[0].imageString }}" alt="{{ col.title }}"
+              class="w-full h-full object-cover">
+            } @else {
+            <div class="w-full h-full flex items-center justify-center text-3xl text-gray-400">
+              <i class="ti ti-photo"></i>
+            </div>
+            }
+          </div>
+          <div class="flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-primary line-clamp-2">{{ col.title }}</h3>
+              <p class="text-sm text-secondary mt-1">{{ t('by') }} <span
+                  class="font-medium cursor-pointer hover:underline" style="color: var(--primary-600);"
+                  (click)="navigateToUser(col.author, $event)">{{ col.author }}</span>
+              </p>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+              <div class="text-sm text-secondary">
+                <i class="ti ti-chef-hat mr-1"></i>
+                {{ col.recipeCount || (col.recipes ? col.recipes.length : 0) }} {{ t('recipes') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    } @else if (collectionViewMode === 'list') {
+    <div class="flex flex-col gap-4">
+      @for (col of collections; track col.id) {
+      <div
+        class="collection-list-item glass rounded-xl p-4 flex items-center gap-6 cursor-pointer shadow-sm hover:translate-x-4 transition-all"
+        (click)="openViewCollectionModal(col)">
+        <div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+          @if (col.recipes && col.recipes.length > 0 && col.recipes[0].imageString) {
+          <img src="{{ 'data:image/jpeg;base64,' + col.recipes[0].imageString }}" alt="{{ col.title }}"
+            class="w-full h-full object-cover">
+          } @else {
+          <div class="w-full h-full flex items-center justify-center text-3xl text-gray-400">
+            <i class="ti ti-photo"></i>
+          </div>
+          }
+        </div>
+        <div class="flex-1 flex flex-col justify-between">
+          <div class="flex items-center gap-2" [class.flex-col]="responsive">
+            <h3 class="text-lg font-bold text-primary line-clamp-2">{{ col.title }}</h3>
+            <span class="ml-2 px-2 py-1 rounded bg-primary-100 text-primary-700 text-xs font-semibold">{{
+              col.recipeCount || (col.recipes ? col.recipes.length : 0) }} {{ t('recipes') }}</span>
+          </div>
+          <p class="text-sm text-secondary mt-1">{{ t('by') }} <span class="font-semibold">{{ col.author }}</span></p>
+        </div>
+      </div>
+      }
+    </div>
+    }
+    @if (hasMoreCollections && !loadingMoreCollections) {
+    <div class="flex justify-center mt-8">
+      <button (click)="loadMoreCollections()"
+        class="px-8 py-3 rounded-xl font-semibold transition-all hover:scale-105 flex items-center gap-2"
+        style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        <i class="ti ti-refresh"></i>
+        {{ t('load_more') }}
+      </button>
+    </div>
+    }
+
+    }
+
+  </div>
+  }
+
+  @if (activeSearchTab === 'users') {
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
+
+    <!-- User Filters Sidebar -->
+    <div class="lg:col-span-1">
+      <div class="flex flex-col gap-6 rounded-3xl border border-solid px-6 py-8 shadow-sm glass sticky top-8"
+        style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+            <i class="ti ti-adjustments mr-2"></i>
+            {{ t('user_filters') }}
+          </h3>
+          <div class="flex items-center gap-2" [class.flex-col]="!responsive">
+            <button (click)="toggleUserFilters()" class="p-2 rounded-full transition-all hover:bg-opacity-50"
+              [style.background]="'var(--primary-200-40)'" [style.color]="'var(--primary-700)'"
+              [title]="isUserFiltersExpanded ? t('collapse') : t('expand')">
+              <i class="ti transition-transform duration-300" [class.ti-chevron-up]="isUserFiltersExpanded"
+                [class.ti-chevron-down]="!isUserFiltersExpanded"></i>
+            </button>
+            <button (click)="clearUserFilters()" class="text-sm font-medium transition-all hover:scale-105"
+              style="color: var(--primary-500);">
+              {{ t('clear') }}
+            </button>
+          </div>
+        </div>
+
+        <div class="userFilters flex flex-col gap-6 overflow-hidden transition-all duration-300 ease-in-out"
+          [style.max-height]="isUserFiltersExpanded ? '1000px' : '0px'"
+          [style.opacity]="isUserFiltersExpanded ? '1' : '0'">
+          <div class="space-y-3">
+            <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('published_recipes') }}</h4>
+            <div class="space-y-4">
+              <div>
+                <input type="range" min="0" max="50" [(ngModel)]="userFilters.minRecipes"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                  style="background: var(--primary-100); accent-color: var(--primary-500);">
+                <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
+                  <span>0</span>
+                  <span class="font-semibold" style="color: var(--primary-700);">{{ userFilters.minRecipes }}
+                    +</span>
+                  <span>50+</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews Count Range -->
+          <div class="space-y-3">
+            <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('reviews_written') }}</h4>
+            <div class="space-y-4">
+              <div>
+                <input type="range" min="0" max="100" [(ngModel)]="userFilters.minReviews"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                  style="background: var(--primary-100); accent-color: var(--primary-500);">
+                <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
+                  <span>0</span>
+                  <span class="font-semibold" style="color: var(--primary-700);">{{ userFilters.minReviews }}
+                    +</span>
+                  <span>100+</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Collections Count Range -->
+          <div class="space-y-3">
+            <h4 class="font-semibold" style="color: var(--primary-700);">{{ t('collections_created') }}</h4>
+            <div class="space-y-4">
+              <div>
+                <input type="range" min="0" max="50" [(ngModel)]="userFilters.minCollections"
+                  class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                  style="background: var(--primary-100); accent-color: var(--primary-500);">
+                <div class="flex justify-between text-sm mt-1" style="color: var(--primary-400);">
+                  <span>0</span>
+                  <span class="font-semibold" style="color: var(--primary-700);">{{ userFilters.minCollections }}
+                    +</span>
+                  <span>50+</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <button (click)="applyUserFilters()"
+              class="w-full py-3 rounded-xl font-semibold transition-all hover:scale-105"
+              style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+              <i class="ti ti-filter-check mr-2"></i>
+              {{ t('apply_filters') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Results -->
+    <div class="lg:col-span-3">
+      <div class="flex flex-col gap-6">
+
+        <!-- Results Header -->
+        <div class="filterOptions flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <h2 class="text-xl font-bold" style="color: var(--primary-700);">
+              {{ totalUsers }} {{ t('users_found') }}
+            </h2>
+          </div>
+
+          <div class="flex items-center gap-4">
+
+            <div class="relative sort-dropdown-container">
+              <button (click)="toggleUserSortDropdown()"
+                class="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all hover:scale-105"
+                style="background: var(--primary-300-40); color: var(--primary-700);">
+                {{ getCurrentUserSortLabel() }}
+                <i class="ti ti-caret-down-filled transition-transform" [class.rotate-180]="showUserSortDropdown"></i>
+              </button>
+
+              @if (showUserSortDropdown) {
+              <div class="absolute right-0 top-full mt-2 w-56 rounded-2xl shadow-lg z-50 overflow-hidden"
+                style="background: var(--primary-100);">
+                @for (option of userSortOptions; track option.value) {
+                <button (click)="changeUserSortOrder(option.value)"
+                  class="w-full px-4 py-3 text-left text-sm font-medium transition-all hover:scale-[1.02] flex items-center gap-3"
+                  [class.selected]="userFilters.sortBy === option.value"
+                  [style.background]="userFilters.sortBy === option.value ? 'var(--primary-500)' : 'transparent'"
+                  [style.color]="userFilters.sortBy === option.value ? 'white' : 'var(--primary-700)'">
+                  <i class="ti {{ option.icon }} text-lg"></i>
+                  {{ t(option.label) }}
+                  @if (userFilters.sortBy === option.value) {
+                  <i class="ti ti-check ml-auto"></i>
+                  }
+                </button>
+                }
+              </div>
+              }
+            </div>
+
+            <div class="flex rounded-xl overflow-hidden" style="background: var(--primary-300-40);">
+              <button (click)="toggleUserViewMode('grid')" class="p-2 transition-all view-toggle"
+                [class.active]="userViewMode === 'grid'"
+                [style.background]="userViewMode === 'grid' ? 'var(--primary-500)' : 'transparent'"
+                [style.color]="userViewMode === 'grid' ? 'white' : 'var(--primary-700)'">
+                <i class="ti ti-grid-3x3"></i>
+              </button>
+              <button (click)="toggleUserViewMode('list')" class="p-2 transition-all view-toggle"
+                [class.active]="userViewMode === 'list'"
+                [style.background]="userViewMode === 'list' ? 'var(--primary-500)' : 'transparent'"
+                [style.color]="userViewMode === 'list' ? 'white' : 'var(--primary-700)'">
+                <i class="ti ti-list"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Grid -->
+        <div
+          [class]="userViewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'">
+          @if (userLoading && userResults.length === 0) {
+          <div [class]="userViewMode === 'grid' ? 'col-span-1 md:col-span-2 lg:col-span-3' : ''"
+            class="flex flex-col items-center justify-center py-20">
+            <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:w-24 [&>svg]:h-24 [&>svg]:mb-4"></div>
+            <p class="text-lg font-medium" style="color: var(--primary-600);">{{ t('loading_users') }}...</p>
+          </div>
+          } @else if (!userResults || userResults.length === 0) {
+          <div [class]="userViewMode === 'grid' ? 'col-span-1 md:col-span-2 lg:col-span-3' : ''"
+            class="flex flex-col items-center justify-center py-20">
+            <div class="w-24 h-24 rounded-full flex items-center justify-center mb-4"
+              style="background: var(--primary-100);">
+              <i class="ti ti-user-off text-5xl" style="color: var(--primary-400);"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2" style="color: var(--primary-700);">{{ t('no_users_found') }}
+              "{{searchQuery}}"</h3>
+            <p class="text-sm" style="color: var(--primary-600);">{{ t('try_adjusting_your_filters') }}</p>
+          </div>
+          } @else {
+          @for (user of userResults; track user.username) {
+          @if (userViewMode === 'grid') {
+          <div class="glass rounded-3xl p-6 transition-all hover:shadow-lg hover:translate-y-[-0.5rem] cursor-pointer"
+            (click)="viewProfile(user.username)">
+            <div class="flex items-start gap-4 mb-4">
+              <div class="relative">
+                @if (user.profileImageString) {
+                <img [src]="'data:image/png;base64,' + user.profileImageString" [alt]="user.displayName"
+                  style="background: var(--primary-400); border-color: var(--primary-300)"
+                  class="w-16 h-16 rounded-full object-cover border-2">
+                } @else {
+                <div class="w-16 h-16 rounded-full flex items-center justify-center">
+                  <img src="assets/img/user.png" [alt]="user.displayName"
+                    class="w-16 h-16 rounded-full object-cover border-2"
+                    style="background: var(--primary-400); border-color: var(--primary-300)">
+                </div>
+                }
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <h3 class="font-bold text-lg truncate" style="color: var(--primary-700);">
+                  {{ user.displayName || user.username }}
+                </h3>
+                <p class="text-sm truncate" style="color: var(--primary-500);">
+                  &#64;{{ user.username }}
+                </p>
+              </div>
+            </div>
+
+            <p class="text-sm line-clamp-2 mb-4 min-h-5" style="color: var(--primary-600);">
+              {{ user?.bio }}
+            </p>
+
+            <div class="flex items-center justify-between pt-4 border-t" style="border-color: var(--primary-200);">
+              <div class="text-center">
+                <div class="font-bold text-lg" style="color: var(--primary-700);">
+                  {{ user.recipesCount || 0 }}
+                </div>
+                <div class="text-xs" style="color: var(--primary-500);">
+                  {{ t('recipes') }}
+                </div>
+              </div>
+              <div class="text-center">
+                <div class="font-bold text-lg" style="color: var(--primary-700);">
+                  {{ user.reviewsCount || 0 }}
+                </div>
+                <div class="text-xs" style="color: var(--primary-500);">
+                  {{ t('reviews') }}
+                </div>
+              </div>
+              <div class="text-center">
+                <div class="font-bold text-lg" style="color: var(--primary-700);">
+                  {{ user.collectionsCount || 0 }}
+                </div>
+                <div class="text-xs" style="color: var(--primary-500);">
+                  {{ t('collections') }}
+                </div>
+              </div>
+            </div>
+
+            <button (click)="viewProfile(user.username); $event.stopPropagation()"
+              class="w-full mt-4 py-2 rounded-xl font-semibold transition-all hover:scale-105"
+              style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+              <i class="ti ti-user mr-2"></i>
+              {{ t('view_user') }}
+            </button>
+          </div>
+          } @else {
+          <div
+            class="glass rounded-2xl p-4 transition-all hover:shadow-lg hover:translate-x-4 cursor-pointer flex items-center justify-between"
+            (click)="viewProfile(user.username)">
+            <div class="flex items-center gap-4 flex-1">
+              <div class="relative">
+                @if (user.profileImageString) {
+                <img [src]="'data:image/png;base64,' + user.profileImageString" [alt]="user.displayName"
+                  class="w-16 h-16 rounded-full object-cover border-2"
+                  style="background: var(--primary-400); border-color: var(--primary-300)">
+                } @else {
+                <div class="w-16 h-16 rounded-full flex items-center justify-center"
+                  style="background: var(--gradient-primary);">
+                  <span class="text-white text-2xl font-bold">
+                    {{ user.displayName ? user.displayName.charAt(0).toUpperCase() :
+                    user.username.charAt(0).toUpperCase() }}
+                  </span>
+                </div>
+                }
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <h3 class="font-bold text-lg truncate" style="color: var(--primary-700);">
+                  {{ user.displayName || user.username }}
+                </h3>
+                <p class="text-sm truncate" style="color: var(--primary-500);">
+                  &#64;{{ user.username }}
+                </p>
+                @if (user.bio && !responsive) {
+                <p class="text-sm line-clamp-1 mt-1" style="color: var(--primary-600);">
+                  {{ user.bio }}
+                </p>
+                }
+              </div>
+              @if (!responsive) {
+              <div class="flex items-center gap-6">
+                <div class="text-center">
+                  <div class="font-bold text-lg" style="color: var(--primary-700);">
+                    {{ user.recipesCount || 0 }}
+                  </div>
+                  <div class="text-xs" style="color: var(--primary-500);">
+                    {{ t('recipes') }}
+                  </div>
+                </div>
+                <div class="text-center">
+                  <div class="font-bold text-lg" style="color: var(--primary-700);">
+                    {{ user.reviewsCount || 0 }}
+                  </div>
+                  <div class="text-xs" style="color: var(--primary-500);">
+                    {{ t('reviews') }}
+                  </div>
+                </div>
+                <div class="text-center">
+                  <div class="font-bold text-lg" style="color: var(--primary-700);">
+                    {{ user.collectionsCount || 0 }}
+                  </div>
+                  <div class="text-xs" style="color: var(--primary-500);">
+                    {{ t('collections') }}
+                  </div>
+                </div>
+              </div>
+
+              <button (click)="viewProfile(user.username); $event.stopPropagation()"
+                class="px-6 py-2 rounded-xl font-semibold transition-all hover:scale-105 whitespace-nowrap"
+                style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <i class="ti ti-user mr-2"></i>
+                {{ t('view_user') }}
+              </button>
+              }
+            </div>
+          </div>
+          }
+        }
+      }
+        </div>
+
+        @if (hasMoreUsers && !loadingMoreUsers) {
+        <div class="flex justify-center mt-8">
+          <button (click)="loadMoreUsers()"
+            class="px-8 py-3 rounded-xl font-semibold transition-all hover:scale-105 flex items-center gap-2"
+            style="background: var(--gradient-primary); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <i class="ti ti-refresh"></i>
+            {{ t('load_more') }}
+          </button>
+        </div>
+        }
+
+        @if (loadingMoreUsers) {
+        <div class="flex justify-center mt-8">
+          <img src="assets/icons/Rarecips_Spinner.svg" alt="Loading" class="w-16 h-16">
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+  }
+
+
 </div>
+</div>
+</div>
+
+@if (showViewCollectionModal && viewingCollection) {
+@if (showViewCollectionModal && viewingCollection) {
+<app-collection-card [mode]="'view'" [collection]="viewingCollection" [showDialog]="showViewCollectionModal"
+  [isOwner]="viewingCollection.author === currentUsername" [collectionList]="collections" [collections]="collections"
+  (onClose)="closeViewCollectionModal()">
+</app-collection-card>
+}
+}
+
+@if (showAddToCollectionDialog && selectedRecipeId) {
+<app-collection-card [mode]="'add-dialog'" [recipeId]="selectedRecipeId" [showDialog]="showAddToCollectionDialog"
+  (onClose)="closeAddToCollection()" (onAdded)="onRecipeAddedToCollection()">
+</app-collection-card>
+}

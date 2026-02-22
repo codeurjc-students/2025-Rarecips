@@ -11,6 +11,9 @@ import java.util.List;
 
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.service.RecipeService;
+import com.blasetvrtumi.rarecips.service.ActivityService;
+import com.blasetvrtumi.rarecips.entity.Activity;
+import com.blasetvrtumi.rarecips.entity.ReviewStack;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,18 +23,22 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
+@RequestMapping("/api/v1")
 public class LandingController {
 
     @Autowired
     private RecipeService recipeService;
 
+    @Autowired
+    private ActivityService activityService;
+
     @Operation(summary = "Get newest recipes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found recipes", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class)) }),
-            @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content) })
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class))}),
+            @ApiResponse(responseCode = "404", description = "No recipes found", content = @Content)})
     @JsonView(Recipe.BasicInfo.class)
-    @GetMapping("/api/recipes")
+    @GetMapping("/recipes")
     public ResponseEntity<?> getNewestRecipes(@RequestParam String order, @RequestParam int size, @RequestParam int page) {
         String sortBy = "";
         if (order.equals("lastmod")) {
@@ -50,4 +57,29 @@ public class LandingController {
         }
     }
 
+    @Operation(summary = "Get latest activities")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found activities"),
+            @ApiResponse(responseCode = "404", description = "No activities found")
+    })
+    @GetMapping("/activities/latest")
+    public ResponseEntity<?> getLatestActivities(@RequestParam(defaultValue = "10") int limit) {
+        List<Activity> activities = activityService.getLatestActivities(limit);
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("activities", activities);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get latest reviews")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found reviews"),
+            @ApiResponse(responseCode = "404", description = "No reviews found")
+    })
+    @GetMapping("/activities/latest-reviews")
+    public ResponseEntity<?> getLatestReviews(@RequestParam(defaultValue = "10") int limit) {
+        List<ReviewStack> reviews = activityService.getLatestReviews(limit);
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("reviews", reviews);
+        return ResponseEntity.ok(response);
+    }
 }

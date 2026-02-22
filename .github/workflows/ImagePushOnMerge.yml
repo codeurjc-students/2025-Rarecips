@@ -1,0 +1,31 @@
+name: Docker image creation and push to Dockerhub on merge to main branch
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+
+  create-push:
+    name: Docker Image Build and Push (merge main)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Run create_image script for merge to main
+        working-directory: ./docker
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          TERM: xterm
+        run: |
+          chmod +x ./create_image.sh
+          ./create_image.sh

@@ -1,0 +1,34 @@
+# In project root:
+# docker pull blasetvrtumi/rarecips
+# cd docker
+# docker-compose -p rarecips up --build
+
+services:
+
+  rarecips-app:
+
+    container_name: rarecips-app
+    image: blasetvrtumi/rarecips:0.1
+    ports:
+      - "8443:8443"
+    depends_on:
+      - rarecips-DB
+    command: [ "/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 -- && java -jar /app/rarecips-0.1-SNAPSHOT.jar" ]
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-DB:3306/rarecips
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+
+  rarecips-DB:
+    container_name: rarecips-DB
+    image: mysql:9.0.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: rarecips
+    volumes:
+      - /var/lib/mysql
+
+volumes:
+  mysql:

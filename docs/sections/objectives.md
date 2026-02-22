@@ -1,6 +1,7 @@
 # 🎯 Objectives
 
 ## Functional Objectives
+
 The platform provides users full control over the content they're allowed to see, upload and modify.
 
 - User registration and authentication
@@ -14,10 +15,13 @@ The platform provides users full control over the content they're allowed to see
 - Recipe sharing through media and format enriched text powered uploading
 - Recipe reviewing and rating
 - Recipe saving and bookmarking
-- Health report feedbacking: Registered users can check health statistics based off their liked recipes simulating a consumption analysis
+- Health report feedbacking: Registered users can check health statistics based off their liked recipes simulating a
+  consumption analysis
 
 ## Technical Objectives
-Modern, scalable, maintainable and continous-deployment supported architecture using the newest technologies and best practices.
+
+Modern, scalable, maintainable and continous-deployment supported architecture using the newest technologies and best
+practices.
 
 - Frontend: Angular + Tailwind CSS
 - Backend: Spring Boot (Java)

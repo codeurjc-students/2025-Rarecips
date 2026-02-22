@@ -1,153 +1,778 @@
-import { Component, HostListener, OnInit, Host, NgModule } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import {Component, HostListener, OnInit} from '@angular/core';
+import {NavigationEnd, Router, RouterModule, RoutesRecognized} from '@angular/router';
+import {Subject, takeUntil, forkJoin, debounceTime, switchMap, of, filter} from 'rxjs';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
+import {SessionService} from '../../services/session.service';
+import {RecipeService} from '../../services/recipe.service';
+import {IngredientService} from '../../services/ingredient.service';
+import {RecipeCollectionService} from '../../services/recipe-collection.service';
+import {UserService} from '../../services/user.service';
+import {CollectionCardComponent} from '../shared/collection-card/collection-card.component';
+import {TranslatorService} from '../../services/translator.service';
+import {ThemeService} from '../../services/theme.service';
 
 @Component({
-    selector: 'app-navbar',
-    templateUrl: './navbar.component.html',
-    standalone: true,
-    styleUrls: ['./navbar.component.css']
+  selector: 'app-navbar',
+  templateUrl: './navbar.component.html',
+  standalone: true,
+  imports: [RouterModule, CommonModule, CollectionCardComponent],
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
+  quickSearchActive = false;
+  quickSearchQuery = '';
+  quickSearchLoading = false;
+  quickSearchResults: {
+    recipes: any[],
+    ingredients: any[],
+    collections: any[],
+    users: any[]
+  } = {recipes: [], ingredients: [], collections: [], users: []};
+  quickSearchError = '';
+  quickSearchDebounce$ = new Subject<string>();
 
-    themes = [
-        "tangerine-light",
-        "tangerine-dark",
-        "ocean-light",
-        "ocean-dark",
-        "forest-light",
-        "forest-dark",
-        "rose-light",
-        "rose-dark",
-        "neutral-light",
-        "neutral-dark"
-    ];
+  themes: { theme: string; icon: string; }[] = [];
 
-    logoSrc = "assets/logo/Rarecips_Isotipo.svg";
+  bowlIcon: string = "assets/icons/bowl-spoon.svg";
 
-    currentLanguage = 'es';
-    isAuthenticated = false;
-    isAdmin = false;
+  currentLanguage = localStorage.getItem('lang') || 'es';
+  currentLanguageText = 'Language';
+  isAuthenticated = false;
+  isAdmin = false;
+  user: any = null;
+  isLogoClicked: boolean = false;
+  anyActiveSections: boolean = false;
+  responsive: boolean = window.innerWidth <= 1366;
+  navExpanded: boolean = false;
+  isDragging: boolean = false;
+  isHandlePressed: boolean = false;
+  startX: number = 0;
+  startTime: number = 0;
+  currentWidth: number = 0;
+  collapsedWidth: number = 0;
+  expandedWidth: number = 240;
 
-    constructor(private router: Router) {
+  showCollectionView = false;
+  selectedCollection: any = undefined;
+  navItem: string = '';
+
+  langDropdownOpen = false;
+  rotateLang: boolean = false;
+  selectedTheme: string = localStorage.getItem("selectedTheme") || "tangerine-light";
+  selectedThemeInd: number = 1;
+
+  logos: Map<string, string> = new Map();
+
+  constructor(
+    private router: Router,
+    private themeService: ThemeService,
+    private sessionService: SessionService,
+    private recipeService: RecipeService,
+    private ingredientService: IngredientService,
+    private collectionService: RecipeCollectionService,
+    private userService: UserService,
+    public translator: TranslatorService
+  ) {
+  }
+
+  t(key: string): string {
+    return this.translator.translate(key);
+  }
+
+  ngOnInit(): void {
+
+    this.logos = this.themeService.getLogos();
+
+    document.addEventListener("DOMContentLoaded", () => {
+      this.themeService.changeTheme(this.selectedTheme);
+    })
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd || event instanceof RoutesRecognized)
+    ).subscribe((event) => {
+      if (event.url.length < 2) {
+        this.navItem = '';
+      } else if (event.url.includes('/admin-panel')) {
+        this.navItem = 'admin-panel';
+      } else if (event.url.includes('/explore')) {
+        this.navItem = 'explore';
+      } else if (event.url.includes('/ingredients')) {
+        this.navItem = 'ingredients';
+      } else if (event.url.includes('/health')) {
+        this.navItem = 'health';
+      } else {
+        this.navItem = undefined as any;
+      }
+
+      let navbar = document.getElementById('navbar') as HTMLElement;
+      this.anyActiveSections = !!navbar.querySelector('.nav-item.active');
+    });
+
+    switch (this.currentLanguage) {
+      case 'en':
+        this.currentLanguageText = 'English';
+        break;
+      case 'es':
+        this.currentLanguageText = 'Español';
+        break;
+      case 'fr':
+        this.currentLanguageText = 'Français';
+        break;
+      case 'ja':
+        this.currentLanguageText = '日本語';
+        break;
+      case 'zh':
+        this.currentLanguageText = '中文';
+        break;
+      default:
+        this.currentLanguageText = 'Language';
+        break;
     }
 
-    ngOnInit(): void {
-        const body = document.querySelector('body');
-        const navbar = document.getElementById('navbar');
-        const selectedTheme = localStorage.getItem('selectedTheme') || "theme-tangerine-light";
-        body?.classList.add(selectedTheme);
-        navbar?.classList.add(selectedTheme);
-    }
+    this.themes = this.themeService.getThemes();
 
-    logoClicked(event: Event): void {
-        event.preventDefault(); // Prevent default anchor behavior
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth' // Smooth scroll to top
-        });
-        // Logo change
-        this.logoSrc = "assets/logo/Rarecips_Stir.svg";
-        setTimeout(() => {
-            this.logoSrc = "assets/logo/Rarecips_Isotipo.svg"; // Reset after 1 second
-        }, 1000);
-    }
 
-    openSearchDialog(): void {
-        const dialogOverlay = document.getElementById('dialogOverlay');
-        if (dialogOverlay) {
-            dialogOverlay.classList.add('open');
+    this.quickSearchDebounce$
+      .pipe(
+        debounceTime(200),
+        switchMap((query) => {
+          if (!query || query.trim().length === 0) {
+            this.quickSearchResults = {recipes: [], ingredients: [], collections: [], users: []};
+            return of(null);
+          }
+          this.quickSearchLoading = true;
+          return forkJoin({
+            recipes: this.recipeService.getFilteredRecipes({query}, 0, 3).pipe(
+              switchMap(res => of(res.recipes?.slice(0, 3) || []))
+            ),
+            ingredients: this.ingredientService.getPagedIngredients(0, 3).pipe(
+              switchMap(res => {
+                if (!query) return of(res.content.slice(0, 3));
+                return of(res.content.filter(i => i.food.toLowerCase().includes(query.toLowerCase())).slice(0, 3));
+              })
+            ),
+            collections: this.collectionService.getPopularPublicCollections(10).pipe(
+              switchMap(res => {
+                if (!query) return of(res.slice(0, 3));
+                return of(res.filter(c => c.title.toLowerCase().includes(query.toLowerCase())).slice(0, 3));
+              })
+            ),
+            users: this.userService.searchUsers(query, 0, 3).pipe(
+              switchMap(res => of((res.users || res.content || []).slice(0, 3)))
+            )
+          });
+        })
+      )
+      .subscribe({
+        next: (results: any) => {
+          if (!results) return;
+          this.quickSearchResults = results;
+          this.quickSearchLoading = false;
+        },
+        error: (err) => {
+          this.quickSearchError = 'Error loading quick search results.';
+          this.quickSearchLoading = false;
         }
-    }
+      });
 
-    currentValue: string = '';
-    selectedText: string = 'Select an option';
-
-    selectItem(event: Event): void {
-        const dropdown = document.getElementById('dropdownMenu');
-        const item = (event.target as HTMLButtonElement).closest('.dropdown-item');
-
-        if (item) {
-            localStorage.setItem('selectedTheme', item.id);
-
-            dropdown?.querySelectorAll('.dropdown-item').forEach(el => {
-                el.classList.remove("selected");
-            });
-            item?.classList.add("selected");
-            const body = document.querySelector('body');
-            const navbar = document.getElementById('navbar');
-            this.themes.forEach(theme => {
-                theme = "theme-" + theme;
-                if (theme === item?.id) return;
-                body?.classList.remove(theme);
-                navbar?.classList.remove(theme);
-            });
-            body?.classList.add(item?.id + "");
-            navbar?.classList.add(item?.id + "");
+    this.sessionService.getLoggedUser().pipe(
+      takeUntil(new Subject<void>())
+    ).subscribe({
+      next: user => {
+        if (!user) {
+          this.isAuthenticated = false;
+          this.isAdmin = false;
+          return;
         }
+        this.isAuthenticated = true;
+        this.user = user;
+        this.isAdmin = user.role === 'ADMIN';
+      },
+      error: () => {
+        this.isAuthenticated = false;
+        this.isAdmin = false;
+      }
+    });
+
+    this.sessionService.session$.subscribe(user => {
+      this.isAuthenticated = !!user;
+      this.user = user;
+      this.isAdmin = !!user && user.role === 'ADMIN';
+    });
+
+    const selectedLangText = document.getElementById('selectedLangText');
+    if (selectedLangText) {
+      switch (this.currentLanguage) {
+        case 'en':
+          selectedLangText.textContent = 'English';
+          break;
+        case 'es':
+          selectedLangText.textContent = 'Español';
+          break;
+        case 'fr':
+          selectedLangText.textContent = 'Français';
+          break;
+        case 'ja':
+          selectedLangText.textContent = '日本語';
+          break;
+        case 'zh':
+          selectedLangText.textContent = '中文';
+          break;
+        default:
+          selectedLangText.textContent = 'Idioma';
+          break;
+      }
     }
 
-    navigateTo(route: string, event?: Event): void {
-        this.router.navigate([`/${route}`]);
-        let currentNavButton = (event?.target as HTMLElement).closest('.nav-item') as HTMLElement;
-        let navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach((item) => {
-            if (item.classList.contains('active')) {
-                item.classList.remove('active')
-                let label = item.children[0] as HTMLElement;
-                label.classList.forEach(c => {
-                    if (c.endsWith('-filled')) {
-                        label.classList.remove(c);
-                        label.classList.add(c.replace('-filled', ''));
-                    }
-                });
-            }
+    this.translator.loadTranslations(this.currentLanguage);
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'lang') {
+        this.currentLanguage = event.newValue || 'es';
+        this.translator.loadTranslations(this.currentLanguage);
+      }
+    });
+    this.translator.onChange(() => {
+      this.currentLanguage = this.translator.getLang();
+    });
+    this.themeService.onChange(() => {
+      this.selectedTheme = this.themeService.getCurrentTheme();
+      this.selectedThemeInd = this.themeService.getSelectedThemeIndex();
+    })
+  }
+
+  onNavHover(hover: boolean) {
+    if (this.responsive) {
+      return;
+    }
+  }
+
+  toggleNav() {
+    if (this.responsive) {
+      this.navExpanded = !this.navExpanded;
+    }
+  }
+
+  closeNav() {
+    if (this.responsive) {
+      this.navExpanded = false;
+    }
+  }
+
+  onNavTouchStart(event: TouchEvent) {
+    if (window.innerWidth > 1366) return;
+
+    const target = event.target as HTMLElement;
+    if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
+      return;
+    }
+
+    this.isDragging = true;
+    this.startX = event.touches[0].clientX;
+    this.collapsedWidth = 80;
+    this.currentWidth = this.navExpanded ? this.expandedWidth : this.collapsedWidth;
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+
+    if (navbar) {
+      navbar.classList.add('dragging');
+    }
+
+    if (handle) {
+      handle.classList.add('dragging');
+    }
+  }
+
+  onNavTouchMove(event: TouchEvent) {
+    if (window.innerWidth > 1366 || !this.isDragging) return;
+
+    const target = event.target as HTMLElement;
+    if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const currentX = event.touches[0].clientX;
+    const deltaX = currentX - this.startX;
+    let newWidth = this.currentWidth + deltaX;
+
+    newWidth = Math.max(this.collapsedWidth, Math.min(this.expandedWidth, newWidth));
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+    const backdrop = document.querySelector('.nav-drag-backdrop') as HTMLElement;
+
+    if (navbar) {
+      navbar.style.setProperty('width', `${newWidth}px`, 'important');
+      navbar.style.setProperty('max-width', `${newWidth}px`, 'important');
+    }
+
+    if (handle) {
+      handle.style.left = `${newWidth - 2}px`;
+      const progress = (newWidth - this.collapsedWidth) / (this.expandedWidth - this.collapsedWidth);
+      const icon = handle.querySelector('i');
+      if (icon) {
+        (icon as HTMLElement).style.transform = `rotate(${progress * 180}deg)`;
+      }
+    }
+
+    if (backdrop) {
+      const progress = (newWidth - this.collapsedWidth) / (this.expandedWidth - this.collapsedWidth);
+      backdrop.style.opacity = `${progress}`;
+    }
+
+    const midPoint = (this.collapsedWidth + this.expandedWidth) / 2;
+    if (newWidth > midPoint) {
+      navbar?.classList.add('expanded');
+    } else {
+      navbar?.classList.remove('expanded');
+    }
+  }
+
+  onNavTouchEnd(event: TouchEvent) {
+    if (window.innerWidth > 1366 || !this.isDragging) return;
+
+    const target = event.target as HTMLElement;
+    if (target.closest('.quick-search-dropdown') || target.closest('.quick-search-wrapper')) {
+      this.isDragging = false;
+      return;
+    }
+
+    const endX = event.changedTouches[0]?.clientX || this.startX;
+    const deltaX = endX - this.startX;
+    const finalWidth = this.currentWidth + deltaX;
+    const midPoint = (this.collapsedWidth + this.expandedWidth) / 2;
+    const shouldExpand = finalWidth > midPoint;
+
+    this.navExpanded = shouldExpand;
+    this.isDragging = false;
+    this.startX = 0;
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+    const backdrop = document.querySelector('.nav-drag-backdrop') as HTMLElement;
+
+    if (navbar != null) {
+      navbar.classList.remove('dragging');
+      navbar.style.width = '';
+      navbar.style.maxWidth = '';
+      if (shouldExpand) {
+        navbar.classList.add('expanded');
+      } else {
+        navbar.classList.remove('expanded');
+      }
+    }
+
+    if (handle) {
+      handle.classList.remove('dragging');
+      handle.style.left = '';
+      const icon = handle.querySelector('i');
+      if (icon) {
+        (icon as HTMLElement).style.transform = '';
+      }
+    }
+
+    if (backdrop) {
+      backdrop.style.opacity = '';
+    }
+  }
+
+  onHandleTouchStart(event: TouchEvent | MouseEvent) {
+    if (window.innerWidth > 1366) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.isDragging = false;
+    this.isHandlePressed = true;
+    this.startX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+    this.startTime = Date.now();
+    this.collapsedWidth = 80;
+    this.currentWidth = this.navExpanded ? this.expandedWidth : this.collapsedWidth;
+  }
+
+  onHandleTouchMove(event: TouchEvent | MouseEvent) {
+    if (window.innerWidth > 1366) return;
+
+    const currentX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+    let deltaX = currentX - this.startX;
+
+    if (Math.abs(deltaX) > 5 && !this.isDragging) {
+      this.isDragging = true;
+      this.startX = currentX;
+      deltaX = 0;
+      const navbar = document.getElementById('navbar');
+      const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+
+      if (navbar) {
+        navbar.classList.add('dragging');
+      }
+
+      if (handle) {
+        handle.classList.add('dragging');
+      }
+    }
+
+    if (!this.isDragging) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    let newWidth = this.currentWidth + deltaX;
+
+    newWidth = Math.max(this.collapsedWidth, Math.min(this.expandedWidth, newWidth));
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+    const backdrop = document.querySelector('.nav-drag-backdrop') as HTMLElement;
+
+    if (navbar) {
+      navbar.style.setProperty('width', `${newWidth}px`, 'important');
+      navbar.style.setProperty('max-width', `${newWidth}px`, 'important');
+    }
+
+    if (handle) {
+      handle.style.left = `${newWidth - 2}px`;
+      const progress = (newWidth - this.collapsedWidth) / (this.expandedWidth - this.collapsedWidth);
+      const icon = handle.querySelector('i');
+      if (icon) {
+        (icon as HTMLElement).style.transform = `rotate(${progress * 180}deg)`;
+      }
+    }
+
+    if (backdrop) {
+      const progress = (newWidth - this.collapsedWidth) / (this.expandedWidth - this.collapsedWidth);
+      backdrop.style.opacity = `${progress}`;
+    }
+
+    const midPoint = (this.collapsedWidth + this.expandedWidth) / 2;
+    if (newWidth > midPoint) {
+      navbar?.classList.add('expanded');
+    } else {
+      navbar?.classList.remove('expanded');
+    }
+  }
+
+  onHandleTouchEnd(event: TouchEvent | MouseEvent) {
+    if (window.innerWidth > 1366) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    const endX = 'changedTouches' in event ? event.changedTouches[0]?.clientX : event.clientX;
+    const deltaX = endX - this.startX;
+    const duration = Date.now() - this.startTime;
+
+    if (duration < 200 && Math.abs(deltaX) < 10) {
+      this.toggleNav();
+      this.isDragging = false;
+      this.isHandlePressed = false;
+      this.startX = 0;
+      return;
+    }
+
+    if (!this.isDragging) {
+      this.startX = 0;
+      this.isHandlePressed = false;
+      return;
+    }
+
+    const finalWidth = this.currentWidth + deltaX;
+    const midPoint = (this.collapsedWidth + this.expandedWidth) / 2;
+    const shouldExpand = finalWidth > midPoint;
+
+    this.navExpanded = shouldExpand;
+    this.isDragging = false;
+    this.isHandlePressed = false;
+    this.startX = 0;
+
+    const navbar = document.getElementById('navbar');
+    const handle = document.querySelector('.nav-drag-handle') as HTMLElement;
+    const backdrop = document.querySelector('.nav-drag-backdrop') as HTMLElement;
+
+    if (navbar) {
+      navbar.classList.remove('dragging');
+      navbar.style.width = '';
+      navbar.style.maxWidth = '';
+      if (shouldExpand) {
+        navbar.classList.add('expanded');
+      } else {
+        navbar.classList.remove('expanded');
+      }
+    }
+
+    if (handle) {
+      handle.classList.remove('dragging');
+      handle.style.left = '';
+      const icon = handle.querySelector('i');
+      if (icon) {
+        (icon as HTMLElement).style.transform = '';
+      }
+    }
+
+    if (backdrop) {
+      backdrop.style.opacity = '';
+    }
+  }
+
+  onQuickSearchFocus() {
+    this.quickSearchActive = true;
+    document.getElementsByTagName("html")[0].style.overflow = 'hidden';
+    setTimeout(() => {
+      const input = document.getElementById('quick-search-input');
+      input?.focus();
+    }, 0);
+  }
+
+  onQuickSearchBlur() {
+    setTimeout(() => {
+      this.quickSearchActive = false;
+      document.getElementsByTagName("html")[0].style.overflow = 'auto';
+    }, 200);
+  }
+
+  onQuickSearchInput(event: any) {
+    this.quickSearchQuery = (event?.target as HTMLInputElement)?.value || '';
+    this.quickSearchDebounce$.next(this.quickSearchQuery);
+  }
+
+  clearQuickSearch() {
+    this.quickSearchQuery = '';
+    this.quickSearchResults = {recipes: [], ingredients: [], collections: [], users: []};
+    this.quickSearchActive = false;
+    document.getElementsByTagName("html")[0].style.overflow = 'auto';
+  }
+
+  goToExplore() {
+    this.navigateTo('explore');
+    this.quickSearchActive = false;
+    this.quickSearchQuery = '';
+    document.getElementsByTagName("html")[0].style.overflow = 'auto';
+  }
+
+  showCollection(collection: any, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showCollectionView = true;
+    this.selectedCollection = collection;
+    this.quickSearchActive = false;
+    this.quickSearchQuery = '';
+    document.getElementsByTagName("html")[0].style.overflow = 'auto';
+  }
+
+  closeCollectionView(): void {
+    this.showCollectionView = false;
+    this.selectedCollection = undefined;
+  }
+
+
+  logoClicked(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    if (!this.isLogoClicked) {
+      document.getElementsByTagName("html")[0].style.overflow = 'auto';
+
+      this.quickSearchActive = false;
+      this.quickSearchQuery = '';
+      this.quickSearchResults = {recipes: [], ingredients: [], collections: [], users: []};
+
+      document.body.scrollTo({top: 0, behavior: 'smooth'});
+
+      this.isLogoClicked = true;
+      setTimeout(() => this.isLogoClicked = false, 800);
+    }
+  }
+
+  onHover(isHovering: boolean): void {
+    this.bowlIcon = isHovering ? "assets/icons/bowl-spoon-stir.svg" : "assets/icons/bowl-spoon-withdraw.svg";
+  }
+
+  selectItem(event: Event): void {
+    const item = (event.target as HTMLElement).closest('.dropdown-item');
+
+    if (item) {
+      this.themeService.changeTheme(item.id);
+      item?.classList.add("selected");
+    }
+  }
+
+  navigateTo(route: string, event?: Event, closeQuickSearch: boolean = true): void {
+    if (route === 'profile' && !this.isAuthenticated) {
+      route = 'login';
+    } else if (route === 'profile' && this.isAuthenticated) {
+      this.sessionService.getLoggedUser().pipe(takeUntil(new Subject<void>())).subscribe(user => {
+        this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
+          this.router.navigate(['/users', user.username]);
         });
-        currentNavButton.classList.add('active');
-        let label = currentNavButton.children[0] as HTMLElement;
+      });
+      return;
+    }
+
+    this.router.navigate(['/' + route]);
+
+    if (closeQuickSearch) {
+      this.quickSearchActive = false;
+      this.quickSearchQuery = '';
+      document.getElementsByTagName("html")[0].style.overflow = 'auto';
+    }
+    let currentNavButton = (event?.target as HTMLElement)?.closest('.nav-item') as HTMLElement;
+    let navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach((item) => {
+      if (item.classList.contains('active')) {
+        item.classList.remove('active')
+        let label = item.children[0] as HTMLElement;
         label.classList.forEach(c => {
-            if (c.startsWith('ti-') && !c.endsWith('-filled')) {
-                label.classList.remove(c);
-                label.classList.add(c + '-filled');
-            }
+          if (c.endsWith('-filled')) {
+            label.classList.remove(c);
+            label.classList.add(c.replace('-filled', ''));
+          }
         });
-    }
+      }
+    });
 
-    selectLanguage(event: Event): void {
-        const item = (event.target as HTMLButtonElement).closest('.dropdown-item');
-        if (item) {
-            const lang = item.getAttribute('data-lang');
-            this.currentLanguage = lang || 'es';
-            localStorage.setItem('selectedLanguage', this.currentLanguage);
-            console.log('Language changed to:', this.currentLanguage);
+    if (!currentNavButton) return;
+    currentNavButton.classList.add('active');
+    let label = currentNavButton.children[0] as HTMLElement;
+    label.classList.forEach(c => {
+      if (c.startsWith('ti-') && !c.endsWith('-filled')) {
+        label.classList.remove(c);
+        label.classList.add(c + '-filled');
+      }
+    });
+  }
+
+  closeLangDropdown() {
+    this.langDropdownOpen = false;
+    const checkbox = document.getElementById('dropdownLangCheckbox') as HTMLInputElement;
+    if (checkbox) checkbox.checked = false;
+    const menu = document.getElementById('dropdownLangMenu');
+    if (menu) menu.classList.remove('open');
+  }
+
+  toggleLangDropdown() {
+    this.langDropdownOpen = !this.langDropdownOpen;
+    const checkbox = document.getElementById('dropdownLangCheckbox') as HTMLInputElement;
+    if (checkbox) {
+      checkbox.checked = this.langDropdownOpen;
+      this.rotateLang = true;
+    }
+    const menu = document.getElementById('dropdownLangMenu');
+    if (menu) menu.classList.toggle('open', this.langDropdownOpen);
+  }
+
+  selectLanguage(event: Event): void {
+    const item = (event.target as HTMLButtonElement).closest('.dropdown-item');
+    if (item) {
+      const lang = item.getAttribute('data-lang');
+      this.currentLanguage = lang || 'es';
+      localStorage.setItem('lang', this.currentLanguage);
+      this.translator.setLang(this.currentLanguage);
+      const selectedLangText = document.getElementById('selectedLangText');
+      if (selectedLangText) {
+        switch (this.currentLanguage) {
+          case 'en':
+            selectedLangText.textContent = 'English';
+            break;
+          case 'es':
+            selectedLangText.textContent = 'Español';
+            break;
+          case 'fr':
+            selectedLangText.textContent = 'Français';
+            break;
+          case 'ja':
+            selectedLangText.textContent = '日本語';
+            break;
+          case 'zh':
+            selectedLangText.textContent = '中文';
+            break;
+          default:
+            selectedLangText.textContent = 'Idioma';
+            break;
         }
+      }
+      this.closeLangDropdown();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  handleClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    const navbar = document.getElementById('navbar');
+    const isInsideNavbar = navbar && navbar.contains(target);
+    const isInsideDragHandle = target.closest('.nav-drag-handle');
+    const isInsideQuickSearch = target.closest('.quick-search-wrapper') || target.closest('.quick-search-dropdown');
+
+    if (this.responsive && isInsideNavbar && !this.isDragging && !isInsideQuickSearch) {
+      const isClickOnButton = target.closest('button') || target.closest('a') || target.closest('.nav-item') || target.closest('.dropdown-container') || target.closest('input');
+
+      if (!isClickOnButton && !this.navExpanded) {
+        this.navExpanded = true;
+        return;
+      }
     }
 
-    openAuth(): void {
-        console.log('Opening authentication dialog');
+    if (this.responsive && this.navExpanded && !isInsideNavbar && !isInsideDragHandle && !this.isDragging && !isInsideQuickSearch) {
+      this.closeNav();
     }
 
-    @HostListener('document:click', ['$event'])
-    handleClick(event: MouseEvent): void {
-        // Close all dropdowns when clicking outside
-        const dropdowns = document.querySelectorAll('.dropdown-container');
-        dropdowns.forEach(container => {
-            const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement;
-            if (!container.contains(event.target as Node)) {
-                checkbox.checked = false;
-            }
-        });
-    }
-
-    @HostListener('document:keydown', ['$event'])
-    handleKeydown(event: KeyboardEvent): void {
-
-        const dropdown = document.getElementById('dropdownMenu');
-
-        if (event.key === 'Escape') {
-            dropdown?.classList.remove("open");
+    // Close all dropdowns when clicking outside
+    const dropdowns = document.querySelectorAll('.dropdown-container');
+    dropdowns.forEach(container => {
+      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement;
+      if (!container.contains(event.target as Node) || (event.target as HTMLElement).closest('#dropdownMenu')) {
+        checkbox.checked = false;
+        if (container.id === 'dropdownLangCheckbox') {
+          this.closeLangDropdown();
+          this.rotateLang = false;
         }
+      }
+    });
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onDocumentMouseMove(event: MouseEvent) {
+    if (this.isHandlePressed) {
+      if (Math.abs(event.clientX - this.startX) > 5) {
+        event.preventDefault();
+      }
+      this.onHandleTouchMove(event);
     }
+  }
 
+  @HostListener('document:mouseup', ['$event'])
+  onDocumentMouseUp(event: MouseEvent) {
+    if (this.isHandlePressed) {
+      this.onHandleTouchEnd(event);
+    }
+  }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeydown(event: KeyboardEvent): void {
+
+    const dropdown = document.getElementById('dropdownMenu');
+
+    if (event.key === 'Escape') {
+      dropdown?.classList.remove("open");
+    }
+  }
+
+  onLogout(): void {
+    this.sessionService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/']).then(() => {
+          window.location.reload();
+        })
+      },
+      error: (err) => {
+        console.error('Logout error:', err);
+        // Even if there's an error, reload the page to clear the session
+        window.location.reload();
+      }
+    });
+  }
 }

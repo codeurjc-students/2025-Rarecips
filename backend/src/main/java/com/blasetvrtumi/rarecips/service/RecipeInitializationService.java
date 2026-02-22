@@ -1,11 +1,13 @@
 package com.blasetvrtumi.rarecips.service;
 
 import com.blasetvrtumi.rarecips.repository.*;
-import com.blasetvrtumi.rarecips.entity.*; // Agregar este import
+import com.blasetvrtumi.rarecips.security.RepositoryUserDetailService;
+import com.blasetvrtumi.rarecips.entity.*;
 import jakarta.annotation.PostConstruct;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,8 +18,12 @@ import java.sql.Blob;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class RecipeInitializationService {
+    private static final Logger logger = LoggerFactory.getLogger(RecipeInitializationService.class);
 
     @Autowired
     private IngredientRepository ingredientRepository;
@@ -32,10 +38,32 @@ public class RecipeInitializationService {
     private ReviewRepository reviewRepository;
 
     @Autowired
+    private RepositoryUserDetailService userDetailService;
+
+    @Autowired
     private JSONArray recipes;
+
+    @Autowired
+    private ImageService imageService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void init() {
+        if (userRepository.findByUsername("user") == null) {
+            userDetailService.createUser("user", "test@example.com", "pass");
+        }
+
+        if (userRepository.findByUsername("admin") == null) {
+            userDetailService.createUser("admin", "admin@rarecips.com", "adminpass");
+            User admin = userRepository.findByUsername("admin");
+            if (admin != null) {
+                admin.setDisplayName("Administrator");
+                admin.setRole("ADMIN");
+                userRepository.save(admin);
+            }
+        }
 
         if (recipes != null && recipes.length() > 0) {
 
@@ -63,23 +91,30 @@ public class RecipeInitializationService {
 
                 // Ingredients entity!!
                 List<Ingredient> ingredients;
+                java.util.Map<Long, Float> ingredientQuantities = new HashMap<>();
+                java.util.Map<Long, String> ingredientUnits = new HashMap<>();
 
                 if (recipeJson.isNull("ingredients")) {
                     ingredients = new ArrayList<>();
                 } else {
                     ingredients = recipeJson.optJSONArray("ingredients", new JSONArray()).toList().stream()
-                    .map(obj -> {
-                        JSONObject ingredientJson = new JSONObject((HashMap<?, ?>) obj);
-                        String ingDescription = ingredientJson.optString("text", null);
-                        Float quantity = ingredientJson.optFloat("quantity", 0.0f);
-                        String measure = ingredientJson.optString("measure", "<unit>");
-                        Float weight = ingredientJson.optFloat("weight", 0.0f);
-                        String food = ingredientJson.optString("food", null);
-                        Ingredient ingredient = new Ingredient(ingDescription, food, quantity, measure, weight);
-                        ingredientRepository.save(ingredient);
-                        return ingredient;
-                    })
-                    .toList();
+                            .map(obj -> {
+                                JSONObject ingredientJson = new JSONObject((HashMap<?, ?>) obj);
+                                String food = ingredientJson.optString("food", null);
+                                String image = ingredientJson.optString("image", null);
+                                String imageString = ingredientJson.optString("imageString", null);
+                                Ingredient ingredient = new Ingredient(food, image, imageString);
+                                ingredientRepository.save(ingredient);
+
+                                Float quantity = ingredientJson.optFloat("quantity", 0.0f);
+                                String measure = ingredientJson.optString("measure", "");
+
+                                ingredientQuantities.put(ingredient.getId(), quantity);
+                                ingredientUnits.put(ingredient.getId(), measure);
+
+                                return ingredient;
+                            })
+                            .toList();
                 }
 
                 int difficulty = recipeJson.optInt("difficulty", 0);
@@ -107,16 +142,14 @@ public class RecipeInitializationService {
 
                 User recipeAuthor = userRepository.findByUsername(recipeJson.optString("owner"));
 
-                if (recipeAuthor == null) {
-                    // If the author does not exist, create a default user
-                    recipeAuthor = new User("user", "", "", null, "", "", "");
-                    userRepository.save(recipeAuthor);
-                }
-
                 // Create a new Recipe object
                 Recipe recipe = new Recipe(label, description, dietLabels, healthLabels, cautions,
                         people, ingredients, difficulty, dishTypes, mealTypes, cuisineType, totalTime,
                         totalWeight, calories, recipeAuthor, steps);
+
+                // Add new qty and measure as mapped properties to ingredient
+                recipe.setIngredientQuantities(ingredientQuantities);
+                recipe.setIngredientUnits(ingredientUnits);
 
                 // Save the new recipe to the database
                 recipeRepository.save(recipe);
@@ -144,28 +177,20 @@ public class RecipeInitializationService {
                 }
 
                 recipe.setReviews(reviews);
-                String imageString = "static/assets/img/" + recipe.getId() + ".jpg";
-                try {
-                    Blob imageBlob = recipe.localImageToBlob(imageString);
-                    recipe.setImageFile(imageBlob);
-                    recipe.setImageString(recipe.blobToString(imageBlob));
-                } catch (IOException | SQLException e) {
-                    recipe.setImageFile(null);
-                    recipe.setImageString(null);
-                    System.out.println("Error loading image for recipe " + recipe.getId() + ": " + e.getMessage());
-                }
+                String imageString = "static/assets/img/" + (recipe.getId() - 1) + ".jpg";
+                Blob imageBlob = imageService.localImageToBlob(imageString);
+                recipe.setImageFile(imageBlob);
+                recipe.setImageString(imageService.blobToString(imageBlob));
 
                 recipe.updateRating();
 
                 recipeRepository.save(recipe);
 
             }
-            System.out.println("Recipes initialized from JSON file successfully.");
+            logger.info("Recipes initialized from JSON file successfully.");
         } else {
-            System.out.println("No recipes found in the JSON file.");
+            logger.warn("No recipes found in the JSON file.");
         }
     }
 
 }
-
-

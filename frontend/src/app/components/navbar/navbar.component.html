@@ -1,114 +1,273 @@
+@if (quickSearchActive) {
+  <div class="quick-search-backdrop" (click)="onQuickSearchBlur()"></div>
+}
+<div class="nav-drag-backdrop" [class.visible]="navExpanded" (click)="closeNav()"></div>
 <!-- Floating Navigation Bar -->
 <nav
   class="fixed top-6 left-1/2 z-50 -translate-x-1/2 flex w-[95vw] max-w-8xl max-h-20 items-center justify-between rounded-3xl backdrop-blur-md shadow-lg px-8 py-2 transition-all gap-4"
+  [class.expanded]="navExpanded && !quickSearchActive"
+  [class.dragging]="isDragging"
+  [class.hidesidenav]="quickSearchActive"
+  (mouseenter)="onNavHover(true)"
+  (mouseleave)="onNavHover(false)"
+  (touchstart)="onNavTouchStart($event)"
+  (touchmove)="onNavTouchMove($event)"
+  (touchend)="onNavTouchEnd($event)"
   style="background-color: var(--primary-300-40);" id="navbar">
 
   <!-- Left side - Logo -->
   <div class="flex items-center mt-2 min-w-fit">
-    <a (click)="logoClicked($event)" href="#" class="flex flex-col items-center">
-      <img class="h-16 object-cover transition-transform hover:scale-105" [src]="logoSrc" alt="Logo" />
+    <a (click)="logoClicked($event)" class="flex flex-col items-center cursor-pointer">
+      <div *ngIf="!isLogoClicked" [innerHTML]="logos.get('Rarecips_Isotipo')" class="transition-transform hover:scale-105 logoImg h-16 [&>svg]:h-full"></div>
+      <div *ngIf="isLogoClicked" [innerHTML]="logos.get('Rarecips_Stir')" class="transition-transform hover:scale-105 logoImg h-16 [&>svg]:h-full"></div>
     </a>
   </div>
 
   <!-- Center - Navigation Items -->
   <div class="w-full">
-    <div class="flex items-center gap-2">
-      <div class="nav-item active px-3 py-4" (click)="navigateTo('', $event)">
-        <i class="flex items-center justify-end ti ti-home-filled w-4 h-4 text-xl"></i>
-        <span class="text-lg font-semibold">Home</span>
-      </div>
-      @if (isAdmin) {
-      <div class="nav-item px-3 py-4" (click)="navigateTo('admin-panel', $event)">
-        <i class="flex items-center ti ti-shield-lock w-4 h-4 text-xl"></i>
-        <span class="text-lg">Admin</span>
-      </div>
-      }
-      <div class="nav-item px-3 py-4" (click)="navigateTo('explore', $event)">
-        <i class="flex items-center ti ti-compass w-4 h-4 text-xl"></i>
-        <span class="text-lg">Explore</span>
-      </div>
-      <div class="nav-item px-3 py-4" (click)="navigateTo('ingredients', $event)">
-        <i class="flex items-center ti ti-basket w-4 h-4 text-xl"></i>
-        <span class="text-lg">Ingredients</span>
-      </div>
-      <div class="nav-item px-3 py-4" (click)="navigateTo('health-report', $event)">
-        <i class="flex items-center ti ti-chart-donut w-4 h-4 text-xl"></i>
-        <span class="text-lg">Health</span>
+    <div class="flex flex-row flex-start">
+      <div class="flex items-center gap-2">
+        <div class="nav-item section px-3 py-4" (click)="navigateTo('', $event)" [class.active]="navItem === ''">
+          <i class="flex items-center justify-end ti w-4 h-4 text-xl" [ngClass]="navItem === '' ? 'ti-chef-hat-filled' : 'ti-chef-hat'"></i>
+          <span class="text-lg font-semibold">{{ t('home') }}</span>
+        </div>
+        @if (isAdmin) {
+          <div class="nav-item section px-3 py-4" (click)="navigateTo('admin-panel', $event)" [class.active]="navItem === 'admin-panel'">
+            <i class="flex items-center ti w-4 h-4 text-xl" [ngClass]="navItem === 'admin-panel' ? 'ti-shield-lock-filled': 'ti-shield-lock'"></i>
+            <span class="text-lg">{{ t('admin') }}</span>
+          </div>
+        }
+        <div class="nav-item section px-3 py-4" (click)="navigateTo('explore', $event)" [class.active]="navItem === 'explore'">
+          <i class="flex items-center ti w-4 h-4 text-xl" [ngClass]="navItem === 'explore' ? 'ti-compass-filled': 'ti-compass'"></i>
+          <span class="text-lg">{{ t('explore') }}</span>
+        </div>
+        <div class="nav-item section px-3 py-4" (click)="navigateTo('ingredients', $event)" [class.active]="navItem === 'ingredients'">
+          <i class="flex items-center ti w-4 h-4 text-xl" [ngClass]="navItem === 'ingredients' ? 'ti-basket-filled': 'ti-basket'"></i>
+          <span class="text-lg">{{ t('ingredients') }}</span>
+        </div>
+        @if (isAuthenticated) {
+          <div class="nav-item section px-3 py-4" (click)="navigateTo('health', $event)" [class.active]="navItem === 'health'">
+            <i class="flex items-center ti ti-chart-donut w-4 h-4 text-xl" [ngClass]="navItem === 'health' ? 'ti-chart-donut-filled': 'ti-chart-donut'"></i>
+            <span class="text-lg">{{ t('health') }}</span>
+          </div>
+        }
       </div>
     </div>
   </div>
 
   <!-- Right side - Actions -->
-  <div class="flex items-center gap-4">
-    <!-- Search Bar -->
-    <div class="search-container">
-      <div class="flex gap-4 search-input-wrapper !py-4">
-        <i class="ti ti-search search-icon flex items-center justify-center text-xl"></i>
-        <input type="text" class="search-input" placeholder="Search">
-        <button class="search-clear-btn">
-          <i class="ti ti-x flex items-center justify-center"></i>
+  <div class="flex items-center gap-4 justify-end">
+    @if (isAuthenticated) {
+      <!-- Create recipe button -->
+      <div class="create-recipe-container">
+        <button  (mouseenter)="onHover(true)" (mouseleave)="onHover(false)" class="w-max flex whitespace-nowrap gap-2 items-center create-recipe-btn px-6 py-2 rounded-full font-semibold text-[14px] text-white"
+                style="background: var(--gradient-primary)"
+                (click)="navigateTo('recipes/create', $event)">
+          <img [src]="bowlIcon" alt="Create Recipe Icon" class="bowlIcon w-max h-max"/>
+          <span>{{ t('create_recipe') }}</span>
         </button>
       </div>
+    }
+
+    <!-- Quick Search Bar -->
+    <div class="search-container">
+      <div class="quick-search-wrapper overflow-hidden gap-2" [class.active]="quickSearchActive" (click)="onQuickSearchFocus()">
+        <i class="ti ti-search search-icon flex items-center justify-center text-xl mr-4"></i>
+        <input
+          id="quick-search-input"
+          type="text"
+          class="search-input"
+          [style.display]="(quickSearchActive && responsive) || (!responsive) ? 'block' : 'none'"
+          placeholder="{{ t('quick_search') }}"
+          [value]="quickSearchQuery"
+          (focus)="onQuickSearchFocus()"
+          (input)="onQuickSearchInput($event)"
+        />
+        @if (quickSearchQuery.length > 0) {
+          <button class="search-clear-btn" (click)="clearQuickSearch()">
+            <i class="ti ti-x flex items-center justify-center"></i>
+          </button>
+        }
+      </div>
+      @if (quickSearchActive && (quickSearchQuery.length > 0 || quickSearchLoading)) {
+        <div class="quick-search-dropdown flex items-center justify-center">
+          <div class="overflow-y-auto max-h-[70vh] m-4 w-full">
+            @if (quickSearchLoading) {
+              <div [innerHTML]="logos.get('Rarecips_Spinner')" class="flex justify-center [&>svg]:max-w-[10%]"></div>
+            } @else {
+              @if (quickSearchResults.recipes.length > 0) {
+                <div class="!mx-4">
+                  <div class="quick-search-group-title">{{ t('recipes') }}</div>
+                  @for (recipe of quickSearchResults.recipes; track recipe.id) {
+                    <div class="quick-search-item" (click)="navigateTo('recipes/' + recipe.id, $event, true)" (tap)="navigateTo('recipes/' + recipe.id, $event, true)">
+                      <img [src]="'data:image/jpeg;base64,' + recipe.imageString" alt="recipe" class="quick-search-thumb" />
+                      <span>{{ recipe.title }}</span>
+                    </div>
+                  }
+                </div>
+              }
+              @if (quickSearchResults.ingredients.length > 0) {
+                <div class="!mx-4">
+                  <div class="quick-search-group-title">{{ t('ingredients') }}</div>
+                  @for (ingredient of quickSearchResults.ingredients; track ingredient.id) {
+                    <div class="quick-search-item" (click)="navigateTo('ingredients', $event, true)">
+                      <img [src]="ingredient.icon || ingredient.image || ingredient.imageString || '/assets/img/ingredient.png'" alt="ingredient" class="quick-search-thumb" />
+                      <span>{{ ingredient.food }}</span>
+                    </div>
+                  }
+                </div>
+              }
+              @if (quickSearchResults.collections.length > 0) {
+                <div class="!mx-4">
+                  <div class="quick-search-group-title">{{ t('collections') }}</div>
+                  @if (quickSearchResults.collections.length > 0) {
+                    @for (collection of quickSearchResults.collections; track collection.id) {
+                      <div class="quick-search-item" (click)="showCollection(collection, $event)">
+                        <span class="quick-search-thumb collection-thumb"><i class="ti ti-cards"></i></span>
+                        <span>{{ collection.title }}</span>
+                      </div>
+                    }
+                  } @else {
+                    <div class="quick-search-no-results">{{ t('no_collections_found') }}</div>
+                  }
+                </div>
+              }
+              @if (quickSearchResults.users.length > 0) {
+                <div class="!mx-4">
+                  <div class="quick-search-group-title">{{ t('users') }}</div>
+                  @if (quickSearchResults.users.length > 0) {
+                    @for (user of quickSearchResults.users; track user.username) {
+                      <div class="quick-search-item" (click)="navigateTo('users/' + user.username, $event, true)">
+                        <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2" />
+                        <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2" />
+                        <span>{{ user.displayName || user.username }}</span>
+                      </div>
+                    }
+                  } @else {
+                    <div class="quick-search-no-results">{{ t('no_users_found') }}</div>
+                  }
+                </div>
+              }
+              @if (quickSearchResults.recipes.length + quickSearchResults.ingredients.length + quickSearchResults.collections.length + quickSearchResults.users.length === 0) {
+                <div class="quick-search-no-results">{{ t('no_results_found') }}</div>
+              }
+              <button class="quick-search-explore-btn" (click)="goToExplore()">{{ t('explore_more') }}</button>
+            }
+          </div>
+        </div>
+      }
     </div>
 
     <!-- Theme Selector -->
     <!-- Theme Dropdown -->
     <div class="dropdown-container py-2" id="themeDropdown">
-      <input type="checkbox" id="dropdownCheckbox" class="hidden" />
+      <input type="checkbox" id="dropdownCheckbox" class="hidden"/>
       <label class="dropdown-trigger" id="dropdownTrigger" for="dropdownCheckbox">
-        <i class="flex items-center justify-center ti ti-palette w-8 h-[2.75rem] text-default-font text-body-bold text-xl" style="color: var(--primary-700);"></i>
+        <i
+          class="flex items-center justify-center ti ti-palette w-8 h-[2.75rem] text-default-font text-body-bold text-xl"
+          style="color: var(--primary-700);"></i>
+        <div *ngIf="selectedThemeInd > -1" class="theme-circle flex items-center justify-center !w-6 !h-6" [class]="themes[selectedThemeInd].theme">
+          <i class="absolute ti ti-{{ themes[selectedThemeInd].icon }} text-[var(--primary-text)] text-md"></i>
+          <div class="theme-colors flex gap-0.5">
+            <span class="theme-color" style="background-color: var(--primary-100)"></span>
+            <span class="theme-color" style="background-color: var(--primary-500)"></span>
+            <span class="theme-color" style="background-color: var(--primary-600)"></span>
+            <span class="theme-color" style="background-color: var(--primary-700)"></span>
+          </div>
+        </div>
         <i id="dropdownIcon" class="flex items-center ti ti-caret-down-filled" style="color: var(--primary-700);"></i>
       </label>
 
-      <div (click)="selectItem($event)" class="dropdown-menu mt-2 right-56" id="dropdownMenu"
-        style="background-color: var(--primary-50); transform: translateX(-1rem);">
+      <div (click)="selectItem($event)" class="dropdown-menu mt-2 mr-2" id="dropdownMenu"
+           style="background-color: var(--primary-50); transform: translateX(-1rem);">
         @for (color of themes; track color) {
-        <button class="dropdown-item" data-value="favorite" [id]="'theme-' + color">
-          <div class="theme-circle flex items-center justify-center" [class]="'theme-' + color">
-            <div class="theme-colors flex gap-0.5">
-              <span class="theme-color" style="background-color: var(--primary-100)"></span>
-              <span class="theme-color" style="background-color: var(--primary-500)"></span>
-              <span class="theme-color" style="background-color: var(--primary-600)"></span>
-              <span class="theme-color" style="background-color: var(--primary-700)"></span>
+          <button class="dropdown-item theme-{{ color.theme }}" data-value="favorite" [id]="color.theme">
+            <div class="theme-circle flex items-center justify-center" [class]="'!' + color.theme">
+              <i class="absolute ti ti-{{ color.icon }} text-[var(--primary-text)] text-xl"></i>
+              <div class="theme-colors flex gap-0.5">
+                <span class="theme-color" style="background-color: var(--primary-100)"></span>
+                <span class="theme-color" style="background-color: var(--primary-500)"></span>
+                <span class="theme-color" style="background-color: var(--primary-600)"></span>
+                <span class="theme-color" style="background-color: var(--primary-700)"></span>
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
         }
       </div>
     </div>
 
     <!-- Language Selector -->
-    <div class="dropdown-container py-2">
-      <input type="checkbox" class="hidden" />
-      <label class="dropdown-trigger">
-        <i class="flex items-center justify-center ti ti-language w-8 h-[2.75rem] text-default-font text-body-bold text-xl" style="color: var(--primary-700);"></i>
-        <i class="flex items-center ti ti-caret-down-filled" style="color: var(--primary-700);"></i>
+    <div class="dropdown-container py-2" id="dropdownLangCheckbox">
+      <input type="checkbox" id="dropdownLangCheckbox" class="hidden" (click)="rotateLang = !rotateLang" (focusout)="rotateLang = !rotateLang" [checked]="langDropdownOpen" />
+      <label class="dropdown-trigger wrappableText" for="dropdownLangCheckbox" (click)="toggleLangDropdown()">
+        <i class="flex items-center justify-center ti ti-language w-8 h-[2.75rem] text-[var(--primary-text)] text-body-bold text-xl" style="color: var(--primary-700);"></i>
+        <span id="selectedLangText" class="ml-2 text-sm min-w-max" style="color: var(--primary-text)" [innerText]="currentLanguageText"></span>
+        <i id="dropdownLangIcon" class="flex items-center ti ti-caret-down-filled rotateCaret transition-all" [class.rotateCaret]="langDropdownOpen" style="color: var(--primary-700);"></i>
       </label>
-
-      <div class="dropdown-menu mt-2 right-44" id="dropdownMenu"
-        style="background-color: var(--primary-50); transform: translateX(-1rem);">
+      <div (click)="selectLanguage($event)" class="dropdown-menu mt-2 px-12" (focusout)="closeLangDropdown()" id="dropdownLangMenu" [class.open]="langDropdownOpen" style="background-color: var(--primary-50); transform: translateX(-1rem);">
+        <button class="dropdown-item" data-lang="es" style="color: var(--primary-text)">Español</button>
+        <button class="dropdown-item" data-lang="en" style="color: var(--primary-text)">English</button>
+        <button class="dropdown-item" data-lang="fr" style="color: var(--primary-text)">Français</button>
+        <button class="dropdown-item" data-lang="ja" style="color: var(--primary-text)">日本語</button>
+        <button class="dropdown-item" data-lang="zh" style="color: var(--primary-text)">中文</button>
       </div>
     </div>
 
-    @if (isAuthenticated) {
-    <!-- Login/Register Button -->
-    <button class="auth-btn !rounded-2xl !py-4 h-full" (click)="navigateTo('login', $event)" style="background: var(--gradient-primary);">
-      <i class="flex items-center justify-center ti ti-login text-xl"></i>
-      <span>Login</span>
-    </button>
+    @if (!isAuthenticated) {
+
+      <!-- Login/Register Button -->
+      <button class="auth-btn !rounded-2xl !py-4 h-full" (click)="navigateTo('login', $event)"
+              style="background: var(--gradient-primary);">
+        <i class="flex items-center justify-center ti ti-login text-xl"></i>
+        <span class="min-w-max">{{ t('login') }}</span>
+      </button>
+
+    } @else {
+
+      <!-- Logout -->
+
+      <button class="auth-btn !rounded-2xl !py-4 h-full min-w-fit" (click)="onLogout()"
+              style="background: var(--gradient-primary);">
+        <i class="flex items-center justify-center ti ti-logout-2 text-xl"></i>
+        <span class="text-nowrap">{{ t('logout') }}</span>
+      </button>
+
+      <!-- Notifications Button -->
+      <button id="notifBut" class="icon-btn p-6" title="{{ t('notifications') }}">
+        <i class="ti ti-bell text-xl"></i>
+      </button>
+
+      <div id="userPfp" class="flex items-center">
+        <button id="userMenuButton"
+                class="relative inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-100 border-2" style="border-color: var(--primary-300)"
+                (click)="navigateTo('profile', $event)" title="{{ t('user_menu') }}">
+          <img *ngIf="user.profileImageString" style="background: var(--primary-400);" class="aspect-square h-full w-full object-cover" src="data:image/jpeg;base64,{{user?.profileImageString}}"
+               alt="User avatar"/>
+          <img *ngIf="!user.profileImageString" class="aspect-square h-full w-full object-cover" style="background: var(--primary-400)" src="/assets/img/user.png"
+               alt="Default user avatar"/>
+        </button>
+      </div>
+
     }
 
-    <!-- Notifications Button -->
-    <button class="icon-btn p-6" title="Notificaciones">
-      <i class="ti ti-bell text-xl"></i>
-    </button>
-
-    <div class="flex items-center">
-      <button id="userMenuButton"
-        class="relative inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-100"
-        (click)="navigateTo('me', $event)" title="User menu">
-        <img class="aspect-square h-full w-full object-cover" src="/assets/img/user.png" alt="User avatar" />
-      </button>
-    </div>
   </div>
 </nav>
+
+<div class="nav-drag-handle hidden z-50 rounded-3xl backdrop-blur-md shadow-lg transition-all"
+     [class.dragging]="isDragging"
+     (touchstart)="!quickSearchActive && onHandleTouchStart($event)"
+     (touchmove)="!quickSearchActive && onHandleTouchMove($event)"
+     (touchend)="!quickSearchActive && onHandleTouchEnd($event)"
+     (mousedown)="!quickSearchActive && onHandleTouchStart($event)"
+     (click)="!quickSearchActive && toggleNav()">
+  <i class="ti ti-chevron-right"></i>
+</div>
+
+@if (showCollectionView && selectedCollection) {
+  <app-collection-card
+    [mode]="'view'"
+    [collection]="selectedCollection"
+    [showDialog]="showCollectionView"
+    (onClose)="closeCollectionView()">
+  </app-collection-card>
+}

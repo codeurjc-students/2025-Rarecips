@@ -12,6 +12,21 @@ jobs:
     name: Backend Basic Quality Control
     runs-on: ubuntu-latest
 
+    # Database service
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: rarecips
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,12 +37,34 @@ jobs:
           java-version: "21"
           distribution: "temurin"
 
+      - name: Create env.properties from secrets
+        working-directory: ./backend/src/main/resources
+        run: |
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
+
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
+      - name: Set up Node.js for Frontend Build
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Frontend and Copy to Backend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          cd ..
+          mkdir -p backend/src/main/resources/public
+          cp -R frontend/dist/rarecips/browser/* backend/src/main/resources/public/
 
       - name: Compile Backend
         working-directory: ./backend
@@ -36,9 +73,7 @@ jobs:
       - name: Run Unit Tests
         working-directory: ./backend
         run: |
-          mvn test -Dtest="**/unit/**/*Test" -Dsurefire.failIfNoSpecifiedTests=false || \
-          mvn test -Dtest="**/*Test" -Dgroups="unit" -Dsurefire.failIfNoSpecifiedTests=false || \
-          mvn test -Dsurefire.failIfNoSpecifiedTests=false
+          mvn clean test -Dtest="**/unit/**/*Test"
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4

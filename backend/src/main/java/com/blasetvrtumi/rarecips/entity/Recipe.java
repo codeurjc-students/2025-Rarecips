@@ -1,6 +1,7 @@
 package com.blasetvrtumi.rarecips.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
@@ -57,7 +58,22 @@ public class Recipe {
 
     @JsonView(BasicInfo.class)
     @ManyToMany
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Ingredient> ingredients = new ArrayList<>();
+
+    @JsonView(BasicInfo.class)
+    @ElementCollection
+    @CollectionTable(name = "recipe_ingredient_quantities", joinColumns = @JoinColumn(name = "recipe_id"))
+    @MapKeyColumn(name = "ingredient_id")
+    @Column(name = "quantity")
+    private java.util.Map<Long, Float> ingredientQuantities = new java.util.HashMap<>();
+
+    @JsonView(BasicInfo.class)
+    @ElementCollection
+    @CollectionTable(name = "recipe_ingredient_units", joinColumns = @JoinColumn(name = "recipe_id"))
+    @MapKeyColumn(name = "ingredient_id")
+    @Column(name = "unit")
+    private java.util.Map<Long, String> ingredientUnits = new java.util.HashMap<>();
 
     @JsonView(BasicInfo.class)
     private int difficulty;
@@ -98,8 +114,9 @@ public class Recipe {
     @JsonView(BasicInfo.class)
     private Float rating;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonView(BasicInfo.class)
+    @JsonIgnoreProperties({"recipes", "reviews", "savedRecipes", "hibernateLazyInitializer", "handler"})
     @JoinColumn(name = "author_username", referencedColumnName = "username")
     private User author;
 
@@ -109,6 +126,7 @@ public class Recipe {
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
     @JsonView(BasicInfo.class)
+    @JsonIgnoreProperties({"recipe", "user", "hibernateLazyInitializer", "handler"})
     private List<Review> reviews = new ArrayList<>();
 
     @CreationTimestamp
@@ -124,9 +142,9 @@ public class Recipe {
     }
 
     public Recipe(String label, String description, List<String> dietLabels, List<String> healthLabels, List<String> cautions,
-            Integer people, List<Ingredient> ingredients,
-            int difficulty, List<String> dishTypes, List<String> mealTypes, List<String> cuisineType,
-            Float totalTime, Float totalWeight, Float calories, User author, List<String> steps) {
+                  Integer people, List<Ingredient> ingredients,
+                  int difficulty, List<String> dishTypes, List<String> mealTypes, List<String> cuisineType,
+                  Float totalTime, Float totalWeight, Float calories, User author, List<String> steps) {
         this.label = label;
         this.description = description;
         this.dietLabels = dietLabels;
@@ -143,44 +161,6 @@ public class Recipe {
         this.calories = calories;
         this.author = author;
         this.steps = steps;
-    }
-
-    public Blob localImageToBlob(String imagePath) throws IOException, SQLException {
-        try {
-            ClassPathResource imageResource = new ClassPathResource(imagePath);
-            if (imageResource.exists()) {
-                InputStream imageStream = imageResource.getInputStream();
-
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int bytesRead;
-                byte[] data = new byte[8192];
-
-                while ((bytesRead = imageStream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, bytesRead);
-                }
-
-                byte[] imageBytes = buffer.toByteArray();
-                Blob imageBlob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-
-                imageStream.close();
-                buffer.close();
-                return imageBlob;
-            } else {
-                System.out.println("Image not found: " + imagePath);
-            }
-        } catch (IOException | SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String blobToString(Blob blob) throws SQLException {
-        if (blob == null) {
-            return null;
-        }
-        byte[] bytes = blob.getBytes(1, (int) blob.length());
-        String userImage = Base64.getEncoder().encodeToString(bytes);
-        return userImage;
     }
 
     public Long getId() {
@@ -283,6 +263,10 @@ public class Recipe {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Float getTotalTime() {
         return totalTime;
     }
@@ -319,6 +303,10 @@ public class Recipe {
         this.author = author;
     }
 
+    public User getAuthorUser() {
+        return author;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -353,6 +341,11 @@ public class Recipe {
         }
     }
 
+    public void addReview(Review review) {
+        this.reviews.add(review);
+        review.setRecipe(this);
+    }
+
     public void setImageString(String imageString) {
         this.imageString = imageString;
     }
@@ -377,6 +370,26 @@ public class Recipe {
 
     public List<String> getSteps() {
         return steps;
+    }
+
+    public void setSteps(List<String> steps) {
+        this.steps = steps;
+    }
+
+    public java.util.Map<Long, Float> getIngredientQuantities() {
+        return ingredientQuantities;
+    }
+
+    public void setIngredientQuantities(java.util.Map<Long, Float> ingredientQuantities) {
+        this.ingredientQuantities = ingredientQuantities;
+    }
+
+    public java.util.Map<Long, String> getIngredientUnits() {
+        return ingredientUnits;
+    }
+
+    public void setIngredientUnits(java.util.Map<Long, String> ingredientUnits) {
+        this.ingredientUnits = ingredientUnits;
     }
 
 }

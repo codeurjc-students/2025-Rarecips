@@ -15,7 +15,7 @@ public class Review {
 
     public interface BasicInfo {
     }
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,18 +24,22 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
-    
+
     @JsonView(BasicInfo.class)
     private Float rating;
-    
+
     @JsonView(BasicInfo.class)
+    @Column(columnDefinition = "TEXT")
     private String comment;
-    
+
     @ManyToOne
-    @JsonView(BasicInfo.class)
     @JoinColumn(name = "user_id")
     private User author;
-    
+
+    @JsonView(BasicInfo.class)
+    @Transient
+    private String authorUsername;
+
     @CreationTimestamp
     @JsonView(BasicInfo.class)
     @Column(name = "created_at", updatable = false)
@@ -63,9 +67,59 @@ public class Review {
         return rating != null ? rating : 0.0f;
     }
 
+    public void setRating(Float rating) {
+        this.rating = rating;
+    }
+
+    public Recipe getRecipe() {
+        return recipe;
+    }
+
     public void setRecipe(Recipe recipe) {
         this.recipe = recipe;
     }
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public String getAuthorUsername() {
+        return author != null ? author.getUsername() : null;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

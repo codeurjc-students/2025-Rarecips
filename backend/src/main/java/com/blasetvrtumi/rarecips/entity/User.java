@@ -3,19 +3,25 @@ package com.blasetvrtumi.rarecips.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import jakarta.persistence.Id;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Entity
 public class User {
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
 
     public interface BasicInfo {
     }
@@ -31,6 +37,7 @@ public class User {
 
     @JsonView({BasicInfo.class, Username.class})
     @Id
+    @Column(unique = true, nullable = false)
     private String username;
 
     @JsonView(BasicInfo.class)
@@ -44,6 +51,7 @@ public class User {
     private Blob profileImageFile;
 
     @JsonView(BasicInfo.class)
+    @Lob
     private String profileImageString;
 
     @JsonView(BasicInfo.class)
@@ -51,15 +59,15 @@ public class User {
 
     @JsonIgnore
     private String password;
-    
+
     @Enumerated(EnumType.STRING)
     @JsonView(BasicInfo.class)
     private Role role = Role.USER;
-    
+
     @CreationTimestamp
     @JsonView(BasicInfo.class)
     private LocalDateTime createdAt;
-    
+
     @UpdateTimestamp
     @JsonView(BasicInfo.class)
     private LocalDateTime lastOnline;
@@ -67,14 +75,19 @@ public class User {
     // Different lists of elements that the user has
 
     // Recipes a user has created
-    @JsonView(Recipes.class)
+    @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Recipe> recipes = new ArrayList<>();
 
     // Reviews a user has made
-    @JsonView(Reviews.class)
+    @JsonIgnore
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private Set<Review> reviews = new HashSet<>();
+
+    // Ingredients a user has stored
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.ALL})
+    private List<Ingredient> ingredients = new ArrayList<>();
 
     // Recipes a user has saved
     @ManyToMany
@@ -82,7 +95,17 @@ public class User {
             joinColumns = @JoinColumn(name = "username"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id"))
     private List<Recipe> savedRecipes = new ArrayList<>();
-    
+
+    @JsonView(BasicInfo.class)
+    @Column(name = "private_profile", nullable = false)
+    private boolean privateProfile = false;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_token_expiry")
+    private LocalDateTime passwordResetTokenExpiry;
+
     public enum Role {
         USER, ADMIN
     }
@@ -95,33 +118,182 @@ public class User {
         this.displayName = displayName;
         this.bio = bio;
         this.profileImageFile = profileImageFile;
-        this.profileImageString = profileImageString;
         this.email = email;
         this.password = password;
+        this.profileImageFile = profileImageFile;
+        this.profileImageString = profileImageString;
+
+        try {
+            if (this.profileImageFile == null) {
+                this.profileImageFile = localImageToBlob(this.profileImageString);
+            }
+        } catch (IOException | SQLException e) {
+            this.profileImageFile = null;
+            logger.error("Error loading profile image for user {}: {}", this.username, e.getMessage());
+        }
+    }
+
+    public Blob localImageToBlob(String imagePath) throws IOException, SQLException {
+        try {
+            ClassPathResource imageResource = new ClassPathResource(imagePath);
+            if (imageResource.exists()) {
+                InputStream imageStream = imageResource.getInputStream();
+
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int bytesRead;
+                byte[] data = new byte[8192];
+
+                while ((bytesRead = imageStream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, bytesRead);
+                }
+
+                byte[] imageBytes = buffer.toByteArray();
+                Blob imageBlob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
+
+                imageStream.close();
+                buffer.close();
+                return imageBlob;
+            } else {
+                logger.warn("Image not found: {}", imagePath);
+            }
+        } catch (IOException | SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public void setEmail(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setEmail'");
+    public String getEmail() {
+        return email;
     }
 
-    public void setBio(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setBio'");
+    public String getPassword() {
+        return password;
     }
 
-    public void setUsername(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUsername'");
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setPassword(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPassword'");
+    public String getBio() {
+        return bio;
+    }
+
+    public String getRole() {
+        return role.name();
+    }
+
+    public void setRole(String role) {
+        this.role = Role.valueOf(role);
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setLastOnline(LocalDateTime lastOnline) {
+        this.lastOnline = lastOnline;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setProfileImageString(String profileImageString) {
+        this.profileImageString = profileImageString;
+    }
+
+    public void setProfileImageFile(Blob profileImageFile) {
+        this.profileImageFile = profileImageFile;
+    }
+
+    public Blob getProfileImageFile() {
+        return profileImageFile;
+    }
+
+    public String getProfileImageString() {
+        return profileImageString;
+    }
+
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void addIngredient(Ingredient ingredient) {
+        this.ingredients.add(ingredient);
+    }
+
+    @JsonView(BasicInfo.class)
+    public int getRecipesCount() {
+        return this.recipes != null ? this.recipes.size() : 0;
+    }
+
+    @JsonView(BasicInfo.class)
+    public int getReviewsCount() {
+        return this.reviews != null ? this.reviews.size() : 0;
+    }
+
+    @JsonView(BasicInfo.class)
+    public int getSavedRecipesCount() {
+        return this.savedRecipes != null ? this.savedRecipes.size() : 0;
+    }
+
+    public boolean isPrivateProfile() {
+        return privateProfile;
+    }
+
+    public void setPrivateProfile(boolean privateProfile) {
+        this.privateProfile = privateProfile;
+    }
+
+    public String getPasswordResetToken() {
+        return passwordResetToken;
+    }
+    public void setPasswordResetToken(String token) {
+        this.passwordResetToken = token;
+    }
+    public LocalDateTime getPasswordResetTokenExpiry() {
+        return passwordResetTokenExpiry;
+    }
+    public void setPasswordResetTokenExpiry(LocalDateTime expiry) {
+        this.passwordResetTokenExpiry = expiry;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", bio='" + bio + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                ", createdAt=" + createdAt +
+                ", lastOnline=" + lastOnline +
+                ", ingredients=" + ingredients +
+                '}';
     }
 
 }
