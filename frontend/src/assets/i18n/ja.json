@@ -427,6 +427,7 @@
   "username": "ユーザー名",
   "username_already_exists": "このユーザー名は既に使用されています",
   "username_placeholder": "ユーザー名を入力",
+  "unknown_user": "不明なユーザー",
   "users": "ユーザー",
   "users_found": "件のユーザーが見つかりました",
   "very_easy": "とても簡単",

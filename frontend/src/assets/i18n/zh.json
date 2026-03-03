@@ -427,6 +427,7 @@
   "username": "用户名",
   "username_already_exists": "该用户名已被使用",
   "username_placeholder": "您的用户名",
+  "unknown_user": "未知用户",
   "users": "用户",
   "users_found": "个用户被找到",
   "very_easy": "非常简单",

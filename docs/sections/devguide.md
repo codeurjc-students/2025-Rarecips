@@ -5,8 +5,10 @@
 - [Introduction](#introduction)
 - [Technologies](#technologies)
 - [Tools](#tools)
+- [AI Usage](#ai-usage)
 - [Architecture](#architecture)
 - [Quality Control](#quality-control)
+- [Deployment](#deployment)
 - [Development Process](#development-process)
 - [Code Execution and Editing](#code-execution-and-editing)
 
@@ -129,12 +131,18 @@ of processes, optimization, testing and feedback.
 
 ## Architecture
 
+### Domain Model
+
+<p align="center">
+  <img width="70%" src="../../readme-resources/domain_model.png">
+</p>
+
 ### Deployment Architecture
 
 ```
-┌─────────────────┐    HTTP/HTTPS    ┌─────────────────┐    JDBC    ┌─────────────────┐
-│    Angular      │ ──────────────→  │  Spring Boot    │ ────────→  │     MySQL       │
-│   static SPA    │                  │   (Backend)     │            │   (Database)    │
+┌─────────────────┐    HTTP/HTTPS    ┌─────────────────┐            ┌─────────────────┐
+│    Angular      │ ──────────────→  │  Spring Boot    │   JDBC     │     MySQL       │
+│   static SPA    │                  │   (Backend)     │ ────────→  │   (Database)    │
 │   Port: 8443    │ ←──────────────  │   Port: 8443    │            │   Port: 3306    │
 └─────────────────┘    REST API      └─────────────────┘            └─────────────────┘
 ```
@@ -148,6 +156,18 @@ of processes, optimization, testing and feedback.
 
 The complete API documentation is available in OpenAPI format and can be viewed
 at [Rarecips API Documentation](https://raw.githack.com/codeurjc-students/2025-Rarecips/main/docs/api/api-docs.html)
+
+### Server Architecture
+
+<p align="center">
+  <img width="90%" src="../../readme-resources/server_architecture.png">
+</p>
+
+### Client Architecture
+
+<p align="center">
+  <img width="50%" src="../../readme-resources/client_architecture.png">
+</p>
 
 ## Quality Control
 
@@ -172,6 +192,11 @@ at [Rarecips API Documentation](https://raw.githack.com/codeurjc-students/2025-R
     <img src="../../readme-resources/coverage.png"/>
 
 *Test metrics will be updated as development progresses*
+
+## Deployment
+
+As of 0.1, deployment of the bundled application is only available through the local running of the [docker container](https://hub.docker.com/repository/docker/blasetvrtumi/rarecips).
+To see more information, take a look at the [Setup]((docs/sections/setup.md)) section.
 
 ## Development Process
 
@@ -201,6 +226,15 @@ GitHub Actions workflows automate:
 
 - **Build Verification:** Compile and package both frontend and backend
 - **Automated Testing:** Run unit and integration tests on pull requests
+
+#### Versioning and Releases
+
+The application versioning will consist of the following releases:
+- 0.1: Basic functionality
+- 0.2: Intermediate functionality
+- 1.0: Full functionality, first stable release
+
+Each version will be released with both a github releases tag and a docker container tag for a compose image
 
 ## Code Execution and Editing
 
