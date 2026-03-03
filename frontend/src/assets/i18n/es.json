@@ -427,6 +427,7 @@
   "username": "Usuario",
   "username_already_exists": "El nombre de usuario ya está en uso",
   "username_placeholder": "Tu usuario",
+  "unknown_user": "Usuario desconocido",
   "users": "Usuarios",
   "users_found": "usuarios encontrados",
   "very_easy": "Muy fácil",

@@ -1,100 +1,2322 @@
-openapi: 3.0.1
-
+openapi: 3.1.0
 info:
-  title: Rarecips API
-  description: API documentation for Rarecips, a recipe management application.
+  title: OpenAPI definition
   version: v0
-
 servers:
-  - url: http://localhost:8443/api
-
+- url: http://localhost:8080
+  description: Generated server url
 paths:
-  
-  # Recipe requests
-  /recipes:
+  /api/v1/users/{username}:
     get:
-      summary: Retrieve a list of recipes
+      tags:
+      - user-controller
+      summary: Get user info by username with optional display parameter
+      operationId: getUserByUsername
       parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 0
-          description: Page number for pagination
-        - in: query
-          name: size
-          schema:
-            type: integer
-            default: 10
-          description: Number of items per page
-        - in: query
-          name: order
-          schema:
-            type: string
-            enum: [ lastmod ]
-            default: lastmod
-          description: Order by field
-
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: display
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
       responses:
-        '200':
-          description: A paginated list of recipes
+        "200":
+          description: User info retrieved successfully
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+          content:
+            '*/*':
               schema:
                 type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Recipe'
-                  page:
-                    type: integer
-                  size:
-                    type: integer
-                  totalElements:
-                    type: integer
-                  totalPages:
-                    type: integer
-        '400':
-          description: Invalid request parameters
+        "401":
+          description: Unauthorized access
           content:
-            application/json:
+            '*/*':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
+                type: object
+        "403":
+          description: Forbidden access
           content:
-            application/json:
+            '*/*':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /recipes/{id}:
-    get:
-      summary: Retrieve a specific recipe by ID
+                type: object
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                type: object
+    put:
+      tags:
+      - user-controller
+      summary: Update user info by username
+      operationId: updateUser
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: The ID of the recipe to retrieve
-
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
       responses:
-        '200':
-          description: A single recipe
+        "200":
+          description: User info updated successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "403":
+          description: Forbidden access
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                type: object
+    delete:
+      tags:
+      - user-controller
+      summary: Delete user by username (admin only)
+      operationId: deleteUserByUsername
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/users/{username}/password:
+    put:
+      tags:
+      - user-controller
+      summary: Change user password by admin
+      operationId: adminChangeUserPassword
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: Password changed successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/users/{username}/checkin:
+    put:
+      tags:
+      - user-controller
+      summary: Update own's last online timestamp
+      operationId: updateLastOnline
+      responses:
+        "200":
+          description: Last online timestamp updated successfully
+        "400":
+          description: Bad request
+        "403":
+          description: Forbidden access
+  /api/v1/users/me/password:
+    put:
+      tags:
+      - user-controller
+      summary: Change password for current user
+      operationId: changePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: Password changed successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                type: object
+        "403":
+          description: Forbidden access
+          content:
+            '*/*':
+              schema:
+                type: object
+        "422":
+          description: "Unprocessable entity: current password incorrect"
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/users/me/ingredients:
+    get:
+      tags:
+      - user-controller
+      summary: Get your stored ingredients
+      operationId: getStoredIngredients
+      responses:
+        "200":
+          description: Stored ingredients retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Recipe'
-        '404':
+                $ref: "#/components/schemas/Ingredient"
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ingredient"
+    put:
+      tags:
+      - user-controller
+      summary: Add an ingredient to your stored ingredients
+      operationId: addStoredIngredient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ingredient"
+        required: true
+      responses:
+        "200":
+          description: Ingredient added successfully
+        "400":
+          description: Bad request
+  /api/v1/users/me/ingredients/remove:
+    put:
+      tags:
+      - user-controller
+      summary: Delete a user stored ingredient by ID
+      operationId: deleteStoredIngredient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: integer
+              format: int64
+        required: true
+      responses:
+        "200":
+          description: Ingredient deleted successfully
+        "400":
+          description: Bad request
+  /api/v1/users/me/ingredients/clear:
+    put:
+      tags:
+      - user-controller
+      summary: Clear user's ingredient pantry
+      operationId: clearStoredIngredients
+      responses:
+        "200":
+          description: Stored ingredients cleared successfully
+        "400":
+          description: Bad request
+  /api/v1/reviews:
+    get:
+      tags:
+      - review-controller
+      summary: Get paged reviews for a recipe
+      operationId: getReviews
+      parameters:
+      - name: recipeId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Reviews retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "400":
+          description: Invalid input
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "404":
           description: Recipe not found
           content:
-            application/json:
+            '*/*':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
+                type: object
+                additionalProperties:
+                  type: object
+    put:
+      tags:
+      - review-controller
+      summary: Submit a review for a recipe
+      operationId: submitReview
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Review"
+        required: true
+      responses:
+        "200":
+          description: Review submitted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Invalid input
+          content:
+            '*/*':
+              schema:
+                type: object
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Recipe not found
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/reviews/{reviewId}:
+    get:
+      tags:
+      - review-controller
+      summary: Get a review by ID
+      operationId: getReviewById
+      parameters:
+      - name: reviewId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Review found
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Review not found
+          content:
+            '*/*':
+              schema:
+                type: object
+    put:
+      tags:
+      - review-controller
+      summary: Update a review by ID
+      operationId: updateReview
+      parameters:
+      - name: reviewId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Review"
+        required: true
+      responses:
+        "200":
+          description: Review updated successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Invalid input
+          content:
+            '*/*':
+              schema:
+                type: object
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Review not found
+          content:
+            '*/*':
+              schema:
+                type: object
+    delete:
+      tags:
+      - review-controller
+      summary: Delete a review
+      operationId: deleteReview
+      parameters:
+      - name: reviewId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Review deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Review not found
+          content:
+            '*/*':
+              schema:
+                type: object
+        "403":
+          description: Unauthorized to delete this review
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/recipes:
+    get:
+      tags:
+      - landing-controller
+      summary: Get newest recipes
+      operationId: getNewestRecipes
+      parameters:
+      - name: order
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: size
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Found recipes
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/Recipe_BasicInfo"
+        "404":
+          description: No recipes found
+    put:
+      tags:
+      - recipe-controller
+      summary: Create a new recipe
+      operationId: createRecipe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: object
+        required: true
+      responses:
+        "201":
+          description: Recipe created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+  /api/v1/recipes/{id}:
+    get:
+      tags:
+      - recipe-controller
+      summary: Get recipe by ID
+      operationId: getRecipeById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Found the recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "404":
+          description: Recipe not found
+    put:
+      tags:
+      - recipe-controller
+      summary: Update an existing recipe
+      operationId: updateRecipe
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: object
+        required: true
+      responses:
+        "200":
+          description: Recipe updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "404":
+          description: Recipe not found
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Not the recipe author
+    delete:
+      tags:
+      - recipe-controller
+      summary: Delete a recipe
+      operationId: deleteRecipe
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Recipe deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "403":
+          description: Forbidden - Not the recipe author
+        "404":
+          description: Recipe not found
+  /api/v1/ingredients:
+    get:
+      tags:
+      - ingredient-controller
+      summary: Get paged ingredients (ordered by id desc)
+      operationId: getIngredients
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageIngredient"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageIngredient"
+    put:
+      tags:
+      - ingredient-controller
+      summary: Create a new ingredient (admin only)
+      operationId: createIngredient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ingredient"
+        required: true
+      responses:
+        "201":
+          description: Ingredient created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+  /api/v1/ingredients/{id}:
+    get:
+      tags:
+      - ingredient-controller
+      summary: Get ingredient by ID
+      operationId: getIngredientById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Ingredient found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+        "404":
+          description: Ingredient not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+    put:
+      tags:
+      - ingredient-controller
+      summary: Update an existing ingredient (admin only)
+      operationId: updateIngredient
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ingredient"
+        required: true
+      responses:
+        "200":
+          description: Ingredient updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+        "404":
+          description: Ingredient not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+    delete:
+      tags:
+      - ingredient-controller
+      summary: Delete an ingredient by ID
+      operationId: deleteIngredient
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Ingredient deleted successfully
+        "404":
+          description: Ingredient not found
+        "403":
+          description: Forbidden
+  /api/v1/collections:
+    get:
+      tags:
+      - recipe-collection-controller
+      summary: Get all collections for a user
+      operationId: getUserCollections
+      parameters:
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Collections retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecipeCollection_BasicInfo"
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecipeCollection_BasicInfo"
+    put:
+      tags:
+      - recipe-collection-controller
+      summary: Create a new collection
+      operationId: createCollection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "201":
+          description: Collection created successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/collections/{id}:
+    get:
+      tags:
+      - recipe-collection-controller
+      summary: Get collection by ID
+      operationId: getCollectionById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Collection retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecipeCollection_BasicInfo"
+        "404":
+          description: Collection not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecipeCollection_BasicInfo"
+    put:
+      tags:
+      - recipe-collection-controller
+      summary: "Modify collection: add/remove recipe (recipeId query param), update\
+        \ title (title in body)"
+      operationId: modifyCollection
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: recipeId
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: remove
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+      responses:
+        "200":
+          description: Collection modified successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Collection or recipe not found
+          content:
+            '*/*':
+              schema:
+                type: object
+    delete:
+      tags:
+      - recipe-collection-controller
+      summary: Delete collection
+      operationId: deleteCollection
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Collection deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Cannot delete favorites collection
+          content:
+            '*/*':
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Collection not found
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/collections/liked:
+    get:
+      tags:
+      - recipe-collection-controller
+      summary: Get favorites collection for own user
+      operationId: getFavoritesCollection
+      parameters:
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Favorites collection retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecipeCollection"
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecipeCollection"
+    put:
+      tags:
+      - recipe-collection-controller
+      summary: Add recipe to favorites
+      operationId: addRecipeToFavorites
+      parameters:
+      - name: recipeId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: Recipe added to favorites successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Recipe not found
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/auth/signup:
+    put:
+      tags:
+      - auth-controller
+      summary: User registration endpoint
+      operationId: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+        required: true
+      responses:
+        "200":
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid registration data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/auth/refresh:
+    put:
+      tags:
+      - auth-controller
+      summary: Refresh token
+      operationId: refreshToken
+      parameters:
+      - name: refreshToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid token
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/auth/logout:
+    put:
+      tags:
+      - auth-controller
+      summary: Logout
+      operationId: logOut
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid token
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/auth/login:
+    put:
+      tags:
+      - auth-controller
+      summary: User login endpoint
+      operationId: login
+      parameters:
+      - name: accessToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      - name: refreshToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+        required: true
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/users/change-password:
+    post:
+      tags:
+      - user-controller
+      summary: Change password by email or token
+      operationId: recoverOrChangePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: Password recovery email sent or password changed successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                type: object
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/users/search:
+    get:
+      tags:
+      - user-controller
+      summary: Search users by query
+      operationId: searchUsers
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 9
+      responses:
+        "200":
+          description: Users retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/users/me:
+    get:
+      tags:
+      - user-controller
+      summary: Get current logged-in user info
+      operationId: getCurrentUser
+      responses:
+        "200":
+          description: User info retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      tags:
+      - user-controller
+      summary: Delete current user and all associated data (cascade)
+      operationId: deleteCurrentUser
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                type: object
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/users/filter:
+    get:
+      tags:
+      - user-controller
+      summary: Filter users with multiple criteria
+      operationId: filterUsers
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: minRecipes
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: minReviews
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: minCollections
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 9
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          default: createdAt
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+          default: desc
+      responses:
+        "200":
+          description: Users retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/recipes/search:
+    get:
+      tags:
+      - recipe-controller
+      summary: Search recipes by query text
+      operationId: searchRecipes
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Recipes retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: No recipes found
+  /api/v1/recipes/search/count:
+    get:
+      tags:
+      - recipe-controller
+      summary: Count recipes by meal type or dish type
+      operationId: countRecipes
+      parameters:
+      - name: mealType
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: dishType
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Count retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Invalid parameters
+        "404":
+          description: No recipes found
+  /api/v1/recipes/filter:
+    get:
+      tags:
+      - recipe-controller
+      summary: Filter recipes with multiple criteria
+      operationId: filterRecipes
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: cuisines
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: mealTypes
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: dishTypes
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: dietLabels
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: healthLabels
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: difficulties
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int32
+      - name: minRating
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: minTime
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: maxTime
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: minCalories
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: maxCalories
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: minWeight
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: maxWeight
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: minPeople
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: maxPeople
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: onlyUserIngredients
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          default: updatedAt
+      responses:
+        "200":
+          description: Recipes retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Invalid parameters
+        "401":
+          description: Unauthorized - User must be authenticated for certain filters
+        "404":
+          description: No recipes found
+  /api/v1/ingredients/search:
+    get:
+      tags:
+      - ingredient-controller
+      summary: Search ingredients by name (food)
+      operationId: searchIngredients
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageIngredient"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageIngredient"
+  /api/v1/ingredients/names:
+    get:
+      tags:
+      - ingredient-controller
+      summary: Get all unique ingredient names
+      operationId: getAllIngredientNames
+      responses:
+        "200":
+          description: List of ingredient names retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/enums/meal-types:
+    get:
+      tags:
+      - enum-controller
+      summary: Get all meal types
+      operationId: getMealTypes
+      responses:
+        "200":
+          description: Successfully retrieved meal types
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/enums/health-labels:
+    get:
+      tags:
+      - enum-controller
+      summary: Get all health labels
+      operationId: getHealthLabels
+      responses:
+        "200":
+          description: Successfully retrieved health labels
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/enums/dish-types:
+    get:
+      tags:
+      - enum-controller
+      summary: Get all dish types
+      operationId: getDishTypes
+      responses:
+        "200":
+          description: Successfully retrieved dish types
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/enums/difficulty:
+    get:
+      tags:
+      - enum-controller
+      summary: Get all difficulty levels
+      operationId: getDifficultyLevels
+      responses:
+        "200":
+          description: Successfully retrieved difficulty levels
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: integer
+                  format: int32
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: integer
+                  format: int32
+  /api/v1/enums/diet-labels:
+    get:
+      tags:
+      - enum-controller
+      summary: Get all diet labels
+      operationId: getDietLabels
+      responses:
+        "200":
+          description: Successfully retrieved diet labels
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/enums/cuisine-types:
+    get:
+      tags:
+      - enum-controller
+      summary: Get all cautions
+      operationId: getCuisineTypes
+      responses:
+        "200":
+          description: Successfully retrieved cuisine types
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/enums/cautions:
+    get:
+      tags:
+      - enum-controller
+      summary: Get all cautions
+      operationId: getCautions
+      responses:
+        "200":
+          description: Successfully retrieved cautions
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/collections/search:
+    get:
+      tags:
+      - recipe-collection-controller
+      summary: Search collections by query
+      operationId: searchCollections
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 9
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Collections retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "400":
+          description: Bad request
+        "500":
+          description: Internal server error
+  /api/v1/collections/public/popular:
+    get:
+      tags:
+      - recipe-collection-controller
+      summary: Get popular public collections
+      operationId: getPopularPublicCollections
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Popular collections retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecipeCollection_BasicInfo"
+        "400":
+          description: Bad request
+  /api/v1/auth/usernames:
+    get:
+      tags:
+      - auth-controller
+      summary: Index all users' usernames for validation
+      operationId: getAllUsernames
+      responses:
+        "200":
+          description: Usernames retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: Invalid request
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/auth/emails:
+    get:
+      tags:
+      - auth-controller
+      summary: Index all users' emails for validation
+      operationId: getAllEmails
+      parameters:
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Emails retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/activities/latest:
+    get:
+      tags:
+      - landing-controller
+      summary: Get latest activities
+      operationId: getLatestActivities
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Found activities
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: No activities found
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/activities/latest-reviews:
+    get:
+      tags:
+      - landing-controller
+      summary: Get latest reviews
+      operationId: getLatestReviews
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: Found reviews
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: No reviews found
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        bio:
+          type: string
+        profileImageString:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastOnline:
+          type: string
+          format: date-time
+        privateProfile:
+          type: boolean
+        passwordResetToken:
+          type: string
+        passwordResetTokenExpiry:
+          type: string
+          format: date-time
+        savedRecipesCount:
+          type: integer
+          format: int32
+        recipesCount:
+          type: integer
+          format: int32
+        reviewsCount:
+          type: integer
+          format: int32
+    Ingredient:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        food:
+          type: string
+        image:
+          type: string
+        imageString:
+          type: string
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+        description:
+          type: string
+        imageString:
+          type: string
+        people:
+          type: integer
+          format: int32
+        ingredients:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ingredient"
+        ingredientQuantities:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+        ingredientUnits:
+          type: object
+          additionalProperties:
+            type: string
+        difficulty:
+          type: integer
+          format: int32
+        dishTypes:
+          type: array
+          items:
+            type: string
+        mealTypes:
+          type: array
+          items:
+            type: string
+        cuisineType:
+          type: array
+          items:
+            type: string
+        dietLabels:
+          type: array
+          items:
+            type: string
+        healthLabels:
+          type: array
+          items:
+            type: string
+        cautions:
+          type: array
+          items:
+            type: string
+        totalTime:
+          type: number
+          format: float
+        totalWeight:
+          type: number
+          format: float
+        calories:
+          type: number
+          format: float
+        rating:
+          type: number
+          format: float
+        author:
+          type: string
+        steps:
+          type: array
+          items:
+            type: string
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        authorUser:
+          $ref: "#/components/schemas/User"
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        rating:
+          type: number
+          format: float
+        comment:
+          type: string
+        author:
+          $ref: "#/components/schemas/User"
+        authorUsername:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    AuthRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        preferences:
+          type: object
+          additionalProperties:
+            type: string
+    AuthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - SUCCESS
+          - FAILURE
+        message:
+          type: string
+        error:
+          type: string
+    Ingredient_BasicInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+    Recipe_BasicInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+        description:
+          type: string
+        imageString:
+          type: string
+        people:
+          type: integer
+          format: int32
+        ingredients:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ingredient_BasicInfo"
+        ingredientQuantities:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+        ingredientUnits:
+          type: object
+          additionalProperties:
+            type: string
+        difficulty:
+          type: integer
+          format: int32
+        dishTypes:
+          type: array
+          items:
+            type: string
+        mealTypes:
+          type: array
+          items:
+            type: string
+        cuisineType:
+          type: array
+          items:
+            type: string
+        dietLabels:
+          type: array
+          items:
+            type: string
+        healthLabels:
+          type: array
+          items:
+            type: string
+        cautions:
+          type: array
+          items:
+            type: string
+        totalTime:
+          type: number
+          format: float
+        totalWeight:
+          type: number
+          format: float
+        calories:
+          type: number
+          format: float
+        rating:
+          type: number
+          format: float
+        author:
+          type: string
+        steps:
+          type: array
+          items:
+            type: string
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review_BasicInfo"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        authorUser:
+          $ref: "#/components/schemas/User_BasicInfo"
+    Review_BasicInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        author:
+          $ref: "#/components/schemas/User_BasicInfo"
+    User_BasicInfo:
+      type: object
+      properties:
+        passwordResetToken:
+          type: string
+        passwordResetTokenExpiry:
+          type: string
+          format: date-time
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+    PageIngredient:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ingredient"
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    RecipeCollection_BasicInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        isFavorites:
+          type: boolean
+        recipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recipe_BasicInfo"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        author:
+          type: string
+        favorites:
+          type: boolean
+        recipeCount:
+          type: integer
+          format: int32
+    RecipeCollection:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        isFavorites:
+          type: boolean
+        recipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recipe"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        author:
+          type: string
+        favorites:
+          type: boolean
+        recipeCount:
+          type: integer
+          format: int32

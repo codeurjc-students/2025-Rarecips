@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
     Ingredient findByFood(String food);
+    Ingredient findByFoodIgnoreCase(String food);
 
     @Query("SELECT i FROM Ingredient i WHERE LOWER(i.food) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<Ingredient> searchByFood(@Param("query") String query, Pageable pageable);

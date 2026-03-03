@@ -68,7 +68,7 @@ public class RecipeInitializationService {
         if (recipes != null && recipes.length() > 0) {
 
             // Add all recipes from the JSON file to the database
-            for (int i = 0; i < 20/*recipes.length() - 1*/; i++) {
+            for (int i = 0; i < recipes.length() - 1; i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
 
                 String label = recipeJson.optString("label", null);
@@ -103,8 +103,12 @@ public class RecipeInitializationService {
                                 String food = ingredientJson.optString("food", null);
                                 String image = ingredientJson.optString("image", null);
                                 String imageString = ingredientJson.optString("imageString", null);
-                                Ingredient ingredient = new Ingredient(food, image, imageString);
-                                ingredientRepository.save(ingredient);
+                                
+                                Ingredient ingredient = ingredientRepository.findByFoodIgnoreCase(food);
+                                if (ingredient == null) {
+                                    ingredient = new Ingredient(food, image, imageString);
+                                    ingredientRepository.save(ingredient);
+                                }
 
                                 Float quantity = ingredientJson.optFloat("quantity", 0.0f);
                                 String measure = ingredientJson.optString("measure", "");

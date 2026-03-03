@@ -157,10 +157,9 @@
                              [src]="'data:image/jpeg;base64,' + recipe.imageString"
                              [alt]="recipe.label"/>
                       } @else {
-                        <div class="h-44 w-64 flex-none rounded-md flex items-center justify-center"
-                             style="background: var(--primary-100);">
-                          <i class="ti ti-photo text-6xl" style="color: var(--primary-400);"></i>
-                        </div>
+                        <img class="h-44 w-64 flex-none rounded-md object-cover"
+                             src="assets/img/recipe.png"
+                             [alt]="recipe.label" style="background-color: var(--primary-300);" />
                       }
                       <div class="flex grow shrink-0 basis-0 flex-col items-start gap-2">
                         <span class="text-2xl font-semibold" style="color: var(--primary-700);">{{ recipe.label }}</span>

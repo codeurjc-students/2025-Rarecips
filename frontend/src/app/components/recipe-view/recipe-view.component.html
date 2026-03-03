@@ -44,12 +44,12 @@
           <div class="flex items-center gap-8 recipe-header">
             <!-- Recipe Image -->
             <div class="relative w-2/4">
-              <img *ngIf="user?.imageString || recipe?.imageUrl"
+              <img *ngIf="recipe?.imageString || recipe?.imageUrl"
                 class="w-full h-full aspect-square rounded-3xl object-cover shadow-lg"
                 src="data:image/png;base64,{{ recipe?.imageString || recipe?.imageUrl}}" alt="{{ recipe?.title }}" />
               <img *ngIf="!recipe?.imageString && !recipe?.imageUrl"
                 class="w-full h-full aspect-square rounded-3xl object-cover shadow-lg" src="assets/img/recipe.png"
-                alt="{{ recipe?.title }}" />
+                alt="{{ recipe?.title }}" style="background-color: var(--primary-300);" />
 
               <!-- Image Actions -->
               <div class="absolute top-4 right-4 flex gap-2">

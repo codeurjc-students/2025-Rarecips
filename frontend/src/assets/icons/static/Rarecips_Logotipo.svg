@@ -2,11 +2,6 @@
 <svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560.8 166.8">
   <defs>
     <style>
-      @font-face {
-        font-family: "Fredoka";
-        src: url("../fonts/Fredoka-VariableFont_wdth,wght.ttf");
-      }
-
       .cls-1 {
         letter-spacing: -.04em;
       }
@@ -16,7 +11,7 @@
       }
 
       .cls-3 {
-        fill: var(--logo-textcolor);
+        fill: #e84d13;
         font-family: Fredoka-Medium, Fredoka;
         font-size: 150px;
         font-variation-settings: 'wght' 500, 'wdth' 100;
@@ -44,14 +39,5 @@
       }
     </style>
   </defs>
-  <text class="cls-3" transform="translate(0 127.5)">
-    <tspan class="cls-2" x="0" y="0">R</tspan>
-    <tspan class="cls-5" x="88.23" y="0">a</tspan>
-    <tspan class="cls-1" x="172.17" y="0">r</tspan>
-    <tspan class="cls-4" x="228.42" y="0">e</tspan>
-    <tspan class="cls-6" x="305.92" y="0">c</tspan>
-    <tspan class="cls-8" x="378.6" y="0">i</tspan>
-    <tspan class="cls-7" x="412.01" y="0">p</tspan>
-    <tspan x="492.1" y="0">s</tspan>
-  </text>
+  <text class="cls-3" transform="translate(0 127.5)"><tspan class="cls-2" x="0" y="0">R</tspan><tspan class="cls-5" x="88.23" y="0">a</tspan><tspan class="cls-1" x="172.17" y="0">r</tspan><tspan class="cls-4" x="228.42" y="0">e</tspan><tspan class="cls-6" x="305.92" y="0">c</tspan><tspan class="cls-8" x="378.6" y="0">i</tspan><tspan class="cls-7" x="412.01" y="0">p</tspan><tspan x="492.1" y="0">s</tspan></text>
 </svg>

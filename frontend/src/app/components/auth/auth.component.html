@@ -201,7 +201,7 @@
                   <i class="ti ti-login text-xl" aria-hidden="true"></i>
                   {{ t('login') }}
                 </div>
-                <div *ngIf="loginLoad" class="w-7 h-7">
+                <div *ngIf="loginLoad || true" class="w-7 h-7">
                   <div [innerHTML]="logos.get('Rarecips_Spinner')"></div>
                 </div>
               </button>

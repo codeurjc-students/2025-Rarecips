@@ -100,7 +100,7 @@
                   <div class="quick-search-group-title">{{ t('recipes') }}</div>
                   @for (recipe of quickSearchResults.recipes; track recipe.id) {
                     <div class="quick-search-item" (click)="navigateTo('recipes/' + recipe.id, $event, true)" (tap)="navigateTo('recipes/' + recipe.id, $event, true)">
-                      <img [src]="'data:image/jpeg;base64,' + recipe.imageString" alt="recipe" class="quick-search-thumb" />
+                      <img [src]="recipe.imageString ? 'data:image/jpeg;base64,' + recipe.imageString : 'assets/img/recipe.png'" alt="recipe" class="quick-search-thumb" style="background-color: var(--primary-300);" />
                       <span>{{ recipe.title }}</span>
                     </div>
                   }

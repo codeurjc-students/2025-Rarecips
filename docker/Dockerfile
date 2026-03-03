@@ -39,7 +39,7 @@ FROM amazoncorretto:21
 WORKDIR /app
 
 # Add the project's jar file to the container
-COPY --from=build /app/target/rarecips-0.0.1-SNAPSHOT.jar /app
+COPY --from=build /app/target/rarecips-0.1.0.jar /app
 
 # Copy the wait-for-it.sh script to /app in the docker image
 RUN curl -LJO https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && chmod +x /app/wait-for-it.sh

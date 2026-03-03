@@ -239,9 +239,13 @@
               <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent"></div>
 
               <div class="imageCont relative aspect-43 overflow-hidden" (mouseover)="hoverRecipeId = recipe.id" (mouseout)="hoverRecipeId = undefined">
-                <img
+                <img *ngIf="recipe.imageUrl"
                   src="data:image/png;base64,{{recipe.imageUrl}}"
-                  alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;"
+                  alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available; background-color: var(--primary-300);"
+                  [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
+                <img *ngIf="!recipe.imageUrl"
+                  src="assets/img/recipe.png"
+                  alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available; background-color: var(--primary-300);"
                   [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
 
                 <div class="absolute inset-0 gradient-overlay"></div>
@@ -417,9 +421,13 @@
 
                   <!-- Image Container -->
                   <div class="imageCont relative aspect-43 overflow-hidden" (mouseover)="hoverRecipeId = recipe.id" (mouseout)="hoverRecipeId = undefined">
-                    <img
+                    <img *ngIf="recipe.imageUrl"
                       src="data:image/png;base64,{{recipe.imageUrl}}"
                       alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;"
+                      [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
+                    <img *ngIf="!recipe.imageUrl"
+                      src="assets/img/recipe.png"
+                      alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available; background-color: var(--primary-300);"
                       [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
 
                     <!-- Gradient Overlay -->
