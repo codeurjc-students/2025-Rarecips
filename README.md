@@ -105,6 +105,8 @@ It brings the first standalone bundled dockerized version of the application, al
 
 - #### 0.1 Video:
 
+https://github.com/user-attachments/assets/de8e30a0-d230-4ae5-a164-8e21cd369ee6
+
 - #### Upcoming features:
     0.2 release is expected to include the remaining intermediate features, such as:
   - Full recipe management (creation, editing, deletion)
