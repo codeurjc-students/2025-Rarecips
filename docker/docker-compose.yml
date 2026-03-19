@@ -8,15 +8,16 @@ services:
   rarecips-app:
 
     container_name: rarecips-app
-    image: blasetvrtumi/rarecips:0.1
+    image: blasetvrtumi/rarecips:0.2
     build:
       context: ../
       dockerfile: docker/Dockerfile
     ports:
       - "8443:8443"
     depends_on:
-      - rarecips-DB
-    command: [ "/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 -- && java -jar /app/rarecips-0.1.0.jar" ]
+      rarecips-DB:
+        condition: service_healthy
+    command: [ "/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 --timeout=20 -- && java -jar /app/rarecips-0.2.0.jar" ]
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-DB:3306/rarecips
       - SPRING_DATASOURCE_USERNAME=root

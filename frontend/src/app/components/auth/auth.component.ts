@@ -296,19 +296,59 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
           });
         },
         error: (error) => {
-          if (error.message.includes('400')) {
-            this.loginLoad = false;
+          this.loginLoad = false;
 
-            const usernameInput = document.getElementById('login-username') as HTMLInputElement;
-            const passwordInput = document.getElementById('login-password') as HTMLInputElement;
+          const usernameInput = document.getElementById('login-username') as HTMLInputElement;
+          const passwordInput = document.getElementById('login-password') as HTMLInputElement;
+          const credErrorMsg = document.querySelector('.credErrorMsg') as HTMLElement;
 
-            const credErrorMsg = document.querySelector('.credErrorMsg') as HTMLElement;
-            credErrorMsg.innerText = 'Invalid username or password.';
+          if (error.status === 423 || (error.message && error.message.includes('423'))) {
+            credErrorMsg.innerText = this.t('account_suspended');
+            credErrorMsg.classList.remove('hidden');
+
+            usernameInput.style.borderColor = 'red';
+            usernameInput.style.background = 'rgba(255, 0, 0, 0.1)';
+            passwordInput.style.borderColor = 'red';
+            passwordInput.style.background = 'rgba(255, 0, 0, 0.1)';
+
+            usernameInput.onkeydown = () => {
+              credErrorMsg.classList.add('hidden');
+              usernameInput.style.borderColor = '';
+              usernameInput.style.background = '';
+            }
+
+            passwordInput.onkeydown = () => {
+              credErrorMsg.classList.add('hidden');
+              passwordInput.style.borderColor = '';
+              passwordInput.style.background = '';
+            }
+          } else if (error.status === 400 || (error.message && error.message.includes('400'))) {
+            credErrorMsg.innerText = this.t('invalid_credentials') || 'Invalid username or password.';
             credErrorMsg.classList.remove('hidden');
 
             usernameInput.style.borderColor = 'red';
             usernameInput.style.background = 'rgba(255, 0, 0, 0.1)';
 
+            passwordInput.style.borderColor = 'red';
+            passwordInput.style.background = 'rgba(255, 0, 0, 0.1)';
+
+            usernameInput.onkeydown = () => {
+              credErrorMsg.classList.add('hidden');
+              usernameInput.style.borderColor = '';
+              usernameInput.style.background = '';
+            }
+
+            passwordInput.onkeydown = () => {
+              credErrorMsg.classList.add('hidden');
+              passwordInput.style.borderColor = '';
+              passwordInput.style.background = '';
+            }
+          } else if (error.status === 423 || (error.message && error.message.includes('423'))) {
+            credErrorMsg.innerText = this.t('account_suspended');
+            credErrorMsg.classList.remove('hidden');
+
+            usernameInput.style.borderColor = 'red';
+            usernameInput.style.background = 'rgba(255, 0, 0, 0.1)';
             passwordInput.style.borderColor = 'red';
             passwordInput.style.background = 'rgba(255, 0, 0, 0.1)';
 

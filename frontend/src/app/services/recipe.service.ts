@@ -172,4 +172,8 @@ export class RecipeService {
       })
     );
   }
+
+  changeRecipeStatus(id: number | string, action: 'approve' | 'reject'): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${id}/status?action=${action}`, null);
+  }
 }

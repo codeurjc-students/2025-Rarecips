@@ -330,4 +330,46 @@ public class RecipeController {
             return ResponseEntity.ok(response);
         }
     }
+
+    @Operation(summary = "Change status of a pending recipe (approve or reject)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recipe status changed successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Admin only"),
+            @ApiResponse(responseCode = "404", description = "Recipe not found")
+    })
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> changeRecipeStatus(@PathVariable Long id, @RequestParam String action, Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) return ResponseEntity.status(401).body("User must be authenticated");
+
+        User adminUser = userService.findByUsername(authentication.getName());
+
+        if (!adminUser.getRole().equals("ADMIN")) {
+            return ResponseEntity.status(403).body("Only admins can change recipe status.");
+        }
+
+        if (!action.equalsIgnoreCase("approve") && !action.equalsIgnoreCase("reject")) {
+            return ResponseEntity.badRequest().body("Invalid action. Use 'approve' or 'reject'.");
+        }
+
+        Recipe recipe = recipeService.findById(id);
+
+        if (recipe == null) return ResponseEntity.status(404).body("Recipe not found.");
+
+        if (action.equalsIgnoreCase("approve")) {
+
+            recipe.setStatus(com.blasetvrtumi.rarecips.enums.RecipeStatus.APPROVED);
+            recipeRepository.save(recipe);
+
+            return ResponseEntity.ok().body(java.util.Collections.singletonMap("message", "Recipe approved successfully."));
+        } else {
+
+            recipe.setStatus(com.blasetvrtumi.rarecips.enums.RecipeStatus.REJECTED);
+            recipeRepository.save(recipe);
+            
+            return ResponseEntity.ok().body(java.util.Collections.singletonMap("message", "Recipe rejected successfully."));
+        }
+    }
 }

@@ -30,14 +30,24 @@
                      style="background: var(--primary-400)"
                      alt="Profile"/>
               </div>
-              @if (isAdminProfile) {
-                <span
-                  class="absolute -bottom-4 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
-                  style="background: var(--primary-400); color: var(--primary-700);">
-                                  <i class="ti ti-user-shield font-extrabold text-xl"></i>
-                  {{ t('admin') }}
-                              </span>
-              }
+              <div class="absolute -bottom-4 flex flex-col gap-2 items-center">
+                @if (isAdminProfile) {
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                    style="background: var(--primary-400); color: var(--primary-700);">
+                    <i class="ti ti-user-shield font-extrabold text-xl"></i>
+                    {{ t('admin') }}
+                  </span>
+                }
+                @if (user?.suspended) {
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 text-nowrap"
+                    style="background: #ef4444; color: white;">
+                    <i class="ti ti-user-cancel font-extrabold text-xl"></i>
+                    {{ t('suspended') }}
+                  </span>
+                }
+              </div>
             </div>
             <div class="flex w-full flex-col items-center gap-6">
               <div class="flex flex-col">

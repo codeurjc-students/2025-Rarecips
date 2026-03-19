@@ -100,6 +100,10 @@ public class User {
     @Column(name = "private_profile", nullable = false)
     private boolean privateProfile = false;
 
+    @JsonView(BasicInfo.class)
+    @Column(name = "suspended", nullable = false)
+    private boolean suspended = false;
+
     @Column(name = "password_reset_token")
     private String passwordResetToken;
 
@@ -267,6 +271,14 @@ public class User {
 
     public void setPrivateProfile(boolean privateProfile) {
         this.privateProfile = privateProfile;
+    }
+
+    public boolean isSuspended() {
+        return suspended;
+    }
+
+    public void setSuspended(boolean suspended) {
+        this.suspended = suspended;
     }
 
     public String getPasswordResetToken() {

@@ -98,6 +98,24 @@ export class UserService {
     );
   }
 
+  getUsersByRole(role: string, page: number = 0, size: number = 50): Observable<any> {
+    const params: any = { role, page, size };
+    return this.httpClient.get(`${this.API_URL}/role`, { params, withCredentials: true }).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(`Error fetching users by role: ${error.statusText}`));
+      })
+    );
+  }
+
+  getUsersByStatus(suspended: boolean, page: number = 0, size: number = 50): Observable<any> {
+    const params: any = { suspended, page, size };
+    return this.httpClient.get(`${this.API_URL}/status`, { params, withCredentials: true }).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(`Error fetching users by status: ${error.statusText}`));
+      })
+    );
+  }
+
   filterUsers(filterParams: any, page: number, size: number): Observable<any> {
     if (filterParams.sortBy === 'username') {
       filterParams.direction = 'asc';
@@ -198,5 +216,13 @@ export class UserService {
       newPassword,
       confirmPassword
     }, { responseType: 'text' });
+  }
+
+  changeUserStatus(username: string, action: 'suspend' | 'unsuspend'): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${username}/status?action=${action}`, null, { withCredentials: true });
+  }
+
+  changeUserRole(username: string, role: string): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${username}/role?role=${role}`, null, { withCredentials: true });
   }
 }

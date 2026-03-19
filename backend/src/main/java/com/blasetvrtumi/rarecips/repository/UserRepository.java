@@ -37,5 +37,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             Pageable pageable
     );
 
+    @Query("SELECT u FROM User u WHERE (u.role IS NULL OR u.role != :role) AND u.suspended = :suspended")
+    Page<User> findByRoleNotAndSuspendedCustom(@Param("role") User.Role role, @Param("suspended") boolean suspended, Pageable pageable);
+
     User findByPasswordResetToken(String token);
+
+    Page<User> findByRole(User.Role role, Pageable pageable);
 }

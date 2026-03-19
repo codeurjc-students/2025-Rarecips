@@ -50,6 +50,10 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
+      - name: Run Unit Tests
+        working-directory: ./backend
+        run: mvn clean test -Dtest="*/unit/*Test"
+
       - name: Set up Node.js for Frontend Build
         uses: actions/setup-node@v4
         with:
@@ -73,10 +77,6 @@ jobs:
             echo "Waiting for MySQL to be ready..."
             sleep 5
           done
-
-      - name: Run Unit Tests
-        working-directory: ./backend
-        run: mvn clean test -Dtest="*/unit/*Test"
 
       - name: Run Integration Tests
         working-directory: ./backend
@@ -144,6 +144,15 @@ jobs:
           echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" > env.properties
           echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> env.properties
 
+      - name: Run Unit Tests
+        working-directory: ./backend
+        run: mvn clean test -Dtest="frontend.unit.*Test"
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+
       - name: Set up Node.js for Frontend Build
         uses: actions/setup-node@v4
         with:
@@ -167,15 +176,6 @@ jobs:
             echo "Waiting for MySQL to be ready..."
             sleep 5
           done
-
-      - name: Run Unit Tests
-        working-directory: ./backend
-        run: mvn clean test -Dtest="frontend.unit.*Test"
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
-          SPRING_DATASOURCE_USERNAME: root
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
       - name: Run Integration Tests
         working-directory: ./backend

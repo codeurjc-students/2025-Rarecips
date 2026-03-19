@@ -305,6 +305,70 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get users by role (admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    @GetMapping("/role")
+    @JsonView(User.BasicInfo.class)
+    public ResponseEntity<?> getUsersByRole(
+            @RequestParam String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized.");
+        }
+        User adminUser = userService.findByUsername(authentication.getName());
+        if (!adminUser.getRole().equals("ADMIN")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can fetch this.");
+        }
+        User.Role enumRole;
+        try {
+            enumRole = User.Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid role.");
+        }
+        Page<User> usersList = userService.getUsersByRole(enumRole, page, size);
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("users", usersList.getContent());
+        response.put("total", usersList.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get users by suspended status (admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    @GetMapping("/status")
+    @JsonView(User.BasicInfo.class)
+    public ResponseEntity<?> getUsersByStatus(
+            @RequestParam boolean suspended,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized.");
+        }
+        User adminUser = userService.findByUsername(authentication.getName());
+        if (!adminUser.getRole().equals("ADMIN")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can fetch this.");
+        }
+        Page<User> users = userService.getFilteredUsersStatus(suspended, page, size);
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("users", users.getContent());
+        response.put("total", users.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Filter users with multiple criteria")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
@@ -434,6 +498,76 @@ public class UserController {
         }
         userService.updatePassword(username, newPassword);
         return ResponseEntity.ok().body("Password changed successfully.");
+    }
+
+    @Operation(summary = "Suspend or unsuspend a user (admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User status changed successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PutMapping("/{username}/status")
+    public ResponseEntity<?> changeUserStatus(@PathVariable String username, @RequestParam String action, Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized.");
+        }
+        User adminUser = userService.findByUsername(authentication.getName());
+
+        if (!adminUser.getRole().equals("ADMIN")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can change user status.");
+        }
+
+        if (!action.equalsIgnoreCase("suspend") && !action.equalsIgnoreCase("unsuspend")) {
+            return ResponseEntity.badRequest().body("Invalid action. Use 'suspend' or 'unsuspend'.");
+        }
+
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        if (action.equalsIgnoreCase("suspend")) {
+            user.setSuspended(true);
+            userService.save(user);
+            return ResponseEntity.ok().body(Collections.singletonMap("message", "User suspended successfully."));
+        } else {
+            user.setSuspended(false);
+            userService.save(user);
+            return ResponseEntity.ok().body(Collections.singletonMap("message", "User unsuspended successfully."));
+        }
+    }
+
+    @Operation(summary = "Change user role (admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User role changed successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PutMapping("/{username}/role")
+    public ResponseEntity<?> changeUserRole(@PathVariable String username, @RequestParam String role, Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized.");
+        }
+        User adminUser = userService.findByUsername(authentication.getName());
+
+        if (!adminUser.getRole().equals("ADMIN")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can change user roles.");
+        }
+
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+        
+        try {
+            user.setRole(role.toUpperCase());
+            userService.save(user);
+            return ResponseEntity.ok().body(Collections.singletonMap("message", "User role changed successfully."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid role. Must be ADMIN or USER.");
+        }
     }
 
     @Operation(summary = "Change password by email or token")

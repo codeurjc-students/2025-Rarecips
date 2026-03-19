@@ -121,6 +121,16 @@ public class UserService {
         );
     }
 
+    public Page<User> getFilteredUsersStatus(boolean suspended, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "username"));
+        return userRepository.findByRoleNotAndSuspendedCustom(User.Role.ADMIN, suspended, pageable);
+    }
+
+    public Page<User> getUsersByRole(User.Role role, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "username"));
+        return userRepository.findByRole(role, pageable);
+    }
+
     public void deleteUserAndCascade(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) return;

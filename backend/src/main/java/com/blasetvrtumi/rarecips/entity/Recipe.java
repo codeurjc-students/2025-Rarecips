@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import com.blasetvrtumi.rarecips.enums.RecipeStatus;
+
 @Entity
 public class Recipe {
 
@@ -136,6 +138,10 @@ public class Recipe {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @JsonView(BasicInfo.class)
+    private RecipeStatus status = RecipeStatus.PENDING;
 
     public Recipe() {
         // Default constructor
@@ -321,6 +327,14 @@ public class Recipe {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public RecipeStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RecipeStatus status) {
+        this.status = status;
     }
 
     public String getAuthor() {

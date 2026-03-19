@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.sql.Blob;
-import java.io.IOException;
-import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,31 +63,26 @@ public class RecipeInitializationService {
             }
         }
 
-        if (recipes != null && recipes.length() > 0) {
+        if (recipeRepository.count() == 0 && recipes != null && recipes.length() > 0) {
+            logger.info("Database is empty. Initializing recipes from JSON file...");
 
-            // Add all recipes from the JSON file to the database
-            for (int i = 0; i < recipes.length() - 1; i++) {
+            for (int i = 0; i < recipes.length(); i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
 
                 String label = recipeJson.optString("label", null);
-
                 String description = recipeJson.optString("description", null);
 
                 List<String> dietLabels = recipeJson.optJSONArray("dietLabels", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> healthLabels = recipeJson.optJSONArray("healthLabels", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> cautions = recipeJson.optJSONArray("cautions", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 int people = recipeJson.optInt("people", 0);
 
-                // Ingredients entity!!
                 List<Ingredient> ingredients;
                 java.util.Map<Long, Float> ingredientQuantities = new HashMap<>();
                 java.util.Map<Long, String> ingredientUnits = new HashMap<>();
@@ -117,28 +110,22 @@ public class RecipeInitializationService {
                                 ingredientUnits.put(ingredient.getId(), measure);
 
                                 return ingredient;
-                            })
-                            .toList();
+                            }).toList();
                 }
 
                 int difficulty = recipeJson.optInt("difficulty", 0);
 
                 List<String> dishTypes = recipeJson.optJSONArray("dishType", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> mealTypes = recipeJson.optJSONArray("mealType", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> cuisineType = recipeJson.optJSONArray("cuisineType", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> steps = recipeJson.optJSONArray("steps", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
-
+                        .map(Object::toString).toList();
 
                 Float totalTime = recipeJson.optFloat("totalTime", 0.0f);
                 Float totalWeight = recipeJson.optFloat("totalWeight", 0.0f);
@@ -176,25 +163,29 @@ public class RecipeInitializationService {
                                 Review review = new Review(relRecipe, reviewAuthor, rating, comment, createdAt, null);
                                 reviewRepository.save(review);
                                 return review;
-                            })
-                            .toList();
+                            }).toList();
                 }
 
                 recipe.setReviews(reviews);
-                String imageString = "static/assets/img/" + (recipe.getId() - 1) + ".jpg";
-                Blob imageBlob = imageService.localImageToBlob(imageString);
-                recipe.setImageFile(imageBlob);
-                recipe.setImageString(imageService.blobToString(imageBlob));
+                
+                String imageString = "static/assets/img/" + i + ".jpg";
+                
+                try {
+                    Blob imageBlob = imageService.localImageToBlob(imageString);
+                    recipe.setImageFile(imageBlob);
+                    recipe.setImageString(imageService.blobToString(imageBlob));
+                } catch (Exception e) {
+                    logger.error("Error loading image for recipe " + label, e);
+                }
 
                 recipe.updateRating();
-
                 recipeRepository.save(recipe);
-
             }
             logger.info("Recipes initialized from JSON file successfully.");
-        } else {
+        } else if (recipes == null || recipes.length() == 0) {
             logger.warn("No recipes found in the JSON file.");
+        } else {
+            logger.info("Recipes already exist in the database. Skipping initialization to avoid duplicates.");
         }
     }
-
 }

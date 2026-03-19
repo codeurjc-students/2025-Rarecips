@@ -50,6 +50,20 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
+      - name: Run Unit Tests
+        working-directory: ./backend
+        run: |
+          mvn clean test -Dtest="**/unit/**/*Test"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-basic-test-results
+          path: |
+            backend/target/surefire-reports/**
+            backend/target/test-classes/**
+
       - name: Set up Node.js for Frontend Build
         uses: actions/setup-node@v4
         with:
@@ -69,20 +83,6 @@ jobs:
       - name: Compile Backend
         working-directory: ./backend
         run: mvn clean compile
-
-      - name: Run Unit Tests
-        working-directory: ./backend
-        run: |
-          mvn clean test -Dtest="**/unit/**/*Test"
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: backend-basic-test-results
-          path: |
-            backend/target/surefire-reports/**
-            backend/target/test-classes/**
 
   # Frontend
   frontend-basic:

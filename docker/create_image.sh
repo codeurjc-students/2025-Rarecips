@@ -40,8 +40,9 @@ if [ "$MODE" == "release" ] && [ -n "$RELEASE_TAG" ]; then
     # Build container
     docker build -f Dockerfile -t "$DOCKERHUB_USER/rarecips:$MODE" -t "$DOCKERHUB_USER/rarecips:latest" ../
 
-    # Push image latest
+    # Push latest images
     docker push "$DOCKERHUB_USER/rarecips:latest"
+    docker compose -f $FILE -p rarecips publish --with-env -y "$DOCKERHUB_USER/rarecips:latest-compose"
 
 else
 
