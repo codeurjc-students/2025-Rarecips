@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { TranslatorService } from '../../services/translator.service';
 import { RecipeService } from '../../services/recipe.service';
@@ -11,6 +11,7 @@ import { ThemeService } from '../../services/theme.service';
 import { ReviewService } from '../../services/review.service';
 import { EnumService, RecipeAttribute } from '../../services/enum.service';
 import { FormsModule } from '@angular/forms';
+import { AdminService, SystemStatus } from '../../services/admin.service';
 
 @Component({
   selector: 'app-admin-panel',
@@ -19,7 +20,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './admin-panel.component.html',
   styleUrls: ['./admin-panel.component.css']
 })
-export class AdminPanelComponent implements OnInit {
+export class AdminPanelComponent implements OnInit, OnDestroy {
   currentModal: string | null = null;
   activeTab: 'recipes' | 'reviews' | 'users' = 'recipes';
   tabAnimation: string = 'slideleft';
@@ -56,6 +57,13 @@ export class AdminPanelComponent implements OnInit {
   showAttributeTypeDropdown: boolean = false;
   deletingAttributeId: number | null = null;
 
+  systemStatus: SystemStatus = {
+    server: 'admin_loading',
+    database: 'admin_loading',
+    mail: 'admin_loading',
+    websockets: 'admin_down'
+  };
+
   usersPage: number = 0;
   hasMoreUsers: boolean = true;
   isLoadingUsers: boolean = false;
@@ -86,6 +94,8 @@ export class AdminPanelComponent implements OnInit {
 
   logos: Map<string, string> = new Map();
 
+  private statusInterval: any;
+
   constructor(
     private titleService: Title,
     public translatorService: TranslatorService,
@@ -95,7 +105,8 @@ export class AdminPanelComponent implements OnInit {
     private userService: UserService,
     private themeService: ThemeService,
     private reviewService: ReviewService,
-    private enumService: EnumService
+    private enumService: EnumService,
+    private adminService: AdminService
   ) {
   }
 
@@ -107,406 +118,68 @@ export class AdminPanelComponent implements OnInit {
     this.updateTitle();
     this.logos = this.themeService.getLogos();
 
+    this.fetchSystemStatus();
+    this.fetchPopularRecipes();
+
+    this.statusInterval = setInterval(() => {
+      this.fetchSystemStatus();
+    }, 15000);
+
     this.translatorService.onChange(() => {
       this.updateTitle();
     });
 
-    this.sessionService.getLoggedUser().subscribe(loggedUser => {
-      this.isAdmin = loggedUser?.role.includes("ADMIN");
-
-      if (!this.isAdmin) {
-        this.router.navigate(['/error'], {
-          state: {
-            status: 403,
-            reason: "You do not have permission to perform this action."
-          }
-        });
+    this.sessionService.getLoggedUser().subscribe({
+      next: (loggedUser: any) => {
+        this.isAdmin = loggedUser && loggedUser.role === 'ADMIN';
+        if (!this.isAdmin) {
+          this.router.navigate(['/']);
+        }
+      },
+      error: () => {
+        this.isAdmin = false;
+        this.router.navigate(['/login']);
       }
     });
+  }
 
-    this.fetchPopularRecipes();
+  ngOnDestroy() {
+    if (this.statusInterval) {
+      clearInterval(this.statusInterval);
+    }
   }
 
   fetchPopularRecipes() {
-    this.recipeService.getFilteredRecipes({ sortBy: 'rating' }, 0, 4).subscribe({
-      next: (data) => {
-        this.popularRecipes = data.recipes || [];
-      },
-      error: (err) => {
-        console.error('Error fetching popular recipes:', err);
-      }
+    this.recipeService.getFilteredRecipes({ sortBy: 'rating' }, 0, 10).subscribe({
+      next: (data: any) => this.popularRecipes = data.recipes,
+      error: (err: any) => console.error('Error fetching popular recipes:', err)
     });
   }
 
-  t(key: string) {
-    return this.translatorService.translate(key);
-  }
-
-  openModal(modalId: string) {
-    this.currentModal = modalId;
-    document.getElementsByTagName("html")[0].style.overflow = 'hidden';
-
-    if (modalId === 'viewAllUsers') {
-      this.fetchUsers(true);
-    } else if (modalId === 'suspendedUsers') {
-      this.fetchSuspendedUsers(true);
-    } else if (modalId === 'manageAdmins') {
-      this.fetchAdminUsers(true);
-    } else if (modalId === 'pendingRecipes') {
-      this.fetchPendingRecipes(true);
-    } else if (modalId === 'contentReports') {
-      this.fetchReports(true);
-    } else if (modalId === 'manageCategories') {
-      this.fetchAttributes();
-    }
-  }
-
-  fetchAttributes() {
-    this.enumService.getAllAttributes().subscribe({
-      next: (data) => {
-        this.attributes = data;
-        this.filterAttributes();
-      },
-      error: (err) => console.error('Error fetching attributes:', err)
-    });
-  }
-
-  filterAttributes() {
-    this.filteredAttributes = this.attributes.filter(a => a.type === this.selectedAttributeType);
-    console.log(`AdminPanel: Filtered ${this.filteredAttributes.length} attributes for type: ${this.selectedAttributeType}`);
-  }
-
-  onAttributeTypeChange() {
-    this.filterAttributes();
-    this.editingAttribute = null;
-    this.newAttributeName = '';
-  }
-
-  toggleAttributeTypeDropdown() {
-    this.showAttributeTypeDropdown = !this.showAttributeTypeDropdown;
-  }
-
-  selectAttributeType(type: any) {
-    this.selectedAttributeType = type.value;
-    this.onAttributeTypeChange();
-    this.showAttributeTypeDropdown = false;
-  }
-
-  getSelectedAttributeLabel(): string {
-    const found = this.attributeTypes.find(t => t.value === this.selectedAttributeType);
-    return found ? found.label : '';
-  }
-
-  addAttribute() {
-    if (!this.newAttributeName.trim()) return;
-    const attr: RecipeAttribute = {
-      name: this.newAttributeName,
-      type: this.selectedAttributeType
-    };
-    this.enumService.addAttribute(attr).subscribe({
-      next: () => {
-        this.newAttributeName = '';
-        this.fetchAttributes();
-      },
-      error: (err) => console.error('Error adding attribute:', err)
-    });
-  }
-
-  startEditAttribute(attr: RecipeAttribute) {
-    console.log('AdminPanel: Start editing attribute', attr);
-    this.editingAttribute = { ...attr };
-  }
-
-  cancelEditAttribute() {
-    this.editingAttribute = null;
-  }
-
-  saveAttribute() {
-    if (!this.editingAttribute || !this.editingAttribute.name.trim()) return;
-    console.log('AdminPanel: Saving attribute', this.editingAttribute);
-    this.enumService.updateAttribute(this.editingAttribute.id!, this.editingAttribute).subscribe({
-      next: () => {
-        this.editingAttribute = null;
-        this.fetchAttributes();
-      },
-      error: (err) => console.error('Error updating attribute:', err)
-    });
-  }
-
-  deleteAttribute(id: number, event?: Event) {
-    if (event) event.stopPropagation();
-    if (this.deletingAttributeId !== id) {
-      this.deletingAttributeId = id;
-      return;
-    }
-
-    console.log('AdminPanel: Confirmed deletion of attribute with id', id);
-    this.enumService.deleteAttribute(id).subscribe({
-      next: () => {
-        this.fetchAttributes();
-        this.deletingAttributeId = null;
-      },
-      error: (err) => {
-        console.error('Error deleting attribute:', err);
-        this.deletingAttributeId = null;
-      }
-    });
-  }
-
-  cancelDeleteAttribute() {
-    this.deletingAttributeId = null;
-  }
-
-  fetchUsers(reset: boolean = false) {
-    if (reset) {
-      this.usersPage = 0;
-      this.users = [];
-      this.hasMoreUsers = true;
-    }
-    if (!this.hasMoreUsers || this.isLoadingUsers) return;
-
-    this.isLoadingUsers = true;
-    this.userService.getUsersByStatus(false, this.usersPage, 10).subscribe({
-      next: (data) => {
-        const fetched = data.users || [];
-        if (reset) {
-          this.users = fetched;
-        } else {
-          this.users = [...this.users, ...fetched];
-        }
-        this.hasMoreUsers = fetched.length === 10;
-        this.isLoadingUsers = false;
-        this.usersPage++;
-      },
-      error: (err) => {
-        console.error('Error fetching users:', err);
-        this.isLoadingUsers = false;
-      }
-    });
-  }
-
-  fetchAdminUsers(reset: boolean = false) {
-    if (reset) {
-      this.adminUsersPage = 0;
-      this.adminUsers = [];
-      this.hasMoreAdminUsers = true;
-    }
-    if (!this.hasMoreAdminUsers || this.isLoadingAdminUsers) return;
-
-    this.isLoadingAdminUsers = true;
-    this.userService.getUsersByRole('ADMIN', this.adminUsersPage, 10).subscribe({
-      next: (data) => {
-        const fetched = data.users || [];
-        if (reset) {
-          this.adminUsers = fetched;
-        } else {
-          this.adminUsers = [...this.adminUsers, ...fetched];
-        }
-        this.hasMoreAdminUsers = fetched.length === 10;
-        this.isLoadingAdminUsers = false;
-        this.adminUsersPage++;
-      },
-      error: (err) => {
-        console.error('Error fetching admin users:', err);
-        this.isLoadingAdminUsers = false;
-      }
-    });
-  }
-
-  fetchSuspendedUsers(reset: boolean = false) {
-    if (reset) {
-      this.suspendedUsersPage = 0;
-      this.suspendedUsers = [];
-      this.hasMoreSuspendedUsers = true;
-    }
-    if (!this.hasMoreSuspendedUsers || this.isLoadingSuspendedUsers) return;
-
-    this.isLoadingSuspendedUsers = true;
-    this.userService.getUsersByStatus(true, this.suspendedUsersPage, 10).subscribe({
-      next: (data) => {
-        const fetched = data.users || [];
-        if (reset) {
-          this.suspendedUsers = fetched;
-        } else {
-          this.suspendedUsers = [...this.suspendedUsers, ...fetched];
-        }
-        this.hasMoreSuspendedUsers = fetched.length === 10;
-        this.isLoadingSuspendedUsers = false;
-        this.suspendedUsersPage++;
-      },
-      error: (err) => {
-        console.error('Error fetching suspended users:', err);
-        this.isLoadingSuspendedUsers = false;
-      }
-    });
-  }
-
-  fetchPendingRecipes(reset: boolean = false) {
-    if (reset) {
-      this.pendingRecipesPage = 0;
-      this.pendingRecipes = [];
-      this.hasMorePendingRecipes = true;
-    }
-    if (!this.hasMorePendingRecipes || this.isLoadingPendingRecipes) return;
-
-    this.isLoadingPendingRecipes = true;
-    this.recipeService.getPendingRecipes(this.pendingRecipesPage, 10).subscribe({
-      next: (data: any) => {
-        const fetched = data.recipes || [];
-        if (reset) {
-          this.pendingRecipes = fetched;
-        } else {
-          this.pendingRecipes = [...this.pendingRecipes, ...fetched];
-        }
-        this.hasMorePendingRecipes = fetched.length === 10;
-        this.isLoadingPendingRecipes = false;
-        this.pendingRecipesPage++;
-      },
+  fetchSystemStatus() {
+    this.adminService.getSystemStatus().subscribe({
+      next: (status) => this.systemStatus = status,
       error: (err: any) => {
-        console.error('Error fetching pending recipes:', err);
-        this.isLoadingPendingRecipes = false;
+        console.error('Error fetching system status:', err);
+        this.systemStatus = {
+          ...this.systemStatus,
+          server: 'admin_down',
+          database: 'admin_down',
+          mail: 'admin_down',
+          websockets: 'admin_down'
+        };
       }
     });
   }
 
-  fetchReports(reset: boolean = false) {
-    this.fetchReportedRecipes(reset);
-    this.fetchReportedUsers(reset);
-    this.fetchReportedReviews(reset);
-  }
-
-  fetchReportedRecipes(reset: boolean = false) {
-    if (reset) {
-      this.reportedRecipesPage = 0;
-      this.reportedRecipes = [];
-      this.hasMoreReportedRecipes = true;
-    }
-    if (!this.hasMoreReportedRecipes || this.isLoadingReportedRecipes) return;
-    this.isLoadingReportedRecipes = true;
-    this.recipeService.getReportedRecipes(this.reportedRecipesPage, 3).subscribe({
-      next: (data) => {
-        const fetched = data.recipes || [];
-        if (reset) {
-          this.reportedRecipes = fetched;
-        } else {
-          this.reportedRecipes = [...this.reportedRecipes, ...fetched];
-        }
-        this.hasMoreReportedRecipes = this.reportedRecipes.length < (data.total || 0);
-        this.isLoadingReportedRecipes = false;
-        this.reportedRecipesPage++;
-      },
-      error: (err) => {
-        console.error('Error fetching reported recipes:', err);
-        this.isLoadingReportedRecipes = false;
-      }
-    });
-  }
-
-  fetchReportedUsers(reset: boolean = false) {
-    if (reset) {
-      this.reportedUsersPage = 0;
-      this.reportedUsers = [];
-      this.hasMoreReportedUsers = true;
-    }
-    if (!this.hasMoreReportedUsers || this.isLoadingReportedUsers) return;
-    this.isLoadingReportedUsers = true;
-    this.userService.getReportedUsers(this.reportedUsersPage, 3).subscribe({
-      next: (data) => {
-        const fetched = data.users || [];
-        if (reset) {
-          this.reportedUsers = fetched;
-        } else {
-          this.reportedUsers = [...this.reportedUsers, ...fetched];
-        }
-        this.hasMoreReportedUsers = this.reportedUsers.length < (data.total || 0);
-        this.isLoadingReportedUsers = false;
-        this.reportedUsersPage++;
-      },
-      error: (err) => {
-        console.error('Error fetching reported users:', err);
-        this.isLoadingReportedUsers = false;
-      }
-    });
-  }
-
-  fetchReportedReviews(reset: boolean = false) {
-    if (reset) {
-      this.reportedReviewsPage = 0;
-      this.reportedReviews = [];
-      this.hasMoreReportedReviews = true;
-    }
-    if (!this.hasMoreReportedReviews || this.isLoadingReportedReviews) return;
-    this.isLoadingReportedReviews = true;
-    this.reviewService.getReportedReviews(this.reportedReviewsPage, 3).subscribe({
-      next: (data) => {
-        const fetched = data.reviews || [];
-        if (reset) {
-          this.reportedReviews = fetched;
-        } else {
-          this.reportedReviews = [...this.reportedReviews, ...fetched];
-        }
-        this.hasMoreReportedReviews = this.reportedReviews.length < (data.total || 0);
-        this.isLoadingReportedReviews = false;
-        this.reportedReviewsPage++;
-      },
-      error: (err) => {
-        console.error('Error fetching reported reviews:', err);
-        this.isLoadingReportedReviews = false;
-      }
-    });
-  }
-
-  closeModal(event?: Event) {
-    if (event) {
-      const target = event.target as HTMLElement;
-      const backdrop = target.closest('.visibleBackdrop');
-      if (backdrop) {
-        backdrop.classList.remove('visibleBackdrop');
-        setTimeout(() => {
-          this.resetAttributeManagementState();
-          this.currentModal = null;
-          document.getElementsByTagName("html")[0].style.overflow = 'auto';
-        }, 300);
-        return;
-      }
-    }
-
-    const backdrops = document.querySelectorAll('.visibleBackdrop');
-    if (backdrops.length > 0) {
-      backdrops.forEach(b => b.classList.remove('visibleBackdrop'));
-      setTimeout(() => {
-        this.resetAttributeManagementState();
-        this.currentModal = null;
-        document.getElementsByTagName("html")[0].style.overflow = 'auto';
-      }, 300);
-    } else {
-      this.resetAttributeManagementState();
-      this.currentModal = null;
-      document.getElementsByTagName("html")[0].style.overflow = 'auto';
-    }
-  }
-
-  resetAttributeManagementState() {
-    this.editingAttribute = null;
-    this.newAttributeName = '';
-    this.showAttributeTypeDropdown = false;
-    this.selectedAttributeType = 'caution';
-  }
-
-  onBackdropClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget) {
-      this.closeModal(event);
-    }
+  t(key: string): string {
+    return this.translatorService.translate(key);
   }
 
   switchTab(tab: 'recipes' | 'reviews' | 'users') {
     if (this.activeTab === tab) return;
 
-    const tabsOrder = ['recipes', 'reviews', 'users'];
-    const oldIndex = tabsOrder.indexOf(this.activeTab);
-    const newIndex = tabsOrder.indexOf(tab);
-
-    this.tabAnimation = newIndex > oldIndex ? 'slideleft' : 'slideright';
+    this.tabAnimation = tab === 'users' ? 'slideleft' : (tab === 'recipes' ? 'slideright' : (this.activeTab === 'recipes' ? 'slideleft' : 'slideright'));
     this.activeTab = tab;
   }
 
@@ -519,87 +192,378 @@ export class AdminPanelComponent implements OnInit {
     this.isTimeRangeDropdownOpen = false;
   }
 
-  changeUserRole(userId: string, targetRole: string) {
-    this.userService.changeUserRole(userId, targetRole).subscribe({
+  openModal(modal: string) {
+    this.currentModal = modal;
+    if (modal === 'viewAllUsers') this.fetchUsers(true);
+    if (modal === 'manageAdmins') this.fetchAdminUsers(true);
+    if (modal === 'suspendedUsers') this.fetchSuspendedUsers(true);
+    if (modal === 'pendingRecipes') this.fetchPendingRecipes(true);
+    if (modal === 'contentReports') {
+      this.fetchReportedRecipes(true);
+      this.fetchReportedUsers(true);
+      this.fetchReportedReviews(true);
+    }
+    if (modal === 'manageCategories') this.loadAttributes();
+  }
+
+  closeModal(event?: Event) {
+    if (event) event.stopPropagation();
+    this.currentModal = null;
+    this.resetAttributeManagementState();
+  }
+
+  onBackdropClick(event: Event) {
+    this.closeModal(event);
+  }
+
+  fetchUsers(reset: boolean = false) {
+    if (reset) {
+      this.users = [];
+      this.usersPage = 0;
+      this.hasMoreUsers = true;
+    }
+    if (!this.hasMoreUsers || this.isLoadingUsers) return;
+
+    this.isLoadingUsers = true;
+    this.userService.searchUsers('', this.usersPage, 10).subscribe({
+      next: (data: any) => {
+        this.users = [...this.users, ...data.users];
+        this.hasMoreUsers = (this.usersPage + 1) * 10 < data.total;
+        this.usersPage++;
+        this.isLoadingUsers = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading users:', err);
+        this.isLoadingUsers = false;
+      }
+    });
+  }
+
+  fetchAdminUsers(reset: boolean = false) {
+    if (reset) {
+      this.adminUsers = [];
+      this.adminUsersPage = 0;
+      this.hasMoreAdminUsers = true;
+    }
+    if (!this.hasMoreAdminUsers || this.isLoadingAdminUsers) return;
+
+    this.isLoadingAdminUsers = true;
+    this.userService.getUsersByRole('ADMIN', this.adminUsersPage, 10).subscribe({
+      next: (data: any) => {
+        this.adminUsers = [...this.adminUsers, ...data.users];
+        this.hasMoreAdminUsers = (this.adminUsersPage + 1) * 10 < data.total;
+        this.adminUsersPage++;
+        this.isLoadingAdminUsers = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading admins:', err);
+        this.isLoadingAdminUsers = false;
+      }
+    });
+  }
+
+  fetchSuspendedUsers(reset: boolean = false) {
+    if (reset) {
+      this.suspendedUsers = [];
+      this.suspendedUsersPage = 0;
+      this.hasMoreSuspendedUsers = true;
+    }
+    if (!this.hasMoreSuspendedUsers || this.isLoadingSuspendedUsers) return;
+
+    this.isLoadingSuspendedUsers = true;
+    this.userService.getUsersByStatus(true, this.suspendedUsersPage, 10).subscribe({
+      next: (data: any) => {
+        this.suspendedUsers = [...this.suspendedUsers, ...data.users];
+        this.hasMoreSuspendedUsers = (this.suspendedUsersPage + 1) * 10 < data.total;
+        this.suspendedUsersPage++;
+        this.isLoadingSuspendedUsers = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading suspended users:', err);
+        this.isLoadingSuspendedUsers = false;
+      }
+    });
+  }
+
+  fetchPendingRecipes(reset: boolean = false) {
+    if (reset) {
+      this.pendingRecipes = [];
+      this.pendingRecipesPage = 0;
+      this.hasMorePendingRecipes = true;
+    }
+    if (!this.hasMorePendingRecipes || this.isLoadingPendingRecipes) return;
+
+    this.isLoadingPendingRecipes = true;
+    this.recipeService.getPendingRecipes(this.pendingRecipesPage, 10).subscribe({
+      next: (data: any) => {
+        this.pendingRecipes = [...this.pendingRecipes, ...data.recipes];
+        this.hasMorePendingRecipes = (this.pendingRecipesPage + 1) * 10 < data.total;
+        this.pendingRecipesPage++;
+        this.isLoadingPendingRecipes = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading pending recipes:', err);
+        this.isLoadingPendingRecipes = false;
+      }
+    });
+  }
+
+  fetchReportedRecipes(reset: boolean = false) {
+    if (reset) {
+      this.reportedRecipes = [];
+      this.reportedRecipesPage = 0;
+      this.hasMoreReportedRecipes = true;
+    }
+    if (!this.hasMoreReportedRecipes || this.isLoadingReportedRecipes) return;
+
+    this.isLoadingReportedRecipes = true;
+    this.recipeService.getReportedRecipes(this.reportedRecipesPage, 10).subscribe({
+      next: (data: any) => {
+        this.reportedRecipes = [...this.reportedRecipes, ...data.recipes];
+        this.hasMoreReportedRecipes = (this.reportedRecipesPage + 1) * 10 < data.total;
+        this.reportedRecipesPage++;
+        this.isLoadingReportedRecipes = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading reported recipes:', err);
+        this.isLoadingReportedRecipes = false;
+      }
+    });
+  }
+
+  fetchReportedUsers(reset: boolean = false) {
+    if (reset) {
+      this.reportedUsers = [];
+      this.reportedUsersPage = 0;
+      this.hasMoreReportedUsers = true;
+    }
+    if (!this.hasMoreReportedUsers || this.isLoadingReportedUsers) return;
+
+    this.isLoadingReportedUsers = true;
+    this.userService.getReportedUsers(this.reportedUsersPage, 10).subscribe({
+      next: (data: any) => {
+        this.reportedUsers = [...this.reportedUsers, ...data.users];
+        this.hasMoreReportedUsers = (this.reportedUsersPage + 1) * 10 < data.total;
+        this.reportedUsersPage++;
+        this.isLoadingReportedUsers = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading reported users:', err);
+        this.isLoadingReportedUsers = false;
+      }
+    });
+  }
+
+  fetchReportedReviews(reset: boolean = false) {
+    if (reset) {
+      this.reportedReviews = [];
+      this.reportedReviewsPage = 0;
+      this.hasMoreReportedReviews = true;
+    }
+    if (!this.hasMoreReportedReviews || this.isLoadingReportedReviews) return;
+
+    this.isLoadingReportedReviews = true;
+    this.reviewService.getReportedReviews(this.reportedReviewsPage, 10).subscribe({
+      next: (data: any) => {
+        this.reportedReviews = [...this.reportedReviews, ...data.reviews];
+        this.hasMoreReportedReviews = (this.reportedReviewsPage + 1) * 10 < data.total;
+        this.reportedReviewsPage++;
+        this.isLoadingReportedReviews = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading reported reviews:', err);
+        this.isLoadingReportedReviews = false;
+      }
+    });
+  }
+
+  toggleAttributeTypeDropdown() {
+    this.showAttributeTypeDropdown = !this.showAttributeTypeDropdown;
+  }
+
+  selectAttributeType(type: any) {
+    this.selectedAttributeType = typeof type === 'string' ? type : type.value;
+    this.showAttributeTypeDropdown = false;
+    this.filterAttributes();
+  }
+
+  getSelectedAttributeLabel(): string {
+    const type = this.attributeTypes.find(t => t.value === this.selectedAttributeType);
+    return type ? type.label : '';
+  }
+
+  loadAttributes() {
+    this.enumService.getAllAttributes().subscribe({
+      next: (attrs) => {
+        this.attributes = attrs;
+        this.filterAttributes();
+      },
+      error: (err: any) => console.error('Error loading attributes:', err)
+    });
+  }
+
+  filterAttributes() {
+    this.filteredAttributes = this.attributes.filter(a => a.type === this.selectedAttributeType);
+  }
+
+  addAttribute() {
+    if (!this.newAttributeName.trim()) return;
+
+    const newAttr: RecipeAttribute = {
+      name: this.newAttributeName,
+      type: this.selectedAttributeType
+    };
+
+    this.enumService.addAttribute(newAttr).subscribe({
+      next: (attr: RecipeAttribute) => {
+        this.attributes.push(attr);
+        this.newAttributeName = '';
+        this.filterAttributes();
+      },
+      error: (err: any) => console.error('Error adding attribute:', err)
+    });
+  }
+
+  startEditAttribute(attr: RecipeAttribute) {
+    this.editingAttribute = { ...attr };
+  }
+
+  cancelEditAttribute() {
+    this.editingAttribute = null;
+  }
+
+  saveAttribute() {
+    if (!this.editingAttribute || !this.editingAttribute.name.trim()) return;
+
+    this.enumService.updateAttribute(this.editingAttribute.id!, this.editingAttribute).subscribe({
+      next: (updated) => {
+        const index = this.attributes.findIndex(a => a.id === updated.id);
+        if (index !== -1) {
+          this.attributes[index] = updated;
+        }
+        this.editingAttribute = null;
+        this.filterAttributes();
+      },
+      error: (err: any) => console.error('Error updating attribute:', err)
+    });
+  }
+
+  deleteAttribute(id: number, event: Event) {
+    event.stopPropagation();
+    this.enumService.deleteAttribute(id).subscribe({
+      next: () => {
+        this.attributes = this.attributes.filter(a => a.id !== id);
+        this.deletingAttributeId = null;
+        this.filterAttributes();
+      },
+      error: (err: any) => {
+        console.error('Error deleting attribute:', err);
+        this.deletingAttributeId = null;
+      }
+    });
+  }
+
+  confirmDeleteAttribute(id: number, event: Event) {
+    event.stopPropagation();
+    this.deletingAttributeId = id;
+  }
+
+  cancelDeleteAttribute() {
+    this.deletingAttributeId = null;
+  }
+
+  resetAttributeManagementState() {
+    this.newAttributeName = '';
+    this.editingAttribute = null;
+    this.deletingAttributeId = null;
+    this.showAttributeTypeDropdown = false;
+    this.selectedAttributeType = 'caution';
+  }
+
+  suspendUser(username: string) {
+    this.userService.changeUserStatus(username, 'suspend').subscribe({
+      next: () => {
+        if (this.currentModal === 'viewAllUsers') this.fetchUsers(true);
+        if (this.currentModal === 'suspendedUsers') this.fetchSuspendedUsers(true);
+      },
+      error: (err: any) => console.error('Error suspending user:', err)
+    });
+  }
+
+  unsuspendUser(username: string) {
+    this.userService.changeUserStatus(username, 'unsuspend').subscribe({
+      next: () => {
+        if (this.currentModal === 'viewAllUsers') this.fetchUsers(true);
+        if (this.currentModal === 'suspendedUsers') this.fetchSuspendedUsers(true);
+      },
+      error: (err: any) => console.error('Error unsuspending user:', err)
+    });
+  }
+
+  liftSuspension(username: string) {
+    this.unsuspendUser(username);
+  }
+
+  promoteToAdmin(username: string) {
+    this.userService.changeUserRole(username, 'ADMIN').subscribe({
       next: () => {
         if (this.currentModal === 'viewAllUsers') this.fetchUsers(true);
         if (this.currentModal === 'manageAdmins') this.fetchAdminUsers(true);
       },
-      error: (err) => {
-        console.error('Error changing user role:', err);
-      }
-    });
-  }
-  suspendUser(userId: string) {
-    this.userService.changeUserStatus(userId, 'suspend').subscribe({
-      next: () => {
-        if (this.currentModal === 'viewAllUsers') this.fetchUsers(true);
-        if (this.currentModal === 'suspendedUsers') this.fetchSuspendedUsers(true);
-      },
-      error: (err) => {
-        console.error('Error suspending user:', err);
-      }
-    });
-  }
-  liftSuspension(userId: string) {
-    this.userService.changeUserStatus(userId, 'unsuspend').subscribe({
-      next: () => {
-        if (this.currentModal === 'viewAllUsers') this.fetchUsers(true);
-        if (this.currentModal === 'suspendedUsers') this.fetchSuspendedUsers(true);
-      },
-      error: (err) => {
-        console.error('Error lifting suspension:', err);
-      }
+      error: (err: any) => console.error('Error promoting user:', err)
     });
   }
 
-  approveRecipe(recipeId: string) {
-    this.recipeService.changeRecipeStatus(recipeId, 'approve').subscribe({
+  demoteToUser(username: string) {
+    this.userService.changeUserRole(username, 'USER').subscribe({
       next: () => {
-        if (this.currentModal === 'pendingRecipes') this.fetchPendingRecipes(true);
+        if (this.currentModal === 'viewAllUsers') this.fetchUsers(true);
+        if (this.currentModal === 'manageAdmins') this.fetchAdminUsers(true);
       },
-      error: (err) => {
-        console.error('Error approving recipe:', err);
-      }
-    });
-  }
-  rejectRecipe(recipeId: string) {
-    this.recipeService.changeRecipeStatus(recipeId, 'reject').subscribe({
-      next: () => {
-        if (this.currentModal === 'pendingRecipes') this.fetchPendingRecipes(true);
-      },
-      error: (err) => {
-        console.error('Error rejecting recipe:', err);
-      }
+      error: (err: any) => console.error('Error demoting user:', err)
     });
   }
 
-  dismissRecipeReport(recipeId: string | number) {
-    this.recipeService.dismissReport(recipeId).subscribe({
+  changeUserRole(username: string, role: string) {
+    if (role === 'ADMIN') {
+      this.promoteToAdmin(username);
+    } else {
+      this.demoteToUser(username);
+    }
+  }
+
+  approveRecipe(id: number) {
+    this.recipeService.changeRecipeStatus(id, 'approve').subscribe({
+      next: () => this.fetchPendingRecipes(true),
+      error: (err: any) => console.error('Error approving recipe:', err)
+    });
+  }
+
+  rejectRecipe(id: number) {
+    this.recipeService.changeRecipeStatus(id, 'reject').subscribe({
+      next: () => this.fetchPendingRecipes(true),
+      error: (err: any) => console.error('Error rejecting recipe:', err)
+    });
+  }
+
+  dismissRecipeReport(id: number) {
+    this.recipeService.dismissReport(id).subscribe({
       next: () => this.fetchReportedRecipes(true),
-      error: (err) => console.error('Error dismissing recipe report:', err)
+      error: (err: any) => console.error('Error resolving recipe report:', err)
     });
   }
 
   dismissUserReport(username: string) {
     this.userService.dismissReport(username).subscribe({
       next: () => this.fetchReportedUsers(true),
-      error: (err) => console.error('Error dismissing user report:', err)
+      error: (err: any) => console.error('Error resolving user report:', err)
     });
   }
 
-  dismissReviewReport(reviewId: string | number) {
-    this.reviewService.dismissReport(reviewId).subscribe({
+  dismissReviewReport(id: number) {
+    this.reviewService.dismissReport(id).subscribe({
       next: () => this.fetchReportedReviews(true),
-      error: (err) => console.error('Error dismissing review report:', err)
-    });
-  }
-
-  deleteReview(reviewId: string) {
-    this.reviewService.deleteReview(reviewId).subscribe({
-      next: () => this.fetchReportedReviews(true),
-      error: (err) => console.error('Error deleting review:', err)
+      error: (err: any) => console.error('Error resolving review report:', err)
     });
   }
 }
-

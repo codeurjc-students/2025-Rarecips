@@ -21,7 +21,7 @@
               <button
                 class="userReportBut absolute top-7 left-7 w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"
                 style="background: #ef4444; color: white;"
-                (click)="reportProfile()">
+                (click)="reportProfile($event)">
                 <i class="ti ti-flag text-xl"></i>
               </button>
             }
@@ -272,7 +272,7 @@
                         </span>
                       </div>
                       @if (isAuthenticated && review.authorUsername !== user?.username) {
-                        <button class="p-2 cursor-pointer transition hover:scale-110" (click)="reportReview(review.id)" title="{{ t('report') }}">
+                        <button class="p-2 cursor-pointer transition hover:scale-110" (click)="reportReview(review.id, $event)" title="{{ t('report') }}">
                           <i class="ti ti-flag text-lg text-red-500"></i>
                         </button>
                       }

@@ -716,7 +716,10 @@ export class RecipeViewComponent implements OnInit {
     }
     this.reviewService.reportReview(reviewId).subscribe({
       next: () => {
-        (event?.target as HTMLElement).closest('i')?.classList.add('ti-flag-filled');
+        if (event) {
+          const icon = (event.target as HTMLElement).closest('button')?.querySelector('i');
+          if (icon) icon.classList.add('ti-flag-filled');
+        }
       },
       error: (err) => console.error('Error reporting review:', err)
     });
@@ -730,7 +733,9 @@ export class RecipeViewComponent implements OnInit {
     }
     if (this.recipe?.id) {
       this.recipeService.reportRecipe(this.recipe.id).subscribe({
-        next: () => alert(this.t('admin_action_success')),
+        next: () => {
+          (event.target as HTMLElement).closest('button')?.querySelector('i')?.classList.add('ti-flag-filled');
+        },
         error: (err) => console.error('Error reporting recipe:', err)
       });
     }

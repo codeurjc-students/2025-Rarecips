@@ -414,16 +414,20 @@ export class ProfileViewComponent implements OnInit {
     this.router.navigate(['/recipes', recipeId]);
   }
 
-  reportProfile() {
+  reportProfile(event: Event) {
     this.userService.reportUser(this.username).subscribe({
-      next: () => alert(this.t('admin_action_success')),
+      next: () => {
+        (event.target as HTMLElement).closest('button')?.querySelector('i')?.classList.add('ti-flag-filled');
+      },
       error: (err) => console.error('Error reporting user:', err)
     });
   }
 
-  reportReview(reviewId: number) {
+  reportReview(reviewId: number, event: Event) {
     this.reviewService.reportReview(reviewId).subscribe({
-      next: () => alert(this.t('admin_action_success')),
+      next: () => {
+        (event.target as HTMLElement).closest('button')?.querySelector('i')?.classList.add('ti-flag-filled');
+      },
       error: (err) => console.error('Error reporting review:', err)
     });
   }

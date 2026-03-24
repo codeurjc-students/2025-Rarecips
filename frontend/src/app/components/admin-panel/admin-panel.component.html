@@ -276,41 +276,57 @@
       <div class="flex flex-col w-full justify-around gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
         <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-          <i class="ti ti-heart-rate-monitor mr-2"></i>
-          {{ t('admin_system_status') }}
+          <i class="ti ti-server mr-2"></i>
+          {{ t('admin_backend_status') }}
         </h3>
         <div class="flex flex-col gap-4">
           <div class="flex items-center justify-between p-3 rounded-xl"
                style="background: var(--primary-100-40);">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_server') }}</span>
+              <div class="w-3 h-3 rounded-full" [ngClass]="{
+                'status-operational': systemStatus.server === 'admin_operational',
+                'status-warning': systemStatus.server === 'admin_slow',
+                'status-error': systemStatus.server === 'admin_down' || systemStatus.server === 'admin_loading'
+              }"></div>
+              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_backend') }}</span>
             </div>
-            <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_operational') }}</span>
+            <span class="text-sm" style="color: var(--primary-400);">{{ t(systemStatus.server) }}</span>
           </div>
           <div class="flex items-center justify-between p-3 rounded-xl"
                style="background: var(--primary-100-40);">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              <div class="w-3 h-3 rounded-full" [ngClass]="{
+                'status-operational': systemStatus.database === 'admin_operational',
+                'status-warning': systemStatus.database === 'admin_slow',
+                'status-error': systemStatus.database === 'admin_down' || systemStatus.database === 'admin_loading'
+              }"></div>
               <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_database') }}</span>
             </div>
-            <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_operational') }}</span>
+            <span class="text-sm" style="color: var(--primary-400);">{{ t(systemStatus.database) }}</span>
           </div>
           <div class="flex items-center justify-between p-3 rounded-xl"
                style="background: var(--primary-100-40);">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_api') }}</span>
+              <div class="w-3 h-3 rounded-full" [ngClass]="{
+                'status-operational': systemStatus.mail === 'admin_operational',
+                'status-warning': systemStatus.mail === 'admin_slow',
+                'status-error': systemStatus.mail === 'admin_down' || systemStatus.mail === 'admin_loading'
+              }"></div>
+              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_mail_sender') }}</span>
             </div>
-            <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_slow') }}</span>
+            <span class="text-sm" style="color: var(--primary-400);">{{ t(systemStatus.mail) }}</span>
           </div>
           <div class="flex items-center justify-between p-3 rounded-xl"
                style="background: var(--primary-100-40);">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-red-500"></div>
+              <div class="w-3 h-3 rounded-full" [ngClass]="{
+                'status-operational': systemStatus.websockets === 'admin_operational',
+                'status-warning': systemStatus.websockets === 'admin_slow',
+                'status-error': systemStatus.websockets === 'admin_down' || systemStatus.websockets === 'admin_loading'
+              }"></div>
               <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_websockets') }}</span>
             </div>
-            <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_down') }}</span>
+            <span class="text-sm" style="color: var(--primary-400);">{{ t(systemStatus.websockets) }}</span>
           </div>
         </div>
       </div>
@@ -611,6 +627,7 @@
     </div>
 
     <div class="h-px w-full" style="background: var(--primary-300);"></div>
+
 
     <div class="flex flex-col gap-2 relative category-dropdown-container">
       <label class="text-sm font-semibold" style="color: var(--primary-700);">{{ t('sort_by') }}</label>
