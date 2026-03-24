@@ -104,6 +104,18 @@ public class User {
     @Column(name = "suspended", nullable = false)
     private boolean suspended = false;
 
+    @JsonView(BasicInfo.class)
+    @Column(name = "reported", nullable = false)
+    private boolean reported = false;
+
+    public boolean isReported() {
+        return reported;
+    }
+
+    public void setReported(boolean reported) {
+        this.reported = reported;
+    }
+
     @Column(name = "password_reset_token")
     private String passwordResetToken;
 

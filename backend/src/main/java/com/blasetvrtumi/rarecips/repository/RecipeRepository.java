@@ -17,8 +17,15 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByLabelContainingIgnoreCase(String label);
 
     List<Recipe> findByAuthor(User author);
-
     Page<Recipe> findByAuthorUsername(String username, Pageable pageable);
+
+    Page<Recipe> findByAuthorUsernameAndPendingReviewFalse(String username, Pageable pageable);
+
+    Page<Recipe> findByAuthorUsernameAndPendingReviewTrue(String username, Pageable pageable);
+
+    Page<Recipe> findByPendingReviewTrue(Pageable pageable);
+
+    Page<Recipe> findByReportedTrue(Pageable pageable);
 
     @Query("SELECT DISTINCT ct FROM Recipe r JOIN r.cuisineType ct WHERE ct IS NOT NULL")
     List<String> findDistinctCuisineTypes();
@@ -60,6 +67,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "(:cuisineTypes IS NULL OR EXISTS (SELECT ct FROM r.cuisineType ct WHERE ct IN :cuisineTypes)) AND " +
             "(:dishTypes IS NULL OR EXISTS (SELECT dt FROM r.dishTypes dt WHERE dt IN :dishTypes)) AND " +
             "(:mealTypes IS NULL OR EXISTS (SELECT mt FROM r.mealTypes mt WHERE mt IN :mealTypes)) AND " +
+            "r.pendingReview = false AND " +
             "(:userIngredientIds IS NULL OR SIZE(r.ingredients) = 0 OR " +
             "(SELECT COUNT(ing) FROM r.ingredients ing WHERE ing.id NOT IN :userIngredientIds) = 0)")
     Page<Recipe> findRecipesWithFilters(
@@ -108,6 +116,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "(:cautions IS NULL OR NOT EXISTS (SELECT c FROM r.cautions c WHERE c IN :cautions)) AND " +
             "(:cuisineTypes IS NULL OR EXISTS (SELECT ct FROM r.cuisineType ct WHERE ct IN :cuisineTypes)) AND " +
             "(:dishTypes IS NULL OR EXISTS (SELECT dt FROM r.dishTypes dt WHERE dt IN :dishTypes)) AND " +
+            "r.pendingReview = false AND " +
             "(:mealTypes IS NULL OR EXISTS (SELECT mt FROM r.mealTypes mt WHERE mt IN :mealTypes))")
     Page<Recipe> findByTags(
             @Param("dietLabels") List<String> dietLabels,
@@ -119,12 +128,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT COUNT(r) FROM Recipe r JOIN r.dishTypes dt WHERE dt = :dishType")
+    @Query("SELECT COUNT(r) FROM Recipe r JOIN r.dishTypes dt WHERE dt = :dishType AND r.pendingReview = false")
     long countByDishType(@Param("dishType") String dishType);
 
-    @Query("SELECT COUNT(r) FROM Recipe r JOIN r.mealTypes mt WHERE mt = :mealType")
+    @Query("SELECT COUNT(r) FROM Recipe r JOIN r.mealTypes mt WHERE mt = :mealType AND r.pendingReview = false")
     long countByMealType(@Param("mealType") String mealType);
 
-    @Query("SELECT r FROM Recipe r LEFT JOIN r.reviews rev GROUP BY r.id ORDER BY COUNT(rev) DESC")
+    @Query("SELECT r FROM Recipe r LEFT JOIN r.reviews rev WHERE r.pendingReview = false GROUP BY r.id ORDER BY COUNT(rev) DESC")
     Page<Recipe> findAllOrderByReviewsCountDesc(Pageable pageable);
 }

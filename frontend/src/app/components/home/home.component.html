@@ -250,6 +250,24 @@
 
                 <div class="absolute inset-0 gradient-overlay"></div>
 
+                @if (recipe.pendingReview) {
+                  <div class="pending-recipe-overlay">
+                    <div class="pending-recipe-chip">
+                      <i class="ti ti-clock text-lg"></i>
+                      <span>{{ t('pending_admin_approval') }}</span>
+                    </div>
+                  </div>
+                }
+
+                @if (recipe.pendingReview) {
+                  <div class="pending-recipe-overlay">
+                    <div class="pending-recipe-chip">
+                      <i class="ti ti-clock text-lg"></i>
+                      <span>{{ t('pending_admin_approval') }}</span>
+                    </div>
+                  </div>
+                }
+
                 @if (currentUser) {
                   <div class="actionButtons absolute top-4 right-4 flex gap-2">
                     <button
@@ -423,7 +441,7 @@
                   <div class="imageCont relative aspect-43 overflow-hidden" (mouseover)="hoverRecipeId = recipe.id" (mouseout)="hoverRecipeId = undefined">
                     <img *ngIf="recipe.imageUrl"
                       src="data:image/png;base64,{{recipe.imageUrl}}"
-                      alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available;"
+                      alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available; background: var(--primary-300)"
                       [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
                     <img *ngIf="!recipe.imageUrl"
                       src="assets/img/recipe.png"
@@ -432,6 +450,24 @@
 
                     <!-- Gradient Overlay -->
                     <div class="absolute inset-0 gradient-overlay"></div>
+
+                    @if (recipe.pendingReview) {
+                      <div class="pending-recipe-overlay">
+                        <div class="pending-recipe-chip">
+                          <i class="ti ti-clock text-lg"></i>
+                          <span>{{ t('pending_admin_approval') }}</span>
+                        </div>
+                      </div>
+                    }
+
+                    @if (recipe.pendingReview) {
+                      <div class="pending-recipe-overlay">
+                        <div class="pending-recipe-chip">
+                          <i class="ti ti-clock text-lg"></i>
+                          <span>{{ t('pending_admin_approval') }}</span>
+                        </div>
+                      </div>
+                    }
 
                     <!-- Top Right Actions -->
                     @if (currentUser) {

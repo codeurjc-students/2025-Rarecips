@@ -12,6 +12,7 @@ import { CollectionCardComponent } from '../shared/collection-card/collection-ca
 import { TranslatorService } from '../../services/translator.service';
 import { DomSanitizer, Title } from '@angular/platform-browser';
 import { ThemeService } from '../../services/theme.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-home',
@@ -22,6 +23,7 @@ import { ThemeService } from '../../services/theme.service';
 })
 export class HomeComponent implements OnInit {
   recipeList: Recipe[] = [];
+  pendingLandingRecipes: Recipe[] = [];
   page = 0;
   itemsPerPage = 9;
   isLoading: boolean = true;
@@ -78,7 +80,8 @@ export class HomeComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     public sanitizer: DomSanitizer,
     public translator: TranslatorService,
-    private titleService: Title
+    private titleService: Title,
+    private userService: UserService
   ) {
   }
 
@@ -198,6 +201,60 @@ export class HomeComponent implements OnInit {
   fetchRecipes(): void {
     this.isLoading = true;
     this.page = 0;
+    if (this.currentUser) {
+      const isAdmin = this.currentUser.role === 'ADMIN';
+
+      if (isAdmin) {
+        forkJoin({
+          pendingRecipes: this.recipeService.getPendingRecipes(0, 100),
+          publicRecipes: this.recipeService.getRecipes(this.page)
+        }).subscribe({
+          next: (results: any) => {
+            this.pendingLandingRecipes = results.pendingRecipes?.recipes || [];
+            const publicRecipes = results.publicRecipes || [];
+            this.recipeList = this.mergeRecipesUnique(this.pendingLandingRecipes, publicRecipes);
+            this.isLoading = false;
+            this.hasMore = publicRecipes.length % this.itemsPerPage === 0;
+          },
+          error: () => {
+            this.pendingLandingRecipes = [];
+            this.loadPublicOnly();
+          }
+        });
+      } else {
+        forkJoin({
+          userPendingRecipes: this.userService.getUserPendingRecipes(this.currentUser.username, 0, 100),
+          publicRecipes: this.recipeService.getRecipes(this.page)
+        }).subscribe({
+          next: (results: any) => {
+            const ownPendingRecipes: Recipe[] = (results.userPendingRecipes?.content || [])
+              .map((r: any) => ({
+                ...r,
+                title: r.label,
+                imageUrl: r.imageString,
+                imageString: r.imageString,
+                pendingReview: !!r.pendingReview
+              }));
+
+            this.pendingLandingRecipes = ownPendingRecipes;
+            const publicRecipes = results.publicRecipes || [];
+            this.recipeList = this.mergeRecipesUnique(this.pendingLandingRecipes, publicRecipes);
+            this.isLoading = false;
+            this.hasMore = publicRecipes.length % this.itemsPerPage === 0;
+          },
+          error: () => {
+            this.pendingLandingRecipes = [];
+            this.loadPublicOnly();
+          }
+        });
+      }
+    } else {
+      this.pendingLandingRecipes = [];
+      this.loadPublicOnly();
+    }
+  }
+
+  private loadPublicOnly(): void {
     this.recipeService.getRecipes(this.page).subscribe({
       next: (recipes) => {
         this.recipeList = recipes;
@@ -210,11 +267,24 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  private mergeRecipesUnique(priorityRecipes: Recipe[], publicRecipes: Recipe[]): Recipe[] {
+    const merged = [...priorityRecipes, ...publicRecipes];
+    const seen = new Set<number>();
+    return merged.filter((recipe) => {
+      if (seen.has(recipe.id)) {
+        return false;
+      }
+      seen.add(recipe.id);
+      return true;
+    });
+  }
+
   loadMoreRecipes(): void {
     this.isLoading = true;
     this.recipeService.getRecipes(++this.page).subscribe({
       next: (moreRecipes) => {
-        this.recipeList = [...this.recipeList, ...moreRecipes];
+        const mergedPublic = this.mergeRecipesUnique(this.recipeList, moreRecipes);
+        this.recipeList = mergedPublic;
         this.isLoading = false;
         this.hasMore = moreRecipes.length % this.itemsPerPage > 0;
       },
@@ -378,7 +448,7 @@ export class HomeComponent implements OnInit {
       case 'DELETE_COLLECTION':
         if (activity.collectionId) {
           this.getCollectionName(activity.collectionId).subscribe({
-            next: (colName) => {
+            next: (colName: string) => {
               link = `<p>${colName}</p>`;
               name = link;
             },

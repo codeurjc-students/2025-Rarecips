@@ -138,6 +138,19 @@ export class UserService {
       })
     );
   }
+  getUserPendingRecipes(username: string, page: number = 0, size: number = 10): Observable<any> {
+    const params = {
+      display: 'recipes',
+      pendingOnly: 'true',
+      page: page.toString(),
+      size: size.toString()
+    };
+    return this.httpClient.get(`${this.API_URL}/${username}`, {params}).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(`Error fetching user pending recipes: ${error.statusText}`));
+      })
+    );
+  }
 
   getUserReviews(username: string, page: number = 0, size: number = 10): Observable<any> {
     const params = {display: 'reviews', page: page.toString(), size: size.toString()};
@@ -219,10 +232,33 @@ export class UserService {
   }
 
   changeUserStatus(username: string, action: 'suspend' | 'unsuspend'): Observable<any> {
-    return this.httpClient.put(`${this.API_URL}/${username}/status?action=${action}`, null, { withCredentials: true });
+    const lang = localStorage.getItem('lang') || 'en';
+    const theme = localStorage.getItem('selectedTheme') || 'theme-tangerine-light';
+    return this.httpClient.put(
+      `${this.API_URL}/${username}/status?action=${action}&lang=${encodeURIComponent(lang)}&theme=${encodeURIComponent(theme)}`,
+      null,
+      { withCredentials: true }
+    );
   }
 
   changeUserRole(username: string, role: string): Observable<any> {
     return this.httpClient.put(`${this.API_URL}/${username}/role?role=${role}`, null, { withCredentials: true });
+  }
+
+  reportUser(username: string): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${username}/report`, null);
+  }
+
+  getReportedUsers(page: number, size: number): Observable<any> {
+    const params: any = { page, size };
+    return this.httpClient.get<any>(`${this.API_URL}/reported`, { params, withCredentials: true }).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(`Error fetching reported users: ${error.statusText}`));
+      })
+    );
+  }
+
+  dismissReport(username: string): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${username}/dismiss-report`, null);
   }
 }

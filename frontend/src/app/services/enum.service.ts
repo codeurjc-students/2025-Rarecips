@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface RecipeAttribute {
+  id?: number;
+  name: string;
+  type: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,5 +43,22 @@ export class EnumService {
   getMealTypes(): Observable<string[]> {
     return this.http.get<string[]>(`${this.apiUrl}/meal-types`);
   }
+
+  getAllAttributes(): Observable<RecipeAttribute[]> {
+    return this.http.get<RecipeAttribute[]>(`${this.apiUrl}/attributes`);
+  }
+
+  addAttribute(attribute: RecipeAttribute): Observable<RecipeAttribute> {
+    return this.http.post<RecipeAttribute>(`${this.apiUrl}/attributes`, attribute);
+  }
+
+  updateAttribute(id: number, attribute: RecipeAttribute): Observable<RecipeAttribute> {
+    return this.http.put<RecipeAttribute>(`${this.apiUrl}/attributes/${id}`, attribute);
+  }
+
+  deleteAttribute(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/attributes/${id}`);
+  }
 }
+
 

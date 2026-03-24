@@ -108,12 +108,20 @@ public class RecipeCollectionService {
     }
 
     @Transactional
-    public RecipeCollection addRecipeToCollection(Long collectionId, Long recipeId) {
+    public RecipeCollection addRecipeToCollection(Long collectionId, Long recipeId, User actingUser) {
         RecipeCollection collection = recipeCollectionRepository.findById(collectionId)
                 .orElseThrow(() -> new IllegalArgumentException("Collection not found"));
 
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new IllegalArgumentException("Recipe not found"));
+
+        if (recipe.isPendingReview()) {
+            boolean isAdmin = actingUser != null && "ADMIN".equals(actingUser.getRole());
+            boolean isAuthor = actingUser != null && recipe.getAuthor() != null && recipe.getAuthor().equals(actingUser.getUsername());
+            if (!isAdmin && !isAuthor) {
+                throw new IllegalArgumentException("Pending recipes can only be managed by author or admin");
+            }
+        }
 
         collection.setUpdatedAt(LocalDateTime.now());
         collection.addRecipe(recipe);

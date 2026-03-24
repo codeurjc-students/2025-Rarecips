@@ -1,8 +1,10 @@
 package com.blasetvrtumi.rarecips.controller;
 
+import com.blasetvrtumi.rarecips.entity.Activity;
 import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
+import com.blasetvrtumi.rarecips.service.ActivityService;
 import com.blasetvrtumi.rarecips.service.ImageService;
 import com.blasetvrtumi.rarecips.service.RecipeService;
 
@@ -40,6 +42,28 @@ public class RecipeController {
     private RecipeRepository recipeRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ActivityService activityService;
+
+    private User getAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        return userService.findByUsername(authentication.getName());
+    }
+
+    private boolean canViewPendingRecipe(Recipe recipe, User user) {
+        if (!recipe.isPendingReview()) {
+            return true;
+        }
+        if (user == null) {
+            return false;
+        }
+        if ("ADMIN".equals(user.getRole())) {
+            return true;
+        }
+        return recipe.getAuthor() != null && recipe.getAuthor().equals(user.getUsername());
+    }
 
     @Operation(summary = "Get recipe by ID")
     @ApiResponses(value = {
@@ -47,15 +71,18 @@ public class RecipeController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class))}),
             @ApiResponse(responseCode = "404", description = "Recipe not found", content = @Content)})
     @GetMapping("/{id}")
-    public ResponseEntity<?> getRecipeById(@PathVariable Long id) {
+    public ResponseEntity<?> getRecipeById(@PathVariable Long id, Authentication authentication) {
         Recipe recipe = recipeService.findById(id);
-        HashMap<String, Object> response = new HashMap<>();
-        if (recipe != null) {
-            response.put("recipe", recipe);
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(404).body("Recipe not found");
+        if (recipe == null) return ResponseEntity.status(404).body("Recipe not found");
+
+        User authenticatedUser = getAuthenticatedUser(authentication);
+        if (!canViewPendingRecipe(recipe, authenticatedUser)) {
+            return ResponseEntity.status(403).body("Recipe is pending approvak");
         }
+        
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("recipe", recipe);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Create a new recipe")
@@ -331,6 +358,35 @@ public class RecipeController {
         }
     }
 
+    @Operation(summary = "Get pending recipes (admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pending recipes retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Admin only")
+    })
+    @GetMapping("/pending")
+    public ResponseEntity<?> getPendingRecipes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+
+        User adminUser = getAuthenticatedUser(authentication);
+        if (adminUser == null) return ResponseEntity.status(401).body("User must be authenticated");
+        if (!adminUser.getRole().equals("ADMIN")) {
+            return ResponseEntity.status(403).body("Only admins can fetch pending recipes.");
+        }
+        
+        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+        Page<Recipe> pending = recipeRepository.findByPendingReviewTrue(pageable);
+        
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("recipes", pending.getContent());
+        response.put("total", pending.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Change status of a pending recipe (approve or reject)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Recipe status changed successfully"),
@@ -341,10 +397,8 @@ public class RecipeController {
     })
     @PutMapping("/{id}/status")
     public ResponseEntity<?> changeRecipeStatus(@PathVariable Long id, @RequestParam String action, Authentication authentication) {
-
-        if (authentication == null || !authentication.isAuthenticated()) return ResponseEntity.status(401).body("User must be authenticated");
-
-        User adminUser = userService.findByUsername(authentication.getName());
+        User adminUser = getAuthenticatedUser(authentication);
+        if (adminUser == null) return ResponseEntity.status(401).body("User must be authenticated");
 
         if (!adminUser.getRole().equals("ADMIN")) {
             return ResponseEntity.status(403).body("Only admins can change recipe status.");
@@ -359,17 +413,81 @@ public class RecipeController {
         if (recipe == null) return ResponseEntity.status(404).body("Recipe not found.");
 
         if (action.equalsIgnoreCase("approve")) {
-
             recipe.setStatus(com.blasetvrtumi.rarecips.enums.RecipeStatus.APPROVED);
+            recipe.setPendingReview(false);
             recipeRepository.save(recipe);
-
+            String authorUsername = recipe.getAuthor();
+            if (authorUsername != null) {
+                activityService.logActivity(
+                        authorUsername,
+                        Activity.ActivityType.CREATE_RECIPE,
+                        recipe.getLabel(),
+                        "created recipe " + recipe.getLabel(),
+                        recipe.getId(),
+                        null
+                );
+            }
+            // TODO: send notification to user about acceptance
             return ResponseEntity.ok().body(java.util.Collections.singletonMap("message", "Recipe approved successfully."));
         } else {
-
-            recipe.setStatus(com.blasetvrtumi.rarecips.enums.RecipeStatus.REJECTED);
-            recipeRepository.save(recipe);
-            
+            recipeService.deleteRecipe(id, adminUser.getUsername());
+            // TODO: send notification to user about rejection
             return ResponseEntity.ok().body(java.util.Collections.singletonMap("message", "Recipe rejected successfully."));
         }
+    }
+
+    @Operation(summary = "Report a recipe")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recipe reported successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Recipe not found")
+    })
+    @PutMapping("/{id}/report")
+    public ResponseEntity<?> reportRecipe(@PathVariable Long id, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("User must be authenticated to report a recipe");
+        }
+        Recipe recipe = recipeService.findById(id);
+        if (recipe == null) return ResponseEntity.status(404).body("Recipe not found");
+        
+        recipe.setReported(true);
+        recipeRepository.save(recipe);
+        return ResponseEntity.ok(Map.of("message", "Recipe reported successfully"));
+    }
+
+    @Operation(summary = "Get reported recipes (admin only)")
+    @GetMapping("/reported")
+    public ResponseEntity<?> getReportedRecipes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        User adminUser = getAuthenticatedUser(authentication);
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            return ResponseEntity.status(403).body("Only admins can fetch reported recipes");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Recipe> reported = recipeRepository.findByReportedTrue(pageable);
+        
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("recipes", reported.getContent());
+        response.put("total", reported.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Dismiss report for a recipe (admin only)")
+    @PutMapping("/{id}/dismiss-report")
+    public ResponseEntity<?> dismissReport(@PathVariable Long id, Authentication authentication) {
+        User adminUser = getAuthenticatedUser(authentication);
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            return ResponseEntity.status(403).body("Only admins can dismiss reports");
+        }
+        Recipe recipe = recipeService.findById(id);
+        if (recipe == null) return ResponseEntity.status(404).body("Recipe not found");
+
+        recipe.setReported(false);
+        recipeRepository.save(recipe);
+        return ResponseEntity.ok(Map.of("message", "Report dismissed successfully"));
     }
 }

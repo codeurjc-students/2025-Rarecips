@@ -5,14 +5,17 @@ import { RecipeService } from '../../services/recipe.service';
 import { UserService } from '../../services/user.service';
 import { Recipe } from '../../models/recipe.model';
 import { CommonModule } from '@angular/common';
-import {Router, RouterModule} from '@angular/router';
-import {SessionService} from '../../services/session.service';
+import { Router, RouterModule } from '@angular/router';
+import { SessionService } from '../../services/session.service';
 import { ThemeService } from '../../services/theme.service';
+import { ReviewService } from '../../services/review.service';
+import { EnumService, RecipeAttribute } from '../../services/enum.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './admin-panel.component.html',
   styleUrls: ['./admin-panel.component.css']
 })
@@ -28,11 +31,30 @@ export class AdminPanelComponent implements OnInit {
   adminUsers: any[] = [];
   suspendedUsers: any[] = [];
   pendingRecipes: any[] = [];
-  contentReports: any[] = [];
-  categories: any[] = [];
+  reportedRecipes: any[] = [];
+  reportedUsers: any[] = [];
+  reportedReviews: any[] = [];
+  attributes: RecipeAttribute[] = [];
+  filteredAttributes: RecipeAttribute[] = [];
+  selectedAttributeType: string = 'caution';
+
+  newAttributeName: string = '';
+  editingAttribute: RecipeAttribute | null = null;
+
+  attributeTypes = [
+    { value: 'caution', label: 'allergens' },
+    { value: 'cuisineType', label: 'cuisine_type' },
+    { value: 'dietLabel', label: 'diet_labels' },
+    { value: 'dishType', label: 'dish_type' },
+    { value: 'healthLabel', label: 'health_labels' },
+    { value: 'mealType', label: 'meal_type' }
+  ];
 
   isTimeRangeDropdownOpen: boolean = false;
   selectedTimeRange: string = 'admin_last_7_days';
+
+  showAttributeTypeDropdown: boolean = false;
+  deletingAttributeId: number | null = null;
 
   usersPage: number = 0;
   hasMoreUsers: boolean = true;
@@ -46,6 +68,22 @@ export class AdminPanelComponent implements OnInit {
   hasMoreSuspendedUsers: boolean = true;
   isLoadingSuspendedUsers: boolean = false;
 
+  pendingRecipesPage: number = 0;
+  hasMorePendingRecipes: boolean = true;
+  isLoadingPendingRecipes: boolean = false;
+
+  reportedRecipesPage: number = 0;
+  hasMoreReportedRecipes: boolean = true;
+  isLoadingReportedRecipes: boolean = false;
+
+  reportedUsersPage: number = 0;
+  hasMoreReportedUsers: boolean = true;
+  isLoadingReportedUsers: boolean = false;
+
+  reportedReviewsPage: number = 0;
+  hasMoreReportedReviews: boolean = true;
+  isLoadingReportedReviews: boolean = false;
+
   logos: Map<string, string> = new Map();
 
   constructor(
@@ -55,7 +93,9 @@ export class AdminPanelComponent implements OnInit {
     private sessionService: SessionService,
     private router: Router,
     private userService: UserService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private reviewService: ReviewService,
+    private enumService: EnumService
   ) {
   }
 
@@ -112,7 +152,109 @@ export class AdminPanelComponent implements OnInit {
       this.fetchSuspendedUsers(true);
     } else if (modalId === 'manageAdmins') {
       this.fetchAdminUsers(true);
+    } else if (modalId === 'pendingRecipes') {
+      this.fetchPendingRecipes(true);
+    } else if (modalId === 'contentReports') {
+      this.fetchReports(true);
+    } else if (modalId === 'manageCategories') {
+      this.fetchAttributes();
     }
+  }
+
+  fetchAttributes() {
+    this.enumService.getAllAttributes().subscribe({
+      next: (data) => {
+        this.attributes = data;
+        this.filterAttributes();
+      },
+      error: (err) => console.error('Error fetching attributes:', err)
+    });
+  }
+
+  filterAttributes() {
+    this.filteredAttributes = this.attributes.filter(a => a.type === this.selectedAttributeType);
+    console.log(`AdminPanel: Filtered ${this.filteredAttributes.length} attributes for type: ${this.selectedAttributeType}`);
+  }
+
+  onAttributeTypeChange() {
+    this.filterAttributes();
+    this.editingAttribute = null;
+    this.newAttributeName = '';
+  }
+
+  toggleAttributeTypeDropdown() {
+    this.showAttributeTypeDropdown = !this.showAttributeTypeDropdown;
+  }
+
+  selectAttributeType(type: any) {
+    this.selectedAttributeType = type.value;
+    this.onAttributeTypeChange();
+    this.showAttributeTypeDropdown = false;
+  }
+
+  getSelectedAttributeLabel(): string {
+    const found = this.attributeTypes.find(t => t.value === this.selectedAttributeType);
+    return found ? found.label : '';
+  }
+
+  addAttribute() {
+    if (!this.newAttributeName.trim()) return;
+    const attr: RecipeAttribute = {
+      name: this.newAttributeName,
+      type: this.selectedAttributeType
+    };
+    this.enumService.addAttribute(attr).subscribe({
+      next: () => {
+        this.newAttributeName = '';
+        this.fetchAttributes();
+      },
+      error: (err) => console.error('Error adding attribute:', err)
+    });
+  }
+
+  startEditAttribute(attr: RecipeAttribute) {
+    console.log('AdminPanel: Start editing attribute', attr);
+    this.editingAttribute = { ...attr };
+  }
+
+  cancelEditAttribute() {
+    this.editingAttribute = null;
+  }
+
+  saveAttribute() {
+    if (!this.editingAttribute || !this.editingAttribute.name.trim()) return;
+    console.log('AdminPanel: Saving attribute', this.editingAttribute);
+    this.enumService.updateAttribute(this.editingAttribute.id!, this.editingAttribute).subscribe({
+      next: () => {
+        this.editingAttribute = null;
+        this.fetchAttributes();
+      },
+      error: (err) => console.error('Error updating attribute:', err)
+    });
+  }
+
+  deleteAttribute(id: number, event?: Event) {
+    if (event) event.stopPropagation();
+    if (this.deletingAttributeId !== id) {
+      this.deletingAttributeId = id;
+      return;
+    }
+
+    console.log('AdminPanel: Confirmed deletion of attribute with id', id);
+    this.enumService.deleteAttribute(id).subscribe({
+      next: () => {
+        this.fetchAttributes();
+        this.deletingAttributeId = null;
+      },
+      error: (err) => {
+        console.error('Error deleting attribute:', err);
+        this.deletingAttributeId = null;
+      }
+    });
+  }
+
+  cancelDeleteAttribute() {
+    this.deletingAttributeId = null;
   }
 
   fetchUsers(reset: boolean = false) {
@@ -199,6 +341,121 @@ export class AdminPanelComponent implements OnInit {
     });
   }
 
+  fetchPendingRecipes(reset: boolean = false) {
+    if (reset) {
+      this.pendingRecipesPage = 0;
+      this.pendingRecipes = [];
+      this.hasMorePendingRecipes = true;
+    }
+    if (!this.hasMorePendingRecipes || this.isLoadingPendingRecipes) return;
+
+    this.isLoadingPendingRecipes = true;
+    this.recipeService.getPendingRecipes(this.pendingRecipesPage, 10).subscribe({
+      next: (data: any) => {
+        const fetched = data.recipes || [];
+        if (reset) {
+          this.pendingRecipes = fetched;
+        } else {
+          this.pendingRecipes = [...this.pendingRecipes, ...fetched];
+        }
+        this.hasMorePendingRecipes = fetched.length === 10;
+        this.isLoadingPendingRecipes = false;
+        this.pendingRecipesPage++;
+      },
+      error: (err: any) => {
+        console.error('Error fetching pending recipes:', err);
+        this.isLoadingPendingRecipes = false;
+      }
+    });
+  }
+
+  fetchReports(reset: boolean = false) {
+    this.fetchReportedRecipes(reset);
+    this.fetchReportedUsers(reset);
+    this.fetchReportedReviews(reset);
+  }
+
+  fetchReportedRecipes(reset: boolean = false) {
+    if (reset) {
+      this.reportedRecipesPage = 0;
+      this.reportedRecipes = [];
+      this.hasMoreReportedRecipes = true;
+    }
+    if (!this.hasMoreReportedRecipes || this.isLoadingReportedRecipes) return;
+    this.isLoadingReportedRecipes = true;
+    this.recipeService.getReportedRecipes(this.reportedRecipesPage, 3).subscribe({
+      next: (data) => {
+        const fetched = data.recipes || [];
+        if (reset) {
+          this.reportedRecipes = fetched;
+        } else {
+          this.reportedRecipes = [...this.reportedRecipes, ...fetched];
+        }
+        this.hasMoreReportedRecipes = this.reportedRecipes.length < (data.total || 0);
+        this.isLoadingReportedRecipes = false;
+        this.reportedRecipesPage++;
+      },
+      error: (err) => {
+        console.error('Error fetching reported recipes:', err);
+        this.isLoadingReportedRecipes = false;
+      }
+    });
+  }
+
+  fetchReportedUsers(reset: boolean = false) {
+    if (reset) {
+      this.reportedUsersPage = 0;
+      this.reportedUsers = [];
+      this.hasMoreReportedUsers = true;
+    }
+    if (!this.hasMoreReportedUsers || this.isLoadingReportedUsers) return;
+    this.isLoadingReportedUsers = true;
+    this.userService.getReportedUsers(this.reportedUsersPage, 3).subscribe({
+      next: (data) => {
+        const fetched = data.users || [];
+        if (reset) {
+          this.reportedUsers = fetched;
+        } else {
+          this.reportedUsers = [...this.reportedUsers, ...fetched];
+        }
+        this.hasMoreReportedUsers = this.reportedUsers.length < (data.total || 0);
+        this.isLoadingReportedUsers = false;
+        this.reportedUsersPage++;
+      },
+      error: (err) => {
+        console.error('Error fetching reported users:', err);
+        this.isLoadingReportedUsers = false;
+      }
+    });
+  }
+
+  fetchReportedReviews(reset: boolean = false) {
+    if (reset) {
+      this.reportedReviewsPage = 0;
+      this.reportedReviews = [];
+      this.hasMoreReportedReviews = true;
+    }
+    if (!this.hasMoreReportedReviews || this.isLoadingReportedReviews) return;
+    this.isLoadingReportedReviews = true;
+    this.reviewService.getReportedReviews(this.reportedReviewsPage, 3).subscribe({
+      next: (data) => {
+        const fetched = data.reviews || [];
+        if (reset) {
+          this.reportedReviews = fetched;
+        } else {
+          this.reportedReviews = [...this.reportedReviews, ...fetched];
+        }
+        this.hasMoreReportedReviews = this.reportedReviews.length < (data.total || 0);
+        this.isLoadingReportedReviews = false;
+        this.reportedReviewsPage++;
+      },
+      error: (err) => {
+        console.error('Error fetching reported reviews:', err);
+        this.isLoadingReportedReviews = false;
+      }
+    });
+  }
+
   closeModal(event?: Event) {
     if (event) {
       const target = event.target as HTMLElement;
@@ -206,6 +463,7 @@ export class AdminPanelComponent implements OnInit {
       if (backdrop) {
         backdrop.classList.remove('visibleBackdrop');
         setTimeout(() => {
+          this.resetAttributeManagementState();
           this.currentModal = null;
           document.getElementsByTagName("html")[0].style.overflow = 'auto';
         }, 300);
@@ -217,13 +475,22 @@ export class AdminPanelComponent implements OnInit {
     if (backdrops.length > 0) {
       backdrops.forEach(b => b.classList.remove('visibleBackdrop'));
       setTimeout(() => {
+        this.resetAttributeManagementState();
         this.currentModal = null;
         document.getElementsByTagName("html")[0].style.overflow = 'auto';
       }, 300);
     } else {
+      this.resetAttributeManagementState();
       this.currentModal = null;
       document.getElementsByTagName("html")[0].style.overflow = 'auto';
     }
+  }
+
+  resetAttributeManagementState() {
+    this.editingAttribute = null;
+    this.newAttributeName = '';
+    this.showAttributeTypeDropdown = false;
+    this.selectedAttributeType = 'caution';
   }
 
   onBackdropClick(event: MouseEvent): void {
@@ -289,28 +556,50 @@ export class AdminPanelComponent implements OnInit {
   approveRecipe(recipeId: string) {
     this.recipeService.changeRecipeStatus(recipeId, 'approve').subscribe({
       next: () => {
+        if (this.currentModal === 'pendingRecipes') this.fetchPendingRecipes(true);
       },
       error: (err) => {
+        console.error('Error approving recipe:', err);
       }
     });
   }
   rejectRecipe(recipeId: string) {
     this.recipeService.changeRecipeStatus(recipeId, 'reject').subscribe({
       next: () => {
+        if (this.currentModal === 'pendingRecipes') this.fetchPendingRecipes(true);
       },
       error: (err) => {
+        console.error('Error rejecting recipe:', err);
       }
     });
   }
-  dismissReport(reportId: string) {
-  }
-  deleteReportedContent(reportId: string) {
+
+  dismissRecipeReport(recipeId: string | number) {
+    this.recipeService.dismissReport(recipeId).subscribe({
+      next: () => this.fetchReportedRecipes(true),
+      error: (err) => console.error('Error dismissing recipe report:', err)
+    });
   }
 
-  addCategory(categoryName: string) {
+  dismissUserReport(username: string) {
+    this.userService.dismissReport(username).subscribe({
+      next: () => this.fetchReportedUsers(true),
+      error: (err) => console.error('Error dismissing user report:', err)
+    });
   }
-  editCategory(categoryId: string, newName: string) {
+
+  dismissReviewReport(reviewId: string | number) {
+    this.reviewService.dismissReport(reviewId).subscribe({
+      next: () => this.fetchReportedReviews(true),
+      error: (err) => console.error('Error dismissing review report:', err)
+    });
   }
-  deleteCategory(categoryId: string) {
+
+  deleteReview(reviewId: string) {
+    this.reviewService.deleteReview(reviewId).subscribe({
+      next: () => this.fetchReportedReviews(true),
+      error: (err) => console.error('Error deleting review:', err)
+    });
   }
 }
+

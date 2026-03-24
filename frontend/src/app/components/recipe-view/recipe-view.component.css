@@ -2,6 +2,26 @@
   max-width: 80vw;
 }
 
+.recipe-view-image-wrapper {
+  position: relative;
+}
+
+.recipe-view-pending-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: color-mix(in srgb, var(--primary-200-40) 80%, grey);
+  color: var(--primary-text);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+  pointer-events: none;
+}
+
 /* Recipe View Specific Styles */
 
 /* Hero image animations */

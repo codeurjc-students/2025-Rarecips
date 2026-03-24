@@ -14,6 +14,7 @@ import java.util.List;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+    Page<Review> findByReportedTrue(Pageable pageable);
 
     List<Review> findByRecipe(Recipe recipe);
 

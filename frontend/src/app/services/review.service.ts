@@ -39,4 +39,21 @@ export class ReviewService {
       })
     );
   }
+
+  reportReview(reviewId: number | string): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${reviewId}/report`, null);
+  }
+
+  getReportedReviews(page: number, size: number): Observable<any> {
+    const params = { page: page.toString(), size: size.toString() };
+    return this.httpClient.get<any>(`${this.API_URL}/reported`, { params }).pipe(
+      catchError((error: any) => {
+        return throwError(() => new Error(`Error fetching reported reviews: ${error.statusText}`));
+      })
+    );
+  }
+
+  dismissReport(reviewId: number | string): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${reviewId}/dismiss-report`, null);
+  }
 }

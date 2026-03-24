@@ -11,6 +11,8 @@ import {filter, firstValueFrom} from 'rxjs';
 import {ActivityService} from '../../services/activity.service';
 import {Title} from '@angular/platform-browser';
 
+import { ReviewService } from '../../services/review.service';
+
 @Component({
   selector: 'app-profile-view',
   templateUrl: './profile-view.component.html',
@@ -68,7 +70,9 @@ export class ProfileViewComponent implements OnInit {
   count: number = -1;
   animationClass = '';
 
+
   responsive: boolean = window.innerWidth < 1024;
+  isAuthenticated: boolean = false;
 
   constructor(
     private router: Router,
@@ -79,7 +83,8 @@ export class ProfileViewComponent implements OnInit {
     private activityService: ActivityService,
     private cdr: ChangeDetectorRef,
     private translatorService: TranslatorService,
-    private titleService: Title
+    private titleService: Title,
+    private reviewService: ReviewService
   ) {}
 
   t(key: string) {
@@ -127,6 +132,7 @@ export class ProfileViewComponent implements OnInit {
         this.user = userData;
         this.updateTitle();
 
+        this.isAuthenticated = true;
         this.isAdminProfile = this.user?.role?.includes('ADMIN');
 
         this.creationDate = this.user.createdAt;
@@ -408,4 +414,17 @@ export class ProfileViewComponent implements OnInit {
     this.router.navigate(['/recipes', recipeId]);
   }
 
+  reportProfile() {
+    this.userService.reportUser(this.username).subscribe({
+      next: () => alert(this.t('admin_action_success')),
+      error: (err) => console.error('Error reporting user:', err)
+    });
+  }
+
+  reportReview(reviewId: number) {
+    this.reviewService.reportReview(reviewId).subscribe({
+      next: () => alert(this.t('admin_action_success')),
+      error: (err) => console.error('Error reporting review:', err)
+    });
+  }
 }

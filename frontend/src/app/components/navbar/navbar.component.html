@@ -32,8 +32,8 @@
           <span class="text-lg font-semibold">{{ t('home') }}</span>
         </div>
         @if (isAdmin) {
-          <div class="nav-item section px-3 py-4" (click)="navigateTo('admin-panel', $event)" [class.active]="navItem === 'admin-panel'">
-            <i class="flex items-center ti w-4 h-4 text-xl" [ngClass]="navItem === 'admin-panel' ? 'ti-shield-lock-filled': 'ti-shield-lock'"></i>
+          <div class="nav-item section px-3 py-4" (click)="navigateTo('admin', $event)" [class.active]="navItem === 'admin'">
+            <i class="flex items-center ti w-4 h-4 text-xl" [ngClass]="navItem === 'admin' ? 'ti-shield-lock-filled': 'ti-shield-lock'"></i>
             <span class="text-lg">{{ t('admin') }}</span>
           </div>
         }

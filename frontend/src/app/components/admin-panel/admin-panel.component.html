@@ -471,12 +471,25 @@
     <div class="h-px w-full" style="background: var(--primary-300);"></div>
 
     <div class="flex flex-col gap-2 p-4 rounded-xl" style="background: var(--primary-200-40);">
-      <div class="flex justify-between items-center py-2 border-primary/10">
-        <span class="font-semibold text-primary" style="color: var(--primary-700);">Secret Sauce Recipe</span>
+      <div *ngIf="pendingRecipes.length === 0 && !isLoadingPendingRecipes" class="text-secondary text-sm">
+        {{ t('no_recipes_found') }}...
+      </div>
+      <div *ngFor="let recipe of pendingRecipes" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+        <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/recipes/{{recipe.id}}">
+          <img *ngIf="recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" [src]="'data:image/jpeg;base64,' + recipe.imageUrl" alt="recipe" />
+          <img *ngIf="!recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" src="/assets/img/recipe.png" alt="default recipe" style="background-color: var(--primary-300);" />
+          {{ recipe.title }}
+        </span>
         <div class="flex gap-2">
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #10b981;" (click)="approveRecipe('99')">{{ t('admin_approve_recipe') }}</button>
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="rejectRecipe('99')">{{ t('admin_reject_recipe') }}</button>
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #10b981;" (click)="approveRecipe(recipe.id.toString())">{{ t('admin_approve_recipe') }}</button>
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="rejectRecipe(recipe.id.toString())">{{ t('admin_reject_recipe') }}</button>
         </div>
+      </div>
+      <div *ngIf="isLoadingPendingRecipes" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+      <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMorePendingRecipes && !isLoadingPendingRecipes && pendingRecipes.length > 0">
+        <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchPendingRecipes()">
+          <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+        </button>
       </div>
     </div>
   </div>
@@ -502,12 +515,77 @@
 
     <div class="h-px w-full" style="background: var(--primary-300);"></div>
 
-    <div class="flex flex-col gap-2 p-4 rounded-xl" style="background: var(--primary-200-40);">
-      <div class="flex justify-between items-center py-2 border-primary/10">
-        <span class="font-semibold text-primary" style="color: var(--primary-700);">Report #1241</span>
-        <div class="flex gap-2">
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--primary-500);" (click)="dismissReport('report_1241')">{{ t('admin_dismiss_report') }}</button>
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="deleteReportedContent('report_1241')">{{ t('admin_delete_content') }}</button>
+<div class="flex flex-col gap-6 p-4 rounded-xl" style="background: var(--primary-200-40);">
+      <div>
+        <h4 class="text-xl font-bold mb-4" style="color: var(--primary-700);">{{ t('reported_recipes') }}</h4>
+        <div *ngIf="reportedRecipes.length === 0 && !isLoadingReportedRecipes" class="text-secondary text-sm mb-4">
+          {{ t('no_reported_recipes') }}
+        </div>
+        <div *ngFor="let recipe of reportedRecipes" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+          <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/recipes/{{recipe.id}}" (click)="closeModal()">
+            <img *ngIf="recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" [src]="'data:image/jpeg;base64,' + recipe.imageUrl" alt="recipe" />
+            <img *ngIf="!recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" src="/assets/img/recipe.png" alt="default recipe" style="background-color: var(--primary-300);" />
+            {{ recipe.title }}
+          </span>
+          <div class="flex gap-2">
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #3b82f6;" routerLink="/recipes/{{recipe.id}}" (click)="closeModal()">{{ t('view') }}</button>
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #94a3b8;" (click)="dismissRecipeReport(recipe.id)">{{ t('ignore') }}</button>
+          </div>
+        </div>
+        <div *ngIf="isLoadingReportedRecipes" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+        <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreReportedRecipes && !isLoadingReportedRecipes && reportedRecipes.length > 0">
+          <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchReportedRecipes()">
+            <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <h4 class="text-xl font-bold mb-4" style="color: var(--primary-700);">{{ t('reported_users') }}</h4>
+        <div *ngIf="reportedUsers.length === 0 && !isLoadingReportedUsers" class="text-secondary text-sm mb-4">
+          {{ t('no_reported_users') }}
+        </div>
+        <div *ngFor="let user of reportedUsers" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+          <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/users/{{user.username}}" (click)="closeModal()">
+            <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+            <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+            {{ user.username }}
+          </span>
+          <div class="flex gap-2">
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #3b82f6;" routerLink="/users/{{user.username}}" (click)="closeModal()">{{ t('view') }}</button>
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #94a3b8;" (click)="dismissUserReport(user.username)">{{ t('ignore') }}</button>
+          </div>
+        </div>
+        <div *ngIf="isLoadingReportedUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+        <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreReportedUsers && !isLoadingReportedUsers && reportedUsers.length > 0">
+          <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchReportedUsers()">
+            <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <h4 class="text-xl font-bold mb-4" style="color: var(--primary-700);">{{ t('reported_reviews') }}</h4>
+        <div *ngIf="reportedReviews.length === 0 && !isLoadingReportedReviews" class="text-secondary text-sm mb-4">
+          {{ t('no_reported_reviews') }}
+        </div>
+        <div *ngFor="let review of reportedReviews" class="flex flex-col gap-2 py-4 border-b border-[var(--primary-300)] border-primary/10">
+          <div class="flex justify-between items-start">
+            <div class="flex flex-col">
+              <span class="text-sm font-bold" style="color: var(--primary-700);">{{ t('by') }} {{ review.authorUsername }}</span>
+              <p class="text-sm" style="color: var(--primary-600);">{{ review.comment }}</p>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #3b82f6;" routerLink="/recipes/{{review.recipe?.id}}" (click)="closeModal()">{{ t('view') }}</button>
+              <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #94a3b8;" (click)="dismissReviewReport(review.id)">{{ t('ignore') }}</button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isLoadingReportedReviews" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+        <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreReportedReviews && !isLoadingReportedReviews && reportedReviews.length > 0">
+          <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchReportedReviews()">
+            <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+          </button>
         </div>
       </div>
     </div>
@@ -527,25 +605,96 @@
             (click)="closeModal($event)">
       <i class="ti ti-x text-2xl"></i>
     </button>
-    <div class="flex items-center gap-4 pr-16">
+    <div class="flex items-center gap-4 pr-16 text-primary">
       <i class="ti ti-tags text-4xl" style="color: var(--primary-700);"></i>
       <h2 class="text-3xl font-bold" style="color: var(--primary-700);">{{ t('admin_manage_categories') }}</h2>
     </div>
 
     <div class="h-px w-full" style="background: var(--primary-300);"></div>
 
-    <div class="flex flex-col gap-2 p-4 rounded-xl" style="background: var(--primary-200-40);">
-      <div class="flex justify-between items-center py-2 border-primary/10">
-        <span class="font-semibold text-primary" style="color: var(--primary-700);">Mediterranean</span>
-        <div class="flex gap-2">
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #3b82f6;" (click)="editCategory('cat_1', 'Mediterranean Updated')">{{ t('admin_edit_category') }}</button>
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="deleteCategory('cat_1')">{{ t('admin_delete_category') }}</button>
+    <div class="flex flex-col gap-2 relative category-dropdown-container">
+      <label class="text-sm font-semibold" style="color: var(--primary-700);">{{ t('sort_by') }}</label>
+      <div (click)="toggleAttributeTypeDropdown()"
+           class="w-full px-4 py-3 rounded-xl border-2 flex justify-between items-center cursor-pointer transition-all"
+           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+        <span class="font-medium">{{ t(getSelectedAttributeLabel()) }}</span>
+        <i class="ti ti-caret-down-filled transition-transform" [class.rotate-180]="showAttributeTypeDropdown"></i>
+      </div>
+
+      <div *ngIf="showAttributeTypeDropdown"
+           class="absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-2xl overflow-hidden max-h-60 overflow-y-auto z-[100]"
+           style="background: var(--primary-50); border-color: var(--primary-100); animation: fadeIn 0.2s ease-out;">
+        <div *ngFor="let type of attributeTypes"
+             (click)="selectAttributeType(type)"
+             class="px-4 py-3 cursor-pointer transition-all hover:bg-[var(--primary-100)] flex items-center justify-between"
+             [class.bg-[var(--primary-200)]]="type.value === selectedAttributeType"
+             style="color: var(--primary-700);">
+          <span>{{ t(type.label) }}</span>
+          <i *ngIf="type.value === selectedAttributeType" class="ti ti-check" style="color: var(--primary-500);"></i>
         </div>
       </div>
     </div>
-    <div class="mt-4 flex justify-between gap-2">
-      <button class="px-6 py-3 rounded-xl text-white font-medium border-none cursor-pointer hover:scale-105 transition-transform shadow-md" style="background: #10b981;" (click)="addCategory('New Category')"><i class="ti ti-plus"></i> {{ t('admin_add_category') }}</button>
+
+    <div class="flex gap-2 mt-4">
+      <input type="text" [(ngModel)]="newAttributeName" [placeholder]="t('name')"
+             class="flex-1 p-4 rounded-xl border-none glass-strong"
+             style="background: var(--primary-300-40); color: var(--primary-700);">
+      <button class="px-6 py-4 rounded-xl text-white font-bold border-none cursor-pointer hover:scale-105 transition-all shadow-lg active:scale-95"
+              style="background: var(--gradient-primary);" (click)="addAttribute()">
+        <i class="ti ti-plus mr-1"></i> {{ t('add') }}
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-2 p-4 rounded-xl mt-4" style="background: var(--primary-200-40);">
+      <div *ngIf="filteredAttributes.length === 0" class="text-secondary text-sm p-4 text-center">
+        {{ t('no_results') }}
+      </div>
+      <div *ngFor="let attr of filteredAttributes" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10 last:border-none">
+        <div class="flex-1">
+          <input *ngIf="editingAttribute && editingAttribute.id == attr.id" type="text" [(ngModel)]="editingAttribute.name"
+                 class="w-full p-2 rounded-lg border-none" style="background: var(--white); color: var(--primary-700);">
+          
+          <span *ngIf="!editingAttribute || editingAttribute.id != attr.id" class="font-semibold text-primary" style="color: var(--primary-700);">{{ attr.name }}</span>
+        </div>
+        <div class="flex gap-2">
+          <ng-container *ngIf="editingAttribute && editingAttribute.id == attr.id">
+            <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                    style="background: var(--gradient-primary);" (click)="saveAttribute()" [title]="t('save')">
+              <i class="ti ti-check text-lg"></i>
+            </button>
+            <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                    style="background: red;" (click)="cancelEditAttribute()" [title]="t('cancel')">
+              <i class="ti ti-x text-lg"></i>
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="!editingAttribute || editingAttribute.id != attr.id">
+            <ng-container *ngIf="deletingAttributeId !== attr.id">
+              <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                      style="background: var(--gradient-primary);" (click)="startEditAttribute(attr)" [title]="t('edit')">
+                <i class="ti ti-pencil text-lg" style="color: white !important;"></i>
+              </button>
+              <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                      style="background: red;" (click)="deleteAttribute(attr.id!, $event)" [title]="t('remove')">
+                <i class="ti ti-trash text-lg"></i>
+              </button>
+            </ng-container>
+
+            <ng-container *ngIf="deletingAttributeId === attr.id">
+              <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                      style="background: var(--gradient-primary);" (click)="cancelDeleteAttribute()" [title]="t('cancel')">
+                <i class="ti ti-arrow-left text-lg"></i>
+              </button>
+              <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                      style="background: red;" (click)="deleteAttribute(attr.id!, $event)" [title]="t('confirm_delete')">
+                <i class="ti ti-check text-lg font-bold"></i>
+              </button>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 }
+

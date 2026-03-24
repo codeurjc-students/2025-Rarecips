@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.HashMap;
 import java.sql.Blob;
 
+import com.blasetvrtumi.rarecips.enums.*;
+import com.blasetvrtumi.rarecips.service.RecipeAttributeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Arrays;
 
 @Service
 public class RecipeInitializationService {
@@ -47,6 +50,9 @@ public class RecipeInitializationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RecipeAttributeService attributeService;
+
     @PostConstruct
     public void init() {
         if (userRepository.findByUsername("user") == null) {
@@ -63,10 +69,27 @@ public class RecipeInitializationService {
             }
         }
 
+        if (attributeService.getAll().isEmpty()) {
+            logger.info("Database is empty. Initializing recipe attributes from enums...");
+            Arrays.stream(Caution.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "caution")));
+            Arrays.stream(CuisineType.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "cuisineType")));
+            Arrays.stream(DietLabel.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "dietLabel")));
+            Arrays.stream(DishType.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "dishType")));
+            Arrays.stream(HealthLabel.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "healthLabel")));
+            Arrays.stream(MealType.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "mealType")));
+            logger.info("Recipe attributes initialized successfully.");
+        }
+
         if (recipeRepository.count() == 0 && recipes != null && recipes.length() > 0) {
             logger.info("Database is empty. Initializing recipes from JSON file...");
 
-            for (int i = 0; i < recipes.length(); i++) {
+            for (int i = 0; i < /*recipes.length()*/ 20; i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
 
                 String label = recipeJson.optString("label", null);
@@ -137,6 +160,9 @@ public class RecipeInitializationService {
                 Recipe recipe = new Recipe(label, description, dietLabels, healthLabels, cautions,
                         people, ingredients, difficulty, dishTypes, mealTypes, cuisineType, totalTime,
                         totalWeight, calories, recipeAuthor, steps);
+
+                recipe.setStatus(com.blasetvrtumi.rarecips.enums.RecipeStatus.APPROVED);
+                recipe.setPendingReview(false);
 
                 // Add new qty and measure as mapped properties to ingredient
                 recipe.setIngredientQuantities(ingredientQuantities);

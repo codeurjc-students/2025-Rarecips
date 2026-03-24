@@ -78,6 +78,7 @@ public class UserController {
     public ResponseEntity<?> getUserByUsername(
             @PathVariable String username,
             @RequestParam(required = false) String display,
+            @RequestParam(defaultValue = "false") boolean pendingOnly,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Authentication authentication) {
@@ -92,7 +93,7 @@ public class UserController {
         if (authentication != null && authentication.isAuthenticated()) {
             isOwner = authentication.getName().equals(username);
             User loggedUser = userService.findByUsername(authentication.getName());
-            isAdmin = loggedUser.getRole().equals("ADMIN");
+            isAdmin = loggedUser != null && loggedUser.getRole().equals("ADMIN");
         }
         if (user.isPrivateProfile() && !isOwner && !isAdmin) {
             return ResponseEntity.status(403).body("This profile is private.");
@@ -103,7 +104,9 @@ public class UserController {
             Pageable pageable = PageRequest.of(page, size);
             switch (display.toLowerCase()) {
                 case "recipes":
-                    Page<?> recipes = userService.getUserRecipes(username, pageable);
+                    Page<?> recipes = pendingOnly
+                            ? userService.getUserPendingRecipes(username, pageable, authentication)
+                            : userService.getUserRecipes(username, pageable, authentication);
                     response.put("content", recipes.getContent());
                     response.put("total", recipes.getTotalElements());
                     response.put("page", page);
@@ -508,7 +511,12 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PutMapping("/{username}/status")
-    public ResponseEntity<?> changeUserStatus(@PathVariable String username, @RequestParam String action, Authentication authentication) {
+    public ResponseEntity<?> changeUserStatus(
+            @PathVariable String username,
+            @RequestParam String action,
+            @RequestParam(defaultValue = "en") String lang,
+            @RequestParam(defaultValue = "theme-tangerine-light") String theme,
+            Authentication authentication) {
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized.");
         }
@@ -530,6 +538,9 @@ public class UserController {
         if (action.equalsIgnoreCase("suspend")) {
             user.setSuspended(true);
             userService.save(user);
+            if (user.getEmail() != null && !user.getEmail().isBlank()) {
+                mailService.sendUserSuspendedEmail(user.getEmail(), frontendUrl, lang, theme, user.getUsername());
+            }
             return ResponseEntity.ok().body(Collections.singletonMap("message", "User suspended successfully."));
         } else {
             user.setSuspended(false);
@@ -626,5 +637,61 @@ public class UserController {
         } else {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Missing required fields."));
         }
+    }
+
+    @Operation(summary = "Report a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User reported successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PutMapping("/{username}/report")
+    public ResponseEntity<?> reportUser(@PathVariable String username, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("User must be authenticated to report a user");
+        }
+        User user = userService.findByUsername(username);
+        if (user == null) return ResponseEntity.status(404).body("User not found");
+        
+        user.setReported(true);
+        userService.save(user);
+        return ResponseEntity.ok(Map.of("message", "User reported successfully"));
+    }
+
+    @Operation(summary = "Get reported users (admin only)")
+    @GetMapping("/reported")
+    @JsonView(User.BasicInfo.class)
+    public ResponseEntity<?> getReportedUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        User adminUser = userService.findByUsername(authentication.getName());
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            return ResponseEntity.status(403).body("Only admins can fetch reported users");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> reported = userRepository.findByReportedTrue(pageable);
+        
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("users", reported.getContent());
+        response.put("total", reported.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Dismiss report for a user (admin only)")
+    @PutMapping("/{username}/dismiss-report")
+    public ResponseEntity<?> dismissReport(@PathVariable String username, Authentication authentication) {
+        User adminUser = userService.findByUsername(authentication.getName());
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            return ResponseEntity.status(403).body("Only admins can dismiss reports");
+        }
+        User user = userService.findByUsername(username);
+        if (user == null) return ResponseEntity.status(404).body("User not found");
+
+        user.setReported(false);
+        userService.save(user);
+        return ResponseEntity.ok(Map.of("message", "Report dismissed successfully"));
     }
 }

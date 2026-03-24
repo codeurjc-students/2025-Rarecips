@@ -38,7 +38,7 @@ public class Recipe {
 
     @Id
     @JsonView(BasicInfo.class)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonView(BasicInfo.class)
@@ -142,6 +142,12 @@ public class Recipe {
     @Enumerated(EnumType.STRING)
     @JsonView(BasicInfo.class)
     private RecipeStatus status = RecipeStatus.PENDING;
+
+    @JsonView(BasicInfo.class)
+    private boolean pendingReview = true;
+
+    @JsonView(BasicInfo.class)
+    private boolean reported = false;
 
     public Recipe() {
         // Default constructor
@@ -335,6 +341,22 @@ public class Recipe {
 
     public void setStatus(RecipeStatus status) {
         this.status = status;
+    }
+
+    public boolean isPendingReview() {
+        return pendingReview;
+    }
+
+    public void setPendingReview(boolean pendingReview) {
+        this.pendingReview = pendingReview;
+    }
+
+    public boolean isReported() {
+        return reported;
+    }
+
+    public void setReported(boolean reported) {
+        this.reported = reported;
     }
 
     public String getAuthor() {

@@ -43,4 +43,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByPasswordResetToken(String token);
 
     Page<User> findByRole(User.Role role, Pageable pageable);
+
+    Page<User> findByReportedTrue(Pageable pageable);
 }

@@ -112,6 +112,37 @@ public class MailService {
         }
     }
 
+    public void sendUserSuspendedEmail(String to, String baseUrl, String lang, String theme, String username) {
+        try {
+            ClassPathResource resource = new ClassPathResource("templates/user_suspended_mail_template.mustache");
+            String template;
+
+            try (InputStream inputStream = resource.getInputStream()) {
+                template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+
+            Map<String, String> themeVars = getThemeVars(theme);
+            Map<String, String> translations = getTranslatedStrings(lang, "usersuspended", username);
+            Map<String, Object> context = new HashMap<>();
+            String subject = translations.getOrDefault("subject", "Your Rarecips account has been suspended");
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+            context.putAll(translations);
+            context.putAll(themeVars);
+            context.put("baseUrl", baseUrl);
+            context.put("subject", subject);
+            context.put("username", username);
+            context.put("timestamp", timestamp);
+            context.put("fromAddress", fromAddress);
+
+            Template mustache = Mustache.compiler().escapeHTML(false).compile(template);
+            String html = mustache.execute(context);
+            sendHtmlEmail(to, subject, html);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send user suspended email", e);
+        }
+    }
+
     private void sendHtmlEmail(String to, String subject, String html) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -208,6 +239,44 @@ public class MailService {
                     translations.put("or", "or");
                     translations.put("password_change_link_label", "Change Password Link");
                     translations.put("ignore_text", "If you didn't request this, contact us as soon as possible at this very address.");
+                    break;
+            }
+        } else if ("usersuspended".equals(mailType)) {
+            switch (l) {
+                case "es":
+                    translations.put("subject", "Tu cuenta de Rarecips ha sido suspendida");
+                    translations.put("suspension_title", "Cuenta suspendida temporalmente");
+                    translations.put("suspension_message", "Hola " + username + ", un administrador ha suspendido temporalmente tu cuenta por incumplir las normas de la plataforma.");
+                    translations.put("suspension_next_steps", "Si crees que ha sido un error, puedes contactar con soporte para revisarlo.");
+                    translations.put("contact_label", "Contacto de soporte");
+                    break;
+                case "fr":
+                    translations.put("subject", "Votre compte Rarecips a été suspendu");
+                    translations.put("suspension_title", "Compte temporairement suspendu");
+                    translations.put("suspension_message", "Bonjour " + username + ", un administrateur a temporairement suspendu votre compte pour non-respect des règles de la plateforme.");
+                    translations.put("suspension_next_steps", "Si vous pensez qu'il s'agit d'une erreur, contactez le support pour révision.");
+                    translations.put("contact_label", "Contact support");
+                    break;
+                case "ja":
+                    translations.put("subject", "Rarecipsアカウントが停止されました");
+                    translations.put("suspension_title", "アカウントが一時停止されました");
+                    translations.put("suspension_message", "こんにちは " + username + " さん、プラットフォーム規約違反により管理者があなたのアカウントを一時停止しました。");
+                    translations.put("suspension_next_steps", "誤りだと思われる場合は、サポートまでご連絡ください。確認いたします。");
+                    translations.put("contact_label", "サポート連絡先");
+                    break;
+                case "zh":
+                    translations.put("subject", "您的 Rarecips 账户已被暂停");
+                    translations.put("suspension_title", "账户已被临时暂停");
+                    translations.put("suspension_message", "您好 " + username + "，由于违反平台规则，管理员已临时暂停您的账户。");
+                    translations.put("suspension_next_steps", "如果您认为这是误判，请联系支持团队进行复核。");
+                    translations.put("contact_label", "支持联系方式");
+                    break;
+                default:
+                    translations.put("subject", "Your Rarecips account has been suspended");
+                    translations.put("suspension_title", "Account temporarily suspended");
+                    translations.put("suspension_message", "Hi " + username + ", an administrator has temporarily suspended your account for violating platform rules.");
+                    translations.put("suspension_next_steps", "If you think this is a mistake, contact support and we will review it.");
+                    translations.put("contact_label", "Support contact");
                     break;
             }
         }
