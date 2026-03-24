@@ -19,12 +19,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.blasetvrtumi.rarecips.enums.RecipeStatus;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -208,9 +213,7 @@ public class RecipeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Pageable pageable = PageRequest.of(page, size,
-            org.springframework.data.domain.Sort.by(
-                org.springframework.data.domain.Sort.Direction.DESC, "updatedAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "updatedAt"));
 
         Page<Recipe> recipes = recipeRepository.findRecipesWithFilters(
             query, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, pageable);
@@ -291,7 +294,7 @@ public class RecipeController {
                 userIngredientIds = recipeService.getUserIngredientIds(authentication);
                 if (userIngredientIds.isEmpty()) {
                     HashMap<String, Object> emptyResponse = new HashMap<>();
-                    emptyResponse.put("recipes", new java.util.ArrayList<>());
+                    emptyResponse.put("recipes", new ArrayList<>());
                     emptyResponse.put("total", 0);
                     emptyResponse.put("page", page);
                     emptyResponse.put("size", size);
@@ -307,14 +310,14 @@ public class RecipeController {
                 query, difficulties, minPeople, maxPeople, minTime, maxTime, minCalories, maxCalories, minWeight, maxWeight, minRating,
                 dietLabels, healthLabels, cuisines, dishTypes, mealTypes, userIngredientIds, Pageable.unpaged()
             );
-            List<Recipe> all = new java.util.ArrayList<>(filtered.getContent());
+            List<Recipe> all = new ArrayList<>(filtered.getContent());
             all.sort((a, b) -> Integer.compare(
                 b.getReviews() != null ? b.getReviews().size() : 0,
                 a.getReviews() != null ? a.getReviews().size() : 0
             ));
             int start = page * size;
             int end = Math.min(start + size, all.size());
-            List<Recipe> pageContent = start < end ? all.subList(start, end) : new java.util.ArrayList<>();
+            List<Recipe> pageContent = start < end ? all.subList(start, end) : new ArrayList<>();
             HashMap<String, Object> response = new HashMap<>();
             response.put("recipes", pageContent);
             response.put("total", all.size());
@@ -326,11 +329,11 @@ public class RecipeController {
                 query, difficulties, minPeople, maxPeople, minTime, maxTime, minCalories, maxCalories, minWeight, maxWeight, minRating,
                 dietLabels, healthLabels, cuisines, dishTypes, mealTypes, userIngredientIds, Pageable.unpaged()
             );
-            List<Recipe> all = new java.util.ArrayList<>(filtered.getContent());
+            List<Recipe> all = new ArrayList<>(filtered.getContent());
             all.sort((a, b) -> Float.compare(b.getRating(), a.getRating()));
             int start = page * size;
             int end = Math.min(start + size, all.size());
-            List<Recipe> pageContent = start < end ? all.subList(start, end) : new java.util.ArrayList<>();
+            List<Recipe> pageContent = start < end ? all.subList(start, end) : new ArrayList<>();
             HashMap<String, Object> response = new HashMap<>();
             response.put("recipes", pageContent);
             response.put("total", all.size());
@@ -338,11 +341,11 @@ public class RecipeController {
             response.put("size", size);
             return ResponseEntity.ok(response);
         } else {
-            org.springframework.data.domain.Sort sort;
+            Sort sort;
             if ("alphabetical".equals(sortBy)) {
-                sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "label");
+                sort = Sort.by(Direction.ASC, "label");
             } else {
-                sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "updatedAt");
+                sort = Sort.by(Direction.DESC, "updatedAt");
             }
             Pageable pageable = PageRequest.of(page, size, sort);
             Page<Recipe> recipes = recipeRepository.findRecipesWithFilters(
@@ -376,7 +379,7 @@ public class RecipeController {
             return ResponseEntity.status(403).body("Only admins can fetch pending recipes.");
         }
         
-        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
         Page<Recipe> pending = recipeRepository.findByPendingReviewTrue(pageable);
         
         HashMap<String, Object> response = new HashMap<>();
@@ -413,7 +416,7 @@ public class RecipeController {
         if (recipe == null) return ResponseEntity.status(404).body("Recipe not found.");
 
         if (action.equalsIgnoreCase("approve")) {
-            recipe.setStatus(com.blasetvrtumi.rarecips.enums.RecipeStatus.APPROVED);
+            recipe.setStatus(RecipeStatus.APPROVED);
             recipe.setPendingReview(false);
             recipeRepository.save(recipe);
             String authorUsername = recipe.getAuthor();
@@ -428,11 +431,11 @@ public class RecipeController {
                 );
             }
             // TODO: send notification to user about acceptance
-            return ResponseEntity.ok().body(java.util.Collections.singletonMap("message", "Recipe approved successfully."));
+            return ResponseEntity.ok().body(Collections.singletonMap("message", "Recipe approved successfully."));
         } else {
             recipeService.deleteRecipe(id, adminUser.getUsername());
             // TODO: send notification to user about rejection
-            return ResponseEntity.ok().body(java.util.Collections.singletonMap("message", "Recipe rejected successfully."));
+            return ResponseEntity.ok().body(Collections.singletonMap("message", "Recipe rejected successfully."));
         }
     }
 

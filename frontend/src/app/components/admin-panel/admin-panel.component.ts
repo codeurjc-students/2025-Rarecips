@@ -64,6 +64,20 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     websockets: 'admin_down'
   };
 
+  stats: any = {
+    totalUsers: 0,
+    totalRecipes: 0,
+    totalReviews: 0,
+    totalIngredients: 0,
+    usersGrowth: 0,
+    recipesGrowth: 0,
+    reviewsGrowth: 0,
+    ingredientsGrowth: 0,
+    userGrowthChart: [],
+    recipeGrowthChart: [],
+    reviewGrowthChart: []
+  };
+
   usersPage: number = 0;
   hasMoreUsers: boolean = true;
   isLoadingUsers: boolean = false;
@@ -120,6 +134,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
     this.fetchSystemStatus();
     this.fetchPopularRecipes();
+    this.updateCharts();
 
     this.statusInterval = setInterval(() => {
       this.fetchSystemStatus();
@@ -149,8 +164,47 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     }
   }
 
+  fetchStats() {
+    console.log('DEBUG: Fetching admin stats with range:', this.selectedTimeRange);
+    this.adminService.getStats(this.selectedTimeRange).subscribe({
+      next: (data) => {
+        console.log('Admin Stats received:', data);
+        this.stats = data;
+      },
+      error: (err) => console.error('Error fetching admin stats:', err)
+    });
+  }
+
+  updateCharts() {
+    this.fetchStats();
+  }
+
+  getMax(data: any[]): number {
+    if (!data || data.length === 0) return 1;
+    const max = Math.max(...data.map(d => d.count));
+    return max === 0 ? 1 : max;
+  }
+
+  getBarHeight(count: number, data: any[]): string {
+    const max = this.getMax(data);
+    return Math.max(5, (count / max * 85)) + '%';
+  }
+
+  getBarColor(count: number, data: any[]): string {
+    if (count === 0) return 'var(--primary-100)';
+    const max = this.getMax(data);
+    const ratio = count / max;
+    
+    if (ratio > 0.8) return 'var(--primary-700)';
+    if (ratio > 0.65) return 'var(--primary-600)';
+    if (ratio > 0.5) return 'var(--primary-500)';
+    if (ratio > 0.35) return 'var(--primary-400)';
+    if (ratio > 0.2) return 'var(--primary-300)';
+    return 'var(--primary-200)';
+  }
+
   fetchPopularRecipes() {
-    this.recipeService.getFilteredRecipes({ sortBy: 'rating' }, 0, 10).subscribe({
+    this.recipeService.getFilteredRecipes({ sortBy: 'mostPopular' }, 0, 9).subscribe({
       next: (data: any) => this.popularRecipes = data.recipes,
       error: (err: any) => console.error('Error fetching popular recipes:', err)
     });
@@ -190,6 +244,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   selectTimeRange(range: string) {
     this.selectedTimeRange = range;
     this.isTimeRangeDropdownOpen = false;
+    this.updateCharts();
   }
 
   openModal(modal: string) {

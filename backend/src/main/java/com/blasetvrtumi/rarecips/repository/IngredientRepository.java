@@ -9,9 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+
 
 @Repository
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
+    @Query("SELECT COUNT(i) FROM Ingredient i WHERE i.createdAt BETWEEN :start AND :end")
+    long countByCreatedAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
     Ingredient findByFood(String food);
     Ingredient findByFoodIgnoreCase(String food);
 

@@ -46,6 +46,7 @@ public class RecipeControllerTest {
         Recipe recipe = new Recipe();
         recipe.setId(1L);
         recipe.setLabel("Test Recipe");
+        recipe.setPendingReview(false);
 
         when(recipeService.findById(1L)).thenReturn(recipe);
 

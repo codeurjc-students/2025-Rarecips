@@ -16,11 +16,11 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-3xl font-bold" style="color: var(--primary-700);">2,847</span>
+          <span class="text-3xl font-bold" style="color: var(--primary-700);">{{ stats.totalUsers | number }}</span>
           <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_total_users') }}</span>
         </div>
         <span class="text-sm font-semibold px-3 py-1 rounded-full max-w-min"
-              style="background: var(--primary-100); color: var(--primary-700);">+12%</span>
+              style="background: var(--primary-100); color: var(--primary-700);">+{{ stats.usersGrowth }}%</span>
       </div>
 
       <!-- Total Recipes -->
@@ -34,11 +34,11 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-3xl font-bold" style="color: var(--primary-700);">1,234</span>
+          <span class="text-3xl font-bold" style="color: var(--primary-700);">{{ stats.totalRecipes | number }}</span>
           <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_published_recipes') }}</span>
         </div>
         <span class="text-sm font-semibold px-3 py-1 rounded-full"
-              style="background: var(--primary-100); color: var(--primary-700);">+8%</span>
+              style="background: var(--primary-100); color: var(--primary-700);">+{{ stats.recipesGrowth }}%</span>
       </div>
 
       <!-- Ingredients -->
@@ -52,11 +52,11 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-3xl font-bold" style="color: var(--primary-700);">1,892</span>
+          <span class="text-3xl font-bold" style="color: var(--primary-700);">{{ stats.totalIngredients | number }}</span>
           <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_ingredients') }}</span>
         </div>
         <span class="text-sm font-semibold px-3 py-1 rounded-full"
-              style="background: var(--primary-100); color: var(--primary-700);">+15%</span>
+              style="background: var(--primary-100); color: var(--primary-700);">+{{ stats.ingredientsGrowth }}%</span>
       </div>
 
       <!-- Total Reviews -->
@@ -70,11 +70,11 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-3xl font-bold" style="color: var(--primary-700);">5,678</span>
+          <span class="text-3xl font-bold" style="color: var(--primary-700);">{{ stats.totalReviews | number }}</span>
           <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_total_reviews') }}</span>
         </div>
         <span class="text-sm font-semibold px-3 py-1 rounded-full"
-              style="background: var(--primary-100); color: var(--primary-700);">+22%</span>
+              style="background: var(--primary-100); color: var(--primary-700);">+{{ stats.reviewsGrowth }}%</span>
       </div>
     </div>
 
@@ -97,99 +97,75 @@
           </button>
         </div>
 
-        <div class="relative w-full h-64 overflow-hidden rounded-3xl" style="height: 18rem;">
-           <!-- Dropdown Backdrop -->
-           <div *ngIf="isTimeRangeDropdownOpen" (click)="isTimeRangeDropdownOpen = false" class="fixed inset-0 z-10 cursor-default rounded-3xl"></div>
+        <div class="relative w-full h-[22rem] overflow-visible rounded-3xl">
+            <div *ngIf="isTimeRangeDropdownOpen" (click)="isTimeRangeDropdownOpen = false" class="fixed inset-0 z-40"></div>
 
-           <!-- Recipes chart -->
-           <div *ngIf="activeTab === 'recipes'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-around gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-             <div class="flex justify-end relative z-20">
-               <button (click)="toggleTimeRangeDropdown()" class="px-3 py-1 w-auto min-w-[30%] justify-between rounded-lg text-sm font-medium flex items-center cursor-pointer hover:bg-white/10 transition-colors border-none"
-                    style="background: var(--primary-100); color: var(--primary-700);">
-                 {{ t(selectedTimeRange) }}
-                 <i class="ti ti-caret-down-filled text-sm ml-2"></i>
-               </button>
-               <div *ngIf="isTimeRangeDropdownOpen" class="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-lg border border-solid p-2 flex flex-col gap-1 origin-top-right transition-all"
-                    style="background: var(--primary-100); border-color: var(--primary-300);">
-                 <button (click)="selectTimeRange('admin_last_7_days')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_last_7_days') }}</button>
-                 <button (click)="selectTimeRange('admin_last_30_days')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_last_30_days') }}</button>
-                 <button (click)="selectTimeRange('admin_this_month')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_this_month') }}</button>
-                 <button (click)="selectTimeRange('admin_this_year')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_this_year') }}</button>
-                 <button (click)="selectTimeRange('admin_all_time')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_all_time') }}</button>
-               </div>
-             </div>
-             <div class="flex justify-between items-end h-[85%] w-full gap-3 pt-2">
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 60%; background: var(--primary-300);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">240</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 80%; background: var(--primary-400);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">320</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 45%; background: var(--primary-100);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">180</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 75%; background: var(--primary-500);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">300</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 90%; background: var(--primary-600);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">380</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 55%; background: var(--primary-300);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">220</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 85%; background: var(--primary-500);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">340</span></div>
-             </div>
-           </div>
+            <div class="absolute top-8 right-8 z-50 min-w-[200px]">
+              <div (click)="toggleTimeRangeDropdown()"
+                   class="px-4 py-2 rounded-xl border-2 flex justify-between items-center cursor-pointer transition-all hover:border-[var(--primary-400)] shadow-sm"
+                   style="background: var(--primary-100-40); border-color: var(--primary-200); color: var(--primary-700);">
+                <span class="font-bold text-xs">{{ t(selectedTimeRange) }}</span>
+                <i class="ti ti-caret-down-filled transition-transform text-xs" [class.rotate-180]="isTimeRangeDropdownOpen"></i>
+              </div>
 
-           <!-- Reviews chart -->
-           <div *ngIf="activeTab === 'reviews'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-around gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-             <div class="flex justify-end relative z-20">
-               <button (click)="toggleTimeRangeDropdown()" class="px-3 py-1 w-auto min-w-[30%] justify-between rounded-lg text-sm font-medium flex items-center cursor-pointer hover:bg-white/10 transition-colors border-none"
-                    style="background: var(--primary-100); color: var(--primary-700);">
-                 {{ t(selectedTimeRange) }}
-                 <i class="ti ti-caret-down-filled text-sm ml-2"></i>
-               </button>
-               <div *ngIf="isTimeRangeDropdownOpen" class="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-lg border border-solid p-2 flex flex-col gap-1 origin-top-right transition-all"
-                    style="background: var(--primary-100); border-color: var(--primary-300);">
-                 <button (click)="selectTimeRange('admin_last_7_days')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_last_7_days') }}</button>
-                 <button (click)="selectTimeRange('admin_last_30_days')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_last_30_days') }}</button>
-                 <button (click)="selectTimeRange('admin_this_month')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_this_month') }}</button>
-                 <button (click)="selectTimeRange('admin_this_year')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_this_year') }}</button>
-                 <button (click)="selectTimeRange('admin_all_time')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_all_time') }}</button>
-               </div>
-             </div>
-             <div class="flex justify-between items-end h-[85%] w-full gap-3 pt-2">
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 30%; background: var(--primary-600);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">120</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 50%; background: var(--primary-300);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">200</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 90%; background: var(--primary-500);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">360</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 25%; background: var(--primary-100);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">100</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 70%; background: var(--primary-400);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">280</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 80%; background: var(--primary-600);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">320</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 60%; background: var(--primary-300);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">240</span></div>
-             </div>
-           </div>
+              <div *ngIf="isTimeRangeDropdownOpen"
+                   class="absolute top-full right-0 left-0 mt-2 rounded-2xl border-2 shadow-2xl overflow-hidden z-[100]"
+                   style="background: var(--primary-50); border-color: var(--primary-200); animation: fadeIn 0.2s ease-out;">
+                <div *ngFor="let range of ['admin_last_7_days', 'admin_this_month', 'admin_this_year', 'admin_all_time']"
+                     (click)="selectTimeRange(range)"
+                     class="px-4 py-3 cursor-pointer transition-all hover:bg-[var(--primary-200)] flex items-center justify-between text-xs"
+                     [class.bg-[var(--primary-300-40)]]="range === selectedTimeRange"
+                     style="color: var(--primary-700);">
+                  <span class="font-medium">{{ t(range) }}</span>
+                  <i *ngIf="range === selectedTimeRange" class="ti ti-check" style="color: var(--primary-500);"></i>
+                </div>
+              </div>
+            </div>
 
-           <!-- Users chart -->
-           <div *ngIf="activeTab === 'users'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-around gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-             <div class="flex justify-end relative z-20">
-               <button (click)="toggleTimeRangeDropdown()" class="px-3 py-1 w-auto min-w-[30%] justify-between rounded-lg text-sm font-medium flex items-center cursor-pointer hover:bg-white/10 transition-colors border-none"
-                    style="background: var(--primary-100); color: var(--primary-700);">
-                 {{ t(selectedTimeRange) }}
-                 <i class="ti ti-caret-down-filled text-sm ml-2"></i>
-               </button>
-               <div *ngIf="isTimeRangeDropdownOpen" class="absolute top-full right-0 mt-2 w-48 rounded-xl shadow-lg border border-solid p-2 flex flex-col gap-1 origin-top-right transition-all"
-                    style="background: var(--primary-100); border-color: var(--primary-300);">
-                 <button (click)="selectTimeRange('admin_last_7_days')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_last_7_days') }}</button>
-                 <button (click)="selectTimeRange('admin_last_30_days')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_last_30_days') }}</button>
-                 <button (click)="selectTimeRange('admin_this_month')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_this_month') }}</button>
-                 <button (click)="selectTimeRange('admin_this_year')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_this_year') }}</button>
-                 <button (click)="selectTimeRange('admin_all_time')" class="text-left px-3 py-2 text-sm rounded-lg hover:bg-black/5 transition-colors cursor-pointer border-none" style="color: var(--primary-700); background: transparent;">{{ t('admin_all_time') }}</button>
+            <div *ngIf="activeTab === 'recipes'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-end gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+               <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2">
+                  @for (day of stats.recipeGrowthChart; track day.date) {
+                    <div class="chart-bar group relative flex-1 rounded-t-lg transition-all min-w-[2px]" 
+                         [style.height]="getBarHeight(day.count, stats.recipeGrowthChart)"
+                         [style.background]="getBarColor(day.count, stats.recipeGrowthChart)">
+                      <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" 
+                            style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
+                    </div>
+                  }
                </div>
-             </div>
-             <div class="flex justify-between items-end h-[85%] w-full gap-3 pt-2">
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 10%; background: var(--primary-300);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">50</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 35%; background: var(--primary-400);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">150</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 85%; background: var(--primary-600);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">350</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 55%; background: var(--primary-500);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">220</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 20%; background: var(--primary-100);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">80</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 45%; background: var(--primary-300);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">180</span></div>
-                <div class="chart-bar group relative w-full rounded-t-lg" style="height: 75%; background: var(--primary-400);"><span class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" style="background: var(--primary-700); color: var(--white); z-index: 10;">300</span></div>
-             </div>
-           </div>
+            </div>
+
+            <div *ngIf="activeTab === 'reviews'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-end gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+              <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2">
+                  @for (day of stats.reviewGrowthChart; track day.date) {
+                    <div class="chart-bar group relative flex-1 rounded-t-lg transition-all min-w-[2px]" 
+                         [style.height]="getBarHeight(day.count, stats.reviewGrowthChart)"
+                         [style.background]="getBarColor(day.count, stats.reviewGrowthChart)">
+                      <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" 
+                            style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
+                    </div>
+                  }
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'users'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-end gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+              <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2">
+                  @for (day of stats.userGrowthChart; track day.date) {
+                    <div class="chart-bar group relative flex-1 rounded-t-lg transition-all min-w-[2px]" 
+                         [style.height]="getBarHeight(day.count, stats.userGrowthChart)"
+                         [style.background]="getBarColor(day.count, stats.userGrowthChart)">
+                      <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" 
+                            style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
+                    </div>
+                  }
+              </div>
+            </div>
         </div>
       </div>
 
       <!-- Popular Recipes -->
-      <div class="flex flex-col gap-6 w-1/2 rounded-3xl border border-solid px-8 py-8 shadow-sm glass overflow-y-auto"
-           style="border-color: var(--primary-100-40); background: var(--primary-200-40); max-height: 25rem;">
+      <div class="flex flex-col gap-6 w-1/2 rounded-3xl border border-solid px-8 py-8 shadow-sm glass overflow-y-auto max-h-[30rem]"
+           style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
         <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
           <i class="ti ti-flame mr-2"></i>
           {{ t('admin_most_popular_recipes') }}
@@ -365,7 +341,7 @@
           <img *ngIf="!admin.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
           {{ admin.username }}
         </span>
-        <button class="btn btn-sm btn-primary rounded text-xs px-3 py-2 text-white font-medium hover:scale-105 transition-transform" style="background: var(--gradient-primary);" (click)="changeUserRole(admin.username, 'USER')">{{ t('remove') }}</button>
+        <button class="btn btn-sm text-xs px-3 py-2 text-white font-medium hover:scale-105 transition-transform rounded-xl" style="background: #ef4444;" (click)="changeUserRole(admin.username, 'USER')">{{ t('remove') }}</button>
       </div>
       <div *ngIf="isLoadingAdminUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
       <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreAdminUsers && !isLoadingAdminUsers && adminUsers.length > 0">
@@ -409,8 +385,12 @@
           {{ user.username }}
         </span>
         <div class="flex gap-2">
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #3b82f6;" (click)="changeUserRole(user.username, 'ADMIN')">{{ t('promote') }}</button>
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="suspendUser(user.username)">{{ t('admin_confirm_suspension') }}</button>
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" (click)="changeUserRole(user.username, 'ADMIN')">
+            <i class="ti ti-user-up mr-1 text-base"></i> {{ t('promote') }}
+          </button>
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="suspendUser(user.username)">
+            <i class="ti ti-user-cancel mr-1 text-base"></i> {{ t('admin_confirm_suspension') }}
+          </button>
         </div>
       </div>
       <div *ngIf="isLoadingUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
@@ -454,7 +434,9 @@
           <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
           {{ user.username }}
         </span>
-        <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #10b981;" (click)="liftSuspension(user.username)">{{ t('admin_lift_suspension') }}</button>
+        <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" (click)="liftSuspension(user.username)">
+          <i class="ti ti-user-bolt mr-1 text-base"></i> {{ t('admin_lift_suspension') }}
+        </button>
       </div>
       <div *ngIf="isLoadingSuspendedUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
       <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreSuspendedUsers && !isLoadingSuspendedUsers && suspendedUsers.length > 0">
@@ -497,7 +479,7 @@
           {{ recipe.title }}
         </span>
         <div class="flex gap-2">
-          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #10b981;" (click)="approveRecipe(recipe.id.toString())">{{ t('admin_approve_recipe') }}</button>
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" (click)="approveRecipe(recipe.id.toString())">{{ t('admin_approve_recipe') }}</button>
           <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="rejectRecipe(recipe.id.toString())">{{ t('admin_reject_recipe') }}</button>
         </div>
       </div>
@@ -544,8 +526,12 @@
             {{ recipe.title }}
           </span>
           <div class="flex gap-2">
-            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #3b82f6;" routerLink="/recipes/{{recipe.id}}" (click)="closeModal()">{{ t('view') }}</button>
-            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #94a3b8;" (click)="dismissRecipeReport(recipe.id)">{{ t('ignore') }}</button>
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" routerLink="/recipes/{{recipe.id}}" (click)="closeModal()">
+              <i class="ti ti-eye mr-1 text-base"></i> {{ t('view') }}
+            </button>
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="dismissRecipeReport(recipe.id)">
+              <i class="ti ti-u-turn-right mr-1 text-base"></i> {{ t('ignore') }}
+            </button>
           </div>
         </div>
         <div *ngIf="isLoadingReportedRecipes" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
@@ -568,8 +554,12 @@
             {{ user.username }}
           </span>
           <div class="flex gap-2">
-            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #3b82f6;" routerLink="/users/{{user.username}}" (click)="closeModal()">{{ t('view') }}</button>
-            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #94a3b8;" (click)="dismissUserReport(user.username)">{{ t('ignore') }}</button>
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" routerLink="/users/{{user.username}}" (click)="closeModal()">
+              <i class="ti ti-eye mr-1 text-base"></i> {{ t('view') }}
+            </button>
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="dismissUserReport(user.username)">
+              <i class="ti ti-u-turn-right mr-1 text-base"></i> {{ t('ignore') }}
+            </button>
           </div>
         </div>
         <div *ngIf="isLoadingReportedUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
@@ -592,8 +582,12 @@
               <p class="text-sm" style="color: var(--primary-600);">{{ review.comment }}</p>
             </div>
             <div class="flex gap-2">
-              <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #3b82f6;" routerLink="/recipes/{{review.recipe?.id}}" (click)="closeModal()">{{ t('view') }}</button>
-              <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #94a3b8;" (click)="dismissReviewReport(review.id)">{{ t('ignore') }}</button>
+              <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" routerLink="/recipes/{{review.recipe?.id}}" (click)="closeModal()">
+                <i class="ti ti-eye mr-1 text-base"></i> {{ t('view') }}
+              </button>
+              <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="dismissReviewReport(review.id)">
+                <i class="ti ti-u-turn-right mr-1 text-base"></i> {{ t('ignore') }}
+              </button>
             </div>
           </div>
         </div>

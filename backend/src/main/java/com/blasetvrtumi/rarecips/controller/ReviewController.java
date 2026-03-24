@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -208,8 +211,8 @@ public class ReviewController {
         if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
             return ResponseEntity.status(403).body("Only admins can fetch reported reviews");
         }
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
-        org.springframework.data.domain.Page<Review> reported = reviewService.getReportedReviews(pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Review> reported = reviewService.getReportedReviews(pageable);
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("reviews", reported.getContent());

@@ -22,6 +22,8 @@ import { ReviewService } from '../../services/review.service';
 })
 export class ProfileViewComponent implements OnInit {
   isOwnProfile: boolean = false;
+  isLoggedIn: boolean = false;
+  profileLoaded: boolean = false;
 
   editing: boolean = false;
   username: string = '';
@@ -72,7 +74,6 @@ export class ProfileViewComponent implements OnInit {
 
 
   responsive: boolean = window.innerWidth < 1024;
-  isAuthenticated: boolean = false;
 
   constructor(
     private router: Router,
@@ -126,13 +127,15 @@ export class ProfileViewComponent implements OnInit {
       }
     });
 
+    console.log(this.isOwnProfile)
+
 
     this.userService.getUserByUsername(this.username).subscribe({
       next: (userData) => {
         this.user = userData;
         this.updateTitle();
 
-        this.isAuthenticated = true;
+        this.profileLoaded = true;
         this.isAdminProfile = this.user?.role?.includes('ADMIN');
 
         this.creationDate = this.user.createdAt;
@@ -166,6 +169,7 @@ export class ProfileViewComponent implements OnInit {
     });
 
     this.sessionService.getLoggedUser().subscribe(loggedUser => {
+      this.isLoggedIn = !!loggedUser;
       this.isOwnProfile = loggedUser?.username === this.username;
       this.isAdmin = loggedUser?.role?.includes('ADMIN');
     });

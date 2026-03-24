@@ -14,6 +14,9 @@ import java.util.List;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.createdAt BETWEEN :start AND :end")
+    long countByCreatedAtBetween(@Param("start") java.time.LocalDateTime start, @Param("end") java.time.LocalDateTime end);
+
     Page<Review> findByReportedTrue(Pageable pageable);
 
     List<Review> findByRecipe(Recipe recipe);

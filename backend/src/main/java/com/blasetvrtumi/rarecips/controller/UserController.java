@@ -9,12 +9,15 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import java.security.Principal;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -201,7 +204,7 @@ public class UserController {
         }
 
         User user = userService.findByUsername(principal.getName());
-        user.setLastOnline(java.time.LocalDateTime.now());
+        user.setLastOnline(LocalDateTime.now());
         userService.save(user);
         return ResponseEntity.ok().build();
     }
@@ -290,9 +293,7 @@ public class UserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size) {
 
-        Pageable pageable = PageRequest.of(page, size,
-            org.springframework.data.domain.Sort.by(
-                org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
 
         Page<User> users = userRepository.findByUsernameContainingIgnoreCaseOrDisplayNameContainingIgnoreCase(
             query != null ? query : "",
@@ -601,7 +602,7 @@ public class UserController {
 
             String recoveryToken = UUID.randomUUID().toString();
             user.setPasswordResetToken(recoveryToken);
-            user.setPasswordResetTokenExpiry(java.time.LocalDateTime.now().plusHours(2));
+            user.setPasswordResetTokenExpiry(LocalDateTime.now().plusHours(2));
             userService.save(user);
             String theme = payload.getOrDefault("theme", "theme-tangerine-light");
             String lang = payload.getOrDefault("lang", "en");
@@ -620,7 +621,7 @@ public class UserController {
         } else if (token != null && newPassword != null && confirmPassword != null) {
             User user = userService.findByPasswordResetToken(token);
 
-            if (user == null || user.getPasswordResetTokenExpiry() == null || user.getPasswordResetTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+            if (user == null || user.getPasswordResetTokenExpiry() == null || user.getPasswordResetTokenExpiry().isBefore(LocalDateTime.now())) {
                 return ResponseEntity.status(400).body(Collections.singletonMap("error", "Invalid or expired token."));
             }
             if (!newPassword.equals(confirmPassword)) {
