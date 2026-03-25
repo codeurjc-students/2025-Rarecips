@@ -1,5 +1,9 @@
 name: Docker image creation and push to Dockerhub on merge to main branch
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+
 on:
   push:
     branches:
