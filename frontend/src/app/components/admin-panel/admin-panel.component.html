@@ -126,10 +126,10 @@
                <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2 bars-wrapper">
                   @for (day of stats.recipeGrowthChart; track day.date) {
                     <div class="flex flex-col items-center flex-1 min-w-[2px] h-full justify-end bar-group">
-                      <div class="chart-bar group relative w-full rounded-t-lg transition-all" 
+                      <div class="chart-bar group relative w-full rounded-t-lg transition-all"
                            [style.height]="getBarHeight(day.count, stats.recipeGrowthChart)"
                            [style.background]="getBarColor(day.count, stats.recipeGrowthChart)">
-                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" 
+                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
                               style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
                       </div>
                       <span class="bar-label-mobile">{{ day.date }}</span>
@@ -142,10 +142,10 @@
               <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2 bars-wrapper">
                   @for (day of stats.reviewGrowthChart; track day.date) {
                     <div class="flex flex-col items-center flex-1 min-w-[2px] h-full justify-end bar-group">
-                      <div class="chart-bar group relative w-full rounded-t-lg transition-all" 
+                      <div class="chart-bar group relative w-full rounded-t-lg transition-all"
                            [style.height]="getBarHeight(day.count, stats.reviewGrowthChart)"
                            [style.background]="getBarColor(day.count, stats.reviewGrowthChart)">
-                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" 
+                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
                               style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
                       </div>
                       <span class="bar-label-mobile">{{ day.date }}</span>
@@ -158,10 +158,10 @@
               <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2 bars-wrapper">
                   @for (day of stats.userGrowthChart; track day.date) {
                     <div class="flex flex-col items-center flex-1 min-w-[2px] h-full justify-end bar-group">
-                      <div class="chart-bar group relative w-full rounded-t-lg transition-all" 
+                      <div class="chart-bar group relative w-full rounded-t-lg transition-all"
                            [style.height]="getBarHeight(day.count, stats.userGrowthChart)"
                            [style.background]="getBarColor(day.count, stats.userGrowthChart)">
-                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" 
+                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
                               style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
                       </div>
                       <span class="bar-label-mobile">{{ day.date }}</span>
@@ -213,17 +213,17 @@
           {{ t('admin_user_management') }}
         </h3>
         <div class="flex flex-col gap-4">
-          <button (click)="openModal('manageAdmins')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
+          <button id="manageAdminsBtn" (click)="openModal('manageAdmins')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-user-hexagon text-xl"></i>
             <span class="font-semibold">{{ t('admin_manage_administrators') }}</span>
           </button>
-          <button (click)="openModal('viewAllUsers')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
+          <button id="viewAllUsersBtn" (click)="openModal('viewAllUsers')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-users text-xl"></i>
             <span class="font-semibold">{{ t('admin_view_all_users') }}</span>
           </button>
-          <button (click)="openModal('suspendedUsers')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
+          <button id="suspendedUsersBtn" (click)="openModal('suspendedUsers')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-user-cancel text-xl"></i>
             <span class="font-semibold">{{ t('admin_suspended_users') }}</span>
@@ -239,12 +239,12 @@
           {{ t('admin_content_management') }}
         </h3>
         <div class="flex flex-col gap-4">
-          <button (click)="openModal('pendingRecipes')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
+          <button id="pendingRecipesBtn" (click)="openModal('pendingRecipes')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-file-time text-xl"></i>
             <span class="font-semibold">{{ t('admin_pending_recipes') }}</span>
           </button>
-          <button (click)="openModal('contentReports')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
+          <button id="contentReportsBtn" (click)="openModal('contentReports')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-eye-exclamation text-xl"></i>
             <span class="font-semibold">{{ t('admin_content_reports') }}</span>
@@ -673,7 +673,7 @@
         <div class="flex-1">
           <input *ngIf="editingAttribute && editingAttribute.id == attr.id" type="text" [(ngModel)]="editingAttribute.name"
                  class="w-full p-2 rounded-lg border-none" style="background: var(--white); color: var(--primary-700);">
-          
+
           <span *ngIf="!editingAttribute || editingAttribute.id != attr.id" class="font-semibold text-primary" style="color: var(--primary-700);">{{ attr.name }}</span>
         </div>
         <div class="flex gap-2">
