@@ -62,13 +62,15 @@ public class UICollectionTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
+
     {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex:nth-child(3) > .imageCont .btn:nth-child(2)")));
+      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
       Actions builder = new Actions(driver);
       builder.moveToElement(element).perform();
     }
 
-    WebElement btnElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex:nth-child(3) > .imageCont .btn:nth-child(2)")));
+    WebElement btnElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
     jsClick(btnElement);
 
     {
@@ -112,7 +114,9 @@ public class UICollectionTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    WebElement addBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex:nth-child(3) > .imageCont .btn:nth-child(2)")));
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
+
+    WebElement addBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
     jsClick(addBtn);
 
     js.executeScript("window.scrollTo(0,0)");
