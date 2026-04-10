@@ -288,7 +288,7 @@
   .visibleBackdrop button {
     padding: 0.35rem 0.65rem !important;
     font-size: 0.75rem !important;
-    border-radius: 8px !important;
+    border-radius: 8px;
   }
 
   .tabs {
