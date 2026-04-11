@@ -1,48 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, interval, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
-import { Activity } from '../models/activity.model';
-import { ReviewStack } from '../models/review-stack.model';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ActivityService {
 
-  private latestActivitiesSubject = new BehaviorSubject<Activity[]>([]);
-
-  private latestReviewsSubject = new BehaviorSubject<ReviewStack[]>([]);
-
   private apiUrl = '/api/v1';
 
-  constructor(private http: HttpClient) {
-    this.startPolling();
-  }
-
-  private startPolling(): void {
-    this.loadLatestActivities();
-    interval(30000).pipe(
-      tap(() => this.loadLatestActivities()),
-      catchError(() => of(null))
-    ).subscribe();
-  }
-
-  private loadLatestActivities(): void {
-    this.http.get<any>(`${this.apiUrl}/activities/latest?limit=10`).subscribe({
-      next: (response) => {
-        this.latestActivitiesSubject.next(response.activities || []);
-      },
-      error: () => {}
-    });
-
-    this.http.get<any>(`${this.apiUrl}/activities/latest-reviews?limit=10`).subscribe({
-      next: (response) => {
-        this.latestReviewsSubject.next(response.reviews || []);
-      },
-      error: () => {}
-    });
-  }
+  constructor(private http: HttpClient) { }
 
   public getLatestActivities(limit: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/activities/latest?limit=${limit}`);
