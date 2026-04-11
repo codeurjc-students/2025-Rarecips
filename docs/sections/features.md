@@ -38,6 +38,20 @@
     <p align="center">
       <img src="../../readme-resources/gif/ingredients.gif" alt="Ingredients" width="200">
     </p>
+  
+  - **0.2**:
+    - Report: Users can report recipes, reviews and users to administrators.
+    <p align="center">
+      <img src="../../readme-resources/gif/report.gif" alt="Report" width="200">
+    </p>
+    - Manage users: Administrators can manage users to promote them to administrators, remove them or suspend them.
+    <p align="center">
+      <img src="../../readme-resources/gif/manageusers.gif" alt="Manage users" width="200">
+    </p>
+    - Manage content: Administrators can manage content to approve or reject pending recipes, view reports or edit recipe tags.
+    <p align="center">
+      <img src="../../readme-resources/gif/managecontent.gif" alt="Manage content" width="200">
+    </p>
 
  - ## Detailed Functionality
 
@@ -54,12 +68,12 @@
       - User profile management (Registered users) ✔️
       - User ingredient list management (registered users) ✔️
       - Recipe saving and bookmarking (Registered users) ✔️
+      - Stat tracking (Administrators) ✔️
+      - Analytics dashboard viewing (Admins) ✔️
+      - User and content moderation (Admins) ✔️
     
     ### Intricate
     
-    - User and content moderation (Admins)
       - User notifications through websockets (Registered users) ❌
-      - Analytics dashboard viewing (Admins) ❌
       - Health report feedbacking (Registered users) ❌
-      - Stat tracking (Registered users) ❌
       - Personalized recommendations (Registered users) ❌

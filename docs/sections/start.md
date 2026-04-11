@@ -54,6 +54,11 @@ The project will follow an agile, iterative, and incremental development process
 </p>
 
 - **Phase 4 (15/12/2025 - 01/03/2026):** Medium features
+
+<p align="center">
+   <img src="../../readme-resources/Gantt02.png" width="80%"/>
+</p>
+
 - **Phase 5 (01/03/2026 - 15/04/2026):** Intricate features
 - **Phase 6 (15/04/2026 - 15/05/2026):** Final report
 - **Phase 7 (15/05/2026 - 15/06/2026):** Project presentation
