@@ -1,10 +1,10 @@
 <!-- Main Content -->
 <div
-  class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
-  <div class="glass p-8 gap-8 flex w-full max-w-[1400px] min-h-full flex-col items-start">
+  class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto relative">
+  <div class="glass p-8 gap-8 flex w-full max-w-[1400px] min-h-full flex-col items-start admin-panel-inner">
 
     <!-- Stats Overview -->
-    <div class="flex flex-row gap-6 w-full">
+    <div class="flex flex-row gap-6 w-full admin-stats-grid">
       <!-- Total Users -->
       <div
         class="flex flex-row items-center justify-between w-full h-auto gap-4 rounded-3xl border border-solid px-8 py-6 shadow-sm glass enhanced-card"
@@ -16,11 +16,11 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-3xl font-bold" style="color: var(--primary-700);">2,847</span>
-          <span class="text-sm" style="color: var(--primary-400);">Total Users</span>
+          <span class="text-3xl font-bold" style="color: var(--primary-700);">{{ stats.totalUsers | number }}</span>
+          <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_total_users') }}</span>
         </div>
         <span class="text-sm font-semibold px-3 py-1 rounded-full max-w-min"
-              style="background: var(--primary-100); color: var(--primary-700);">+12%</span>
+              style="background: var(--primary-100); color: var(--primary-700);">+{{ stats.usersGrowth }}%</span>
       </div>
 
       <!-- Total Recipes -->
@@ -34,11 +34,11 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-3xl font-bold" style="color: var(--primary-700);">1,234</span>
-          <span class="text-sm" style="color: var(--primary-400);">Published Recipes</span>
+          <span class="text-3xl font-bold" style="color: var(--primary-700);">{{ stats.totalRecipes | number }}</span>
+          <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_published_recipes') }}</span>
         </div>
         <span class="text-sm font-semibold px-3 py-1 rounded-full"
-              style="background: var(--primary-100); color: var(--primary-700);">+8%</span>
+              style="background: var(--primary-100); color: var(--primary-700);">+{{ stats.recipesGrowth }}%</span>
       </div>
 
       <!-- Ingredients -->
@@ -52,11 +52,11 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-3xl font-bold" style="color: var(--primary-700);">1,892</span>
-          <span class="text-sm" style="color: var(--primary-400);">Ingredients</span>
+          <span class="text-3xl font-bold" style="color: var(--primary-700);">{{ stats.totalIngredients | number }}</span>
+          <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_ingredients') }}</span>
         </div>
         <span class="text-sm font-semibold px-3 py-1 rounded-full"
-              style="background: var(--primary-100); color: var(--primary-700);">+15%</span>
+              style="background: var(--primary-100); color: var(--primary-700);">+{{ stats.ingredientsGrowth }}%</span>
       </div>
 
       <!-- Total Reviews -->
@@ -70,176 +70,133 @@
           </div>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="text-3xl font-bold" style="color: var(--primary-700);">5,678</span>
-          <span class="text-sm" style="color: var(--primary-400);">Total Reviews</span>
+          <span class="text-3xl font-bold" style="color: var(--primary-700);">{{ stats.totalReviews | number }}</span>
+          <span class="text-sm" style="color: var(--primary-400);">{{ t('admin_total_reviews') }}</span>
         </div>
         <span class="text-sm font-semibold px-3 py-1 rounded-full"
-              style="background: var(--primary-100); color: var(--primary-700);">+22%</span>
+              style="background: var(--primary-100); color: var(--primary-700);">+{{ stats.reviewsGrowth }}%</span>
       </div>
     </div>
 
     <!-- Charts and Analytics -->
-    <div class="flex flex-row gap-8 w-full">
+    <div class="flex flex-row gap-8 w-full admin-charts-layout">
       <!-- User Growth Chart -->
-      <div class="flex flex-col justify-around gap-8 w-1/2 h-auto">
+      <div class="flex flex-col justify-around gap-8 h-auto admin-chart-col">
         <div class="tabs glass text-nowrap w-full">
-          <button class="tab active">
+          <button class="tab" [class.active]="activeTab === 'recipes'" (click)="switchTab('recipes')">
             <i class="ti ti-chef-hat text-xl" aria-hidden="true"></i>
-            Recipes
+            {{ t('recipes') }}
           </button>
-          <button class="tab">
+          <button class="tab" [class.active]="activeTab === 'reviews'" (click)="switchTab('reviews')">
             <i class="ti ti-stars text-xl" aria-hidden="true"></i>
-            Reviews
+            {{ t('reviews') }}
           </button>
-          <button class="tab">
+          <button class="tab" [class.active]="activeTab === 'users'" (click)="switchTab('users')">
             <i class="ti ti-users text-xl" aria-hidden="true"></i>
-            Users
+            {{ t('users') }}
           </button>
         </div>
-        <div class="flex flex-col justify-around gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-             style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-          <div class="flex justify-end">
-            <div class="px-3 py-1 w-1/4 justify-around rounded-lg text-sm font-medium"
-                 style="background: var(--primary-100); color: var(--primary-700); border: none;">
-              Last 7 days
-              <i class="ti ti-caret-down-filled text-sm ml-1"></i>
-            </div>
-          </div>
-          <div class="h-64 flex items-end justify-center rounded-2xl p-6 relative overflow-hidden chart-container"
-               style="background: var(--primary-300-40);">
-            <!-- Chart placeholder with animated bars -->
-            <div class="flex items-end justify-between gap-3 w-full h-full">
-              <!-- Animated bars representing data with tooltips -->
-              <div class="chart-bar group relative"
-                   style="height: 60%; background: var(--primary-300); animation-delay: 0.1s;"
-                   title="Monday: 240 users">
-                                <span
-                                  class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style="background: var(--primary-700); color: var(--primary-100);">240</span>
+
+        <div class="relative w-full h-[22rem] overflow-visible rounded-3xl">
+            <div *ngIf="isTimeRangeDropdownOpen" (click)="isTimeRangeDropdownOpen = false" class="fixed inset-0 z-40"></div>
+
+            <div class="absolute top-8 right-8 z-50 min-w-[200px] stats-dropdown-container">
+              <div (click)="toggleTimeRangeDropdown()"
+                   class="px-4 py-2 rounded-xl border-2 flex justify-between items-center cursor-pointer transition-all hover:border-[var(--primary-400)] shadow-sm"
+                   style="background: var(--primary-100-40); border-color: var(--primary-200); color: var(--primary-700);">
+                <span class="font-bold text-xs">{{ t(selectedTimeRange) }}</span>
+                <i class="ti ti-caret-down-filled transition-transform text-xs" [class.rotate-180]="isTimeRangeDropdownOpen"></i>
               </div>
-              <div class="chart-bar group relative"
-                   style="height: 80%; background: var(--primary-400); animation-delay: 0.2s;"
-                   title="Tuesday: 320 users">
-                                <span
-                                  class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style="background: var(--primary-700); color: var(--primary-100);">320</span>
-              </div>
-              <div class="chart-bar group relative"
-                   style="height: 45%; background: var(--primary-100-40); animation-delay: 0.3s;"
-                   title="Wednesday: 180 users">
-                                <span
-                                  class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style="background: var(--primary-700); color: var(--primary-100);">180</span>
-              </div>
-              <div class="chart-bar group relative"
-                   style="height: 75%; background: var(--primary-500); animation-delay: 0.4s;"
-                   title="Thursday: 300 users">
-                                <span
-                                  class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style="background: var(--primary-700); color: var(--primary-100);">300</span>
-              </div>
-              <div class="chart-bar group relative"
-                   style="height: 90%; background: var(--primary-600); animation-delay: 0.5s;"
-                   title="Friday: 360 users">
-                                <span
-                                  class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style="background: var(--primary-700); color: var(--primary-100);">360</span>
-              </div>
-              <div class="chart-bar group relative"
-                   style="height: 55%; background: var(--primary-300); animation-delay: 0.6s;"
-                   title="Saturday: 220 users">
-                                <span
-                                  class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style="background: var(--primary-700); color: var(--primary-100);">220</span>
-              </div>
-              <div class="chart-bar group relative"
-                   style="height: 85%; background: var(--primary-500); animation-delay: 0.7s;"
-                   title="Sunday: 340 users">
-                                <span
-                                  class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style="background: var(--primary-700); color: var(--primary-100);">340</span>
+
+              <div *ngIf="isTimeRangeDropdownOpen"
+                   class="dropdown absolute top-full right-0 left-0 mt-2 rounded-2xl border-2 shadow-2xl overflow-hidden z-[100]"
+                   style="background: var(--primary-50); border-color: var(--primary-200); animation: fadeIn 0.2s ease-out;">
+                <div *ngFor="let range of ['admin_last_7_days', 'admin_this_month', 'admin_this_year', 'admin_all_time']"
+                     (click)="selectTimeRange(range)"
+                     class="px-4 py-3 cursor-pointer transition-all hover:bg-[var(--primary-200)] flex items-center justify-between text-xs"
+                     [class.bg-[var(--primary-300-40)]]="range === selectedTimeRange"
+                     style="color: var(--primary-700);">
+                  <span class="font-medium">{{ t(range) }}</span>
+                  <i *ngIf="range === selectedTimeRange" class="ti ti-check" style="color: var(--primary-500);"></i>
+                </div>
               </div>
             </div>
 
-            <!-- Chart days labels -->
-            <!--
-            <div class="absolute bottom-2 left-0 right-0 flex justify-center">
-                <div class="flex justify-between gap-3" style="width: calc(100% - 3rem);">
-                    <span class="text-xs flex-none w-8 text-center" style="color: var(--primary-400);">L</span>
-                    <span class="text-xs flex-none w-8 text-center" style="color: var(--primary-400);">M</span>
-                    <span class="text-xs flex-none w-8 text-center" style="color: var(--primary-400);">X</span>
-                    <span class="text-xs flex-none w-8 text-center" style="color: var(--primary-400);">J</span>
-                    <span class="text-xs flex-none w-8 text-center" style="color: var(--primary-400);">V</span>
-                    <span class="text-xs flex-none w-8 text-center" style="color: var(--primary-400);">S</span>
-                    <span class="text-xs flex-none w-8 text-center" style="color: var(--primary-400);">D</span>
-                </div>
+            <div *ngIf="activeTab === 'recipes'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-end gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+               <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2 bars-wrapper">
+                  @for (day of stats.recipeGrowthChart; track day.date) {
+                    <div class="flex flex-col items-center flex-1 min-w-[2px] h-full justify-end bar-group">
+                      <div class="chart-bar group relative w-full rounded-t-lg transition-all"
+                           [style.height]="getBarHeight(day.count, stats.recipeGrowthChart)"
+                           [style.background]="getBarColor(day.count, stats.recipeGrowthChart)">
+                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                              style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
+                      </div>
+                      <span class="bar-label-mobile">{{ day.date }}</span>
+                    </div>
+                  }
+               </div>
             </div>
-            -->
-          </div>
+
+            <div *ngIf="activeTab === 'reviews'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-end gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+              <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2 bars-wrapper">
+                  @for (day of stats.reviewGrowthChart; track day.date) {
+                    <div class="flex flex-col items-center flex-1 min-w-[2px] h-full justify-end bar-group">
+                      <div class="chart-bar group relative w-full rounded-t-lg transition-all"
+                           [style.height]="getBarHeight(day.count, stats.reviewGrowthChart)"
+                           [style.background]="getBarColor(day.count, stats.reviewGrowthChart)">
+                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                              style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
+                      </div>
+                      <span class="bar-label-mobile">{{ day.date }}</span>
+                    </div>
+                  }
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'users'" [ngClass]="tabAnimation" class="absolute inset-0 flex flex-col justify-end gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass" style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+              <div class="flex justify-between items-end h-[75%] w-full gap-2 pt-2 bars-wrapper">
+                  @for (day of stats.userGrowthChart; track day.date) {
+                    <div class="flex flex-col items-center flex-1 min-w-[2px] h-full justify-end bar-group">
+                      <div class="chart-bar group relative w-full rounded-t-lg transition-all"
+                           [style.height]="getBarHeight(day.count, stats.userGrowthChart)"
+                           [style.background]="getBarColor(day.count, stats.userGrowthChart)">
+                        <span class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                              style="background: var(--primary-700); color: var(--white); z-index: 10;">{{ day.date }}: {{ day.count }}</span>
+                      </div>
+                      <span class="bar-label-mobile">{{ day.date }}</span>
+                    </div>
+                  }
+              </div>
+            </div>
         </div>
       </div>
 
       <!-- Popular Recipes -->
-      <div class="flex flex-col gap-6 w-1/2 max-h- rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+      <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass overflow-y-auto max-h-[30rem] admin-recipes-col"
            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
         <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
           <i class="ti ti-flame mr-2"></i>
-          Most Popular Recipes
+          {{ t('admin_most_popular_recipes') }}
         </h3>
         <div class="flex flex-col gap-4">
-          <div class="flex items-center gap-4 p-4 rounded-2xl" style="background: var(--primary-100-40);">
-            <img class="h-12 w-12 rounded-lg object-cover"
-                 src="https://res.cloudinary.com/subframe/image/upload/v1724690099/uploads/302/zxrsheptnqfesqupssbb.png"
-                 alt="Recipe"/>
-            <div class="flex-1">
-              <p class="font-semibold" style="color: var(--primary-700);">Paella Valenciana</p>
-              <p class="text-sm" style="color: var(--primary-400);">2,847 views</p>
-            </div>
-            <div class="flex items-center gap-1">
-              <i class="ti ti-star-filled text-yellow-500"></i>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">4.8</span>
-            </div>
+          <div *ngIf="popularRecipes.length === 0" class="text-secondary text-sm">
+            {{ t('loading_recipes') }}...
           </div>
-
-          <div class="flex items-center gap-4 p-4 rounded-2xl" style="background: var(--primary-100-40);">
-            <img class="h-12 w-12 rounded-lg object-cover"
-                 src="https://res.cloudinary.com/subframe/image/upload/v1723780751/uploads/302/cbaa1tfstfnmksus95et.png"
-                 alt="Recipe"/>
-            <div class="flex-1">
-              <p class="font-semibold" style="color: var(--primary-700);">Spanish Tortilla</p>
-              <p class="text-sm" style="color: var(--primary-400);">2,143 views</p>
+          <div *ngFor="let recipe of popularRecipes" class="flex items-center gap-4 p-4 rounded-2xl glass-strong hover:scale-[1.02] cursor-pointer" style="background: var(--primary-100-40); transition: all 0.3s ease;" routerLink="/recipes/{{recipe.id}}">
+            <img *ngIf="recipe.imageUrl" class="h-12 w-12 rounded-lg object-cover"
+                 [src]="'data:image/png;base64,' + recipe.imageUrl"
+                 [alt]="recipe.title"/>
+            <img *ngIf="!recipe.imageUrl" class="h-12 w-12 rounded-lg object-cover"
+                 src="assets/img/recipe.png" style="background-color: var(--primary-300);"
+                 [alt]="recipe.title"/>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold line-clamp-1 truncate" style="color: var(--primary-700);">{{ recipe.title }}</p>
+              <p class="text-sm truncate" style="color: var(--primary-400);">{{ t('by') }} {{ recipe.author }}</p>
             </div>
             <div class="flex items-center gap-1">
-              <i class="ti ti-star-filled text-yellow-500"></i>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">4.7</span>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4 p-4 rounded-2xl" style="background: var(--primary-100-40);">
-            <img class="h-12 w-12 rounded-lg object-cover"
-                 src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
-                 alt="Recipe"/>
-            <div class="flex-1">
-              <p class="font-semibold" style="color: var(--primary-700);">Andalusian Gazpacho</p>
-              <p class="text-sm" style="color: var(--primary-400);">1,892 views</p>
-            </div>
-            <div class="flex items-center gap-1">
-              <i class="ti ti-star-filled text-yellow-500"></i>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">4.6</span>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4 p-4 rounded-2xl" style="background: var(--primary-100-40);">
-            <img class="h-12 w-12 rounded-lg object-cover"
-                 src="https://res.cloudinary.com/subframe/image/upload/v1723780655/uploads/302/vacffcy0kwezmeps1tbv.png"
-                 alt="Recipe"/>
-            <div class="flex-1">
-              <p class="font-semibold" style="color: var(--primary-700);">Andalusian Gazpacho</p>
-              <p class="text-sm" style="color: var(--primary-400);">1,892 views</p>
-            </div>
-            <div class="flex items-center gap-1">
-              <i class="ti ti-star-filled text-yellow-500"></i>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">4.6</span>
+              <i class="ti ti-star-filled" style="color: #f59e0b;"></i>
+              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ recipe.rating | number:'1.1-1' }}</span>
             </div>
           </div>
         </div>
@@ -247,29 +204,29 @@
     </div>
 
     <!-- Management Sections -->
-    <div class="flex gap-8 w-full">
+    <div class="flex gap-8 w-full admin-management-layout">
       <!-- User Management -->
       <div class="flex flex-col w-full justify-around gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
         <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
           <i class="ti ti-users-group mr-2"></i>
-          User Management
+          {{ t('admin_user_management') }}
         </h3>
         <div class="flex flex-col gap-4">
-          <button class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass"
+          <button id="manageAdminsBtn" (click)="openModal('manageAdmins')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-user-hexagon text-xl"></i>
-            <span class="font-semibold">Manage administrators</span>
+            <span class="font-semibold">{{ t('admin_manage_administrators') }}</span>
           </button>
-          <button class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass"
+          <button id="viewAllUsersBtn" (click)="openModal('viewAllUsers')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-users text-xl"></i>
-            <span class="font-semibold">View All Users</span>
+            <span class="font-semibold">{{ t('admin_view_all_users') }}</span>
           </button>
-          <button class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass"
+          <button id="suspendedUsersBtn" (click)="openModal('suspendedUsers')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-user-cancel text-xl"></i>
-            <span class="font-semibold">Suspended Users</span>
+            <span class="font-semibold">{{ t('admin_suspended_users') }}</span>
           </button>
         </div>
       </div>
@@ -279,23 +236,23 @@
            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
         <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
           <i class="ti ti-nut mr-2"></i>
-          Content Management
+          {{ t('admin_content_management') }}
         </h3>
         <div class="flex flex-col gap-4">
-          <button class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass"
+          <button id="pendingRecipesBtn" (click)="openModal('pendingRecipes')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-file-time text-xl"></i>
-            <span class="font-semibold">Pending Recipes</span>
+            <span class="font-semibold">{{ t('admin_pending_recipes') }}</span>
           </button>
-          <button class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass"
+          <button id="contentReportsBtn" (click)="openModal('contentReports')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-eye-exclamation text-xl"></i>
-            <span class="font-semibold">Content Reports</span>
+            <span class="font-semibold">{{ t('admin_content_reports') }}</span>
           </button>
-          <button class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass"
+          <button (click)="openModal('manageCategories')" class="flex items-center gap-3 p-4 transition-all hover:scale-[1.02] glass border-none cursor-pointer"
                   style="background: var(--primary-300-40); color: var(--primary-700);">
             <i class="ti ti-tags text-xl"></i>
-            <span class="font-semibold">Manage Categories</span>
+            <span class="font-semibold">{{ t('admin_manage_categories') }}</span>
           </button>
         </div>
       </div>
@@ -304,44 +261,460 @@
       <div class="flex flex-col w-full justify-around gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
            style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
         <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-          <i class="ti ti-heart-rate-monitor mr-2"></i>
-          System Status
+          <i class="ti ti-server mr-2"></i>
+          {{ t('admin_backend_status') }}
         </h3>
         <div class="flex flex-col gap-4">
-          <div class="flex items-center justify-between p-3 rounded-xl"
+          <div class="flex items-center justify-between p-3 rounded-xl system-status-item"
                style="background: var(--primary-100-40);">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">Server</span>
+              <div class="w-3 h-3 rounded-full" [ngClass]="{
+                'status-operational': systemStatus.server === 'admin_operational',
+                'status-warning': systemStatus.server === 'admin_slow',
+                'status-error': systemStatus.server === 'admin_down' || systemStatus.server === 'admin_loading'
+              }"></div>
+              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_backend') }}</span>
             </div>
-            <span class="text-sm" style="color: var(--primary-400);">Operational</span>
+            <span class="text-sm status-text" style="color: var(--primary-400);">{{ t(systemStatus.server) }}</span>
           </div>
-          <div class="flex items-center justify-between p-3 rounded-xl"
+          <div class="flex items-center justify-between p-3 rounded-xl system-status-item"
                style="background: var(--primary-100-40);">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">Database</span>
+              <div class="w-3 h-3 rounded-full" [ngClass]="{
+                'status-operational': systemStatus.database === 'admin_operational',
+                'status-warning': systemStatus.database === 'admin_slow',
+                'status-error': systemStatus.database === 'admin_down' || systemStatus.database === 'admin_loading'
+              }"></div>
+              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_database') }}</span>
             </div>
-            <span class="text-sm" style="color: var(--primary-400);">Operational</span>
+            <span class="text-sm status-text" style="color: var(--primary-400);">{{ t(systemStatus.database) }}</span>
           </div>
-          <div class="flex items-center justify-between p-3 rounded-xl"
+          <div class="flex items-center justify-between p-3 rounded-xl system-status-item"
                style="background: var(--primary-100-40);">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">API</span>
+              <div class="w-3 h-3 rounded-full" [ngClass]="{
+                'status-operational': systemStatus.mail === 'admin_operational',
+                'status-warning': systemStatus.mail === 'admin_slow',
+                'status-error': systemStatus.mail === 'admin_down' || systemStatus.mail === 'admin_loading'
+              }"></div>
+              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_mail_sender') }}</span>
             </div>
-            <span class="text-sm" style="color: var(--primary-400);">Slow</span>
+            <span class="text-sm status-text" style="color: var(--primary-400);">{{ t(systemStatus.mail) }}</span>
           </div>
-          <div class="flex items-center justify-between p-3 rounded-xl"
+          <div class="flex items-center justify-between p-3 rounded-xl system-status-item"
                style="background: var(--primary-100-40);">
             <div class="flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-red-500"></div>
-              <span class="text-sm font-medium" style="color: var(--primary-700);">Websockets</span>
+              <div class="w-3 h-3 rounded-full" [ngClass]="{
+                'status-operational': systemStatus.websockets === 'admin_operational',
+                'status-warning': systemStatus.websockets === 'admin_slow',
+                'status-error': systemStatus.websockets === 'admin_down' || systemStatus.websockets === 'admin_loading'
+              }"></div>
+              <span class="text-sm font-medium" style="color: var(--primary-700);">{{ t('admin_websockets') }}</span>
             </div>
-            <span class="text-sm" style="color: var(--primary-400);">Down</span>
+            <span class="text-sm status-text" style="color: var(--primary-400);">{{ t(systemStatus.websockets) }}</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Modals with visibleBackdrop effect -->
+@if (currentModal === 'manageAdmins') {
+<div class="opacity-0 fixed inset-0 z-50 flex items-center justify-center transition-all visibleBackdrop"
+     style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;"
+     (click)="onBackdropClick($event)">
+  <div class="w-11/12 max-w-2xl rounded-3xl p-8 relative flex flex-col gap-4 shadow-2xl transition-all"
+       style="background: var(--primary-200); max-height: 85vh; overflow-y: auto;"
+       (click)="$event.stopPropagation()">
+    <button class="absolute top-6 right-6 w-12 h-12 !rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90"
+            style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);"
+            (click)="closeModal($event)">
+      <i class="ti ti-x text-2xl"></i>
+    </button>
+    <div class="flex items-center gap-4 pr-16">
+      <i class="ti ti-user-hexagon text-4xl" style="color: var(--primary-700);"></i>
+      <h2 class="text-3xl font-bold" style="color: var(--primary-700);">{{ t('admin_manage_administrators') }}</h2>
+    </div>
+
+    <div class="h-px w-full" style="background: var(--primary-300);"></div>
+
+    <div class="flex flex-col gap-2 p-4 rounded-xl" style="background: var(--primary-200-40);">
+      <div *ngIf="adminUsers.length === 0 && !isLoadingAdminUsers" class="text-secondary text-sm">
+        {{ t('no_users_found') }}...
+      </div>
+      <div *ngFor="let admin of adminUsers" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+        <span class="font-semibold text-primary flex flex-row items-center justify-center gap-4 cursor-pointer" style="color: var(--primary-700);"
+              routerLink="/users/{{admin.username}}">
+          <img *ngIf="admin.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + admin.profileImageString" alt="admin" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="!admin.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          {{ admin.username }}
+        </span>
+        <button class="btn btn-sm text-xs px-3 py-2 text-white font-medium hover:scale-105 transition-transform rounded-xl" style="background: #ef4444;" (click)="changeUserRole(admin.username, 'USER')">{{ t('remove') }}</button>
+      </div>
+      <div *ngIf="isLoadingAdminUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+      <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreAdminUsers && !isLoadingAdminUsers && adminUsers.length > 0">
+        <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchAdminUsers()">
+          <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (currentModal === 'viewAllUsers') {
+<div class="opacity-0 fixed inset-0 z-50 flex items-center justify-center transition-all visibleBackdrop"
+     style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;"
+     (click)="onBackdropClick($event)">
+  <div class="w-11/12 max-w-2xl rounded-3xl p-8 relative flex flex-col gap-4 shadow-2xl transition-all"
+       style="background: var(--primary-200); max-height: 85vh; overflow-y: auto;"
+       (click)="$event.stopPropagation()">
+    <button class="absolute top-6 right-6 w-12 h-12 !rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90"
+            style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);"
+            (click)="closeModal($event)">
+      <i class="ti ti-x text-2xl"></i>
+    </button>
+    <div class="flex items-center gap-4 pr-16">
+      <i class="ti ti-users text-4xl" style="color: var(--primary-700);"></i>
+      <h2 class="text-3xl font-bold" style="color: var(--primary-700);">{{ t('admin_view_all_users') }}</h2>
+    </div>
+
+    <div class="h-px w-full" style="background: var(--primary-300);"></div>
+
+    <div class="flex flex-col gap-2 p-4 rounded-xl" style="background: var(--primary-200-40);">
+      <div *ngIf="users.length === 0 && !isLoadingUsers" class="text-secondary text-sm">
+        {{ t('no_users_found') }}...
+      </div>
+      <div *ngFor="let user of users" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+        <span class="font-semibold text-primary flex flex-row items-center justify-center gap-4 cursor-pointer" style="color: var(--primary-700);"
+              routerLink="/users/{{user.username}}">
+          <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          {{ user.username }}
+        </span>
+        <div class="flex gap-2">
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" (click)="changeUserRole(user.username, 'ADMIN')">
+            <i class="ti ti-user-up mr-1 text-base"></i> {{ t('promote') }}
+          </button>
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="suspendUser(user.username)">
+            <i class="ti ti-user-cancel mr-1 text-base"></i> {{ t('admin_confirm_suspension') }}
+          </button>
+        </div>
+      </div>
+      <div *ngIf="isLoadingUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+      <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreUsers && !isLoadingUsers && users.length > 0">
+        <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchUsers()">
+          <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (currentModal === 'suspendedUsers') {
+<div class="opacity-0 fixed inset-0 z-50 flex items-center justify-center transition-all visibleBackdrop"
+     style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;"
+     (click)="onBackdropClick($event)">
+  <div class="w-11/12 max-w-2xl rounded-3xl p-8 relative flex flex-col gap-4 shadow-2xl transition-all"
+       style="background: var(--primary-200); max-height: 85vh; overflow-y: auto;"
+       (click)="$event.stopPropagation()">
+    <button class="absolute top-6 right-6 w-12 h-12 !rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90"
+            style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);"
+            (click)="closeModal($event)">
+      <i class="ti ti-x text-2xl"></i>
+    </button>
+    <div class="flex items-center gap-4 pr-16">
+      <i class="ti ti-user-cancel text-4xl" style="color: var(--primary-700);"></i>
+      <h2 class="text-3xl font-bold" style="color: var(--primary-700);">{{ t('admin_suspended_users') }}</h2>
+    </div>
+
+    <div class="h-px w-full" style="background: var(--primary-300);"></div>
+
+    <div class="flex flex-col gap-2 p-4 rounded-xl" style="background: var(--primary-200-40);">
+      <div *ngIf="suspendedUsers.length === 0 && !isLoadingSuspendedUsers" class="text-secondary text-sm">
+        {{ t('no_users_found') }}...
+      </div>
+      <div *ngFor="let user of suspendedUsers" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+        <span class="font-semibold text-primary flex flex-row items-center justify-center gap-4 cursor-pointer" style="color: var(--primary-700);"
+        routerLink="/users/{{user.username}}">
+          <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          {{ user.username }}
+        </span>
+        <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" (click)="liftSuspension(user.username)">
+          <i class="ti ti-user-bolt mr-1 text-base"></i> {{ t('admin_lift_suspension') }}
+        </button>
+      </div>
+      <div *ngIf="isLoadingSuspendedUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+      <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreSuspendedUsers && !isLoadingSuspendedUsers && suspendedUsers.length > 0">
+        <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchSuspendedUsers()">
+          <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (currentModal === 'pendingRecipes') {
+<div class="opacity-0 fixed inset-0 z-50 flex items-center justify-center transition-all visibleBackdrop"
+     style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;"
+     (click)="onBackdropClick($event)">
+  <div class="w-11/12 max-w-2xl rounded-3xl p-8 relative flex flex-col gap-4 shadow-2xl transition-all"
+       style="background: var(--primary-200); max-height: 85vh; overflow-y: auto;"
+       (click)="$event.stopPropagation()">
+    <button class="absolute top-6 right-6 w-12 h-12 !rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90"
+            style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);"
+            (click)="closeModal($event)">
+      <i class="ti ti-x text-2xl"></i>
+    </button>
+    <div class="flex items-center gap-4 pr-16">
+      <i class="ti ti-file-time text-4xl" style="color: var(--primary-700);"></i>
+      <h2 class="text-3xl font-bold" style="color: var(--primary-700);">{{ t('admin_pending_recipes') }}</h2>
+    </div>
+
+    <div class="h-px w-full" style="background: var(--primary-300);"></div>
+
+    <div class="flex flex-col gap-2 p-4 rounded-xl" style="background: var(--primary-200-40);">
+      <div *ngIf="pendingRecipes.length === 0 && !isLoadingPendingRecipes" class="text-secondary text-sm">
+        {{ t('no_recipes_found') }}...
+      </div>
+      <div *ngFor="let recipe of pendingRecipes" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+        <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/recipes/{{recipe.id}}">
+          <img *ngIf="recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" [src]="'data:image/jpeg;base64,' + recipe.imageUrl" alt="recipe" />
+          <img *ngIf="!recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" src="/assets/img/recipe.png" alt="default recipe" style="background-color: var(--primary-300);" />
+          {{ recipe.title }}
+        </span>
+        <div class="flex gap-2">
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" (click)="approveRecipe(recipe.id.toString())">{{ t('admin_approve_recipe') }}</button>
+          <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="rejectRecipe(recipe.id.toString())">{{ t('admin_reject_recipe') }}</button>
+        </div>
+      </div>
+      <div *ngIf="isLoadingPendingRecipes" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+      <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMorePendingRecipes && !isLoadingPendingRecipes && pendingRecipes.length > 0">
+        <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchPendingRecipes()">
+          <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (currentModal === 'contentReports') {
+<div class="opacity-0 fixed inset-0 z-50 flex items-center justify-center transition-all visibleBackdrop"
+     style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;"
+     (click)="onBackdropClick($event)">
+  <div class="w-11/12 max-w-2xl rounded-3xl p-8 relative flex flex-col gap-4 shadow-2xl transition-all"
+       style="background: var(--primary-200); max-height: 85vh; overflow-y: auto;"
+       (click)="$event.stopPropagation()">
+    <button class="absolute top-6 right-6 w-12 h-12 !rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90"
+            style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);"
+            (click)="closeModal($event)">
+      <i class="ti ti-x text-2xl"></i>
+    </button>
+    <div class="flex items-center gap-4 pr-16">
+      <i class="ti ti-eye-exclamation text-4xl" style="color: var(--primary-700);"></i>
+      <h2 class="text-3xl font-bold" style="color: var(--primary-700);">{{ t('admin_content_reports') }}</h2>
+    </div>
+
+    <div class="h-px w-full" style="background: var(--primary-300);"></div>
+
+<div class="flex flex-col gap-6 p-4 rounded-xl" style="background: var(--primary-200-40);">
+      <div>
+        <h4 class="text-xl font-bold mb-4" style="color: var(--primary-700);">{{ t('reported_recipes') }}</h4>
+        <div *ngIf="reportedRecipes.length === 0 && !isLoadingReportedRecipes" class="text-secondary text-sm mb-4">
+          {{ t('no_reported_recipes') }}
+        </div>
+        <div *ngFor="let recipe of reportedRecipes" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+          <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/recipes/{{recipe.id}}" (click)="closeModal()">
+            <img *ngIf="recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" [src]="'data:image/jpeg;base64,' + recipe.imageUrl" alt="recipe" />
+            <img *ngIf="!recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" src="/assets/img/recipe.png" alt="default recipe" style="background-color: var(--primary-300);" />
+            {{ recipe.title }}
+          </span>
+          <div class="flex gap-2">
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" routerLink="/recipes/{{recipe.id}}" (click)="closeModal()">
+              <i class="ti ti-eye mr-1 text-base"></i> {{ t('view') }}
+            </button>
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="dismissRecipeReport(recipe.id)">
+              <i class="ti ti-u-turn-right mr-1 text-base"></i> {{ t('ignore') }}
+            </button>
+          </div>
+        </div>
+        <div *ngIf="isLoadingReportedRecipes" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+        <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreReportedRecipes && !isLoadingReportedRecipes && reportedRecipes.length > 0">
+          <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchReportedRecipes()">
+            <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <h4 class="text-xl font-bold mb-4" style="color: var(--primary-700);">{{ t('reported_users') }}</h4>
+        <div *ngIf="reportedUsers.length === 0 && !isLoadingReportedUsers" class="text-secondary text-sm mb-4">
+          {{ t('no_reported_users') }}
+        </div>
+        <div *ngFor="let user of reportedUsers" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
+          <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/users/{{user.username}}" (click)="closeModal()">
+            <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+            <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+            {{ user.username }}
+          </span>
+          <div class="flex gap-2">
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" routerLink="/users/{{user.username}}" (click)="closeModal()">
+              <i class="ti ti-eye mr-1 text-base"></i> {{ t('view') }}
+            </button>
+            <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="dismissUserReport(user.username)">
+              <i class="ti ti-u-turn-right mr-1 text-base"></i> {{ t('ignore') }}
+            </button>
+          </div>
+        </div>
+        <div *ngIf="isLoadingReportedUsers" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+        <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreReportedUsers && !isLoadingReportedUsers && reportedUsers.length > 0">
+          <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchReportedUsers()">
+            <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <h4 class="text-xl font-bold mb-4" style="color: var(--primary-700);">{{ t('reported_reviews') }}</h4>
+        <div *ngIf="reportedReviews.length === 0 && !isLoadingReportedReviews" class="text-secondary text-sm mb-4">
+          {{ t('no_reported_reviews') }}
+        </div>
+        <div *ngFor="let review of reportedReviews" class="flex flex-col gap-2 py-4 border-b border-[var(--primary-300)] border-primary/10">
+          <div class="flex justify-between items-start">
+            <div class="flex flex-col">
+              <span class="text-sm font-bold" style="color: var(--primary-700);">{{ t('by') }} {{ review.authorUsername }}</span>
+              <p class="text-sm" style="color: var(--primary-600);">{{ review.comment }}</p>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" routerLink="/recipes/{{review.recipe?.id}}" (click)="closeModal()">
+                <i class="ti ti-eye mr-1 text-base"></i> {{ t('view') }}
+              </button>
+              <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: #ef4444;" (click)="dismissReviewReport(review.id)">
+                <i class="ti ti-u-turn-right mr-1 text-base"></i> {{ t('ignore') }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isLoadingReportedReviews" [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:mx-auto [&>svg]:my-4 [&>svg]:max-w-12"></div>
+        <div class="text-center mt-2 rounded-2xl" style="background: var(--gradient-primary);" *ngIf="hasMoreReportedReviews && !isLoadingReportedReviews && reportedReviews.length > 0">
+          <button class="btn btn-primary w-full text-white cursor-pointer px-4 py-2 border-none rounded-2xl font-medium" style="background: transparent;" (click)="fetchReportedReviews()">
+            <i class="ti ti-refresh mr-2"></i> {{ t('load_more') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (currentModal === 'manageCategories') {
+<div class="opacity-0 fixed inset-0 z-50 flex items-center justify-center transition-all visibleBackdrop"
+     style="backdrop-filter: blur(10px); background: var(--primary-backdrop); pointer-events: auto;"
+     (click)="onBackdropClick($event)">
+  <div class="w-11/12 max-w-2xl rounded-3xl p-8 relative flex flex-col gap-4 shadow-2xl transition-all"
+       style="background: var(--primary-200); max-height: 85vh; overflow-y: auto;"
+       (click)="$event.stopPropagation()">
+    <button class="absolute top-6 right-6 w-12 h-12 !rounded-full flex items-center justify-center transition-all hover:scale-110 hover:rotate-90"
+            style="background: var(--primary-400); color: white; box-shadow: 0 4px 12px var(--primary-300);"
+            (click)="closeModal($event)">
+      <i class="ti ti-x text-2xl"></i>
+    </button>
+    <div class="flex items-center gap-4 pr-16 text-primary">
+      <i class="ti ti-tags text-4xl" style="color: var(--primary-700);"></i>
+      <h2 class="text-3xl font-bold" style="color: var(--primary-700);">{{ t('admin_manage_categories') }}</h2>
+    </div>
+
+    <div class="h-px w-full" style="background: var(--primary-300);"></div>
+
+
+    <div class="flex flex-col gap-2 relative category-dropdown-container">
+      <label class="text-sm font-semibold" style="color: var(--primary-700);">{{ t('sort_by') }}</label>
+      <div (click)="toggleAttributeTypeDropdown()"
+           class="w-full px-4 py-3 rounded-xl border-2 flex justify-between items-center cursor-pointer transition-all"
+           style="background: var(--primary-100-40); border-color: var(--primary-100); color: var(--primary-700);">
+        <span class="font-medium">{{ t(getSelectedAttributeLabel()) }}</span>
+        <i class="ti ti-caret-down-filled transition-transform" [class.rotate-180]="showAttributeTypeDropdown"></i>
+      </div>
+
+      <div *ngIf="showAttributeTypeDropdown"
+           class="absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 shadow-2xl overflow-hidden max-h-60 overflow-y-auto z-[100]"
+           style="background: var(--primary-50); border-color: var(--primary-100); animation: fadeIn 0.2s ease-out;">
+        <div *ngFor="let type of attributeTypes"
+             (click)="selectAttributeType(type)"
+             class="px-4 py-3 cursor-pointer transition-all hover:bg-[var(--primary-100)] flex items-center justify-between"
+             [class.bg-[var(--primary-200)]]="type.value === selectedAttributeType"
+             style="color: var(--primary-700);">
+          <span>{{ t(type.label) }}</span>
+          <i *ngIf="type.value === selectedAttributeType" class="ti ti-check" style="color: var(--primary-500);"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-2 mt-4">
+      <input type="text" [(ngModel)]="newAttributeName" [placeholder]="t('name')"
+             class="flex-1 p-4 rounded-xl border-none glass-strong"
+             style="background: var(--primary-300-40); color: var(--primary-700);">
+      <button class="px-6 py-4 rounded-xl text-white font-bold border-none cursor-pointer hover:scale-105 transition-all shadow-lg active:scale-95"
+              style="background: var(--gradient-primary);" (click)="addAttribute()">
+        <i class="ti ti-plus mr-1"></i> {{ t('add') }}
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-2 p-4 rounded-xl mt-4" style="background: var(--primary-200-40);">
+      <div *ngIf="filteredAttributes.length === 0" class="text-secondary text-sm p-4 text-center">
+        {{ t('no_results') }}
+      </div>
+      <div *ngFor="let attr of filteredAttributes" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10 last:border-none">
+        <div class="flex-1">
+          <input *ngIf="editingAttribute && editingAttribute.id == attr.id" type="text" [(ngModel)]="editingAttribute.name"
+                 class="w-full p-2 rounded-lg border-none" style="background: var(--white); color: var(--primary-700);">
+
+          <span *ngIf="!editingAttribute || editingAttribute.id != attr.id" class="font-semibold text-primary" style="color: var(--primary-700);">{{ attr.name }}</span>
+        </div>
+        <div class="flex gap-2">
+          <ng-container *ngIf="editingAttribute && editingAttribute.id == attr.id">
+            <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                    style="background: var(--gradient-primary);" (click)="saveAttribute()" [title]="t('save')">
+              <i class="ti ti-check text-lg"></i>
+            </button>
+            <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                    style="background: red;" (click)="cancelEditAttribute()" [title]="t('cancel')">
+              <i class="ti ti-x text-lg"></i>
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="!editingAttribute || editingAttribute.id != attr.id">
+            <ng-container *ngIf="deletingAttributeId !== attr.id">
+              <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                      style="background: var(--gradient-primary);" (click)="startEditAttribute(attr)" [title]="t('edit')">
+                <i class="ti ti-pencil text-lg" style="color: white !important;"></i>
+              </button>
+              <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                      style="background: red;" (click)="deleteAttribute(attr.id!, $event)" [title]="t('remove')">
+                <i class="ti ti-trash text-lg"></i>
+              </button>
+            </ng-container>
+
+            <ng-container *ngIf="deletingAttributeId === attr.id">
+              <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                      style="background: var(--gradient-primary);" (click)="cancelDeleteAttribute()" [title]="t('cancel')">
+                <i class="ti ti-arrow-left text-lg"></i>
+              </button>
+              <button class="w-10 h-10 rounded-xl text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-sm"
+                      style="background: red;" (click)="deleteAttribute(attr.id!, $event)" [title]="t('confirm_delete')">
+                <i class="ti ti-check text-lg font-bold"></i>
+              </button>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
+

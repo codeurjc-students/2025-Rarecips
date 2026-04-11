@@ -20,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -75,8 +74,31 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public Page<Recipe> getUserRecipes(String username, Pageable pageable) {
-        return recipeRepository.findByAuthorUsername(username, pageable);
+    public Page<Recipe> getUserRecipes(String username, Pageable pageable, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            User user = this.findByUsername(authentication.getName());
+            if (user != null && (username.equals(user.getUsername()) || "ADMIN".equals(user.getRole()))) {
+                return recipeRepository.findByAuthorUsername(username, pageable);
+            }
+        }
+        return recipeRepository.findByAuthorUsernameAndPendingReviewFalse(username, pageable);
+    }
+
+    public Page<Recipe> getUserPendingRecipes(String username, Pageable pageable, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Page.empty(pageable);
+        }
+
+        User user = this.findByUsername(authentication.getName());
+        if (user == null) {
+            return Page.empty(pageable);
+        }
+
+        if (username.equals(user.getUsername()) || "ADMIN".equals(user.getRole())) {
+            return recipeRepository.findByAuthorUsernameAndPendingReviewTrue(username, pageable);
+        }
+
+        return Page.empty(pageable);
     }
 
     public Page<Review> getUserReviews(String username, Pageable pageable) {
@@ -119,6 +141,16 @@ public class UserService {
             minCollections,
             pageable
         );
+    }
+
+    public Page<User> getFilteredUsersStatus(boolean suspended, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "username"));
+        return userRepository.findByRoleNotAndSuspendedCustom(User.Role.ADMIN, suspended, pageable);
+    }
+
+    public Page<User> getUsersByRole(User.Role role, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "username"));
+        return userRepository.findByRole(role, pageable);
     }
 
     public void deleteUserAndCascade(String username) {

@@ -1,5 +1,6 @@
 package com.blasetvrtumi.rarecips.controller;
 
+import com.blasetvrtumi.rarecips.entity.Recipe;
 import com.blasetvrtumi.rarecips.entity.RecipeCollection;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.service.RecipeCollectionService;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/collections")
@@ -32,6 +34,40 @@ public class RecipeCollectionController {
     @Autowired
     private UserService userService;
 
+    private User getAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        return userService.findByUsername(authentication.getName());
+    }
+
+    private boolean canViewRecipe(Recipe recipe, User authenticatedUser) {
+        if (!recipe.isPendingReview()) {
+            return true;
+        }
+        if (authenticatedUser == null) {
+            return false;
+        }
+        if ("ADMIN".equals(authenticatedUser.getRole())) {
+            return true;
+        }
+        return recipe.getAuthor() != null && recipe.getAuthor().equals(authenticatedUser.getUsername());
+    }
+
+    private RecipeCollection sanitizeCollectionForViewer(RecipeCollection source, User authenticatedUser) {
+        RecipeCollection safe = new RecipeCollection();
+        safe.setId(source.getId());
+        safe.setTitle(source.getTitle());
+        safe.setFavorites(source.isFavorites());
+        safe.setUser(source.getUser());
+        safe.setCreatedAt(source.getCreatedAt());
+        safe.setUpdatedAt(source.getUpdatedAt());
+        safe.setRecipes(source.getRecipes().stream()
+                .filter(recipe -> canViewRecipe(recipe, authenticatedUser))
+                .collect(Collectors.toList()));
+        return safe;
+    }
+
     @Operation(summary = "Get popular public collections")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Popular collections retrieved successfully"),
@@ -40,9 +76,14 @@ public class RecipeCollectionController {
     @GetMapping("/public/popular")
     @JsonView(RecipeCollection.BasicInfo.class)
     public ResponseEntity<List<RecipeCollection>> getPopularPublicCollections(
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(defaultValue = "10") int limit,
+            Authentication authentication) {
         List<RecipeCollection> collections = collectionService.getPopularPublicCollections(limit);
-        return ResponseEntity.ok(collections);
+        User authenticatedUser = getAuthenticatedUser(authentication);
+        List<RecipeCollection> safeCollections = collections.stream()
+                .map(collection -> sanitizeCollectionForViewer(collection, authenticatedUser))
+                .toList();
+        return ResponseEntity.ok(safeCollections);
     }
 
     @Operation(summary = "Get favorites collection for own user")
@@ -57,7 +98,8 @@ public class RecipeCollectionController {
         if (authentication.getName().equals(username) || user.getRole().equals("ADMIN")) {
             try {
                 RecipeCollection favorites = collectionService.getOrCreateFavoritesCollection(username);
-                return ResponseEntity.ok(favorites);
+                RecipeCollection safeFavorites = sanitizeCollectionForViewer(favorites, user);
+                return ResponseEntity.ok(safeFavorites);
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
@@ -76,15 +118,16 @@ public class RecipeCollectionController {
     public ResponseEntity<List<RecipeCollection>> getUserCollections(@RequestParam String username, Authentication authentication) {
         List<RecipeCollection> collections = collectionService.findByUsername(username);
         Map<Long, RecipeCollection> uniqueCollections = new HashMap<>();
+        User authenticatedUser = getAuthenticatedUser(authentication);
         boolean isOwner = authentication != null && authentication.getName().equals(username);
         boolean isAdmin = authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"));
         for (RecipeCollection c : collections) {
             if (c.isFavorites()) {
                 if (isOwner || isAdmin) {
-                    uniqueCollections.put(c.getId(), c);
+                    uniqueCollections.put(c.getId(), sanitizeCollectionForViewer(c, authenticatedUser));
                 }
             } else {
-                uniqueCollections.put(c.getId(), c);
+                uniqueCollections.put(c.getId(), sanitizeCollectionForViewer(c, authenticatedUser));
             }
         }
         return ResponseEntity.ok(new ArrayList<>(uniqueCollections.values()));
@@ -97,9 +140,10 @@ public class RecipeCollectionController {
     })
     @GetMapping("/{id}")
     @JsonView(RecipeCollection.BasicInfo.class)
-    public ResponseEntity<RecipeCollection> getCollectionById(@PathVariable Long id) {
+    public ResponseEntity<RecipeCollection> getCollectionById(@PathVariable Long id, Authentication authentication) {
+        User authenticatedUser = getAuthenticatedUser(authentication);
         return collectionService.findById(id)
-                .map(ResponseEntity::ok)
+                .map(collection -> ResponseEntity.ok(sanitizeCollectionForViewer(collection, authenticatedUser)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -172,7 +216,7 @@ public class RecipeCollectionController {
             if (payload.get("username") != null && user.getRole().equals("ADMIN")) username = payload.get("username");
 
             RecipeCollection favorites = collectionService.getOrCreateFavoritesCollection(username);
-            RecipeCollection updated = collectionService.addRecipeToCollection(favorites.getId(), recipeId);
+            RecipeCollection updated = collectionService.addRecipeToCollection(favorites.getId(), recipeId, user);
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -194,7 +238,7 @@ public class RecipeCollectionController {
             @RequestBody(required = false) Map<String, String> payload,
             Authentication authentication) {
         try {
-            RecipeCollection recipeCollection = getCollectionById(id).getBody();
+            RecipeCollection recipeCollection = getCollectionById(id, authentication).getBody();
 
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be logged in to modify collections");
@@ -215,7 +259,7 @@ public class RecipeCollectionController {
                 if (remove) {
                     collection = collectionService.removeRecipeFromCollection(id, recipeId);
                 } else {
-                    collection = collectionService.addRecipeToCollection(id, recipeId);
+                    collection = collectionService.addRecipeToCollection(id, recipeId, user);
                 }
 
                 URI location = ServletUriComponentsBuilder
@@ -265,7 +309,7 @@ public class RecipeCollectionController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be logged in to delete collections");
             }
 
-            RecipeCollection recipeCollection = getCollectionById(id).getBody();
+            RecipeCollection recipeCollection = getCollectionById(id, authentication).getBody();
             if (recipeCollection == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Collection not found");
             }
@@ -296,14 +340,19 @@ public class RecipeCollectionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size,
             @RequestParam(required = false) String sort,
-            @RequestParam(required = false) String direction) {
+            @RequestParam(required = false) String direction,
+            Authentication authentication) {
         if (page < 0 || size <= 0) {
             return ResponseEntity.badRequest().build();
         }
 
         var result = collectionService.searchCollectionsPaged(q, page, size, sort, direction);
+        User authenticatedUser = getAuthenticatedUser(authentication);
+        List<RecipeCollection> safeCollections = result.getContent().stream()
+                .map(collection -> sanitizeCollectionForViewer(collection, authenticatedUser))
+                .toList();
         Map<String, Object> body = new HashMap<>();
-        body.put("content", result.getContent());
+        body.put("content", safeCollections);
         body.put("total", result.getTotalElements());
         body.put("last", result.isLast());
 

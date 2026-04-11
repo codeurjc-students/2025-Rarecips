@@ -72,6 +72,7 @@ Rarecips is a progressive web application designed to help users discover, share
 Includes basic and most intermediate features such as user authentication and profile management, recipe browsing and management and much more.
 This version marks the first minimally viable product (MVP) release of the application, providing core functionalities for users to interact with the platform and start building a community around rare recipes.
 It brings the first standalone bundled dockerized version of the application, allowing a OOTB use that includes a database, backend and frontend in a single deployment.
+0.1 version's blog can be found [here](https://medium.com/@b.vita.2020/rarecips-0-1-version-f1148367151a).
 
 - #### 0.1 Screenshots:
 
@@ -111,5 +112,38 @@ https://github.com/user-attachments/assets/de8e30a0-d230-4ae5-a164-8e21cd369ee6
     0.2 release is expected to include the remaining intermediate features, such as:
   - Full recipe management (creation, editing, deletion)
   - Full user profile management (editing, ingredient list management, etc.)
+  - Administrator features (content management, user management, etc.)
+
+### Version 0.2 - Intermediate functionality (10/04/2026)
+Includes basic all remaining intermediate features, including content reporting and moderation.
+0.2 version's blog can be found [here](https://medium.com/@b.vita.2020/rarecips-0-2-version-58282ecbf8e4).
+
+- #### 0.2 Screenshots:
+
+<div align="center">
+  <table style="width: 80%;">
+    <thead>
+      <tr>
+        <th style="width: 100%; text-align: center;">🖥️ Desktop</th>
+        <th style="width: 100%; text-align: center;">📱 Mobile</th>
+      </tr>
+      </thead>
+  </table>
+</div>
+
+<p align="center" height="260px">
+    <img width="520px" src="\readme-resources\02_Desktop_1.png" alt=""/>
+    <img height="260px" src="\readme-resources\02_Mobile_1.png" alt=""/>
+</p>
+
+- #### 0.2 Video:
+
+https://github.com/user-attachments/assets/a19829af-33a4-4d55-a18b-fd510853d275
+
+- #### Upcoming features:
+    1.0 release is expected to include the remaining advanced features, such as:
+  - Personal notifications for registered users through WebSockets
+  - Health reports for users based on their culinary preferences
+  - Remote deployment of the application to cloud platforms
 
 

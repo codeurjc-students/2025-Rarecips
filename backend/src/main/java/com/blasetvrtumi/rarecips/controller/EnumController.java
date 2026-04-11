@@ -1,10 +1,14 @@
 package com.blasetvrtumi.rarecips.controller;
 
+import com.blasetvrtumi.rarecips.entity.RecipeAttribute;
 import com.blasetvrtumi.rarecips.enums.*;
+import com.blasetvrtumi.rarecips.service.RecipeAttributeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -15,6 +19,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/enums")
 @CrossOrigin(origins = "https://localhost:4200")
 public class EnumController {
+
+    @Autowired
+    private RecipeAttributeService attributeService;
 
     @Operation(summary = "Get all difficulty levels")
     @ApiResponses(value = {
@@ -29,15 +36,15 @@ public class EnumController {
         return ResponseEntity.ok(levels);
     }
 
-    @Operation(summary = "Get all cautions")
+    @Operation(summary = "Get all cuisine types")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved cuisine types"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/cuisine-types")
     public ResponseEntity<List<String>> getCuisineTypes() {
-        List<String> types = Arrays.stream(CuisineType.values())
-                .map(CuisineType::getDisplayName)
+        List<String> types = attributeService.getByType("cuisineType").stream()
+                .map(RecipeAttribute::getName)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(types);
     }
@@ -49,8 +56,8 @@ public class EnumController {
     })
     @GetMapping("/cautions")
     public ResponseEntity<List<String>> getCautions() {
-        List<String> cautions = Arrays.stream(Caution.values())
-                .map(Caution::getDisplayName)
+        List<String> cautions = attributeService.getByType("caution").stream()
+                .map(RecipeAttribute::getName)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(cautions);
     }
@@ -62,8 +69,8 @@ public class EnumController {
     })
     @GetMapping("/diet-labels")
     public ResponseEntity<List<String>> getDietLabels() {
-        List<String> labels = Arrays.stream(DietLabel.values())
-                .map(DietLabel::getDisplayName)
+        List<String> labels = attributeService.getByType("dietLabel").stream()
+                .map(RecipeAttribute::getName)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(labels);
     }
@@ -75,8 +82,8 @@ public class EnumController {
     })
     @GetMapping("/dish-types")
     public ResponseEntity<List<String>> getDishTypes() {
-        List<String> types = Arrays.stream(DishType.values())
-                .map(DishType::getDisplayName)
+        List<String> types = attributeService.getByType("dishType").stream()
+                .map(RecipeAttribute::getName)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(types);
     }
@@ -88,8 +95,8 @@ public class EnumController {
     })
     @GetMapping("/health-labels")
     public ResponseEntity<List<String>> getHealthLabels() {
-        List<String> labels = Arrays.stream(HealthLabel.values())
-                .map(HealthLabel::getDisplayName)
+        List<String> labels = attributeService.getByType("healthLabel").stream()
+                .map(RecipeAttribute::getName)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(labels);
     }
@@ -101,9 +108,39 @@ public class EnumController {
     })
     @GetMapping("/meal-types")
     public ResponseEntity<List<String>> getMealTypes() {
-        List<String> types = Arrays.stream(MealType.values())
-                .map(MealType::getDisplayName)
+        List<String> types = attributeService.getByType("mealType").stream()
+                .map(RecipeAttribute::getName)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(types);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/attributes")
+    public ResponseEntity<List<RecipeAttribute>> getAllAttributes() {
+        return ResponseEntity.ok(attributeService.getAll());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/attributes")
+    public ResponseEntity<RecipeAttribute> addAttribute(@RequestBody RecipeAttribute attribute) {
+        return ResponseEntity.ok(attributeService.save(attribute));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/attributes/{id}")
+    public ResponseEntity<RecipeAttribute> updateAttribute(@PathVariable Long id, @RequestBody RecipeAttribute attribute) {
+        return attributeService.getById(id).map(existing -> {
+            existing.setName(attribute.getName());
+            existing.setType(attribute.getType());
+            return ResponseEntity.ok(attributeService.save(existing));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/attributes/{id}")
+    public ResponseEntity<Void> deleteAttribute(@PathVariable Long id) {
+        attributeService.delete(id);
+        return ResponseEntity.ok().build();
+    }
 }
+

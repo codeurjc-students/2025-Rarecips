@@ -6,28 +6,33 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.blasetvrtumi.rarecips.RarecipsApplication;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = RarecipsApplication.class)
-@DirtiesContext
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = RarecipsApplication.class)
 @ActiveProfiles("test")
-public class BaseE2ETest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public abstract class BaseE2ETest {
+
+    @LocalServerPort
+    protected int port;
+
+    protected String baseUrl;
 
     protected WebDriver driver;
 
-    protected String baseUrl = "https://localhost:8443";
-
     @BeforeEach
     public void setUp() {
+        baseUrl = "https://localhost:" + port;
         ChromeOptions options = new ChromeOptions();
-        options.setAcceptInsecureCerts(true);
         options.addArguments("--headless");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--window-size=1920,1080");
+        options.setAcceptInsecureCerts(true);
         driver = new ChromeDriver(options);
     }
 

@@ -58,6 +58,7 @@ public class RecipeService {
     public Recipe createRecipe(Recipe recipe, String username) {
         User author = userRepository.findByUsername(username);
         recipe.setAuthor(author);
+        recipe.setPendingReview(!author.getRole().equals("ADMIN"));
 
         EnumValidator.validateDifficulty(recipe.getDifficulty());
         if (recipe.getCuisineType() != null) EnumValidator.validateCuisineTypes(recipe.getCuisineType());
@@ -76,16 +77,7 @@ public class RecipeService {
             recipe.setIngredients(savedIngredients);
         }
 
-        Recipe savedRecipe = recipeRepository.save(recipe);
-        activityService.logActivity(
-            author.getUsername(),
-            Activity.ActivityType.CREATE_RECIPE,
-            recipe.getLabel(),
-            "created recipe " + recipe.getLabel(),
-            savedRecipe.getId(),
-            null
-        );
-        return savedRecipe;
+        return recipeRepository.save(recipe);
     }
 
     @SuppressWarnings("unchecked")

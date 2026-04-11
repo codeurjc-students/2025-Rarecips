@@ -9,7 +9,7 @@ Docker compose OCI image which provides a single step setup for the entire appli
 To run it, simply execute the following command anywhere in your terminal:
 
 ```bash
-docker compose  --env-file NUL -f oci://blasetvrtumi/rarecips:latest up
+docker compose -p rarecips --env-file NUL -f oci://blasetvrtumi/rarecips:latest-compose up --abort-on-container-exit --remove-orphans && docker compose -p rarecips down -v
 ```
 
 This command will pull the latest version of the application from the OCI registry and start all necessary containers, including the backend, frontend, and database.

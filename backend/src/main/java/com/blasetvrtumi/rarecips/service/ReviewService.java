@@ -108,4 +108,20 @@ public class ReviewService {
     public Review findById(Long reviewId) {
         return reviewRepository.findById(reviewId).orElseThrow(() -> new IllegalArgumentException("Review with ID not found"));
     }
+
+    public void reportReview(Long id) {
+        Review review = findById(id);
+        review.setReported(true);
+        reviewRepository.save(review);
+    }
+
+    public org.springframework.data.domain.Page<Review> getReportedReviews(org.springframework.data.domain.Pageable pageable) {
+        return reviewRepository.findByReportedTrue(pageable);
+    }
+
+    public void dismissReport(Long id) {
+        Review review = findById(id);
+        review.setReported(false);
+        reviewRepository.save(review);
+    }
 }

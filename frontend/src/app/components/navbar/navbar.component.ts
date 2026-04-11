@@ -90,18 +90,19 @@ export class NavbarComponent implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd || event instanceof RoutesRecognized)
     ).subscribe((event) => {
-      if (event.url.length < 2) {
+      const url = event.url.split('?')[0];
+      if (url === '/' || url.length < 2) {
         this.navItem = '';
-      } else if (event.url.includes('/admin-panel')) {
-        this.navItem = 'admin-panel';
-      } else if (event.url.includes('/explore')) {
+      } else if (url.startsWith('/admin')) {
+        this.navItem = 'admin';
+      } else if (url.startsWith('/explore')) {
         this.navItem = 'explore';
-      } else if (event.url.includes('/ingredients')) {
+      } else if (url.startsWith('/ingredients')) {
         this.navItem = 'ingredients';
-      } else if (event.url.includes('/health')) {
+      } else if (url.startsWith('/health')) {
         this.navItem = 'health';
       } else {
-        this.navItem = undefined as any;
+        this.navItem = 'none';
       }
 
       let navbar = document.getElementById('navbar') as HTMLElement;

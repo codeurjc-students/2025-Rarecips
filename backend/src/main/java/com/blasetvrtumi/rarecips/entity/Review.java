@@ -50,6 +50,17 @@ public class Review {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonView(BasicInfo.class)
+    private boolean reported = false;
+
+    public boolean isReported() {
+        return reported;
+    }
+
+    public void setReported(boolean reported) {
+        this.reported = reported;
+    }
+
     public Review() {
     }
 

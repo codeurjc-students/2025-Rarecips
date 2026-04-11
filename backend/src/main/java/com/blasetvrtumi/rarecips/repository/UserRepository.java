@@ -13,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(u) FROM User u WHERE u.createdAt BETWEEN :start AND :end")
+    long countByCreatedAtBetween(@org.springframework.data.repository.query.Param("start") java.time.LocalDateTime start, @org.springframework.data.repository.query.Param("end") java.time.LocalDateTime end);
+
     User findByEmail(String email);
 
     User findByUsername(String username);
@@ -37,5 +40,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             Pageable pageable
     );
 
+    @Query("SELECT u FROM User u WHERE (u.role IS NULL OR u.role != :role) AND u.suspended = :suspended")
+    Page<User> findByRoleNotAndSuspendedCustom(@Param("role") User.Role role, @Param("suspended") boolean suspended, Pageable pageable);
+
     User findByPasswordResetToken(String token);
+
+    Page<User> findByRole(User.Role role, Pageable pageable);
+
+    Page<User> findByReportedTrue(Pageable pageable);
 }

@@ -27,7 +27,7 @@ export const routes: Routes = [
   {path: "recipes/:id", component: RecipeViewComponent},
   {path: "recipes/:id/edit", component: RecipeEditComponent},
   {path: "ingredients", component: IngredientsComponent},
-  {path: "admin-panel", component: AdminPanelComponent},
+  {path: "admin", component: AdminPanelComponent},
   {path: "health", component: HealthReportComponent},
   {path: "error", component: ErrorComponent},
   {path: "change-password", component: AuthComponent}

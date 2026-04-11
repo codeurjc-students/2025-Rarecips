@@ -15,11 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.sql.Blob;
-import java.io.IOException;
-import java.sql.SQLException;
 
+import com.blasetvrtumi.rarecips.enums.*;
+import com.blasetvrtumi.rarecips.service.RecipeAttributeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Arrays;
 
 @Service
 public class RecipeInitializationService {
@@ -49,6 +50,9 @@ public class RecipeInitializationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RecipeAttributeService attributeService;
+
     @PostConstruct
     public void init() {
         if (userRepository.findByUsername("user") == null) {
@@ -65,31 +69,43 @@ public class RecipeInitializationService {
             }
         }
 
-        if (recipes != null && recipes.length() > 0) {
+        if (attributeService.getAll().isEmpty()) {
+            logger.info("Database is empty. Initializing recipe attributes from enums...");
+            Arrays.stream(Caution.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "caution")));
+            Arrays.stream(CuisineType.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "cuisineType")));
+            Arrays.stream(DietLabel.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "dietLabel")));
+            Arrays.stream(DishType.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "dishType")));
+            Arrays.stream(HealthLabel.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "healthLabel")));
+            Arrays.stream(MealType.values()).forEach(c -> 
+                attributeService.save(new RecipeAttribute(c.getDisplayName(), "mealType")));
+            logger.info("Recipe attributes initialized successfully.");
+        }
 
-            // Add all recipes from the JSON file to the database
-            for (int i = 0; i < recipes.length() - 1; i++) {
+        if (recipeRepository.count() == 0 && recipes != null && recipes.length() > 0) {
+            logger.info("Database is empty. Initializing recipes from JSON file...");
+
+            for (int i = 0; i < /*recipes.length()*/ 20; i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
 
                 String label = recipeJson.optString("label", null);
-
                 String description = recipeJson.optString("description", null);
 
                 List<String> dietLabels = recipeJson.optJSONArray("dietLabels", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> healthLabels = recipeJson.optJSONArray("healthLabels", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> cautions = recipeJson.optJSONArray("cautions", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 int people = recipeJson.optInt("people", 0);
 
-                // Ingredients entity!!
                 List<Ingredient> ingredients;
                 java.util.Map<Long, Float> ingredientQuantities = new HashMap<>();
                 java.util.Map<Long, String> ingredientUnits = new HashMap<>();
@@ -117,28 +133,22 @@ public class RecipeInitializationService {
                                 ingredientUnits.put(ingredient.getId(), measure);
 
                                 return ingredient;
-                            })
-                            .toList();
+                            }).toList();
                 }
 
                 int difficulty = recipeJson.optInt("difficulty", 0);
 
                 List<String> dishTypes = recipeJson.optJSONArray("dishType", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> mealTypes = recipeJson.optJSONArray("mealType", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> cuisineType = recipeJson.optJSONArray("cuisineType", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
+                        .map(Object::toString).toList();
 
                 List<String> steps = recipeJson.optJSONArray("steps", new JSONArray()).toList().stream()
-                        .map(Object::toString)
-                        .toList();
-
+                        .map(Object::toString).toList();
 
                 Float totalTime = recipeJson.optFloat("totalTime", 0.0f);
                 Float totalWeight = recipeJson.optFloat("totalWeight", 0.0f);
@@ -150,6 +160,9 @@ public class RecipeInitializationService {
                 Recipe recipe = new Recipe(label, description, dietLabels, healthLabels, cautions,
                         people, ingredients, difficulty, dishTypes, mealTypes, cuisineType, totalTime,
                         totalWeight, calories, recipeAuthor, steps);
+
+                recipe.setStatus(com.blasetvrtumi.rarecips.enums.RecipeStatus.APPROVED);
+                recipe.setPendingReview(false);
 
                 // Add new qty and measure as mapped properties to ingredient
                 recipe.setIngredientQuantities(ingredientQuantities);
@@ -176,25 +189,29 @@ public class RecipeInitializationService {
                                 Review review = new Review(relRecipe, reviewAuthor, rating, comment, createdAt, null);
                                 reviewRepository.save(review);
                                 return review;
-                            })
-                            .toList();
+                            }).toList();
                 }
 
                 recipe.setReviews(reviews);
-                String imageString = "static/assets/img/" + (recipe.getId() - 1) + ".jpg";
-                Blob imageBlob = imageService.localImageToBlob(imageString);
-                recipe.setImageFile(imageBlob);
-                recipe.setImageString(imageService.blobToString(imageBlob));
+                
+                String imageString = "static/assets/img/" + i + ".jpg";
+                
+                try {
+                    Blob imageBlob = imageService.localImageToBlob(imageString);
+                    recipe.setImageFile(imageBlob);
+                    recipe.setImageString(imageService.blobToString(imageBlob));
+                } catch (Exception e) {
+                    logger.error("Error loading image for recipe " + label, e);
+                }
 
                 recipe.updateRating();
-
                 recipeRepository.save(recipe);
-
             }
             logger.info("Recipes initialized from JSON file successfully.");
-        } else {
+        } else if (recipes == null || recipes.length() == 0) {
             logger.warn("No recipes found in the JSON file.");
+        } else {
+            logger.info("Recipes already exist in the database. Skipping initialization to avoid duplicates.");
         }
     }
-
 }

@@ -14,15 +14,30 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.blasetvrtumi.rarecips.repository.RecipeCollectionRepository;
+import com.blasetvrtumi.rarecips.repository.RecipeRepository;
+import com.blasetvrtumi.rarecips.repository.ReviewRepository;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
 import com.blasetvrtumi.rarecips.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private RecipeRepository recipeRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
+
+    @Mock
+    private RecipeCollectionRepository collectionRepository;
 
     @InjectMocks
     private UserService userService;
@@ -71,5 +86,42 @@ public class UserServiceTest {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
         User result = userService.findById(99L);
         assertThat(result).isNull();
+    }
+
+    @Test
+    public void shouldGetUsersByRole() {
+        User user = new User("admin", "pass", "admin@test.com", null, "Admin", "desc", "bio");
+        user.setRole("ADMIN");
+        Page<User> page = new PageImpl<>(java.util.Collections.singletonList(user));
+        when(userRepository.findByRole(eq(User.Role.ADMIN), any(Pageable.class))).thenReturn(page);
+        
+        Page<User> result = userService.getUsersByRole(User.Role.ADMIN, 0, 10);
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getRole()).isEqualTo("ADMIN");
+    }
+
+    @Test
+    public void shouldGetFilteredUsersStatus() {
+        User user = new User("suspended", "pass", "s@test.com", null, "Suspended", "desc", "bio");
+        user.setSuspended(true);
+        Page<User> page = new PageImpl<>(java.util.Collections.singletonList(user));
+        when(userRepository.findByRoleNotAndSuspendedCustom(eq(User.Role.ADMIN), eq(true), any(Pageable.class))).thenReturn(page);
+
+        Page<User> result = userService.getFilteredUsersStatus(true, 0, 10);
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).isSuspended()).isTrue();
+    }
+
+    @Test
+    public void shouldDeleteUserAndCascade() {
+        User user = new User("todelete", "pass", "d@test.com", null, "Delete", "desc", "bio");
+        when(userRepository.findByUsername("todelete")).thenReturn(user);
+        when(collectionRepository.findByUser(user)).thenReturn(java.util.Collections.emptyList());
+        when(recipeRepository.findByAuthor(user)).thenReturn(java.util.Collections.emptyList());
+        when(reviewRepository.findByAuthor(user)).thenReturn(java.util.Collections.emptyList());
+
+        userService.deleteUserAndCascade("todelete");
+
+        verify(userRepository).delete(org.mockito.ArgumentMatchers.any(User.class));
     }
 }

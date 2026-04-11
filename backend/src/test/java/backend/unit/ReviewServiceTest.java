@@ -87,4 +87,27 @@ public class ReviewServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Review with ID not found");
     }
+
+    @Test
+    public void shouldReportReviewSuccessfully() {
+        Review review = new Review();
+        review.setId(1L);
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+
+        reviewService.reportReview(1L);
+        assertThat(review.isReported()).isTrue();
+        verify(reviewRepository).save(review);
+    }
+
+    @Test
+    public void shouldDismissReportSuccessfully() {
+        Review review = new Review();
+        review.setId(1L);
+        review.setReported(true);
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+
+        reviewService.dismissReport(1L);
+        assertThat(review.isReported()).isFalse();
+        verify(reviewRepository).save(review);
+    }
 }

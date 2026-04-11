@@ -38,6 +38,7 @@ public class AuthController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
             }),
             @ApiResponse(responseCode = "400", description = "Invalid credentials"),
+            @ApiResponse(responseCode = "423", description = "Account unaccesible due to suspension")
     })
     @PutMapping("/login")
     public ResponseEntity<AuthResponse> login(

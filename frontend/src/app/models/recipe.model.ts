@@ -27,4 +27,5 @@ export interface Recipe {
   steps: string[];
   createdAt: Date;
   updatedAt: Date;
+  pendingReview: boolean;
 }

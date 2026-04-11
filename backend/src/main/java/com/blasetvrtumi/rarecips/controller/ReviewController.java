@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -179,4 +182,58 @@ public class ReviewController {
         }
     }
 
+    @Operation(summary = "Report a review")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Review reported successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Review not found")
+    })
+    @PutMapping("/{reviewId}/report")
+    public ResponseEntity<?> reportReview(@PathVariable Long reviewId, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("User must be authenticated to report a review");
+        }
+        try {
+            reviewService.reportReview(reviewId);
+            return ResponseEntity.ok(Map.of("message", "Review reported successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Get reported reviews (admin only)")
+    @GetMapping("/reported")
+    public ResponseEntity<?> getReportedReviews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        User adminUser = userService.getUserByUsername(authentication.getName());
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            return ResponseEntity.status(403).body("Only admins can fetch reported reviews");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Review> reported = reviewService.getReportedReviews(pageable);
+
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("reviews", reported.getContent());
+        response.put("total", reported.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Dismiss report for a review (admin only)")
+    @PutMapping("/{reviewId}/dismiss-report")
+    public ResponseEntity<?> dismissReport(@PathVariable Long reviewId, Authentication authentication) {
+        User adminUser = userService.getUserByUsername(authentication.getName());
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            return ResponseEntity.status(403).body("Only admins can dismiss reports");
+        }
+        try {
+            reviewService.dismissReport(reviewId);
+            return ResponseEntity.ok(Map.of("message", "Report dismissed successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
 }

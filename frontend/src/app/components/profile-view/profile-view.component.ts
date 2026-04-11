@@ -11,6 +11,8 @@ import {filter, firstValueFrom} from 'rxjs';
 import {ActivityService} from '../../services/activity.service';
 import {Title} from '@angular/platform-browser';
 
+import { ReviewService } from '../../services/review.service';
+
 @Component({
   selector: 'app-profile-view',
   templateUrl: './profile-view.component.html',
@@ -20,6 +22,8 @@ import {Title} from '@angular/platform-browser';
 })
 export class ProfileViewComponent implements OnInit {
   isOwnProfile: boolean = false;
+  isLoggedIn: boolean = false;
+  profileLoaded: boolean = false;
 
   editing: boolean = false;
   username: string = '';
@@ -68,6 +72,7 @@ export class ProfileViewComponent implements OnInit {
   count: number = -1;
   animationClass = '';
 
+
   responsive: boolean = window.innerWidth < 1024;
 
   constructor(
@@ -79,7 +84,8 @@ export class ProfileViewComponent implements OnInit {
     private activityService: ActivityService,
     private cdr: ChangeDetectorRef,
     private translatorService: TranslatorService,
-    private titleService: Title
+    private titleService: Title,
+    private reviewService: ReviewService
   ) {}
 
   t(key: string) {
@@ -121,12 +127,15 @@ export class ProfileViewComponent implements OnInit {
       }
     });
 
+    console.log(this.isOwnProfile)
+
 
     this.userService.getUserByUsername(this.username).subscribe({
       next: (userData) => {
         this.user = userData;
         this.updateTitle();
 
+        this.profileLoaded = true;
         this.isAdminProfile = this.user?.role?.includes('ADMIN');
 
         this.creationDate = this.user.createdAt;
@@ -160,6 +169,7 @@ export class ProfileViewComponent implements OnInit {
     });
 
     this.sessionService.getLoggedUser().subscribe(loggedUser => {
+      this.isLoggedIn = !!loggedUser;
       this.isOwnProfile = loggedUser?.username === this.username;
       this.isAdmin = loggedUser?.role?.includes('ADMIN');
     });
@@ -408,4 +418,21 @@ export class ProfileViewComponent implements OnInit {
     this.router.navigate(['/recipes', recipeId]);
   }
 
+  reportProfile(event: Event) {
+    this.userService.reportUser(this.username).subscribe({
+      next: () => {
+        (event.target as HTMLElement).closest('button')?.querySelector('i')?.classList.add('ti-flag-filled');
+      },
+      error: (err) => console.error('Error reporting user:', err)
+    });
+  }
+
+  reportReview(reviewId: number, event: Event) {
+    this.reviewService.reportReview(reviewId).subscribe({
+      next: () => {
+        (event.target as HTMLElement).closest('button')?.querySelector('i')?.classList.add('ti-flag-filled');
+      },
+      error: (err) => console.error('Error reporting review:', err)
+    });
+  }
 }

@@ -19,6 +19,7 @@ import { TranslatorService } from '../../services/translator.service';
 import { ThemeService } from '../../services/theme.service';
 import { ActivityService } from '../../services/activity.service';
 import { Title } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-recipe-view',
   templateUrl: './recipe-view.component.html',
@@ -26,6 +27,7 @@ import { Title } from '@angular/platform-browser';
     RouterLink,
     CommonModule,
     FormsModule,
+    CollectionCardComponent,
     CollectionCardComponent
   ],
   styleUrls: ['./recipe-view.component.css']
@@ -137,6 +139,7 @@ export class RecipeViewComponent implements OnInit {
   isAdmin: boolean = false;
 
   confirmDeleteReview: boolean = false;
+
 
   constructor(
     private router: Router,
@@ -706,6 +709,38 @@ export class RecipeViewComponent implements OnInit {
     });
   }
 
+  reportReview(reviewId: number, event?: Event) {
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/error'], { state: { status: 403, reason: this.t('please_log_in_to_report') } });
+      return;
+    }
+    this.reviewService.reportReview(reviewId).subscribe({
+      next: () => {
+        if (event) {
+          const icon = (event.target as HTMLElement).closest('button')?.querySelector('i');
+          if (icon) icon.classList.add('ti-flag-filled');
+        }
+      },
+      error: (err) => console.error('Error reporting review:', err)
+    });
+  }
+
+  reportRecipeAction(event: Event) {
+    event.stopPropagation();
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/error'], { state: { status: 403, reason: this.t('please_log_in_to_report') } });
+      return;
+    }
+    if (this.recipe?.id) {
+      this.recipeService.reportRecipe(this.recipe.id).subscribe({
+        next: () => {
+          (event.target as HTMLElement).closest('button')?.querySelector('i')?.classList.add('ti-flag-filled');
+        },
+        error: (err) => console.error('Error reporting recipe:', err)
+      });
+    }
+  }
+
   loadMoreReviews() {
     if (this.loadingReviews || !this.hasMoreReviews) return;
     this.reviewsPage++;
@@ -940,6 +975,7 @@ export class RecipeViewComponent implements OnInit {
     }
   }
 
+
   shareRecipe() {
     if (navigator.share) {
       navigator.share({
@@ -951,5 +987,7 @@ export class RecipeViewComponent implements OnInit {
       });
     }
   }
+
+  protected readonly parseInt = parseInt;
 }
 

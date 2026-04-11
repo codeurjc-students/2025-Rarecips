@@ -95,9 +95,20 @@ public class AuthService {
                     "Auth successful. Tokens are created in cookie.");
             return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
         } catch (Exception e) {
-            AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
-                    "Invalid credentials !");
-            return ResponseEntity.status(400).body(loginResponse);
+
+            User userEnt = userRepository.findByUsername(authRequest.getUsername());
+
+            System.out.println("Is user suspended: " + userEnt.isSuspended());
+
+            if (userEnt.isSuspended()) {
+                AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
+                        "User account is suspended");
+                return ResponseEntity.status(423).body(loginResponse);
+            } else {
+                AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
+                        "Invalid credentials !");
+                return ResponseEntity.status(400).body(loginResponse);
+            }
         }
     }
 

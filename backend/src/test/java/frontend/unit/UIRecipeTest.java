@@ -53,7 +53,7 @@ public class UIRecipeTest extends BaseUnitTest {
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".w-max > span"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.create-recipe-btn"))).click();
     wait.until(ExpectedConditions.elementToBeClickable(By.id("recipeLabel"))).click();
     wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeLabel"))).sendKeys("Test Recipe");
     wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeDesc"))).sendKeys("Test recipe description");
@@ -97,7 +97,9 @@ public class UIRecipeTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    WebElement recipeCard = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex:nth-child(1) .absolute:nth-child(2)")));
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
+
+    WebElement recipeCard = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(1)")));
     jsClick(recipeCard);
 
     js.executeScript("window.scrollTo(0,0)");
@@ -160,7 +162,9 @@ public class UIRecipeTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    WebElement recipeCardDelete = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex:nth-child(1) .absolute:nth-child(2)")));
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
+
+    WebElement recipeCardDelete = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(1)")));
     jsClick(recipeCardDelete);
 
     js.executeScript("window.scrollTo(0,0)");

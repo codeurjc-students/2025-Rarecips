@@ -60,6 +60,18 @@ export class RecipeService {
     );
   }
 
+  getPendingRecipes(page: number, size: number): Observable<any> {
+    return this.httpClient.get<any>(`${this.API_URL}/pending?page=${page}&size=${size}`).pipe(
+      map(data => ({
+        recipes: data.recipes.map((recipe: any) => this.mapRecipe(recipe)),
+        total: data.total,
+        page: data.page,
+        size: data.size
+      })),
+      catchError(this.handleError)
+    );
+  }
+
   private mapRecipe(recipe: any): Recipe {
     return {
       id: recipe.id,
@@ -91,6 +103,7 @@ export class RecipeService {
       author: recipe.author || "",
       reviews: recipe.reviews || [],
       steps: recipe.steps || [],
+      pendingReview: !!recipe.pendingReview,
       createdAt: new Date(recipe.createdAt) || new Date(),
       updatedAt: new Date(recipe.updatedAt) || new Date()
     };
@@ -171,5 +184,29 @@ export class RecipeService {
         });
       })
     );
+  }
+
+  changeRecipeStatus(id: number | string, action: 'approve' | 'reject'): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${id}/status?action=${action}`, null);
+  }
+
+  reportRecipe(id: number | string): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${id}/report`, null);
+  }
+
+  getReportedRecipes(page: number, size: number): Observable<any> {
+    return this.httpClient.get<any>(`${this.API_URL}/reported?page=${page}&size=${size}`).pipe(
+      map(data => ({
+        recipes: data.recipes.map((recipe: any) => this.mapRecipe(recipe)),
+        total: data.total,
+        page: data.page,
+        size: data.size
+      })),
+      catchError(this.handleError)
+    );
+  }
+
+  dismissReport(id: number | string): Observable<any> {
+    return this.httpClient.put(`${this.API_URL}/${id}/dismiss-report`, null);
   }
 }
