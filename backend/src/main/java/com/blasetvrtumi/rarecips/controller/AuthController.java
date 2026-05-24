@@ -105,14 +105,16 @@ public class AuthController {
                 .toUri();
 
             User user = userService.findByUsername(signupRequest.getUsername());
-            notificationService.createAndSendNotificationWithTemplate(
-                    user,
-                    null,
-                    Notification.NotificationType.WELCOME,
-                    java.util.Map.of(),
-                    "notification.welcome",
-                    null
-            );
+            if (notificationService != null && user != null) {
+                notificationService.createAndSendNotificationWithTemplate(
+                        user,
+                        null,
+                        Notification.NotificationType.WELCOME,
+                        java.util.Map.of(),
+                        "notification.welcome",
+                        null
+                );
+            }
 
             return ResponseEntity.ok().header("Location", location.toString()).body(response.getBody());
         }

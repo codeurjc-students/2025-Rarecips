@@ -72,7 +72,7 @@ public class ReviewController {
                 .toUri();
 
             Recipe recipe = savedReview.getRecipe();
-            if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(username)) {
+            if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(username) && notificationService != null) {
                 notificationService.createAndSendNotificationWithTemplate(
                         recipe.getAuthorUser(),
                         userAuthor,
@@ -214,7 +214,7 @@ public class ReviewController {
         try {
             reviewService.reportReview(reviewId);
             Review review = reviewService.findById(reviewId);
-            if (review != null && review.getAuthor() != null) {
+            if (review != null && review.getAuthor() != null && notificationService != null) {
                 notificationService.createAndSendNotificationWithTemplate(
                         review.getAuthor(),
                         null,

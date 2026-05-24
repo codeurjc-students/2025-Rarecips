@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
+import java.time.Duration;
 
 public class UIAuthTest extends BaseUnitTest {
   private JavascriptExecutor js;
@@ -23,15 +22,18 @@ public class UIAuthTest extends BaseUnitTest {
     driver.get(baseUrl + "/login");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    driver.findElement(By.id("login-username")).click();
-    driver.findElement(By.id("login-username")).sendKeys("testuser");
+    helper.pause(500);
+
+    helper.waitAndSendKeys(By.id("login-username"), "testuser");
+    helper.waitAndSendKeys(By.id("login-password"), "testpassword123_");
 
     js.executeScript("window.scrollTo(0,100)");
 
-    driver.findElement(By.id("login-password")).sendKeys("testpassword123_");
-    driver.findElement(By.id("loginBut")).click();
+    helper.waitAndClick(By.id("loginBut"));
 
     js.executeScript("window.scrollTo(0,54)");
+
+    helper.pause(1000);
   }
 
   @Test
@@ -39,19 +41,19 @@ public class UIAuthTest extends BaseUnitTest {
     driver.get(baseUrl + "/signup");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    driver.findElement(By.id("signup-username")).click();
-    driver.findElement(By.id("signup-username")).sendKeys("testuser");
-    driver.findElement(By.id("signup-email")).sendKeys("testuser@example.com");
-    driver.findElement(By.id("signup-password")).sendKeys("testpassword123_");
-    driver.findElement(By.id("signup-confirm-password")).sendKeys("testpassword123_");
+    helper.pause(500);
 
-    driver.findElement(By.cssSelector(".form-options:nth-child(6) .checkbox-custom")).click();
-    driver.findElement(By.cssSelector(".justify-center:nth-child(1)")).click();
+    helper.waitAndSendKeys(By.id("signup-username"), "testuser");
+    helper.waitAndSendKeys(By.id("signup-email"), "testuser@example.com");
+    helper.waitAndSendKeys(By.id("signup-password"), "testpassword123_");
+    helper.waitAndSendKeys(By.id("signup-confirm-password"), "testpassword123_");
 
-    WebElement signupButton = driver.findElement(By.id("signupBut"));
-    Actions builder = new Actions(driver);
-    builder.moveToElement(signupButton).perform();
+    helper.jsClickAfterVisible(By.cssSelector("input[type='checkbox']:nth-of-type(1) + span.checkbox-custom"));
 
     js.executeScript("window.scrollTo(0,0)");
+
+    helper.waitAndClick(By.id("signupBut"));
+
+    helper.pause(1000);
   }
 }

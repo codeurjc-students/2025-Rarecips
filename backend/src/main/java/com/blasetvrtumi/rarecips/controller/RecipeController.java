@@ -461,7 +461,7 @@ public class RecipeController {
         recipeRepository.save(recipe);
 
         User author = recipe.getAuthorUser();
-            if (author != null) {
+            if (author != null && notificationService != null) {
                 notificationService.createAndSendNotificationWithTemplate(
                         author,
                         null,

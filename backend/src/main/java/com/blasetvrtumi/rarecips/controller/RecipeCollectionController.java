@@ -226,7 +226,7 @@ public class RecipeCollectionController {
             RecipeCollection updated = collectionService.addRecipeToCollection(favorites.getId(), recipeId, user);
             
             Recipe recipe = recipeService.findById(recipeId);
-            if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(username)) {
+            if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(username) && notificationService != null) {
                 String senderName = user.getDisplayName() != null && !user.getDisplayName().isBlank() ? user.getDisplayName() : user.getUsername();
                 String recipeTitle = recipe.getLabel() != null ? recipe.getLabel() : "";
                 notificationService.createAndSendNotificationWithTemplate(
@@ -283,7 +283,7 @@ public class RecipeCollectionController {
                     collection = collectionService.addRecipeToCollection(id, recipeId, user);
                     
                     Recipe recipe = recipeService.findById(recipeId);
-                    if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(user.getUsername())) {
+                    if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(user.getUsername()) && notificationService != null) {
                         Notification.NotificationType notifType = collection.isFavorites() ? Notification.NotificationType.LIKED_RECIPE : Notification.NotificationType.ADDED_TO_COLLECTION;
 
                         String senderName = user.getDisplayName() != null && !user.getDisplayName().isBlank() ? user.getDisplayName() : user.getUsername();

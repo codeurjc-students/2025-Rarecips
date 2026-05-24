@@ -21,24 +21,7 @@ public class UIUserTest extends BaseUnitTest {
     js = (JavascriptExecutor) driver;
 
     // Login with admin user
-    driver.get("https://localhost:8443/login");
-    driver.manage().window().setSize(new Dimension(1920, 1080));
-    driver.findElement(By.id("login-username")).click();
-    driver.findElement(By.id("login-username")).sendKeys("admin");
-    js.executeScript("window.scrollTo(0,100)");
-    driver.findElement(By.id("login-password")).sendKeys("adminpass");
-    driver.findElement(By.id("loginBut")).click();
-
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    wait.until(ExpectedConditions.urlToBe("https://localhost:8443/"));
-
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
-
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.login("admin", "adminpass");
   }
   @Test
   public void usercrud() {

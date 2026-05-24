@@ -662,14 +662,16 @@ public class UserController {
         user.setReported(true);
         userService.save(user);
 
-        notificationService.createAndSendNotificationWithTemplate(
-                user,
-                null,
-                Notification.NotificationType.REPORTED_USER,
-                java.util.Map.of(),
-                "notification.reported_user",
-                null
-        );
+        if (notificationService != null) {
+            notificationService.createAndSendNotificationWithTemplate(
+                    user,
+                    null,
+                    Notification.NotificationType.REPORTED_USER,
+                    java.util.Map.of(),
+                    "notification.reported_user",
+                    null
+            );
+        }
 
         return ResponseEntity.ok(Map.of("message", "User reported successfully"));
     }
