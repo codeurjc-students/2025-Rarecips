@@ -19,10 +19,14 @@ public class UIAuthTest extends BaseUnitTest {
 
   @Test
   public void testLogin() {
+    // Ensure server is ready before making requests
+    helper.waitForServerReady();
+    helper.pause(1000);
+
     driver.get(baseUrl + "/login");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    helper.pause(500);
+    // ...existing code...
 
     helper.waitAndSendKeys(By.id("login-username"), "testuser");
     helper.waitAndSendKeys(By.id("login-password"), "testpassword123_");
@@ -38,10 +42,14 @@ public class UIAuthTest extends BaseUnitTest {
 
   @Test
   public void testSignup() {
+    // Ensure server is ready before making requests
+    helper.waitForServerReady();
+    helper.pause(1000);
+
     driver.get(baseUrl + "/signup");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    helper.pause(500);
+    // ...existing code...
 
     helper.waitAndSendKeys(By.id("signup-username"), "testuser");
     helper.waitAndSendKeys(By.id("signup-email"), "testuser@example.com");

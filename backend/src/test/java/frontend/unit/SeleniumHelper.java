@@ -80,13 +80,29 @@ public class SeleniumHelper {
     }
 
     public void login(String username, String password) {
+        // Wait for server to become available
+        waitForServerReady();
+
         driver.get("https://localhost:8443/login");
         driver.manage().window().maximize();
 
-        pause(500);
+        pause(1000);
+
+        // Wait longer for login form to render in CI environment
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("login-username")));
+        } catch (Exception e) {
+            // Refresh and try again
+            driver.navigate().refresh();
+            pause(2000);
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("login-username")));
+        }
 
         waitAndSendKeys(By.id("login-username"), username);
+        pause(500);
+
         waitAndSendKeys(By.id("login-password"), password);
+        pause(500);
 
         waitAndClick(By.id("loginBut"));
 
@@ -95,6 +111,44 @@ public class SeleniumHelper {
 
         pause(2000);
     }
+
+    /**
+     * Wait for the server to become ready and the Angular app to initialize
+     */
+    public void waitForServerReady() {
+        int maxRetries = 15;
+        int attempt = 0;
+
+        while (attempt < maxRetries) {
+            try {
+                // Try to load the login page
+                driver.get("https://localhost:8443/login");
+
+                // Wait for basic page load
+                wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
+
+                // Check if Angular app has initialized
+                Boolean appReady = (Boolean) js.executeScript(
+                    "return document.querySelector('app-root') != null && " +
+                    "document.body.innerHTML.includes('login')"
+                );
+
+                if (appReady != null && appReady) {
+                    pause(500);
+                    return;
+                }
+
+                attempt++;
+                pause(1000);
+            } catch (Exception e) {
+                attempt++;
+                pause(1000);
+                if (attempt >= maxRetries) {
+                    throw new RuntimeException(
+                        "Server did not become ready after " + maxRetries + " attempts. " +
+                        "Make sure the application is running on https://localhost:8443", e);
+                }
+            }
+        }
+    }
 }
-
-

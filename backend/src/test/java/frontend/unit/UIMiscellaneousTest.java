@@ -19,10 +19,14 @@ public class UIMiscellaneousTest extends BaseUnitTest {
 
   @Test
   public void changelanguage() {
+    // Ensure server is ready
+    helper.waitForServerReady();
+    helper.pause(1000);
+
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    helper.pause(1000);
+    // ...existing code...
 
     helper.jsClickAfterVisible(By.id("selectedLangText"));
 
@@ -35,10 +39,14 @@ public class UIMiscellaneousTest extends BaseUnitTest {
 
   @Test
   public void changetheme() {
+    // Ensure server is ready
+    helper.waitForServerReady();
+    helper.pause(1000);
+
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    helper.pause(1000);
+    // ...existing code...
 
     helper.jsClickAfterVisible(By.id("dropdownTrigger"));
 
@@ -51,10 +59,13 @@ public class UIMiscellaneousTest extends BaseUnitTest {
 
   @Test
   public void searchsomething() {
+    // Ensure server is ready
+    helper.waitForServerReady();
+
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    helper.waitAndGetElement(By.cssSelector("body"));
+    // ...existing code...
 
     helper.pause(2000);
 
@@ -85,10 +96,13 @@ public class UIMiscellaneousTest extends BaseUnitTest {
 
   @Test
   public void filtersomething() {
+    // Ensure server is ready
+    helper.waitForServerReady();
+
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    helper.waitAndGetElement(By.cssSelector("body"));
+    // ...existing code...
 
     helper.pause(2000);
 
