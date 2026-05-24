@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, HostListener, OnInit} from '@angular/core';
 import {NavigationEnd, Router, RouterModule, RoutesRecognized} from '@angular/router';
 import {Subject, takeUntil, forkJoin, debounceTime, switchMap, of, filter} from 'rxjs';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
@@ -10,6 +10,8 @@ import {UserService} from '../../services/user.service';
 import {CollectionCardComponent} from '../shared/collection-card/collection-card.component';
 import {TranslatorService} from '../../services/translator.service';
 import {ThemeService} from '../../services/theme.service';
+import {NotificationService} from '../../services/notification.service';
+import {Notification} from '../../models/notification.model';
 
 @Component({
   selector: 'app-navbar',
@@ -63,6 +65,16 @@ export class NavbarComponent implements OnInit {
 
   logos: Map<string, string> = new Map();
 
+  notifications: Notification[] = [];
+  unreadCount: number = 0;
+  notifDropdownOpen = false;
+  bellRingActive = false;
+
+  private bellRingTimer: ReturnType<typeof setTimeout> | null = null;
+
+  showToast: boolean = false;
+  toastNotification: Notification | null = null;
+
   constructor(
     private router: Router,
     private themeService: ThemeService,
@@ -71,8 +83,208 @@ export class NavbarComponent implements OnInit {
     private ingredientService: IngredientService,
     private collectionService: RecipeCollectionService,
     private userService: UserService,
-    public translator: TranslatorService
+    public translator: TranslatorService,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {
+  }
+
+  private recipeTitleCache: Map<number, string> = new Map();
+
+  private enrichNotifications(notifs: Notification[]) {
+    if (!notifs || notifs.length === 0) return;
+
+    notifs.forEach(notif => {
+      if ((notif as any).messageKey && (notif as any).messageKey.trim().length > 0) {
+        const key = (notif as any).messageKey as string;
+        const args = (notif as any).messageArgs as { [k: string]: string } | undefined || {};
+        this.applyLocalizedNotificationText(notif, key, args, notif.relatedId);
+        return;
+      }
+
+      if (notif.message && notif.message.trim().length > 0) {
+        this.clearLinkedMessageData(notif);
+        (notif as any).displayMessage = notif.message;
+        return;
+      }
+
+      if (notif.type === 'LIKED_RECIPE') {
+        if (notif.relatedId) {
+          const cached = this.recipeTitleCache.get(notif.relatedId);
+          if (cached) {
+            this.applyLocalizedNotificationText(notif, 'notification.liked_recipe', { user: notif.senderUsername || this.t('unknown_user'), recipe: cached }, notif.relatedId);
+          } else {
+            this.recipeService.getRecipeById(notif.relatedId).subscribe({
+              next: recipe => {
+                const title = recipe?.title || recipe?.label || '';
+                this.recipeTitleCache.set(notif.relatedId as number, title);
+                this.applyLocalizedNotificationText(notif, 'notification.liked_recipe', { user: notif.senderUsername || this.t('unknown_user'), recipe: title }, notif.relatedId);
+                this.cdr.detectChanges();
+              },
+              error: () => {
+                this.applyLocalizedNotificationText(notif, 'notification.liked_recipe', { user: notif.senderUsername || this.t('unknown_user'), recipe: '' }, notif.relatedId);
+                this.cdr.detectChanges();
+              }
+            });
+          }
+        } else {
+          this.applyLocalizedNotificationText(notif, 'notification.liked_recipe', { user: notif.senderUsername || this.t('unknown_user'), recipe: '' });
+        }
+      } else if (notif.type === 'ADDED_TO_COLLECTION') {
+        const collectionLabel = this.t('favorites') || this.t('collections');
+        if (notif.relatedId) {
+          const cached = this.recipeTitleCache.get(notif.relatedId);
+          if (cached) {
+            this.applyLocalizedNotificationText(notif, 'notification.added_to_collection', { user: notif.senderUsername || this.t('unknown_user'), recipe: cached, collection: collectionLabel }, notif.relatedId);
+          } else {
+            this.recipeService.getRecipeById(notif.relatedId).subscribe({
+              next: recipe => {
+                const title = recipe?.title || recipe?.label || '';
+                this.recipeTitleCache.set(notif.relatedId as number, title);
+                this.applyLocalizedNotificationText(notif, 'notification.added_to_collection', { user: notif.senderUsername || this.t('unknown_user'), recipe: title, collection: collectionLabel }, notif.relatedId);
+                this.cdr.detectChanges();
+              },
+              error: () => {
+                this.applyLocalizedNotificationText(notif, 'notification.added_to_collection', { user: notif.senderUsername || this.t('unknown_user'), recipe: '', collection: collectionLabel }, notif.relatedId);
+                this.cdr.detectChanges();
+              }
+            });
+          }
+        } else {
+          this.applyLocalizedNotificationText(notif, 'notification.added_to_collection', { user: notif.senderUsername || this.t('unknown_user'), recipe: '', collection: collectionLabel });
+        }
+      } else {
+        (notif as any).displayMessage = notif.message || this.t('notifications');
+        this.clearLinkedMessageData(notif);
+      }
+    });
+  }
+
+  private applyLocalizedNotificationText(notif: Notification, key: string, args: { [k: string]: string }, relatedId?: number) {
+    const template = this.t(key);
+    (notif as any).displayMessage = this.formatString(template, args);
+    this.buildLinkedMessageParts(notif, template, args, relatedId);
+  }
+
+  private formatString(template: string, params: { [k: string]: string }): string {
+    if (!template) return '';
+    let out = template;
+    Object.keys(params || {}).forEach(k => {
+      const re = new RegExp(`\\{${k}\\}`, 'g');
+      out = out.replace(re, params[k] ?? '');
+    });
+    return out;
+  }
+
+  private clearLinkedMessageData(notif: Notification) {
+    (notif as any).displayMessageParts = undefined;
+  }
+
+  private buildLinkedMessageParts(notif: Notification, template: string, args: { [k: string]: string }, relatedId?: number) {
+    this.clearLinkedMessageData(notif);
+    if (!template) return;
+
+    const markerMap: Record<string, { marker: string; text: string; commands?: any[] }> = {
+      user: {
+        marker: '__RARECIPS_USER__',
+        text: args?.['user'] ?? '',
+        commands: notif.senderUsername ? ['/users', notif.senderUsername] : undefined
+      },
+      recipe: {
+        marker: '__RARECIPS_RECIPE__',
+        text: args?.['recipe'] ?? '',
+        commands: relatedId ? ['/recipes', relatedId] : undefined
+      }
+    };
+
+    const tokens: string[] = [];
+    const replacements: { [k: string]: string } = {};
+
+    Object.keys(args || {}).forEach(k => {
+      const info = markerMap[k];
+      if (info) {
+        replacements[k] = info.marker;
+        tokens.push(k);
+      } else {
+        replacements[k] = args[k] ?? '';
+      }
+    });
+
+    if (tokens.length === 0) return;
+
+    const prepared = this.formatString(template, replacements);
+    const parts: { text: string; linkCommands?: any[] }[] = [];
+    let cursor = 0;
+
+    while (cursor < prepared.length) {
+      let nextPos = -1;
+      let nextToken: string | null = null;
+
+      tokens.forEach(token => {
+        const marker = markerMap[token].marker;
+        const pos = prepared.indexOf(marker, cursor);
+        if (pos >= 0 && (nextPos === -1 || pos < nextPos)) {
+          nextPos = pos;
+          nextToken = token;
+        }
+      });
+
+      if (nextPos === -1 || !nextToken) {
+        const tail = prepared.slice(cursor);
+        if (tail) parts.push({ text: tail });
+        break;
+      }
+
+      const head = prepared.slice(cursor, nextPos);
+      if (head) parts.push({ text: head });
+
+      const tokenInfo = markerMap[nextToken];
+      parts.push({ text: tokenInfo.text, linkCommands: tokenInfo.commands });
+      cursor = nextPos + tokenInfo.marker.length;
+    }
+
+    if (parts.some(p => !!p.linkCommands?.length)) {
+      (notif as any).displayMessageParts = parts;
+    }
+  }
+
+  private getLanguageLabel(lang: string): string {
+    switch (lang) {
+      case 'en':
+        return 'English';
+      case 'es':
+        return 'Español';
+      case 'fr':
+        return 'Français';
+      case 'ja':
+        return '日本語';
+      case 'zh':
+        return '中文';
+      default:
+        return 'Language';
+    }
+  }
+
+  private syncLanguageUi(): void {
+    this.currentLanguageText = this.getLanguageLabel(this.currentLanguage);
+
+    const selectedLangText = document.getElementById('selectedLangText');
+    if (selectedLangText) {
+      selectedLangText.textContent = this.currentLanguageText;
+    }
+  }
+
+  private refreshLocalizedNotifications(): void {
+    if (this.notifications.length === 0 && !this.toastNotification) return;
+
+    this.notifications = [...this.notifications];
+    this.enrichNotifications(this.notifications);
+
+    if (this.toastNotification) {
+      this.enrichNotifications([this.toastNotification]);
+    }
+
+    this.cdr.detectChanges();
   }
 
   t(key: string): string {
@@ -109,26 +321,7 @@ export class NavbarComponent implements OnInit {
       this.anyActiveSections = !!navbar.querySelector('.nav-item.active');
     });
 
-    switch (this.currentLanguage) {
-      case 'en':
-        this.currentLanguageText = 'English';
-        break;
-      case 'es':
-        this.currentLanguageText = 'Español';
-        break;
-      case 'fr':
-        this.currentLanguageText = 'Français';
-        break;
-      case 'ja':
-        this.currentLanguageText = '日本語';
-        break;
-      case 'zh':
-        this.currentLanguageText = '中文';
-        break;
-      default:
-        this.currentLanguageText = 'Language';
-        break;
-    }
+    this.syncLanguageUi();
 
     this.themes = this.themeService.getThemes();
 
@@ -229,16 +422,56 @@ export class NavbarComponent implements OnInit {
     window.addEventListener('storage', (event) => {
       if (event.key === 'lang') {
         this.currentLanguage = event.newValue || 'es';
+        this.syncLanguageUi();
         this.translator.loadTranslations(this.currentLanguage);
       }
     });
     this.translator.onChange(() => {
       this.currentLanguage = this.translator.getLang();
+      this.syncLanguageUi();
+      this.refreshLocalizedNotifications();
     });
     this.themeService.onChange(() => {
       this.selectedTheme = this.themeService.getCurrentTheme();
       this.selectedThemeInd = this.themeService.getSelectedThemeIndex();
-    })
+    });
+
+    this.notificationService.notifications$.subscribe(notifs => {
+      this.notifications = notifs;
+      this.enrichNotifications(notifs);
+      this.cdr.detectChanges();
+    });
+
+    this.notificationService.unreadCount$.subscribe(count => {
+      this.unreadCount = count;
+      this.cdr.detectChanges();
+    });
+
+    this.notificationService.latestNotification$.subscribe(notif => {
+      if (notif) {
+        this.toastNotification = notif;
+        this.showToast = true;
+        this.triggerNotificationAnimations();
+      } else {
+        this.showToast = false;
+      }
+      this.cdr.detectChanges();
+    });
+  }
+
+  private triggerNotificationAnimations() {
+    this.bellRingActive = false;
+
+    if (this.bellRingTimer) clearTimeout(this.bellRingTimer);
+
+    setTimeout(() => {
+      this.bellRingActive = true;
+      this.cdr.detectChanges();
+
+      this.bellRingTimer = setTimeout(() => {
+        this.bellRingActive = false;
+      }, 850);
+    }, 0);
   }
 
   onNavHover(hover: boolean) {
@@ -672,29 +905,7 @@ export class NavbarComponent implements OnInit {
       this.currentLanguage = lang || 'es';
       localStorage.setItem('lang', this.currentLanguage);
       this.translator.setLang(this.currentLanguage);
-      const selectedLangText = document.getElementById('selectedLangText');
-      if (selectedLangText) {
-        switch (this.currentLanguage) {
-          case 'en':
-            selectedLangText.textContent = 'English';
-            break;
-          case 'es':
-            selectedLangText.textContent = 'Español';
-            break;
-          case 'fr':
-            selectedLangText.textContent = 'Français';
-            break;
-          case 'ja':
-            selectedLangText.textContent = '日本語';
-            break;
-          case 'zh':
-            selectedLangText.textContent = '中文';
-            break;
-          default:
-            selectedLangText.textContent = 'Idioma';
-            break;
-        }
-      }
+      this.syncLanguageUi();
       this.closeLangDropdown();
     }
   }
@@ -721,11 +932,21 @@ export class NavbarComponent implements OnInit {
       this.closeNav();
     }
 
+    const notifContainer = document.getElementById('notifDropdown');
+    if (this.notifDropdownOpen && notifContainer && !notifContainer.contains(target)) {
+      this.closeNotifDropdown();
+    }
+
     // Close all dropdowns when clicking outside
     const dropdowns = document.querySelectorAll('.dropdown-container');
     dropdowns.forEach(container => {
       const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement;
       if (!container.contains(event.target as Node) || (event.target as HTMLElement).closest('#dropdownMenu')) {
+        if (container.id === 'notifDropdown') {
+          this.closeNotifDropdown();
+          return;
+        }
+
         checkbox.checked = false;
         if (container.id === 'dropdownLangCheckbox') {
           this.closeLangDropdown();
@@ -775,5 +996,62 @@ export class NavbarComponent implements OnInit {
         window.location.reload();
       }
     });
+  }
+
+  toggleNotifDropdown(event: Event) {
+    event.stopPropagation();
+    this.notifDropdownOpen = !this.notifDropdownOpen;
+    const checkbox = document.getElementById('notifCheckbox') as HTMLInputElement;
+    if (checkbox) checkbox.checked = this.notifDropdownOpen;
+
+    if (this.notifDropdownOpen) {
+      setTimeout(() => {
+        const menu = document.getElementById('notifDropdownMenu') as HTMLElement | null;
+        menu?.focus();
+      }, 0);
+    }
+  }
+
+  closeNotifDropdown() {
+    this.notifDropdownOpen = false;
+    const checkbox = document.getElementById('notifCheckbox') as HTMLInputElement;
+    if (checkbox) checkbox.checked = false;
+  }
+
+  onNotifFocusOut(event: FocusEvent) {
+    const next = event.relatedTarget as Node | null;
+    const notifContainer = document.getElementById('notifDropdown');
+    if (this.notifDropdownOpen && notifContainer && (!next || !notifContainer.contains(next))) {
+      this.closeNotifDropdown();
+    }
+  }
+
+  markNotifAsRead(notification: Notification, event: Event) {
+    event.stopPropagation();
+    if (!notification.read && notification.id) {
+      this.notificationService.markAsRead(notification.id);
+    }
+  }
+
+  onNotificationInlineLinkClick(notification: Notification, event: Event) {
+    this.markNotifAsRead(notification, event);
+    this.closeNotifDropdown();
+  }
+
+  markAllNotifsAsRead(event: Event) {
+    event.stopPropagation();
+    this.notificationService.markAllAsRead();
+  }
+
+  handleNotifClick(notification: Notification, event: Event) {
+    this.markNotifAsRead(notification, event);
+    if (notification.relatedId) {
+      if (notification.type === 'REPORTED_RECIPE' || notification.type === 'LIKED_RECIPE' || notification.type === 'ADDED_TO_COLLECTION' || notification.type === 'REVIEW_ADDED') {
+        this.router.navigate(['/recipes', notification.relatedId]);
+      } else if (notification.type === 'REPORTED_USER') {
+        this.router.navigate(['/users', notification.recipientUsername]);
+      }
+    }
+    this.closeNotifDropdown();
   }
 }

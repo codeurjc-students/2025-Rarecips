@@ -8,6 +8,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.blasetvrtumi.rarecips.security.jwt.AuthResponse;
 import com.blasetvrtumi.rarecips.security.jwt.AuthService;
 import com.blasetvrtumi.rarecips.service.UserService;
+import com.blasetvrtumi.rarecips.service.NotificationService;
+import com.blasetvrtumi.rarecips.entity.Notification;
+import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.security.jwt.AuthRequest;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,6 +34,9 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Operation(summary = "User login endpoint")
     @ApiResponses(value = {
@@ -97,6 +103,16 @@ public class AuthController {
                 .path("/api/v1/users/{username}")
                 .buildAndExpand(signupRequest.getUsername())
                 .toUri();
+
+            User user = userService.findByUsername(signupRequest.getUsername());
+            notificationService.createAndSendNotificationWithTemplate(
+                    user,
+                    null,
+                    Notification.NotificationType.WELCOME,
+                    java.util.Map.of(),
+                    "notification.welcome",
+                    null
+            );
 
             return ResponseEntity.ok().header("Location", location.toString()).body(response.getBody());
         }

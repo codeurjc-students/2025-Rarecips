@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class SPAController {
 
     // Redirect all frontend paths to index.html for angular router to handle manually
-    @GetMapping("/{path:^(?!assets|media|api|v3|swagger-ui)[^.]*}/**")
+    @GetMapping("/{path:^(?!assets|media|api|v3|swagger-ui|notify)[^.]*}/**")
     public String redirect() {
         return "forward:/index.html";
     }

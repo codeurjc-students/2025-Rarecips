@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, SecurityContext } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, SecurityContext } from '@angular/core';
 import { RecipeService } from '../../services/recipe.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Recipe } from '../../models/recipe.model';
@@ -27,12 +27,11 @@ import { Title } from '@angular/platform-browser';
     RouterLink,
     CommonModule,
     FormsModule,
-    CollectionCardComponent,
     CollectionCardComponent
   ],
   styleUrls: ['./recipe-view.component.css']
 })
-export class RecipeViewComponent implements OnInit {
+export class RecipeViewComponent implements OnInit, OnDestroy {
 
   // User interactions
   recipe: Recipe | null = null;
@@ -140,6 +139,10 @@ export class RecipeViewComponent implements OnInit {
 
   confirmDeleteReview: boolean = false;
 
+  private destroy$ = new Subject<void>();
+  private currentRecipeId: number | null = null;
+  private keyboardListenerAdded = false;
+
 
   constructor(
     private router: Router,
@@ -177,8 +180,48 @@ export class RecipeViewComponent implements OnInit {
     this.translatorService.onChange(() => {
       this.updateTitle();
     });
-    await this.initAll();
-    this.uniqueReviews = this.getUniqueReviewsArray();
+
+    this.activatedRoute.paramMap.pipe(takeUntil(this.destroy$)).subscribe(async params => {
+      const recipeId = Number(params.get('id'));
+      if (!recipeId || recipeId === this.currentRecipeId) return;
+
+      this.currentRecipeId = recipeId;
+      this.resetRecipeState();
+      await this.initAll();
+      this.uniqueReviews = this.getUniqueReviewsArray();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private resetRecipeState(): void {
+    this.recipe = null;
+    this.reviews = new Set<Review>();
+    this.uniqueReviews = [];
+    this.activeTab = 'instructions';
+    this.currentCarouselIndex = 0;
+    this.focusMode = false;
+    this.focusModeClosing = false;
+    this.userReview = null;
+    this.reviewsPage = 0;
+    this.hasMoreReviews = false;
+    this.loadingReviews = false;
+    this.userHasReview = false;
+    this.isRecipeAuthor = false;
+    this.showReviewForm = false;
+    this.showDeleteModal = false;
+    this.showAddToCollectionDialog = false;
+    this.selectedRecipeId = -1;
+    this.authorPfp = '';
+    this.created = '';
+    this.lastUpdated = '';
+    this.time = 0;
+    this.currentServings = 1;
+    this.originalServings = 1;
+    this.servingsScale = 1;
   }
 
   updateTitle() {
@@ -249,16 +292,19 @@ export class RecipeViewComponent implements OnInit {
     if (this.recipe?.totalTime) {
       this.time = this.recipe.totalTime * 60;
     }
-    addEventListener('keydown', (event) => {
-      if (!this.focusMode) return;
-      if (event?.key === 'ArrowRight') {
-        this.nextStep();
-      } else if (event?.key === 'ArrowLeft') {
-        this.previousStep();
-      } else if (event?.key === 'Escape') {
-        this.exitFocusMode();
-      }
-    });
+    if (!this.keyboardListenerAdded) {
+      this.keyboardListenerAdded = true;
+      addEventListener('keydown', (event) => {
+        if (!this.focusMode) return;
+        if (event?.key === 'ArrowRight') {
+          this.nextStep();
+        } else if (event?.key === 'ArrowLeft') {
+          this.previousStep();
+        } else if (event?.key === 'Escape') {
+          this.exitFocusMode();
+        }
+      });
+    }
   }
 
   async loadRecipe(): Promise<void> {

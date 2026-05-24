@@ -233,9 +233,88 @@
       </button>
 
       <!-- Notifications Button -->
-      <button id="notifBut" class="icon-btn p-6" title="{{ t('notifications') }}">
-        <i class="ti ti-bell text-xl"></i>
-      </button>
+      <div class="dropdown-container py-2" id="notifDropdown">
+        <input type="checkbox" id="notifCheckbox" class="hidden" [checked]="notifDropdownOpen" />
+        <label class="dropdown-trigger !p-2 relative cursor-pointer" for="notifCheckbox" (click)="toggleNotifDropdown($event)">
+          <i
+            class="ti text-2xl"
+            [ngClass]="{
+              'ti-bell-filled': unreadCount > 0,
+              'ti-bell': unreadCount === 0,
+              'animate-bell-ring': bellRingActive
+            }"
+            style="color: var(--primary-700);">
+          </i>
+          @if (unreadCount > 0) {
+            <span class="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white font-bold border-2 border-[var(--primary-300)] notif-badge animate-unread-pulse">
+              {{ unreadCount > 9 ? '9+' : unreadCount }}
+            </span>
+          }
+        </label>
+
+        <div id="notifDropdownMenu" tabindex="0" (focusout)="onNotifFocusOut($event)" class="dropdown-menu mt-2 right-0 max-h-[500px] overflow-hidden flex flex-col !w-1/4" [class.open]="notifDropdownOpen" style="background-color: var(--primary-50); transform: translateX(-1rem);">
+          <div class="p-4 border-b border-[var(--primary-200)] items-center bg-[var(--primary-100)] !w-full gap-4 flex !justify-center">
+            <span class="font-bold text-lg w-2/3" style="color: var(--primary-800)">{{ t('notifications') }}</span>
+            <button (click)="markAllNotifsAsRead($event)" class="text-sm text-[var(--primary-600)] hover:underline items-center gap-2 w-1/3 flex justify-center">
+              {{ t('mark_all_as_read') }}
+              <i class="ti ti-checks text-2xl text-[var(--primary-600)]"></i>
+            </button>
+          </div>
+
+          <div class="flex-grow custom-scrollbar">
+            @if (notifications.length === 0) {
+              <div class="p-8 text-center text-[var(--primary-500)]">
+                <i class="ti ti-bell-off text-4xl mb-2"></i>
+                <p>{{ t('no_notifications') }}</p>
+              </div>
+            } @else {
+              @for (notif of notifications; track notif.id) {
+                <div class="p-4 border-b border-[var(--primary-100)] hover:bg-[var(--primary-100)] cursor-pointer transition-colors relative"
+                     [class.unread]="!notif.read"
+                     (click)="handleNotifClick(notif, $event)">
+                  <div class="flex gap-3">
+                    <div class="notif-icon-container flex items-center justify-center shrink-0 w-10 h-10 rounded-full"
+                         [ngClass]="{
+                            'bg-blue-100 text-blue-600': notif.type === 'WELCOME',
+                            'bg-red-100 text-red-600': notif.type.startsWith('REPORTED'),
+                            'bg-pink-100 text-pink-600': notif.type === 'LIKED_RECIPE',
+                            'bg-yellow-100 text-yellow-600': notif.type === 'ADDED_TO_COLLECTION',
+                            'bg-green-100 text-green-600': notif.type === 'REVIEW_ADDED'
+                         }">
+                      <i class="ti text-xl" [ngClass]="{
+                        'ti-confetti': notif.type === 'WELCOME',
+                        'ti-alert-triangle': notif.type.startsWith('REPORTED'),
+                        'ti-heart': notif.type === 'LIKED_RECIPE',
+                        'ti-cards': notif.type === 'ADDED_TO_COLLECTION',
+                        'ti-star': notif.type === 'REVIEW_ADDED'
+                      }"></i>
+                    </div>
+                    <div class="flex-grow">
+                      @if (notif.displayMessageParts?.length) {
+                        <p class="text-sm" [class.font-bold]="!notif.read" style="color: var(--primary-800)">
+                          @for (part of notif.displayMessageParts; track $index) {
+                            @if (part.linkCommands?.length) {
+                              <a class="notification-recipe-link" [routerLink]="part.linkCommands" (click)="onNotificationInlineLinkClick(notif, $event)">{{ part.text }}</a>
+                            } @else {
+                              <span>{{ part.text }}</span>
+                            }
+                          }
+                        </p>
+                      } @else {
+                        <p class="text-sm" [class.font-bold]="!notif.read" style="color: var(--primary-800)">{{ notif.displayMessage || notif.message }}</p>
+                      }
+                      <span class="text-[10px] text-[var(--primary-500)]">{{ notif.createdAt | date:'short' }}</span>
+                    </div>
+                    @if (!notif.read) {
+                      <div class="unread-dot min-w-1 min-h-1 rounded-full bg-[var(--primary-600)] mt-2 animate-unread-pulse"></div>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
 
       <div id="userPfp" class="flex items-center">
         <button id="userMenuButton"
@@ -271,3 +350,51 @@
     (onClose)="closeCollectionView()">
   </app-collection-card>
 }
+
+<!-- Toast Notification -->
+<div class="toast-container fixed bottom-8 right-8 z-[100] transition-all duration-300"
+     [class.translate-y-0]="showToast"
+     [class.opacity-100]="showToast"
+     [class.translate-y-20]="!showToast"
+     [class.opacity-0]="!showToast"
+     [style.pointer-events]="showToast ? 'auto' : 'none'"
+     *ngIf="toastNotification">
+  <div class="flex items-center gap-4 p-4 rounded-2xl shadow-2xl backdrop-blur-lg border border-[var(--primary-200)] min-w-[300px] max-w-[450px]"
+       style="background: var(--primary-50-40);">
+    <div class="flex items-center justify-center shrink-0 w-12 h-12 rounded-full shadow-inner"
+         [ngClass]="{
+            'bg-blue-100 text-blue-600': toastNotification.type === 'WELCOME',
+            'bg-red-100 text-red-600': toastNotification.type.startsWith('REPORTED'),
+            'bg-pink-100 text-pink-600': toastNotification.type === 'LIKED_RECIPE',
+            'bg-yellow-100 text-yellow-600': toastNotification.type === 'ADDED_TO_COLLECTION',
+            'bg-green-100 text-green-600': toastNotification.type === 'REVIEW_ADDED'
+         }">
+      <i class="ti text-2xl" [ngClass]="{
+        'ti-confetti': toastNotification.type === 'WELCOME',
+        'ti-alert-triangle': toastNotification.type.startsWith('REPORTED'),
+        'ti-heart': toastNotification.type === 'LIKED_RECIPE',
+        'ti-cards': toastNotification.type === 'ADDED_TO_COLLECTION',
+        'ti-star': toastNotification.type === 'REVIEW_ADDED'
+      }"></i>
+    </div>
+    <div class="flex-grow">
+      <h4 class="font-bold text-sm mb-0.5" style="color: var(--primary-800)">{{ t('notifications') }}</h4>
+      @if (toastNotification.displayMessageParts?.length) {
+        <p class="text-sm leading-tight text-[var(--primary-700)]">
+          @for (part of toastNotification.displayMessageParts; track $index) {
+            @if (part.linkCommands?.length) {
+              <a class="notification-recipe-link" [routerLink]="part.linkCommands">{{ part.text }}</a>
+            } @else {
+              <span>{{ part.text }}</span>
+            }
+          }
+        </p>
+      } @else {
+        <p class="text-sm leading-tight text-[var(--primary-700)]">{{ toastNotification.displayMessage || toastNotification.message }}</p>
+      }
+    </div>
+    <button (click)="showToast = false" class="text-[var(--primary-400)] hover:text-[var(--primary-600)] transition-colors">
+      <i class="ti ti-x text-xl"></i>
+    </button>
+  </div>
+</div>

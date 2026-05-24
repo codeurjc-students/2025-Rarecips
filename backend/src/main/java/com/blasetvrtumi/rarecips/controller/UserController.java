@@ -4,6 +4,8 @@ import com.blasetvrtumi.rarecips.entity.Ingredient;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
 import com.blasetvrtumi.rarecips.service.UserService;
+import com.blasetvrtumi.rarecips.service.NotificationService;
+import com.blasetvrtumi.rarecips.entity.Notification;
 import com.blasetvrtumi.rarecips.service.MailService;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -44,6 +46,9 @@ public class UserController {
 
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Value("${app.frontend.url:https://localhost:8443}")
     private String frontendUrl;
@@ -656,6 +661,16 @@ public class UserController {
         
         user.setReported(true);
         userService.save(user);
+
+        notificationService.createAndSendNotificationWithTemplate(
+                user,
+                null,
+                Notification.NotificationType.REPORTED_USER,
+                java.util.Map.of(),
+                "notification.reported_user",
+                null
+        );
+
         return ResponseEntity.ok(Map.of("message", "User reported successfully"));
     }
 

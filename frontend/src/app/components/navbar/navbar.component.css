@@ -273,8 +273,8 @@ button:focus {
   border-radius: 18px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   min-width: 160px;
-  width: min-content;
   z-index: 1000;
+  width: min-content;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px);
@@ -380,9 +380,72 @@ button:focus {
 }
 
 .dropdown-menu.open {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+  display: flex !important;
+  width: min-content;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--primary-300);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary-400);
+}
+
+.notif-icon-container {
+  transition: transform 0.2s ease;
+}
+
+.dropdown-menu .custom-scrollbar {
+  overflow-y: auto;
+  max-height: 420px;
+  padding-right: 6px;
+}
+
+.dropdown-menu .custom-scrollbar > * {
+  overflow: visible !important;
+}
+
+.dropdown-menu .custom-scrollbar * {
+  scrollbar-width: none;
+}
+.dropdown-menu .custom-scrollbar *::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.unread {
+  background-color: var(--primary-100-40) !important;
+}
+
+.unread:hover {
+  background-color: var(--primary-100) !important;
+}
+
+.unread-dot {
+  box-shadow: 0 0 0 2px var(--primary-50);
+}
+
+.notification-recipe-link {
+  color: var(--primary-700);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.notification-recipe-link:hover {
+  color: var(--primary-800);
 }
 
 .dropdown-item {
@@ -1283,6 +1346,39 @@ button:focus {
     visibility: visible;
   }
 
+  #notifDropdown {
+    width: 80%;
+    min-height: 4vh;
+  }
+
+  #navbar.expanded #notifDropdown {
+    width: 60% !important;
+  }
+
+  #notifDropdownMenu {
+    position: fixed !important;
+    left: 6rem !important;
+    right: auto !important;
+    top: 60% !important;
+    transform: translate(8px, -50%) !important;
+    width: min(84vw, 380px) !important;
+    max-height: 70vh !important;
+    border-radius: 16px !important;
+    z-index: 100006 !important;
+  }
+
+  #navbar.expanded #notifDropdownMenu {
+    left: 15.25rem !important;
+  }
+
+  #notifDropdownMenu .custom-scrollbar {
+    max-height: calc(70vh - 64px) !important;
+  }
+
+  #notifDropdownMenu .unread-dot {
+    margin-top: 0.35rem;
+  }
+
   #notifBut {
     width: min-content !important;
     height: 4vh !important;
@@ -1367,5 +1463,76 @@ button:focus {
     margin: 0 auto;
   }
 }
+
+
+@keyframes bell-ring {
+  0% { transform: scale(1) rotate(0deg); }
+  10% { transform: scale(1.1) rotate(-15deg); }
+  20% { transform: scale(1.1) rotate(15deg); }
+  30% { transform: scale(1.1) rotate(-15deg); }
+  40% { transform: scale(1.1) rotate(12deg); }
+  50% { transform: scale(1.1) rotate(-12deg); }
+  60% { transform: scale(1.1) rotate(10deg); }
+  70% { transform: scale(1.1) rotate(-10deg); }
+  80% { transform: scale(1.1) rotate(5deg); }
+  90% { transform: scale(1.1) rotate(-5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.animate-bell-ring {
+  transform-origin: top center;
+  animation: bell-ring 0.8s ease-in-out;
+}
+
+@keyframes unread-badge-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--primary-300);
+  }
+  60% {
+    transform: scale(1.14);
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.notif-badge {
+  will-change: transform, box-shadow;
+}
+
+.animate-unread-pulse {
+  animation: unread-badge-pulse 1.2s ease-out infinite;
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s infinite ease-in-out;
+}
+
+.notif-item {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notif-item:hover {
+  background-color: var(--primary-100) !important;
+  transform: translateX(4px);
+}
+
+.notif-item:hover .notif-icon-container {
+  transform: scale(1.15) rotate(8deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.notif-icon-container {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 
 

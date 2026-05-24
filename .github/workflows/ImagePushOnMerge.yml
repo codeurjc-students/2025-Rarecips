@@ -1,4 +1,4 @@
-name: Docker image creation and push to Dockerhub on merge to main branch
+name: Docker image creation and push to Dockerhub on merge to main branch, deploy to Azure VM
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -33,3 +33,22 @@ jobs:
         run: |
           chmod +x ./create_image.sh
           ./create_image.sh
+
+  deploy:
+    name: Deploy to Virtual Machine (CD)
+    needs: create-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_KEY }}
+          DOCKERHUB_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "DOCKERHUB_USER=$DOCKERHUB_USER bash -s" < ./docker/deploy.sh dev-compose

@@ -9,6 +9,8 @@ import com.blasetvrtumi.rarecips.service.ImageService;
 import com.blasetvrtumi.rarecips.service.RecipeService;
 
 import com.blasetvrtumi.rarecips.service.UserService;
+import com.blasetvrtumi.rarecips.service.NotificationService;
+import com.blasetvrtumi.rarecips.entity.Notification;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,6 +51,8 @@ public class RecipeController {
     private UserService userService;
     @Autowired
     private ActivityService activityService;
+    @Autowired
+    private NotificationService notificationService;
 
     private User getAuthenticatedUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -455,6 +459,19 @@ public class RecipeController {
         
         recipe.setReported(true);
         recipeRepository.save(recipe);
+
+        User author = recipe.getAuthorUser();
+            if (author != null) {
+                notificationService.createAndSendNotificationWithTemplate(
+                        author,
+                        null,
+                        Notification.NotificationType.REPORTED_RECIPE,
+                        java.util.Map.of("recipe", recipe.getLabel() != null ? recipe.getLabel() : ""),
+                        "notification.reported_recipe",
+                        recipe.getId()
+                );
+            }
+
         return ResponseEntity.ok(Map.of("message", "Recipe reported successfully"));
     }
 

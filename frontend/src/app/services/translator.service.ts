@@ -30,7 +30,6 @@ export class TranslatorService {
     this.currentLang = lang;
     localStorage.setItem('lang', lang);
     this.loadTranslations(lang);
-    this.notifyListeners();
   }
 
   getLang(): string {
