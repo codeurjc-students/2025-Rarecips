@@ -35,6 +35,18 @@ public class HealthReportController {
         return ResponseEntity.ok(reports);
     }
 
+    @GetMapping("/summary")
+    @JsonView(HealthReport.BasicInfo.class)
+    public ResponseEntity<HealthReport> getSummary(HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) return ResponseEntity.status(401).build();
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) return ResponseEntity.notFound().build();
+
+        HealthReport summary = healthReportService.computeAggregates(user);
+        return ResponseEntity.ok(summary);
+    }
+
     @PostMapping("/generate")
     @JsonView(HealthReport.BasicInfo.class)
     public ResponseEntity<?> generateReport(HttpServletRequest request, @RequestParam(defaultValue = "es") String lang) {
@@ -48,7 +60,7 @@ public class HealthReportController {
             return ResponseEntity.ok(report);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(org.springframework.http.HttpStatus.TOO_MANY_REQUESTS)
-                                 .body(java.util.Map.of("error", e.getMessage()));
+                                 .body(java.util.Map.of("errorCode", e.getMessage()));
         }
     }
 }

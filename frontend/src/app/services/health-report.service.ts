@@ -19,4 +19,8 @@ export class HealthReportService {
   generateReport(lang: string = 'es'): Observable<HealthReport> {
     return this.http.post<HealthReport>(`${BASE_URL}/generate?lang=${lang}`, {});
   }
+
+  getSummary(): Observable<HealthReport> {
+    return this.http.get<HealthReport>(`${BASE_URL}/summary`);
+  }
 }

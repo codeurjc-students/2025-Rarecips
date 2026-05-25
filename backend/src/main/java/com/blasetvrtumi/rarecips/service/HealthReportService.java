@@ -49,7 +49,7 @@ public class HealthReportService {
         int monthlyGenerations = healthReportRepository.countByUserAndCreatedAtAfter(user, startOfMonth);
         
         if (monthlyGenerations >= 5) {
-            throw new IllegalStateException("Monthly report generation limit reached. You can only generate 5 health reports per month.");
+            throw new IllegalStateException("health_report_limit_reached");
         }
 
         List<Recipe> favoriteRecipes = null;
@@ -60,6 +60,10 @@ public class HealthReportService {
         
         int count = 0;
         float totalCalories = 0;
+        float totalWeight = 0;
+        float totalTime = 0;
+        float totalDifficulty = 0;
+        float totalPeople = 0;
         Map<String, Integer> dietLabelsCount = new HashMap<>();
         Map<String, Integer> healthLabelsCount = new HashMap<>();
         Map<String, Integer> cautionsCount = new HashMap<>();
@@ -68,7 +72,11 @@ public class HealthReportService {
             count = favoriteRecipes.size();
             for (Recipe r : favoriteRecipes) {
                 if (r.getCalories() != null) totalCalories += r.getCalories();
-                
+                if (r.getTotalWeight() != null) totalWeight += r.getTotalWeight();
+                if (r.getTotalTime() != null) totalTime += r.getTotalTime();
+                totalDifficulty += r.getDifficulty();
+                if (r.getPeople() != null) totalPeople += r.getPeople();
+
                 if (r.getDietLabels() != null) {
                     for (String label : r.getDietLabels()) {
                         dietLabelsCount.put(label, dietLabelsCount.getOrDefault(label, 0) + 1);
@@ -86,7 +94,11 @@ public class HealthReportService {
                 }
             }
         }
-        
+
+        float averageCalories = count > 0 ? totalCalories / count : 0;
+        float averageDifficulty = count > 0 ? totalDifficulty / count : 0;
+        float averagePeople = count > 0 ? totalPeople / count : 0;
+
         String langName = switch(lang.toLowerCase()) {
             case "es" -> "Spanish";
             case "en" -> "English";
@@ -128,8 +140,87 @@ public class HealthReportService {
             summary = "Ollama communication error: " + e.getMessage();
         }
 
-        HealthReport report = new HealthReport(user, summary, totalCalories, count);
+        HealthReport report = new HealthReport(
+            user,
+            summary,
+            totalCalories,
+            totalWeight,
+            totalTime,
+            averageCalories,
+            averageDifficulty,
+            averagePeople,
+            count,
+            new HashMap<>(dietLabelsCount),
+            new HashMap<>(healthLabelsCount),
+            new HashMap<>(cautionsCount)
+        );
         return healthReportRepository.save(report);
+    }
+
+    public HealthReport computeAggregates(User user) {
+        List<Recipe> favoriteRecipes = null;
+        Optional<RecipeCollection> favCollectionOpt = recipeCollectionRepository.findFirstByUserUsernameAndIsFavoritesTrue(user.getUsername());
+        if (favCollectionOpt.isPresent()) {
+            favoriteRecipes = favCollectionOpt.get().getRecipes();
+        }
+
+        int count = 0;
+        float totalCalories = 0;
+        float totalWeight = 0;
+        float totalTime = 0;
+        float totalDifficulty = 0;
+        float totalPeople = 0;
+        Map<String, Integer> dietLabelsCount = new HashMap<>();
+        Map<String, Integer> healthLabelsCount = new HashMap<>();
+        Map<String, Integer> cautionsCount = new HashMap<>();
+
+        if (favoriteRecipes != null) {
+            count = favoriteRecipes.size();
+            for (Recipe r : favoriteRecipes) {
+                if (r.getCalories() != null) totalCalories += r.getCalories();
+                if (r.getTotalWeight() != null) totalWeight += r.getTotalWeight();
+                if (r.getTotalTime() != null) totalTime += r.getTotalTime();
+                totalDifficulty += r.getDifficulty();
+                if (r.getPeople() != null) totalPeople += r.getPeople();
+
+                if (r.getDietLabels() != null) {
+                    for (String label : r.getDietLabels()) {
+                        dietLabelsCount.put(label, dietLabelsCount.getOrDefault(label, 0) + 1);
+                    }
+                }
+                if (r.getHealthLabels() != null) {
+                    for (String label : r.getHealthLabels()) {
+                        healthLabelsCount.put(label, healthLabelsCount.getOrDefault(label, 0) + 1);
+                    }
+                }
+                if (r.getCautions() != null) {
+                    for (String label : r.getCautions()) {
+                        cautionsCount.put(label, cautionsCount.getOrDefault(label, 0) + 1);
+                    }
+                }
+            }
+        }
+
+        float averageCalories = count > 0 ? totalCalories / count : 0;
+        float averageDifficulty = count > 0 ? totalDifficulty / count : 0;
+        float averagePeople = count > 0 ? totalPeople / count : 0;
+
+        HealthReport report = new HealthReport(
+            user,
+            "",
+            totalCalories,
+            totalWeight,
+            totalTime,
+            averageCalories,
+            averageDifficulty,
+            averagePeople,
+            count,
+            new HashMap<>(dietLabelsCount),
+            new HashMap<>(healthLabelsCount),
+            new HashMap<>(cautionsCount)
+        );
+
+        return report;
     }
     
     private String getTopLabels(Map<String, Integer> map) {

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 import java.time.Duration;
 
 public class UIAuthTest extends BaseUnitTest {
@@ -19,14 +20,10 @@ public class UIAuthTest extends BaseUnitTest {
 
   @Test
   public void testLogin() {
-    // Ensure server is ready before making requests
-    helper.waitForServerReady();
-    helper.pause(1000);
-
     driver.get(baseUrl + "/login");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    // ...existing code...
+    helper.pause(500);
 
     helper.waitAndSendKeys(By.id("login-username"), "testuser");
     helper.waitAndSendKeys(By.id("login-password"), "testpassword123_");
@@ -42,21 +39,18 @@ public class UIAuthTest extends BaseUnitTest {
 
   @Test
   public void testSignup() {
-    // Ensure server is ready before making requests
-    helper.waitForServerReady();
-    helper.pause(1000);
-
     driver.get(baseUrl + "/signup");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    // ...existing code...
+    helper.pause(500);
 
     helper.waitAndSendKeys(By.id("signup-username"), "testuser");
     helper.waitAndSendKeys(By.id("signup-email"), "testuser@example.com");
     helper.waitAndSendKeys(By.id("signup-password"), "testpassword123_");
     helper.waitAndSendKeys(By.id("signup-confirm-password"), "testpassword123_");
 
-    helper.jsClickAfterVisible(By.cssSelector("input[type='checkbox']:nth-of-type(1) + span.checkbox-custom"));
+    WebElement acceptTermsCheckbox = helper.waitAndGetElement(By.cssSelector("input[name='acceptTerms']"));
+    helper.jsClick(acceptTermsCheckbox);
 
     js.executeScript("window.scrollTo(0,0)");
 

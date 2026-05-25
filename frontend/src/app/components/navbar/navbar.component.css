@@ -1357,11 +1357,11 @@ button:focus {
 
   #notifDropdownMenu {
     position: fixed !important;
-    left: 6rem !important;
+    left: 6.5rem !important;
     right: auto !important;
     top: 60% !important;
     transform: translate(8px, -50%) !important;
-    width: min(84vw, 380px) !important;
+    width: 70vw !important;
     max-height: 70vh !important;
     border-radius: 16px !important;
     z-index: 100006 !important;

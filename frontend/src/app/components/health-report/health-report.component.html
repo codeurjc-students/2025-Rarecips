@@ -16,14 +16,19 @@
           class="px-6 py-3 rounded-2xl text-md font-semibold transition-all flex items-center gap-2 cursor-pointer"
           [ngClass]="isLoading ? 'opacity-50' : 'hover:scale-105'"
           style="background: var(--gradient-primary); color: white;">
-          <i class="ti ti-robot text-xl" [ngClass]="{'animate-spin': isLoading}"></i>
+          <ng-container *ngIf="isLoading; else generateIcon">
+            <img src="assets/icons/bowl-steam.svg" alt="loading" class="w-5 h-5 object-contain" />
+          </ng-container>
+          <ng-template #generateIcon>
+            <i class="ti ti-soup text-xl"></i>
+          </ng-template>
           {{ isLoading ? t('health_repo_generating') : t('health_repo_analyze') }}
         </button>
       </div>
 
       <!-- Error Message -->
-      <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative w-full" role="alert">
-        <span class="block sm:inline">{{ error }}</span>
+      <div *ngIf="errorMessage" class="border border-red-400 text-red-700 px-4 py-3 rounded relative w-full" style="background: color-mix(in srgb, red 10%, var(--primary-100-40) 80%)" role="alert">
+        <span class="block sm:inline">{{ this.t(errorMessage) }}</span>
       </div>
 
       <div class="tabs glass text-nowrap w-full">
@@ -42,158 +47,128 @@
       </div>
 
       <!-- Overview (Original Mockup) Content -->
-      <div *ngIf="activeTab === 'overview'" class="flex w-full flex-col items-center gap-8">
+      <div *ngIf="activeTab === 'overview'" id="health-overview-section" class="flex w-full flex-col items-center gap-8">
+        <ng-container *ngIf="getOverviewReport() as report; else noReportScore">
+          <!-- Health Score Overview -->
+          <div class="flex w-full flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
 
-        <!-- Health Score Overview -->
-        <div class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-             style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <div class="text-center">
+              <h2 class="text-2xl font-bold mb-6" style="color: var(--primary-700);">
+                {{ t('health_repo_score') }}
+              </h2>
 
-          <div class="text-center">
-            <h2 class="text-2xl font-bold mb-6" style="color: var(--primary-700);">
-              {{ t('health_repo_score') }}
-            </h2>
-
-            <!-- Circular Progress -->
-            <div class="relative w-48 h-48 mx-auto mb-6">
-              <div class="w-48 h-48 rounded-full flex items-center justify-center relative"
-                   style="background: conic-gradient(var(--primary-500) 0deg 252deg, var(--primary-100) 252deg 360deg);">
-                <div class="w-36 h-36 rounded-full flex flex-col items-center justify-center"
-                     style="background: var(--primary-200-40);">
-                  <span class="text-4xl font-bold" style="color: var(--primary-700);">85</span>
-                  <span class="text-sm font-medium" style="color: var(--primary-600);">/ 100</span>
+              <!-- Circular Progress -->
+              <div class="relative w-48 h-48 mx-auto mb-6">
+                <div class="w-48 h-48 rounded-full flex items-center justify-center relative"
+                     [style.background]="'conic-gradient(var(--primary-500) 0deg ' + scoreToDegrees(getHealthScore(report)) + 'deg, var(--primary-100) ' + scoreToDegrees(getHealthScore(report)) + 'deg 360deg)'">
+                  <div class="w-36 h-36 rounded-full flex flex-col items-center justify-center"
+                       style="background: var(--primary-200-40);">
+                    <span class="text-4xl font-bold" style="color: var(--primary-700);">{{ getHealthScore(report) }}</span>
+                    <span class="text-sm font-medium" style="color: var(--primary-600);">/ 100</span>
+                  </div>
+                </div>
+                <div class="absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center"
+                     style="background: var(--primary-700);">
+                  <ng-container>
+                    <i *ngIf="getHealthScore(report) > 75" class="ti ti-trophy text-white text-xl"></i>
+                    <i *ngIf="getHealthScore(report) <= 75 && getHealthScore(report) >= 50" class="ti ti-medal text-white text-xl"></i>
+                    <i *ngIf="getHealthScore(report) < 50 && getHealthScore(report) >= 25" class="ti ti-star text-white text-xl"></i>
+                    <i *ngIf="getHealthScore(report) < 25" class="ti ti-mood-sad text-white text-xl"></i>
+                  </ng-container>
                 </div>
               </div>
-              <div class="absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center"
-                   style="background: var(--primary-700);">
-                <i class="ti ti-trophy text-white text-xl"></i>
-              </div>
-            </div>
 
-            <div class="flex justify-center gap-8">
-              <div class="text-center">
-                <p class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('health_repo_status') }}</p>
-                <p class="text-lg font-bold text-green-600">{{ t('health_repo_excellent') }}</p>
-              </div>
-              <div class="text-center">
-                <p class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('health_repo_trend') }}</p>
-                <div class="flex flex-row items-center justify-center gap-2 text-lg font-bold text-green-600">
-                  <div class="flex items-center">
-                    <i class="ti ti-circle-arrow-up-right"></i>
+              <div class="flex justify-center gap-8">
+                <div class="text-center">
+                  <p class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('health_repo_status') }}</p>
+                  <p class="text-lg font-bold"
+                     [ngClass]="getHealthScore(report) >= 70 ? 'text-green-600' : getHealthScore(report) >= 50 ? 'text-blue-600' : getHealthScore(report) >= 25 ? 'text-yellow-600' : 'text-red-600'">
+                    {{ getHealthScore(report) >= 70 ? t('health_repo_excellent') : getHealthScore(report) >= 50 ? t('health_repo_good') : getHealthScore(report) >= 25 ? t('health_repo_fair') : t('health_repo_poor') }}
+                  </p>
+                </div>
+                <div class="text-center">
+                  <p class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('health_repo_trend') }}</p>
+                  <div class="flex flex-row items-center justify-center gap-2 text-lg font-bold" [ngClass]="getTrend(report) >= 0 ? 'text-green-600' : 'text-red-600'">
+                    <div class="flex items-center">
+                      <i [class]="getTrend(report) >= 0 ? 'ti ti-circle-arrow-up-right' : 'ti ti-circle-arrow-down-right'"></i>
+                    </div>
+                    {{ getTrend(report) >= 0 ? '+' : '' }}{{ getTrend(report) }} pts
                   </div>
-                  +5 pts
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </ng-container>
+        <ng-template #noReportScore>
+          <div class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <p class="text-center opacity-70">{{ t('health_repo_no_nutrition') }}</p>
+          </div>
+        </ng-template>
 
         <!-- Nutrition Breakdown -->
-        <div class="flex flex-col md:flex-row justify-between gap-6 w-full">
+        <div class="flex flex-col md:flex-row justify-between gap-6 w-full" *ngIf="getOverviewReport() as report">
           <!-- Macronutrients -->
-          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full min-h-96"
                style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
             <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
               <i class="ti ti-chart-pie mr-2"></i>
               {{ t('health_repo_macronutrients') }}
             </h3>
 
-            <div class="space-y-4">
-              <!-- Carbohydrates -->
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="w-4 h-4 rounded-full bg-blue-500"></div>
-                  <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_carbohydrates') }}</span>
+            <div class="space-y-4 flex-1 content-center">
+              <ng-container *ngFor="let macro of getMacroData(report)">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-4 h-4 rounded-full" [ngClass]="macro.color"></div>
+                    <span class="font-medium" style="color: var(--primary-700);">{{ macro.label }}</span>
+                  </div>
+                  <span class="font-bold" style="color: var(--primary-700);">{{ macro.percent }}%</span>
                 </div>
-                <span class="font-bold" style="color: var(--primary-700);">45%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-                <div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div>
-              </div>
-
-              <!-- Proteins -->
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="w-4 h-4 rounded-full bg-green-500"></div>
-                  <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_proteins') }}</span>
+                <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
+                  <div class="h-2 rounded-full" [ngClass]="macro.color" [style.width.%]="macro.percent"></div>
                 </div>
-                <span class="font-bold" style="color: var(--primary-700);">30%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-                <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
-              </div>
-
-              <!-- Fats -->
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="w-4 h-4 rounded-full bg-yellow-500"></div>
-                  <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_fats') }}</span>
-                </div>
-                <span class="font-bold" style="color: var(--primary-700);">25%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-                <div class="bg-yellow-500 h-2 rounded-full" style="width: 25%"></div>
-              </div>
+              </ng-container>
             </div>
           </div>
 
           <!-- Vitamins & Minerals -->
-          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full min-h-96"
                style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
             <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
               <i class="ti ti-pill mr-2"></i>
               {{ t('health_repo_vitamins') }}
             </h3>
 
-            <div class="flex flex-col justify-center h-full space-y-4">
-              <div class="flex items-center justify-between">
-                <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_vit_c') }}</span>
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-green-600">120%</span>
-                  <i class="ti ti-check text-green-600"></i>
+            <div class="flex flex-col justify-center flex-1 space-y-4">
+              <ng-container *ngFor="let health of getHealthData(report)">
+                <div class="flex items-center justify-between">
+                  <span class="font-medium" style="color: var(--primary-700);">{{ health.label }}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold" [ngClass]="health.state === 'good' ? 'text-green-600' : health.state === 'mid' ? 'text-yellow-600' : 'text-red-600'">{{ health.percent }}%</span>
+                    <i [class]="health.state === 'good' ? 'ti ti-check text-green-600' : health.state === 'mid' ? 'ti ti-alert-triangle text-yellow-600' : 'ti ti-x text-red-600'"></i>
+                  </div>
                 </div>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_iron') }}</span>
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-green-600">95%</span>
-                  <i class="ti ti-check text-green-600"></i>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_calcium') }}</span>
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-yellow-600">68%</span>
-                  <i class="ti ti-alert-triangle text-yellow-600"></i>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_vit_d') }}</span>
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-red-600">45%</span>
-                  <i class="ti ti-x text-red-600"></i>
-                </div>
-              </div>
+              </ng-container>
             </div>
           </div>
 
           <!-- Calories -->
-          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full min-h-96"
                style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
             <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
               <i class="ti ti-flame mr-2"></i>
               {{ t('health_repo_calories') }}
             </h3>
 
-            <div class="flex flex-row h-full text-center items-center justify-center space-y-4">
+            <div class="flex flex-row h-full text-center items-center justify-center flex-1 space-y-4">
               <div class="relative w-1/2 h-32 mx-auto">
-                <div class="w-32 h-32 rounded-full flex items-center justify-center"
-                     style="background: conic-gradient(var(--primary-500) 0deg 288deg, var(--primary-100) 288deg 360deg);">
+                <div class="calorie-circle w-32 h-32 rounded-full flex items-center justify-center"
+                     [style.background]="'conic-gradient(var(--primary-500) 0deg ' + (getCaloriesProgress(report) * 3.6) + 'deg, var(--primary-100) ' + (getCaloriesProgress(report) * 3.6) + 'deg 360deg)'">
                   <div class="w-24 h-24 rounded-full flex flex-col items-center justify-center"
                        style="background: var(--primary-200-40);">
-                    <span class="text-lg font-bold" style="color: var(--primary-700);">1,850</span>
+                    <span class="text-lg font-bold" style="color: var(--primary-700);">{{ report.totalCalories | number:'1.0-0' }}</span>
                     <span class="text-xs" style="color: var(--primary-600);">kcal</span>
                   </div>
                 </div>
@@ -202,15 +177,15 @@
               <div class="space-y-2 w-1/2">
                 <div class="flex justify-between text-sm">
                   <span style="color: var(--primary-400);">{{ t('health_repo_consumed') }}</span>
-                  <span class="font-semibold" style="color: var(--primary-700);">1,850</span>
+                  <span class="font-semibold" style="color: var(--primary-700);">{{ report.totalCalories | number:'1.0-0' }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
                   <span style="color: var(--primary-400);">{{ t('health_repo_goal') }}</span>
-                  <span class="font-semibold" style="color: var(--primary-700);">2,100</span>
+                  <span class="font-semibold" style="color: var(--primary-700);">{{ getCaloriesGoal(report) | number:'1.0-0' }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
                   <span style="color: var(--primary-400);">{{ t('health_repo_remaining') }}</span>
-                  <span class="font-semibold text-green-600">250</span>
+                  <span class="font-semibold" [ngClass]="getRemainingCalories(report) > 0 ? 'text-green-600' : 'text-red-600'">{{ getRemainingCalories(report) | number:'1.0-0' }}</span>
                 </div>
               </div>
             </div>
@@ -229,9 +204,9 @@
       </div>
 
       <!-- Analysis Tab Content (AI generated) -->
-      <div *ngIf="activeTab === 'analysis'" class="flex flex-col gap-6 w-full">
+      <div *ngIf="activeTab === 'analysis'" id="health-analysis-section" class="flex flex-col gap-6 w-full">
         <div *ngIf="isLoading" class="flex flex-col items-center justify-center p-12 w-full gap-4">
-          <i class="ti ti-loader text-6xl animate-spin" style="color: var(--primary-500);"></i>
+          <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:w-16 [&>svg]:h-16 [&>svg]:mx-auto"></div>
           <p class="text-xl" style="color: var(--primary-600);">{{ t('health_repo_loading') }}</p>
         </div>
 
@@ -241,7 +216,7 @@
           <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass md:w-2/3"
                style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
             <h3 class="text-2xl font-bold" style="color: var(--primary-700);">
-              <i class="ti ti-brain mr-2"></i>
+              <i class="ti ti-file-text-spark mr-2"></i>
               {{ t('health_repo_ai_summary') }}
             </h3>
 
@@ -276,9 +251,9 @@
 
         </div>
 
-        <div *ngIf="!isLoading && !latestReport && !error" class="flex flex-col items-center justify-center p-12 w-full gap-4">
-          <i class="ti ti-mood-empty text-6xl opacity-50" style="color: var(--primary-500);"></i>
-          <p class="text-xl opacity-70" style="color: var(--primary-600);">{{ t('health_repo_no_reports') }}</p>
+        <div *ngIf="!isLoading && !latestReport" class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
+             style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+          <p class="text-center opacity-70">{{ t('health_repo_no_reports') }}</p>
         </div>
       </div>
 
@@ -289,7 +264,7 @@
         </div>
 
         <div *ngFor="let report of reports"
-             class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 rounded-2xl border border-solid px-6 py-6 shadow-sm glass cursor-pointer hover:bg-white/40 transition-colors"
+             class="history-item flex flex-col md:flex-row justify-between items-start md:items-center gap-4 rounded-2xl border border-solid px-6 py-6 shadow-sm glass cursor-pointer hover:bg-white/40 transition-colors"
              style="border-color: var(--primary-100-40); background: var(--primary-100-20);"
              (click)="latestReport = report; activeTab = 'analysis'">
           <div class="flex flex-col gap-1">
@@ -301,9 +276,10 @@
               <p class="text-xs opacity-70 text-nowrap">{{ t('health_repo_recipes_analyzed') }}</p>
               <p class="font-bold">{{ report.recipesAnalyzed }}</p>
             </div>
-            <div class="text-center px-4 border-l border-gray-300">
+            <hr class="w-[0.05rem] h-10" style="background: var(--primary-300)">
+            <div class="text-center px-4">
               <p class="text-xs opacity-70 text-nowrap">{{ t('health_repo_total_calories') }}</p>
-              <p class="font-bold text-orange-500">{{ report.totalCalories | number:'1.0-0' }}</p>
+              <p class="font-bold" style="color: var(--primary-500)">{{ report.totalCalories | number:'1.0-0' }}</p>
             </div>
             <i class="ti ti-chevron-right text-2xl opacity-50 pl-4"></i>
           </div>

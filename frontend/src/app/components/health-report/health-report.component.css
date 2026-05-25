@@ -18,7 +18,7 @@
 
 @keyframes fillBar {
   from {
-    width: 0%;
+    width: 0;
   }
   to {
     width: var(--target-width);
@@ -240,6 +240,26 @@
 }
 
 /* Responsive adjustments */
+@media (max-width: 1366px) {
+  .tabs {
+    flex-direction: column !important;
+    width: 100% !important;
+    height: auto !important;
+    gap: 0.5rem !important;
+  }
+
+  .tabs .tab {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.75rem 1rem !important;
+    text-align: center !important;
+  }
+
+  .tabs .tab i {
+    font-size: 1.1rem !important;
+  }
+}
+
 @media (max-width: 768px) {
   .health-score-circle {
     width: 180px;
@@ -252,13 +272,137 @@
   }
 
   .calorie-circle {
-    width: 120px;
-    height: 120px;
+    width: 108px;
+    height: 108px;
   }
 
-  .calorie-circle .inner-circle {
-    width: 90px;
-    height: 90px;
+  .calorie-circle > div {
+    width: 82px;
+    height: 82px;
+  }
+}
+
+@media (max-width: 414px) {
+  :host {
+    width: 100%;
+    margin-left: 20vw;
+    margin-top: 10vh;
+    max-width: 70vw;
+  }
+
+  .container {
+    margin-top: 1rem !important;
+    padding: 0.5rem !important;
+  }
+
+  .container > div {
+    padding: 0.85rem !important;
+    gap: 0.85rem !important;
+    width: 108.7%;
+    transform: scale(0.92);
+    transform-origin: top center;
+  }
+
+  h1 { font-size: 1.2rem !important; line-height: 1.2 !important; }
+  h2 { font-size: 1rem !important; line-height: 1.2 !important; }
+  h3 { font-size: 0.9rem !important; line-height: 1.2 !important; }
+  h4 { font-size: 0.85rem !important; }
+  p,
+  span { font-size: 0.78rem; }
+
+  .tabs {
+    flex-direction: column !important;
+    gap: 0.35rem !important;
+  }
+
+  .tabs .tab {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.5rem 0.65rem !important;
+    font-size: 0.74rem !important;
+    gap: 0.35rem !important;
+  }
+
+  .tabs .tab i {
+    font-size: 1rem !important;
+  }
+
+  .glass {
+    padding: 0.75rem !important;
+  }
+
+  .container > div > div:first-child {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .container > div > div:not(:first-child) {
+    gap: 0.75rem !important;
+  }
+
+  button {
+    font-size: 0.82rem !important;
+  }
+
+  button i {
+    font-size: 0.95rem !important;
+  }
+
+  .prose {
+    font-size: 0.85rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .calorie-circle {
+    width: 7rem !important;
+    height: 7rem !important;
+  }
+
+  .calorie-circle > div {
+    width: 5.25rem !important;
+    height: 5.25rem !important;
+  }
+
+  .history-item {
+    padding: 0.75rem !important;
+    gap: 0.5rem !important;
+    border-radius: 1rem !important;
+  }
+
+  .history-item > div:first-child {
+    width: 100%;
+    gap: 0.25rem !important;
+  }
+
+  .history-item > div:last-child {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0.35rem !important;
+  }
+
+  .history-item > div:last-child > div {
+    width: 100%;
+    padding: 0 0.25rem !important;
+    min-width: 0;
+  }
+
+  .history-item > div:last-child > i {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 0 !important;
+    margin-top: 0.25rem;
+    font-size: 1rem !important;
+  }
+
+  .history-item p,
+  .history-item h4,
+  .history-item i {
+    font-size: 0.75rem !important;
   }
 }
 
@@ -314,3 +458,4 @@
 .score-poor {
   background: linear-gradient(135deg, #ef4444, #dc2626);
 }
+
