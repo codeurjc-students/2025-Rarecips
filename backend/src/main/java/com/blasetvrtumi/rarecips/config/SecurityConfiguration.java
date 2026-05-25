@@ -64,6 +64,7 @@ public class SecurityConfiguration {
                                                    RepositoryUserDetailService userDetailService,
                                                    PasswordEncoder passwordEncoder) throws Exception {
         http
+                .securityMatcher("/api/**", "/notify/**")
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authenticationProvider(authenticationProvider(userDetailService, passwordEncoder))
                 .formLogin(formLogin -> formLogin.disable())
