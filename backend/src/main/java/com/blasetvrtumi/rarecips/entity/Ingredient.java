@@ -2,6 +2,7 @@ package com.blasetvrtumi.rarecips.entity;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class Ingredient {
@@ -14,7 +15,7 @@ public class Ingredient {
     private Long id;
 
     @org.hibernate.annotations.CreationTimestamp
-    private java.time.LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @JsonView(BasicInfo.class)
     private String food;

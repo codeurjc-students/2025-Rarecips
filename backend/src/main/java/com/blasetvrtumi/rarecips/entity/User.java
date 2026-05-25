@@ -277,6 +277,14 @@ public class User {
         return this.savedRecipes != null ? this.savedRecipes.size() : 0;
     }
 
+    public List<Recipe> getSavedRecipes() {
+        return savedRecipes;
+    }
+
+    public void setSavedRecipes(List<Recipe> savedRecipes) {
+        this.savedRecipes = savedRecipes;
+    }
+
     public boolean isPrivateProfile() {
         return privateProfile;
     }

@@ -34,7 +34,7 @@ public class MailService {
     @Autowired
     private RecipeService recipeService;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username:}")
     private String fromAddress;
 
     public void sendChangePasswordEmail(String to, String token, String baseUrl, String lang, String theme, String username, String passwordChangeLink) {

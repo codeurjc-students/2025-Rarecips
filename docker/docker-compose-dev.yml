@@ -22,6 +22,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-DB:3306/rarecips
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=password
+      - APP_OLLAMA_URL=http://rarecips-ollama:11434
     secrets:
       - source: env_properties
         target: /run/secrets/env.properties
@@ -34,11 +35,57 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: rarecips
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - /var/lib/mysql
 
+  rarecips-ollama:
+    container_name: rarecips-ollama
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama-init:
+    container_name: ollama-init
+    image: curlimages/curl:latest
+    restart: "no"
+    command: >
+      sh -c "
+      echo 'Waiting for Ollama to be ready...';
+      while ! curl -sSf http://rarecips-ollama:11434/api/tags > /dev/null; do sleep 2; done;
+      echo 'Ollama is ready. Pulling llama3.2:1b...';
+      curl -s -X POST http://rarecips-ollama:11434/api/pull -d '{\"model\": \"llama3.2:1b\"}';
+      echo 'Model pulled successfully.';
+      "
+    depends_on:
+      rarecips-ollama:
+        condition: service_healthy
+
+  nginx-proxy:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+      - '81:81'
+    volumes:
+      - ./nginx_data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
 volumes:
   mysql:
+  ollama_data:
 
 secrets:
   env_properties:

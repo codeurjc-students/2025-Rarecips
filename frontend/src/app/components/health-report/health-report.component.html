@@ -4,203 +4,312 @@
     class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
     <div class="glass p-8 flex w-full max-w-7xl min-h-fit flex-col items-center gap-8">
 
-      <!-- Health Score Overview -->
-      <div class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-           style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-
-        <div class="text-center">
-          <h2 class="text-2xl font-bold mb-6" style="color: var(--primary-700);">
-            Your Health Score
-          </h2>
-
-          <!-- Circular Progress -->
-          <div class="relative w-48 h-48 mx-auto mb-6">
-            <div class="w-48 h-48 rounded-full flex items-center justify-center relative"
-                 style="background: conic-gradient(var(--primary-500) 0deg 252deg, var(--primary-100) 252deg 360deg);">
-              <div class="w-36 h-36 rounded-full flex flex-col items-center justify-center"
-                   style="background: var(--primary-200-40);">
-                <span class="text-4xl font-bold" style="color: var(--primary-700);">85</span>
-                <span class="text-sm font-medium" style="color: var(--primary-600);">/ 100</span>
-              </div>
-            </div>
-            <div class="absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center"
-                 style="background: var(--primary-700);">
-              <i class="ti ti-trophy text-white text-xl"></i>
-            </div>
-          </div>
-
-          <div class="flex justify-center gap-8">
-            <div class="text-center">
-              <p class="text-sm font-semibold" style="color: var(--primary-400);">Status</p>
-              <p class="text-lg font-bold text-green-600">Excellent</p>
-            </div>
-            <div class="text-center">
-              <p class="text-sm font-semibold" style="color: var(--primary-400);">Trend</p>
-              <div class="flex flex-row items-center justify-center gap-2 text-lg font-bold text-green-600">
-                <div class="flex items-center">
-                  <i class="ti ti-circle-arrow-up-right"></i>
-                </div>
-                +5 pts
-              </div>
-            </div>
-          </div>
+      <!-- Header Section -->
+      <div class="flex w-full justify-between items-center px-4">
+        <div class="flex flex-col gap-1">
+          <h1 class="text-3xl font-bold" style="color: var(--primary-700);">{{ t('health_repo_title') }}</h1>
+          <p class="text-sm font-medium" style="color: var(--primary-600); opacity: 0.8;">{{ t('health_repo_quota_1') }}<b>{{ remainingGenerations }}{{ t('health_repo_quota_2') }}</b>{{ t('health_repo_quota_3') }}</p>
         </div>
+        <button
+          (click)="generateNewReport()"
+          [disabled]="isLoading"
+          class="px-6 py-3 rounded-2xl text-md font-semibold transition-all flex items-center gap-2 cursor-pointer"
+          [ngClass]="isLoading ? 'opacity-50' : 'hover:scale-105'"
+          style="background: var(--gradient-primary); color: white;">
+          <i class="ti ti-robot text-xl" [ngClass]="{'animate-spin': isLoading}"></i>
+          {{ isLoading ? t('health_repo_generating') : t('health_repo_analyze') }}
+        </button>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative w-full" role="alert">
+        <span class="block sm:inline">{{ error }}</span>
       </div>
 
       <div class="tabs glass text-nowrap w-full">
-        <button class="tab active">
+        <button class="tab" [class.active]="activeTab === 'overview'" (click)="setTab('overview')">
           <i class="ti ti-pyramid text-xl" aria-hidden="true"></i>
-          Nutritional Information
+          {{ t('health_repo_tab_overview') }}
         </button>
-        <button class="tab">
-          <i class="ti ti-scale-outline text-xl" aria-hidden="true"></i>
-          Analysis
-        </button>
-        <button class="tab">
+        <button class="tab" [class.active]="activeTab === 'analysis'" (click)="setTab('analysis')">
           <i class="ti ti-bulb text-xl" aria-hidden="true"></i>
-          Recommendations
+          {{ t('health_repo_tab_analysis') }}
+        </button>
+        <button class="tab" [class.active]="activeTab === 'history'" (click)="setTab('history')">
+          <i class="ti ti-history text-xl" aria-hidden="true"></i>
+          {{ t('health_repo_tab_history') }}
         </button>
       </div>
 
-      <!-- Nutrition Breakdown -->
-      <div class="flex justify-between md:grid-cols-3 gap-6 w-full">
-        <!-- Macronutrients -->
-        <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+      <!-- Overview (Original Mockup) Content -->
+      <div *ngIf="activeTab === 'overview'" class="flex w-full flex-col items-center gap-8">
+
+        <!-- Health Score Overview -->
+        <div class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
              style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-          <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-            <i class="ti ti-chart-pie mr-2"></i>
-            Macronutrients
-          </h3>
 
-          <div class="space-y-4">
-            <!-- Carbohydrates -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-4 h-4 rounded-full bg-blue-500"></div>
-                <span class="font-medium" style="color: var(--primary-700);">Carbohydrates</span>
-              </div>
-              <span class="font-bold" style="color: var(--primary-700);">45%</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-              <div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div>
-            </div>
+          <div class="text-center">
+            <h2 class="text-2xl font-bold mb-6" style="color: var(--primary-700);">
+              {{ t('health_repo_score') }}
+            </h2>
 
-            <!-- Proteins -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-4 h-4 rounded-full bg-green-500"></div>
-                <span class="font-medium" style="color: var(--primary-700);">Proteins</span>
-              </div>
-              <span class="font-bold" style="color: var(--primary-700);">30%</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-              <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
-            </div>
-
-            <!-- Fats -->
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-4 h-4 rounded-full bg-yellow-500"></div>
-                <span class="font-medium" style="color: var(--primary-700);">Fats</span>
-              </div>
-              <span class="font-bold" style="color: var(--primary-700);">25%</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
-              <div class="bg-yellow-500 h-2 rounded-full" style="width: 25%"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Vitamins & Minerals -->
-        <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
-             style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-          <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-            <i class="ti ti-pill mr-2"></i>
-            Vitamins and Minerals
-          </h3>
-
-          <div class="flex flex-col justify-center h-full space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="font-medium" style="color: var(--primary-700);">Vitamin C</span>
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-green-600">120%</span>
-                <i class="ti ti-check text-green-600"></i>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <span class="font-medium" style="color: var(--primary-700);">Iron</span>
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-green-600">95%</span>
-                <i class="ti ti-check text-green-600"></i>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <span class="font-medium" style="color: var(--primary-700);">Calcium</span>
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-yellow-600">68%</span>
-                <i class="ti ti-alert-triangle text-yellow-600"></i>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <span class="font-medium" style="color: var(--primary-700);">Vitamin D</span>
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-red-600">45%</span>
-                <i class="ti ti-x text-red-600"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Calories -->
-        <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
-             style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
-          <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
-            <i class="ti ti-flame mr-2"></i>
-            Caloric Balance
-          </h3>
-
-          <div class="flex flex-row h-full text-center items-center justify-center space-y-4">
-            <div class="relative w-1/2 h-32 mx-auto">
-              <div class="w-32 h-32 rounded-full flex items-center justify-center"
-                   style="background: conic-gradient(var(--primary-500) 0deg 288deg, var(--primary-100) 288deg 360deg);">
-                <div class="w-24 h-24 rounded-full flex flex-col items-center justify-center"
+            <!-- Circular Progress -->
+            <div class="relative w-48 h-48 mx-auto mb-6">
+              <div class="w-48 h-48 rounded-full flex items-center justify-center relative"
+                   style="background: conic-gradient(var(--primary-500) 0deg 252deg, var(--primary-100) 252deg 360deg);">
+                <div class="w-36 h-36 rounded-full flex flex-col items-center justify-center"
                      style="background: var(--primary-200-40);">
-                  <span class="text-lg font-bold" style="color: var(--primary-700);">1,850</span>
-                  <span class="text-xs" style="color: var(--primary-600);">kcal</span>
+                  <span class="text-4xl font-bold" style="color: var(--primary-700);">85</span>
+                  <span class="text-sm font-medium" style="color: var(--primary-600);">/ 100</span>
+                </div>
+              </div>
+              <div class="absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center"
+                   style="background: var(--primary-700);">
+                <i class="ti ti-trophy text-white text-xl"></i>
+              </div>
+            </div>
+
+            <div class="flex justify-center gap-8">
+              <div class="text-center">
+                <p class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('health_repo_status') }}</p>
+                <p class="text-lg font-bold text-green-600">{{ t('health_repo_excellent') }}</p>
+              </div>
+              <div class="text-center">
+                <p class="text-sm font-semibold" style="color: var(--primary-400);">{{ t('health_repo_trend') }}</p>
+                <div class="flex flex-row items-center justify-center gap-2 text-lg font-bold text-green-600">
+                  <div class="flex items-center">
+                    <i class="ti ti-circle-arrow-up-right"></i>
+                  </div>
+                  +5 pts
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div class="space-y-2 w-1/2">
-              <div class="flex justify-between text-sm">
-                <span style="color: var(--primary-400);">Consumed</span>
-                <span class="font-semibold" style="color: var(--primary-700);">1,850</span>
+        <!-- Nutrition Breakdown -->
+        <div class="flex flex-col md:flex-row justify-between gap-6 w-full">
+          <!-- Macronutrients -->
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+              <i class="ti ti-chart-pie mr-2"></i>
+              {{ t('health_repo_macronutrients') }}
+            </h3>
+
+            <div class="space-y-4">
+              <!-- Carbohydrates -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-4 h-4 rounded-full bg-blue-500"></div>
+                  <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_carbohydrates') }}</span>
+                </div>
+                <span class="font-bold" style="color: var(--primary-700);">45%</span>
               </div>
-              <div class="flex justify-between text-sm">
-                <span style="color: var(--primary-400);">Goal</span>
-                <span class="font-semibold" style="color: var(--primary-700);">2,100</span>
+              <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
+                <div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div>
               </div>
-              <div class="flex justify-between text-sm">
-                <span style="color: var(--primary-400);">Remaining</span>
-                <span class="font-semibold text-green-600">250</span>
+
+              <!-- Proteins -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-4 h-4 rounded-full bg-green-500"></div>
+                  <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_proteins') }}</span>
+                </div>
+                <span class="font-bold" style="color: var(--primary-700);">30%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
+                <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
+              </div>
+
+              <!-- Fats -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-4 h-4 rounded-full bg-yellow-500"></div>
+                  <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_fats') }}</span>
+                </div>
+                <span class="font-bold" style="color: var(--primary-700);">25%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2" style="background: var(--primary-300-40)">
+                <div class="bg-yellow-500 h-2 rounded-full" style="width: 25%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vitamins & Minerals -->
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+              <i class="ti ti-pill mr-2"></i>
+              {{ t('health_repo_vitamins') }}
+            </h3>
+
+            <div class="flex flex-col justify-center h-full space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_vit_c') }}</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-green-600">120%</span>
+                  <i class="ti ti-check text-green-600"></i>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_iron') }}</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-green-600">95%</span>
+                  <i class="ti ti-check text-green-600"></i>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_calcium') }}</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-yellow-600">68%</span>
+                  <i class="ti ti-alert-triangle text-yellow-600"></i>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="font-medium" style="color: var(--primary-700);">{{ t('health_repo_vit_d') }}</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-red-600">45%</span>
+                  <i class="ti ti-x text-red-600"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calories -->
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass w-full h-full"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <h3 class="text-xl font-semibold" style="color: var(--primary-700);">
+              <i class="ti ti-flame mr-2"></i>
+              {{ t('health_repo_calories') }}
+            </h3>
+
+            <div class="flex flex-row h-full text-center items-center justify-center space-y-4">
+              <div class="relative w-1/2 h-32 mx-auto">
+                <div class="w-32 h-32 rounded-full flex items-center justify-center"
+                     style="background: conic-gradient(var(--primary-500) 0deg 288deg, var(--primary-100) 288deg 360deg);">
+                  <div class="w-24 h-24 rounded-full flex flex-col items-center justify-center"
+                       style="background: var(--primary-200-40);">
+                    <span class="text-lg font-bold" style="color: var(--primary-700);">1,850</span>
+                    <span class="text-xs" style="color: var(--primary-600);">kcal</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2 w-1/2">
+                <div class="flex justify-between text-sm">
+                  <span style="color: var(--primary-400);">{{ t('health_repo_consumed') }}</span>
+                  <span class="font-semibold" style="color: var(--primary-700);">1,850</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span style="color: var(--primary-400);">{{ t('health_repo_goal') }}</span>
+                  <span class="font-semibold" style="color: var(--primary-700);">2,100</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span style="color: var(--primary-400);">{{ t('health_repo_remaining') }}</span>
+                  <span class="font-semibold text-green-600">250</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Action Buttons -->
+        <div class="flex w-full justify-center gap-4">
+          <button
+            class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
+            style="background: var(--gradient-primary); color: white;">
+            <i class="ti ti-download"></i>
+            {{ t('health_repo_download') }}
+          </button>
+        </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex w-full justify-center gap-4">
-        <button
-          class="px-8 py-4 rounded-2xl text-lg font-semibold transition-all hover:scale-105 flex items-center gap-3"
-          style="background: var(--gradient-primary); color: white;">
-          <i class="ti ti-download"></i>
-          Download Report
-        </button>
+      <!-- Analysis Tab Content (AI generated) -->
+      <div *ngIf="activeTab === 'analysis'" class="flex flex-col gap-6 w-full">
+        <div *ngIf="isLoading" class="flex flex-col items-center justify-center p-12 w-full gap-4">
+          <i class="ti ti-loader text-6xl animate-spin" style="color: var(--primary-500);"></i>
+          <p class="text-xl" style="color: var(--primary-600);">{{ t('health_repo_loading') }}</p>
+        </div>
+
+        <div *ngIf="!isLoading && latestReport" class="flex flex-col md:flex-row gap-6 w-full items-stretch">
+
+          <!-- Summary Box -->
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass md:w-2/3"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <h3 class="text-2xl font-bold" style="color: var(--primary-700);">
+              <i class="ti ti-brain mr-2"></i>
+              {{ t('health_repo_ai_summary') }}
+            </h3>
+
+            <div class="prose prose-lg whitespace-pre-wrap leading-relaxed" style="color: var(--text-color);">
+              {{ latestReport.generatedSummary }}
+            </div>
+
+            <div class="text-sm mt-4 italic opacity-70">
+              {{ t('health_repo_generated_on') }} {{ latestReport.createdAt | date:'longDate' }}
+            </div>
+          </div>
+
+          <!-- Stats Box -->
+          <div class="flex flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass md:w-1/3"
+               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+            <h3 class="text-xl font-bold" style="color: var(--primary-700);">
+              <i class="ti ti-chart-bar mr-2"></i>
+              {{ t('health_repo_metrics') }}
+            </h3>
+
+            <div class="flex flex-col gap-4">
+              <div class="p-4 rounded-xl" style="background: var(--primary-100-40);">
+                <p class="text-md opacity-80">{{ t('health_repo_recipes_analyzed') }}</p>
+                <p class="text-3xl font-black" style="color: var(--primary-700);">{{ latestReport.recipesAnalyzed }}</p>
+              </div>
+              <div class="p-4 rounded-xl" style="background: var(--primary-100-40);">
+                <p class="text-md opacity-80">{{ t('health_repo_total_calories') }}</p>
+                <p class="text-3xl font-black" style="color: var(--primary-700);">{{ latestReport.totalCalories | number:'1.0-0' }} <span class="text-lg">kcal</span></p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div *ngIf="!isLoading && !latestReport && !error" class="flex flex-col items-center justify-center p-12 w-full gap-4">
+          <i class="ti ti-mood-empty text-6xl opacity-50" style="color: var(--primary-500);"></i>
+          <p class="text-xl opacity-70" style="color: var(--primary-600);">{{ t('health_repo_no_reports') }}</p>
+        </div>
       </div>
+
+      <!-- History Tab Content -->
+      <div *ngIf="activeTab === 'history'" class="flex flex-col gap-4 w-full">
+        <div *ngIf="reports.length === 0" class="text-center py-8 opacity-70">
+          {{ t('health_repo_history_empty') }}
+        </div>
+
+        <div *ngFor="let report of reports"
+             class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 rounded-2xl border border-solid px-6 py-6 shadow-sm glass cursor-pointer hover:bg-white/40 transition-colors"
+             style="border-color: var(--primary-100-40); background: var(--primary-100-20);"
+             (click)="latestReport = report; activeTab = 'analysis'">
+          <div class="flex flex-col gap-1">
+            <h4 class="text-lg font-bold" style="color: var(--primary-700);">{{ t('health_repo_report_of') }} {{ report.createdAt | date:'short' }}</h4>
+            <p class="text-sm opacity-80 line-clamp-2 max-w-2xl">{{ report.generatedSummary }}</p>
+          </div>
+          <div class="flex gap-4 items-center">
+            <div class="text-center px-4">
+              <p class="text-xs opacity-70 text-nowrap">{{ t('health_repo_recipes_analyzed') }}</p>
+              <p class="font-bold">{{ report.recipesAnalyzed }}</p>
+            </div>
+            <div class="text-center px-4 border-l border-gray-300">
+              <p class="text-xs opacity-70 text-nowrap">{{ t('health_repo_total_calories') }}</p>
+              <p class="font-bold text-orange-500">{{ report.totalCalories | number:'1.0-0' }}</p>
+            </div>
+            <i class="ti ti-chevron-right text-2xl opacity-50 pl-4"></i>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
