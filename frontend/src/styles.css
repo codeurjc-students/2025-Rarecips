@@ -989,6 +989,7 @@ input::placeholder {
 .visibleBackdrop {
   animation: fadeInBackdrop 0.3s ease forwards;
   opacity: 1;
+  z-index: 1100;
 }
 
 .visibleBackdrop>div {
@@ -1071,7 +1072,7 @@ input::placeholder {
   }
 
   .visibleBackdrop {
-    z-index: 1000000;
+    z-index: 1100;
   }
 
 }

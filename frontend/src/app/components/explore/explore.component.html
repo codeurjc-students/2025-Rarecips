@@ -662,7 +662,7 @@
             } @else {
             @for (recipe of recipeList; track recipe.id) {
             @if (viewMode === 'grid') {
-            <div
+            <div (click)="viewRecipe(recipe.id)"
               class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm hover:scale-105 hover:[transform:perspective(900px)_rotateY(5deg)_rotateX(-5deg)_rotateZ(-2deg)] hover-skew-x-1">
               <div
                 class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent">

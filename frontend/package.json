@@ -28,6 +28,10 @@
     "@angular/router": "19.2.15",
     "@tabler/icons": "^3.34.0",
     "@tailwindcss/postcss": "^4.1.11",
+    "html-to-image": "^1.11.13",
+    "html2canvas-pro": "^2.0.4",
+    "html2pdf-pro": "^0.10.3",
+    "jspdf": "^4.2.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

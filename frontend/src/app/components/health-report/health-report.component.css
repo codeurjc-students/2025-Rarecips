@@ -5,6 +5,30 @@
   max-width: 100vw;
 }
 
+.pdf-export-root {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1280px;
+  background: var(--primary-200-40);
+  color: var(--primary-700);
+  overflow: visible;
+  pointer-events: none;
+  padding: 0;
+}
+
+.pdf-export-panel {
+  width: 100%;
+  background: var(--primary-200-40);
+  padding: 32px;
+  overflow: visible;
+}
+
+.pdf-export-section {
+  background: var(--primary-200-40);
+  border: 1px solid var(--primary-100-40);
+}
+
 /* Circular progress animations */
 .health-score-circle {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);

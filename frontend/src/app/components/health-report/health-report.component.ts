@@ -3,10 +3,12 @@ import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { TranslatorService } from '../../services/translator.service';
 import { HealthReportService } from '../../services/health-report.service';
+import {SessionService} from '../../services/session.service';
 import { ThemeService } from '../../services/theme.service';
 import { HealthReport } from '../../models/health-report.model';
 
 import { CommonModule } from '@angular/common';
+import {Subject, takeUntil} from 'rxjs';
 
 @Component({
   selector: 'app-health-report',
@@ -20,17 +22,20 @@ export class HealthReportComponent implements OnInit {
   latestReport: HealthReport | null = null;
   aggregateReport: HealthReport | null = null;
   isLoading: boolean = false;
+  isExportingPdf: boolean = false;
   logos: Map<string, string> = new Map();
   errorKey: string | null = null;
   errorDetail: string | null = null;
   activeTab: 'history' | 'analysis' | 'overview' = 'overview';
   remainingGenerations: number = 5;
+  user: any = null;
 
   constructor(
     private titleService: Title,
     private translatorService: TranslatorService,
     private healthReportService: HealthReportService,
     private themeService: ThemeService,
+    private sessionService: SessionService,
     private router: Router
   ) { }
 
@@ -48,6 +53,16 @@ export class HealthReportComponent implements OnInit {
     this.translatorService.onChange(() => {
       this.updateTitle();
     });
+
+    this.sessionService.getLoggedUser().pipe(
+      takeUntil(new Subject<void>())
+    ).subscribe({
+      next: (user: any) => {
+        if (!user) return;
+        this.user = user;
+      }
+    });
+
     this.loadAggregateReport();
     this.loadReports();
   }
@@ -66,10 +81,74 @@ export class HealthReportComponent implements OnInit {
     return this.translatorService.translate(key);
   }
 
+  getLocalizedDate(dateString: string | Date | undefined): string {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      const formatter = new Intl.DateTimeFormat(this.translatorService.getLang(), { dateStyle: 'long' });
+      return formatter.format(date);
+    } catch (e) {
+      return String(dateString);
+    }
+  }
+
+  getLocalizedDateShort(dateString: string | Date | undefined): string {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      const formatter = new Intl.DateTimeFormat(this.translatorService.getLang(), { dateStyle: 'short', timeStyle: 'short' });
+      return formatter.format(date);
+    } catch (e) {
+      return String(dateString);
+    }
+  }
+
   get errorMessage(): string | null {
     if (!this.errorKey) return null;
     const base = this.t(this.errorKey);
     return this.errorDetail ? `${base} ${this.errorDetail}` : base;
+  }
+
+  async downloadReportAsPdf() {
+    const reportSection = document.getElementById('health-report-pdf-root');
+    if (!reportSection) {
+      console.error('Health report section not found');
+      return;
+    }
+
+    this.isExportingPdf = true;
+
+    try {
+      // @ts-ignore
+      const html2pdf = (await import('html2pdf-pro/dist/html2pdf.bundle.min.js')).default || window.html2pdf;
+
+      const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
+      if (fonts?.ready) {
+        await fonts.ready;
+      }
+
+      const width = reportSection.scrollWidth || 1280;
+      const height = reportSection.scrollHeight || 1000;
+
+      const clone = reportSection.cloneNode(true) as HTMLElement;
+      clone.style.left = '0px';
+      clone.style.position = 'relative';
+
+      const opt = {
+        margin:       0,
+        filename:     `Rarecips ${this.t('health_repo_title')} - ${this.user?.username || 'user'}, ${new Date().toISOString().slice(0, 10)}.pdf`,
+        image:        { type: 'jpeg', quality: 1.0 },
+        enableLinks:  true,
+        html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: width, windowHeight: height },
+        jsPDF:        { unit: 'px', format: [width, height], orientation: width >= height ? 'landscape' : 'portrait' }
+      };
+
+      await html2pdf().set(opt).from(clone).save();
+    } catch (error) {
+      console.error('Error exporting health report to PDF', error);
+    } finally {
+      this.isExportingPdf = false;
+    }
   }
 
   setError(key: string | null, detail: string | null = null) {

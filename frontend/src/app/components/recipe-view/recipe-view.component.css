@@ -496,3 +496,219 @@
   width: 24px;
   border-radius: 4px;
 }
+
+.pdf-export-root {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1280px;
+  background: var(--primary-200-40);
+  color: var(--primary-700);
+  background: var(--primary-100);
+  border-radius: 3px;
+}
+
+.sticky-ingredients::-webkit-scrollbar-thumb {
+  background: var(--primary-300);
+  border-radius: 3px;
+}
+
+.toolbar-button:hover {
+  background: var(--primary-400) !important;
+  transform: scale(1.1);
+}
+
+.toolbar-button.clicked {
+  animation: shimmer 1.5s infinite;
+  background: var(--primary-400) !important;
+}
+
+.toolbar-button.active {
+  background: var(--primary-500) !important;
+  color: white;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Print styles */
+@media print {
+
+  .action-button,
+  .timer-helper button,
+  .shopping-button {
+    display: none !important;
+  }
+
+  .glass {
+    background: white !important;
+    border: 1px solid #ccc !important;
+  }
+
+  .recipe-image {
+    max-height: 300px;
+  }
+}
+
+/* Author info hover */
+.author-info {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.author-info:hover {
+  background: var(--primary-100-40) !important;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  transform: scale(1.02);
+}
+
+/* Rating stars */
+.rating-stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.rating-star {
+  color: #fbbf24;
+  transition: transform 0.2s ease;
+}
+
+.rating-star:hover {
+  transform: scale(1.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+
+  :host {
+    max-width: 75vw;
+    margin-left: 25vw;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .recipe-container {
+    flex-direction: column !important;
+  }
+
+  .recipe-image {
+    max-height: 40vh;
+    object-fit: cover;
+  }
+
+  .recipe-details-wrapper {
+    width: 100% !important;
+    padding: 1rem !important;
+  }
+
+  .recipe-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tabs-container {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    white-space: nowrap;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .action-buttons-group {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nutrition-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.carousel-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel-wrapper {
+  overflow: hidden;
+  width: 100%;
+  touch-action: pan-y;
+}
+
+.carousel-track {
+  display: flex;
+  width: 100%;
+  transition: transform 0.3s ease-out;
+  cursor: grab;
+}
+
+.carousel-track:active {
+  cursor: grabbing;
+}
+
+.carousel-card {
+  width: 100%;
+  flex-shrink: 0;
+  padding: 1.5rem 0.5rem;
+  box-sizing: border-box;
+}
+
+.carousel-card:nth-child(2) {
+  align-self: flex-start;
+}
+
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary-300);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator.active {
+  background: var(--primary-600);
+  width: 24px;
+  border-radius: 4px;
+}
+
+.pdf-export-root {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1280px;
+  background: var(--primary-200-40);
+  color: var(--primary-700);
+  overflow: visible;
+  pointer-events: none;
+  padding: 32px;
+}
+
+.pdf-export-panel {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--primary-200-40);
+  padding: 48px;
+  border-radius: 32px;
+  overflow: visible;
+}

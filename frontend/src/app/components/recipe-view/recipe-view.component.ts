@@ -1034,6 +1034,58 @@ export class RecipeViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  get currentUrl(): string {
+    return window.location.href;
+  }
+
+  isExportingPdf: boolean = false;
+
+  async downloadRecipeAsPdf() {
+    const reportSection = document.getElementById('recipe-pdf-root');
+    if (!reportSection) {
+      console.error('Recipe PDF section not found');
+      return;
+    }
+
+    this.isExportingPdf = true;
+
+    try {
+      // @ts-ignore
+      const html2pdf = (await import('html2pdf-pro/dist/html2pdf.bundle.min.js')).default || window.html2pdf;
+
+      const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
+      if (fonts?.ready) {
+        await fonts.ready;
+      }
+
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+      const width = reportSection.scrollWidth || 1310;
+      const height = reportSection.scrollHeight || 1000;
+
+      const clone = reportSection.cloneNode(true) as HTMLElement;
+      clone.style.left = '0px';
+      clone.style.position = 'relative';
+
+      const cleanTitle = (this.recipe?.title || 'recipe');
+
+      const opt = {
+        margin:       0,
+        filename:     `Rarecips - ${cleanTitle}.pdf`,
+        image:        { type: 'jpeg', quality: 1.0 },
+        enableLinks:  true,
+        html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: width, windowHeight: height },
+        jsPDF:        { unit: 'px', format: [width, height], orientation: width >= height ? 'landscape' : 'portrait' }
+      };
+
+      await html2pdf().set(opt).from(clone).save();
+    } catch (error) {
+      console.error('Error exporting recipe to PDF', error);
+    } finally {
+      this.isExportingPdf = false;
+    }
+  }
+
   protected readonly parseInt = parseInt;
 }
 
