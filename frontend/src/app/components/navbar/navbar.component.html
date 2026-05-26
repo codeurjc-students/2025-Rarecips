@@ -18,8 +18,8 @@
   <!-- Left side - Logo -->
   <div class="flex items-center mt-2 min-w-fit">
     <a (click)="logoClicked($event)" class="flex flex-col items-center cursor-pointer">
-      <div *ngIf="!isLogoClicked" [innerHTML]="logos.get('Rarecips_Isotipo')" class="transition-transform hover:scale-105 logoImg h-16 [&>svg]:h-full"></div>
-      <div *ngIf="isLogoClicked" [innerHTML]="logos.get('Rarecips_Stir')" class="transition-transform hover:scale-105 logoImg h-16 [&>svg]:h-full"></div>
+      <div [class.hidden]="isLogoClicked" [innerHTML]="logos.get('Rarecips_Isotipo')" class="transition-transform hover:scale-105 logoImg h-16 [&>svg]:h-full"></div>
+      <div [class.hidden]="!isLogoClicked" [innerHTML]="logos.get('Rarecips_Stir')" class="transition-transform hover:scale-105 logoImg h-16 [&>svg]:h-full"></div>
     </a>
   </div>
 
@@ -60,10 +60,17 @@
     @if (isAuthenticated) {
       <!-- Create recipe button -->
       <div class="create-recipe-container">
-        <button  (mouseenter)="onHover(true)" (mouseleave)="onHover(false)" class="w-max flex whitespace-nowrap gap-2 items-center create-recipe-btn px-6 py-2 rounded-full font-semibold text-[14px] text-white"
+        <button  (mouseenter)="isHoveringRecipeBtn = true" (mouseleave)="isHoveringRecipeBtn = false" class="w-max flex whitespace-nowrap gap-2 items-center create-recipe-btn px-6 py-2 rounded-full font-semibold text-[14px] text-white"
                 style="background: var(--gradient-primary)"
                 (click)="navigateTo('recipes/create', $event)">
-          <img [src]="bowlIcon" alt="Create Recipe Icon" class="bowlIcon w-max h-max"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 30 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bowlIcon w-max h-max">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1z"/>
+            <g class="spoon" [class.stir-anim]="isHoveringRecipeBtn" [class.withdraw-anim]="!isHoveringRecipeBtn">
+              <path d="M8 7c1.657 0 3 -.895 3 -2s-1.343 -2 -3 -2s-3 .895 -3 2s1.343 2 3 2"/>
+              <path d="M11 5h9"/>
+            </g>
+          </svg>
           <span>{{ t('create_recipe') }}</span>
         </button>
       </div>

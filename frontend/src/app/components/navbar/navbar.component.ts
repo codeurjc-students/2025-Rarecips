@@ -43,6 +43,7 @@ export class NavbarComponent implements OnInit {
   isAdmin = false;
   user: any = null;
   isLogoClicked: boolean = false;
+  isHoveringRecipeBtn: boolean = false;
   anyActiveSections: boolean = false;
   responsive: boolean = window.innerWidth <= 1366;
   navExpanded: boolean = false;
@@ -817,6 +818,15 @@ export class NavbarComponent implements OnInit {
       document.body.scrollTo({top: 0, behavior: 'smooth'});
 
       this.isLogoClicked = true;
+      setTimeout(() => {
+        const anims = document.querySelectorAll('animateMotion');
+        anims.forEach(anim => {
+          if (typeof (anim as any).beginElement === 'function') {
+            (anim as any).beginElement();
+          }
+        });
+      }, 0);
+      
       setTimeout(() => this.isLogoClicked = false, 800);
     }
   }

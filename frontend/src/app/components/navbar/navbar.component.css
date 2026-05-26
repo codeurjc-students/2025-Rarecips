@@ -1536,3 +1536,22 @@ button:focus {
 
 
 
+@keyframes stir-spoon {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(0, 0px) rotate(0deg); }
+  50% { transform: translate(12px, 6px) rotate(-90deg); }
+  75% { transform: translate(2px, 6px) rotate(-90deg); }
+  100% { transform: translate(12px, 6px) rotate(-90deg); }
+}
+@keyframes withdraw-spoon {
+  0% { transform: translate(12px, 6px) rotate(-90deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+.stir-anim {
+  animation: stir-spoon 0.8s forwards;
+  transform-origin: 8px 7px;
+}
+.withdraw-anim {
+  animation: withdraw-spoon 0.5s ease-in-out forwards;
+  transform-origin: 8px 7px;
+}
