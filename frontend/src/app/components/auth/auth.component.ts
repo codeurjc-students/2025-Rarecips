@@ -625,17 +625,17 @@ export class AuthComponent implements OnInit, AfterViewInit, OnDestroy {
     this.forgotPasswordError = '';
     this.forgotPasswordSuccess = '';
     if (!this.forgotEmail || !this.validateEmail(this.forgotEmail)) {
-      this.forgotPasswordError = 'Enter a valid email address.';
+      this.forgotPasswordError = this.t('recovery_email_invalid') || 'Enter a valid email address.';
       return;
     }
     this.userService.sendPasswordRecoveryEmail(this.forgotEmail).subscribe({
       next: () => {
-        this.forgotPasswordSuccess = 'A recovery link has been sent to your email.';
+        this.forgotPasswordSuccess = this.t('recovery_email_sent') || 'A recovery link has been sent to your email.';
         setTimeout(() => this.closeForgotPasswordModal(event), 2000);
       },
       error: (err) => {
         console.log(err)
-        this.forgotPasswordError = 'Could not send recovery email.';
+        this.forgotPasswordError = this.t('recovery_email_error') || 'Could not send recovery email.';
       }
     });
   }

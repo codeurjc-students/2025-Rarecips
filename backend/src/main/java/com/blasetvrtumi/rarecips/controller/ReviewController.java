@@ -77,7 +77,7 @@ public class ReviewController {
                         recipe.getAuthorUser(),
                         userAuthor,
                         Notification.NotificationType.REVIEW_ADDED,
-                        java.util.Map.of("user", username, "recipe", recipe.getLabel() != null ? recipe.getLabel() : ""),
+                        Map.of("user", username, "recipe", recipe.getLabel() != null ? recipe.getLabel() : ""),
                         "notification.review_added",
                         recipe.getId()
                 );
@@ -219,7 +219,7 @@ public class ReviewController {
                         review.getAuthor(),
                         null,
                         Notification.NotificationType.REPORTED_REVIEW,
-                        java.util.Map.of("recipe", review.getRecipe().getLabel() != null ? review.getRecipe().getLabel() : ""),
+                        Map.of("recipe", review.getRecipe().getLabel() != null ? review.getRecipe().getLabel() : ""),
                         "notification.reported_review",
                         review.getRecipe().getId()
                 );

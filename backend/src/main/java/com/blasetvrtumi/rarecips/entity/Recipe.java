@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.blasetvrtumi.rarecips.enums.RecipeStatus;
 
@@ -68,14 +70,14 @@ public class Recipe {
     @CollectionTable(name = "recipe_ingredient_quantities", joinColumns = @JoinColumn(name = "recipe_id"))
     @MapKeyColumn(name = "ingredient_id")
     @Column(name = "quantity")
-    private java.util.Map<Long, Float> ingredientQuantities = new java.util.HashMap<>();
+    private Map<Long, Float> ingredientQuantities = new HashMap<>();
 
     @JsonView(BasicInfo.class)
     @ElementCollection
     @CollectionTable(name = "recipe_ingredient_units", joinColumns = @JoinColumn(name = "recipe_id"))
     @MapKeyColumn(name = "ingredient_id")
     @Column(name = "unit")
-    private java.util.Map<Long, String> ingredientUnits = new java.util.HashMap<>();
+    private Map<Long, String> ingredientUnits = new HashMap<>();
 
     @JsonView(BasicInfo.class)
     private int difficulty;
@@ -412,19 +414,19 @@ public class Recipe {
         this.steps = steps;
     }
 
-    public java.util.Map<Long, Float> getIngredientQuantities() {
+    public Map<Long, Float> getIngredientQuantities() {
         return ingredientQuantities;
     }
 
-    public void setIngredientQuantities(java.util.Map<Long, Float> ingredientQuantities) {
+    public void setIngredientQuantities(Map<Long, Float> ingredientQuantities) {
         this.ingredientQuantities = ingredientQuantities;
     }
 
-    public java.util.Map<Long, String> getIngredientUnits() {
+    public Map<Long, String> getIngredientUnits() {
         return ingredientUnits;
     }
 
-    public void setIngredientUnits(java.util.Map<Long, String> ingredientUnits) {
+    public void setIngredientUnits(Map<Long, String> ingredientUnits) {
         this.ingredientUnits = ingredientUnits;
     }
 

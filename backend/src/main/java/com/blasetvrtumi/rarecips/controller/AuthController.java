@@ -1,5 +1,6 @@
 package com.blasetvrtumi.rarecips.controller;
 
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -110,7 +111,7 @@ public class AuthController {
                         user,
                         null,
                         Notification.NotificationType.WELCOME,
-                        java.util.Map.of(),
+                        Map.of(),
                         "notification.welcome",
                         null
                 );

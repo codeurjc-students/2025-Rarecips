@@ -74,7 +74,7 @@ public class Notification {
         this.isRead = false;
     }
 
-    public Notification(User recipient, User sender, NotificationType type, String message, java.util.Map<String, String> messageArgs, String messageKey, Long relatedId) {
+    public Notification(User recipient, User sender, NotificationType type, String message, Map<String, String> messageArgs, String messageKey, Long relatedId) {
         this.recipient = recipient;
         this.sender = sender;
         this.type = type;

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -107,8 +108,8 @@ public class RecipeInitializationService {
                 int people = recipeJson.optInt("people", 0);
 
                 List<Ingredient> ingredients;
-                java.util.Map<Long, Float> ingredientQuantities = new HashMap<>();
-                java.util.Map<Long, String> ingredientUnits = new HashMap<>();
+                Map<Long, Float> ingredientQuantities = new HashMap<>();
+                Map<Long, String> ingredientUnits = new HashMap<>();
 
                 if (recipeJson.isNull("ingredients")) {
                     ingredients = new ArrayList<>();

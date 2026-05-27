@@ -1021,15 +1021,22 @@ export class RecipeViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  canShare: boolean = !!navigator.share;
+  showShareFeedback: boolean = false;
 
   shareRecipe() {
-    if (navigator.share) {
+    if (this.canShare) {
       navigator.share({
         title: this.recipe?.title,
         text: `${this.t('share_recipe_desc')} ${this.recipe?.title}`,
         url: window.location.href
       }).catch((error) => {
         console.error('Error sharing:', error);
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        this.showShareFeedback = true;
+        setTimeout(() => this.showShareFeedback = false, 2000);
       });
     }
   }

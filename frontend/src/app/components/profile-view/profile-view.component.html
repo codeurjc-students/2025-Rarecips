@@ -9,14 +9,24 @@
           class="flex min-w-[240px] max-w-[448px] w-screen grow shrink-0 basis-0 flex-col items-center justify-center gap-6 rounded-md border border-solid px-8 pt-12 pb-8 shadow-sm relative glass"
           style="border-color: var(--primary-200-40); background: var(--primary-200-40)">
           <div class="flex w-full flex-col items-center gap-12">
-            @if (isOwnProfile || isAdmin) {
+            <div class="absolute top-7 right-7 flex gap-2 z-10">
               <button
-                class="userEditBut absolute top-7 right-7 w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"
-                style="background: var(--gradient-primary); color: white;"
-                (click)="navigateToEditProfile()">
-                <i class="ti ti-user-edit text-primary-700 text-xl"></i>
+                class="w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110 relative"
+                style="background: var(--primary-100); color: var(--primary-500);"
+                (click)="shareProfile()" title="{{ t('share') }}">
+                <i *ngIf="canShare" class="ti ti-share text-xl"></i>
+                <i *ngIf="!canShare && !showShareFeedback" class="ti ti-copy text-xl"></i>
+                <i *ngIf="!canShare && showShareFeedback" class="ti ti-check text-xl" style="color: green;"></i>
               </button>
-            }
+              @if (isOwnProfile || isAdmin) {
+                <button
+                  class="userEditBut w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"
+                  style="background: var(--gradient-primary); color: white;"
+                  (click)="navigateToEditProfile()" title="{{ t('edit_profile') }}">
+                  <i class="ti ti-user-edit text-primary-700 text-xl"></i>
+                </button>
+              }
+            </div>
             @if (!isOwnProfile && isLoggedIn && profileLoaded) {
               <button
                 class="userReportBut absolute top-7 left-7 w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"

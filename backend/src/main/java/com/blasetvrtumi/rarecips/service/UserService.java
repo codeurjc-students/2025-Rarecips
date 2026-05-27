@@ -9,6 +9,7 @@ import com.blasetvrtumi.rarecips.repository.UserRepository;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
 import com.blasetvrtumi.rarecips.repository.ReviewRepository;
 import com.blasetvrtumi.rarecips.repository.RecipeCollectionRepository;
+import com.blasetvrtumi.rarecips.repository.IngredientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,7 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
-
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 @Service
 public class UserService {
 
@@ -35,6 +38,9 @@ public class UserService {
 
     @Autowired
     private RecipeCollectionRepository collectionRepository;
+
+    @Autowired
+    private IngredientRepository ingredientRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -194,5 +200,94 @@ public class UserService {
 
     public User findByPasswordResetToken(String token) {
         return userRepository.findByPasswordResetToken(token);
+    }
+
+    public Map<String, Object> exportUserData(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) return null;
+
+        Map<String, Object> export = new HashMap<>();
+        export.put("username", user.getUsername());
+        export.put("displayName", user.getDisplayName());
+        export.put("bio", user.getBio());
+        export.put("email", user.getEmail());
+        export.put("profileImageString", user.getProfileImageString());
+        export.put("privateProfile", user.isPrivateProfile());
+
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        for (RecipeCollection collection : collectionRepository.findByUser(user)) {
+            Map<String, Object> colMap = new HashMap<>();
+            colMap.put("title", collection.getTitle());
+            colMap.put("favorites", collection.isFavorites());
+            List<Long> recIds = new ArrayList<>();
+            for (Recipe r : collection.getRecipes()) {
+                recIds.add(r.getId());
+            }
+            colMap.put("recipes", recIds);
+            collectionsData.add(colMap);
+        }
+        export.put("collections", collectionsData);
+
+        List<Long> ingIds = new ArrayList<>();
+        for (Ingredient i : user.getIngredients()) ingIds.add(i.getId());
+        export.put("ingredients", ingIds);
+
+        List<Long> recIds = new ArrayList<>();
+        for (Recipe r : recipeRepository.findByAuthor(user)) recIds.add(r.getId());
+        export.put("recipes", recIds);
+
+        List<Long> revIds = new ArrayList<>();
+        for (Review r : reviewRepository.findByAuthor(user)) revIds.add(r.getId());
+        export.put("reviews", revIds);
+
+        return export;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void importUserData(String username, Map<String, Object> data) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) return;
+
+        if (data.containsKey("ingredients")) {
+            List<Number> ingredients = (List<Number>) data.get("ingredients");
+            if (ingredients != null) {
+                for (Number ingId : ingredients) {
+                    Ingredient ing = ingredientRepository.findById(ingId.longValue()).orElse(null);
+                    if (ing != null) {
+                        user.addIngredient(ing);
+                    }
+                }
+            }
+        }
+
+        if (data.containsKey("collections")) {
+            List<Map<String, Object>> collections = (List<Map<String, Object>>) data.get("collections");
+            if (collections != null) {
+                for (Map<String, Object> colMap : collections) {
+                    String title = colMap.containsKey("title") ? (String) colMap.get("title") : "Imported Collection";
+                    boolean isFavorites = colMap.containsKey("favorites") ? (Boolean) colMap.get("favorites") : false;
+                    if (isFavorites) continue;
+                    
+                    RecipeCollection collection = new RecipeCollection(title, user, false);
+                    
+                    if (colMap.containsKey("recipes")) {
+                        List<Number> recipes = (List<Number>) colMap.get("recipes");
+                        if (recipes != null) {
+                            for (Number recId : recipes) {
+                                if (recId != null) {
+                                    Recipe r = recipeRepository.findById(recId.longValue()).orElse(null);
+                                    if (r != null) {
+                                        collection.addRecipe(r);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    collectionRepository.save(collection);
+                }
+            }
+        }
+        
+        userRepository.save(user);
     }
 }

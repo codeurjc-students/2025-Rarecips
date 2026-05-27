@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/health-reports")
@@ -60,7 +61,7 @@ public class HealthReportController {
             return ResponseEntity.ok(report);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(org.springframework.http.HttpStatus.TOO_MANY_REQUESTS)
-                                 .body(java.util.Map.of("errorCode", e.getMessage()));
+                                 .body(Map.of("errorCode", e.getMessage()));
         }
     }
 }

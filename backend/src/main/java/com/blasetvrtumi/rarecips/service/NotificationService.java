@@ -54,7 +54,7 @@ public class NotificationService {
         return notification;
     }
 
-    public Notification createAndSendNotificationWithTemplate(User recipient, User sender, Notification.NotificationType type, java.util.Map<String, String> messageArgs, String messageKey, Long relatedId) {
+    public Notification createAndSendNotificationWithTemplate(User recipient, User sender, Notification.NotificationType type, Map<String, String> messageArgs, String messageKey, Long relatedId) {
         Notification notification = new Notification(recipient, sender, type, "", messageArgs, messageKey, relatedId);
         notification = notificationRepository.save(notification);
 

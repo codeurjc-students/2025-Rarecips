@@ -48,6 +48,12 @@ export class ProfileEditComponent implements OnInit {
   secondDeletionText: string = "Deleting account...";
 
   showChangePasswordModal = false;
+  showImportModal = false;
+  showImportSuccessModal = false;
+  importFilePending: File | null = null;
+  importEventPending: any = null;
+  importJsonPending: any = null;
+  importStats = { collections: 0, ingredients: 0 };
 
   changePasswordError: string = '';
   changePasswordSuccess: string = '';
@@ -569,5 +575,107 @@ export class ProfileEditComponent implements OnInit {
   private getDefaultPfp() {
     this.userService.getDefaultPfp()
     return '';
+  }
+
+  exportData() {
+    this.userService.exportUserData().subscribe({
+      next: (blob) => {
+        const a = document.createElement('a');
+        const objectUrl = URL.createObjectURL(blob);
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+        const second = String(now.getSeconds()).padStart(2, '0');
+
+        const timestamp = `${year}${month}${day}_${hour}${minute}${second}`;
+
+        a.href = objectUrl;
+        a.download = 'rarecips_data_' + this.usernamePath + '_' + timestamp + '.json';
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      },
+      error: (err) => {
+        console.error('Error exporting data:', err);
+        alert(this.t('error_exporting_data') || 'Error exporting data');
+      }
+    });
+  }
+
+  triggerImport() {
+    const fileInput = document.getElementById('importFileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  onImportFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const json = JSON.parse(e.target.result);
+        let importedCollections = Array.isArray(json.collections) ? json.collections : [];
+        importedCollections = importedCollections.filter((c: any) => !c.favorites);
+        json.collections = importedCollections;
+        const cols = importedCollections.length;
+        
+        const ings = Array.isArray(json.ingredients) ? json.ingredients.length : 0;
+        
+        this.importStats = { collections: cols, ingredients: ings };
+        this.importJsonPending = json;
+        this.importFilePending = file;
+        this.importEventPending = event;
+        this.showImportModal = true;
+      } catch (error) {
+        console.error('Invalid JSON file', error);
+        alert(this.t('invalid_json_file') || 'Invalid JSON file.');
+        event.target.value = '';
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  confirmImport() {
+    this.showImportModal = false;
+    if (!this.importJsonPending || !this.importEventPending) return;
+    
+    const json = this.importJsonPending;
+    const event = this.importEventPending;
+    
+    this.userService.importUserData(json).subscribe({
+      next: () => {
+        this.showImportSuccessModal = true;
+        event.target.value = '';
+      },
+      error: (err) => {
+        console.error('Error importing data:', err);
+        alert(this.t('error_importing_data') || 'Error importing data');
+        event.target.value = '';
+      }
+    });
+    
+    this.importJsonPending = null;
+    this.importFilePending = null;
+    this.importEventPending = null;
+  }
+
+  cancelImport() {
+    this.showImportModal = false;
+    if (this.importEventPending && this.importEventPending.target) {
+      this.importEventPending.target.value = '';
+    }
+    this.importJsonPending = null;
+    this.importFilePending = null;
+    this.importEventPending = null;
+  }
+
+  closeImportSuccessModal() {
+    this.showImportSuccessModal = false;
   }
 }

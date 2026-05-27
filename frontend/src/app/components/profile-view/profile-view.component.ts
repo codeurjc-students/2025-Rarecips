@@ -435,4 +435,24 @@ export class ProfileViewComponent implements OnInit {
       error: (err) => console.error('Error reporting review:', err)
     });
   }
+
+  canShare: boolean = !!navigator.share;
+  showShareFeedback: boolean = false;
+
+  shareProfile() {
+    if (this.canShare) {
+      navigator.share({
+        title: this.user?.displayName || this.user?.username,
+        text: `${this.t('share_profile_desc')} ${this.user?.displayName || this.user?.username}`,
+        url: window.location.href
+      }).catch((error) => {
+        console.error('Error sharing:', error);
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        this.showShareFeedback = true;
+        setTimeout(() => this.showShareFeedback = false, 2000);
+      });
+    }
+  }
 }

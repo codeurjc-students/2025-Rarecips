@@ -77,7 +77,9 @@
                 }
                 <button (click)="shareRecipe()"
                   class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-transform hover:scale-110">
-                  <i class="ti ti-share text-xl" style="color: var(--primary-500);"></i>
+                  <i *ngIf="canShare" class="ti ti-share text-xl" style="color: var(--primary-500);"></i>
+                  <i *ngIf="!canShare && !showShareFeedback" class="ti ti-copy text-xl" style="color: var(--primary-500);"></i>
+                  <i *ngIf="!canShare && showShareFeedback" class="ti ti-check text-xl" style="color: var(--primary-500);"></i>
                 </button>
                 <button (click)="downloadRecipeAsPdf()" title="{{ t('download') }}"
                   class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-transform hover:scale-110">

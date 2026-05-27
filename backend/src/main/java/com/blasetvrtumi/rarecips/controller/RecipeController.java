@@ -466,7 +466,7 @@ public class RecipeController {
                         author,
                         null,
                         Notification.NotificationType.REPORTED_RECIPE,
-                        java.util.Map.of("recipe", recipe.getLabel() != null ? recipe.getLabel() : ""),
+                        Map.of("recipe", recipe.getLabel() != null ? recipe.getLabel() : ""),
                         "notification.reported_recipe",
                         recipe.getId()
                 );

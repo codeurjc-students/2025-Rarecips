@@ -233,7 +233,7 @@ public class RecipeCollectionController {
                         recipe.getAuthorUser(),
                         user,
                         Notification.NotificationType.LIKED_RECIPE,
-                        java.util.Map.of("user", senderName, "recipe", recipeTitle),
+                        Map.of("user", senderName, "recipe", recipeTitle),
                         "notification.liked_recipe",
                         recipe.getId()
                 );
@@ -293,7 +293,7 @@ public class RecipeCollectionController {
                                     recipe.getAuthorUser(),
                                     user,
                                     notifType,
-                                    java.util.Map.of("user", senderName, "recipe", recipeTitle),
+                                    Map.of("user", senderName, "recipe", recipeTitle),
                                     "notification.liked_recipe",
                                     recipe.getId()
                             );
@@ -302,7 +302,7 @@ public class RecipeCollectionController {
                                     recipe.getAuthorUser(),
                                     user,
                                     notifType,
-                                    java.util.Map.of("user", senderName, "recipe", recipeTitle, "collection", ""),
+                                    Map.of("user", senderName, "recipe", recipeTitle, "collection", ""),
                                     "notification.added_to_collection",
                                     recipe.getId()
                             );

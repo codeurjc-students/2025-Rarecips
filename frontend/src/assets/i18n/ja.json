@@ -568,5 +568,17 @@
   "your_comment": "あなたのコメント",
   "your_pantry_is_empty": "あなたのパントリーは空です！",
   "your_rating": "あなたの評価",
-  "your_review": "あなたのレビュー"
+  "your_review": "あなたのレビュー",
+  "data_management": "データ管理",
+  "data_management_desc": "プロファイルデータをJSONファイルとしてエクスポートするか、以前のエクスポートからコレクションと材料をインポートします。",
+  "error_exporting_data": "データのエクスポート中にエラーが発生しました。",
+  "error_importing_data": "データのインポート中にエラーが発生しました。",
+  "export_data": "データをエクスポート",
+  "import_data": "データをインポート",
+  "import_data_confirm": "このデータをインポートしてもよろしいですか？これにより、コレクションと材料が現在のプロファイルに統合されます。",
+  "import_successful": "データが正常にインポートされました。",
+  "invalid_json_file": "無効なJSONファイルです。",
+  "recovery_email_sent": "回復リンクがあなたのメールアドレスに送信されました。",
+  "recovery_email_error": "回復メールを送信できませんでした。",
+  "recovery_email_invalid": "有効なメールアドレスを入力してください。"
 }
