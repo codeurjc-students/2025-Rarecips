@@ -39,7 +39,6 @@ public class RecipeServiceIntegrationTest {
                 "integrationUser",
                 "password",
                 "integration@example.com",
-                null,
                 "Integration User",
                 "Integration test user",
                 "Test Bio"

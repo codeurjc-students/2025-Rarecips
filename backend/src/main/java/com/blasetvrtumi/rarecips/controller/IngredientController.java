@@ -33,6 +33,9 @@ public class IngredientController {
     @Autowired
     private RecipeRepository recipeRepository;
 
+    @Autowired
+    private com.blasetvrtumi.rarecips.service.MinioService minioService;
+
     @Operation(summary = "Get all unique ingredient names")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of ingredient names retrieved successfully"),
@@ -108,6 +111,12 @@ public class IngredientController {
         if (!userService.getUserByUsername(authentication.getName()).getRole().equals("ADMIN")) {
             return ResponseEntity.status(403).build();
         }
+
+        if (ingredient.getImageUrl() != null && ingredient.getImageUrl().startsWith("data:image")) {
+            String url = minioService.uploadBase64Image(ingredient.getImageUrl());
+            ingredient.setImageUrl(url);
+        }
+
         Ingredient saved = ingredientRepository.save(ingredient);
 
         URI location = ServletUriComponentsBuilder
@@ -131,10 +140,17 @@ public class IngredientController {
         }
 
         return ingredientRepository.findById(id)
-                .map(ingredient -> {
-                    ingredient.setFood(ingredientDetails.getFood());
-                    ingredient.setImageString(ingredientDetails.getImageString());
-                    Ingredient updatedIngredient = ingredientRepository.save(ingredient);
+                .map(existingIngredient -> {
+                    existingIngredient.setFood(ingredientDetails.getFood());
+                    if (ingredientDetails.getImageUrl() != null) {
+                        if (ingredientDetails.getImageUrl().startsWith("data:image")) {
+                            String url = minioService.uploadBase64Image(ingredientDetails.getImageUrl());
+                            existingIngredient.setImageUrl(url);
+                        } else {
+                            existingIngredient.setImageUrl(ingredientDetails.getImageUrl());
+                        }
+                    }
+                    Ingredient updatedIngredient = ingredientRepository.save(existingIngredient);
 
                     URI location = ServletUriComponentsBuilder
                         .fromCurrentContextPath()

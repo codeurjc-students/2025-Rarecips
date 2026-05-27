@@ -103,12 +103,11 @@ public class RecipeServiceTest {
     private User createMockUser() {
         return new User(
                 "testuser",           // username
-                "password",           // password
-                "test@example.com",   // email
-                null,                 // profilePicture (Blob)
-                "Test User",          // displayName
-                "Test description",   // description
-                "Test Bio"            // bio
+                "password",           // displayName
+                "test@example.com",   // bio
+                "Test User",          // profileImageUrl
+                "Test description",   // email
+                "Test Bio"            // password
         );
     }
 

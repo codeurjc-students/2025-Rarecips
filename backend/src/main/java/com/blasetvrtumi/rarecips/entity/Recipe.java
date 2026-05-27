@@ -7,16 +7,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.core.io.ClassPathResource;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -49,13 +41,11 @@ public class Recipe {
     @JsonView(BasicInfo.class)
     String description;
 
-    @Lob
-    @JsonIgnore
-    private Blob imageFile;
+
 
     @JsonView(BasicInfo.class)
     @Lob
-    private String imageString;
+    private String imageUrl;
 
     @JsonView(BasicInfo.class)
     private Integer people;
@@ -193,12 +183,23 @@ public class Recipe {
         this.label = label;
     }
 
-    public Blob getImageFile() {
-        return imageFile;
-    }
 
-    public String getImageString() {
-        return imageString;
+
+    public String getImageUrl() {
+        if (imageUrl == null) return null;
+        String externalUrl = com.blasetvrtumi.rarecips.service.MinioService.staticMinioUrl;
+        if (externalUrl != null && !externalUrl.isEmpty()) {
+            if (externalUrl.endsWith("/")) {
+                externalUrl = externalUrl.substring(0, externalUrl.length() - 1);
+            }
+            if (imageUrl.contains("localhost:9000")) {
+                return imageUrl.replace("http://localhost:9000", externalUrl);
+            }
+            if (imageUrl.contains("rarecips-minio:9000")) {
+                return imageUrl.replace("http://rarecips-minio:9000", externalUrl);
+            }
+        }
+        return imageUrl;
     }
 
     public Integer getPeople() {
@@ -280,6 +281,8 @@ public class Recipe {
     public void setDescription(String description) {
         this.description = description;
     }
+
+
 
     public Float getTotalTime() {
         return totalTime;
@@ -384,13 +387,11 @@ public class Recipe {
         review.setRecipe(this);
     }
 
-    public void setImageString(String imageString) {
-        this.imageString = imageString;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public void setImageFile(Blob imageFile) {
-        this.imageFile = imageFile;
-    }
+
 
     public void updateRating() {
         float sum = 0;
@@ -428,6 +429,21 @@ public class Recipe {
 
     public void setIngredientUnits(Map<Long, String> ingredientUnits) {
         this.ingredientUnits = ingredientUnits;
+    }
+
+    @PostLoad
+    public void sanitizeImageUrlAfterLoad() {
+        String externalUrl = com.blasetvrtumi.rarecips.service.MinioService.staticMinioUrl;
+        if (externalUrl != null && !externalUrl.isEmpty() && this.imageUrl != null) {
+            if (externalUrl.endsWith("/")) {
+                externalUrl = externalUrl.substring(0, externalUrl.length() - 1);
+            }
+            if (this.imageUrl.contains("localhost:9000")) {
+                this.imageUrl = this.imageUrl.replace("http://localhost:9000", externalUrl);
+            } else if (this.imageUrl.contains("rarecips-minio:9000")) {
+                this.imageUrl = this.imageUrl.replace("http://rarecips-minio:9000", externalUrl);
+            }
+        }
     }
 
 }

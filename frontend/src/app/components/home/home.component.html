@@ -231,7 +231,11 @@
 
     @if (responsive) {
       <div class="glass rounded-2xl p-6">
+        @if (currentUser) {
         <h2 class="text-xl font-bold text-primary mb-4">{{ t('based_on_preferences') }}</h2>
+        } @else {
+        <h2 class="text-xl font-bold text-primary mb-4">{{ t('latest_recipes') }}</h2>
+        }
         <div class="grid grid-cols-1 gap-6">
           @for (recipe of recipeList; track recipe.id) {
             <div class="flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm hover:scale-105"
@@ -240,7 +244,7 @@
 
               <div class="imageCont relative aspect-43 overflow-hidden" (mouseover)="hoverRecipeId = recipe.id" (mouseout)="hoverRecipeId = undefined">
                 <img *ngIf="recipe.imageUrl"
-                  src="data:image/png;base64,{{recipe.imageUrl}}"
+                  src="{{recipe.imageUrl}}"
                   alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available; background-color: var(--primary-300);"
                   [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
                 <img *ngIf="!recipe.imageUrl"
@@ -426,7 +430,11 @@
         <!-- Trending Recipes/based in your preferences -->
         <div class="glass rounded-2xl p-6">
           <div>
-            <h2 class="text-xl font-bold text-primary mb-4">{{ t('based_on_preferences') }}</h2>
+            @if (currentUser) {
+              <h2 class="text-xl font-bold text-primary mb-4">{{ t('based_on_preferences') }}</h2>
+            } @else {
+              <h2 class="text-xl font-bold text-primary mb-4">{{ t('latest_recipes') }}</h2>
+            }
             <div class="grid grid-cols-3 md:grid-cols-3 gap-6">
               <!-- Recipe Card -->
               @for (recipe of recipeList; track recipe.id) {
@@ -440,7 +448,7 @@
                   <!-- Image Container -->
                   <div class="imageCont relative aspect-43 overflow-hidden" (mouseover)="hoverRecipeId = recipe.id" (mouseout)="hoverRecipeId = undefined">
                     <img *ngIf="recipe.imageUrl"
-                      src="data:image/png;base64,{{recipe.imageUrl}}"
+                      src="{{recipe.imageUrl}}"
                       alt="{{recipe.title}}" class="recipe-image" style="height: -webkit-fill-available; background: var(--primary-300)"
                       [ngClass]="hoverRecipeId === recipe.id ? 'scale-110 transition-transform duration-500 ease-in-out' : 'transition-transform duration-200 ease-in-out'"/>
                     <img *ngIf="!recipe.imageUrl"

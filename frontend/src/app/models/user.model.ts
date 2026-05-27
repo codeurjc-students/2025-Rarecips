@@ -6,7 +6,7 @@ export interface User {
   displayName: string;
   bio: string;
   profileImageFile: string;
-  profileImageString: string;
+  profileImageUrl: string;
   email: string;
   password: string;
   role: string;

@@ -211,7 +211,7 @@ public class UserService {
         export.put("displayName", user.getDisplayName());
         export.put("bio", user.getBio());
         export.put("email", user.getEmail());
-        export.put("profileImageString", user.getProfileImageString());
+        export.put("profileImageUrl", user.getProfileImageUrl());
         export.put("privateProfile", user.isPrivateProfile());
 
         List<Map<String, Object>> collectionsData = new ArrayList<>();

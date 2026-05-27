@@ -669,7 +669,7 @@
               </div>
 
               <div class="imageCont relative aspect-43 overflow-hidden">
-                <img *ngIf="recipe.imageUrl" src="data:image/png;base64,{{recipe.imageUrl}}" alt="{{recipe.title}}" class="recipe-image"
+                <img *ngIf="recipe.imageUrl" src="{{recipe.imageUrl}}" alt="{{recipe.title}}" class="recipe-image"
                   style="height: -webkit-fill-available;">
                 <img *ngIf="!recipe.imageUrl" src="assets/img/recipe.png" alt="{{recipe.title}}" class="recipe-image"
                   style="height: -webkit-fill-available; background-color: var(--primary-300);">
@@ -769,7 +769,7 @@
             class="recipe-list-item flex flex-col recipe-card glass rounded-3xl overflow-hidden relative cursor-pointer shadow-sm p-4 gap-4"
             (click)="viewRecipe(recipe.id)">
             <div class="relative w-48 h-32 rounded-2xl overflow-hidden flex-shrink-0">
-              <img *ngIf="recipe.imageUrl" src="data:image/png;base64,{{recipe.imageUrl}}" alt="{{recipe.title}}"
+              <img *ngIf="recipe.imageUrl" src="{{recipe.imageUrl}}" alt="{{recipe.title}}"
                 class="w-full h-full object-cover">
               <img *ngIf="!recipe.imageUrl" src="assets/img/recipe.png" alt="{{recipe.title}}"
                 class="w-full h-full object-cover" style="background-color: var(--primary-300);">
@@ -850,7 +850,7 @@
       <div class="ingredient-card glass-strong rounded-2xl overflow-hidden transition-all hover:scale-[1.02]">
         <div class="ingredient-image relative h-48">
 
-          <img [src]="ingredient.image || ingredient.imageString || 'assets/img/ingredient.png'" [alt]="ingredient.food"
+          <img [src]="ingredient.image || ingredient.imageUrl || 'assets/img/ingredient.png'" [alt]="ingredient.food"
             class="w-full h-full object-cover">
           <div class="ingredient-icon">
             <i class="ti {{ingredient.icon}}" style="color: var(--primary-700);"></i>
@@ -879,7 +879,7 @@
         [class.flex-col]="responsive">
         <div class="flex items-center gap-4">
           <div class="relative w-20 h-20 rounded-xl overflow-hidden min-w-fit">
-            <img [src]="ingredient.image || ingredient.imageString || 'assets/img/ingredient.png'"
+            <img [src]="ingredient.image || ingredient.imageUrl || 'assets/img/ingredient.png'"
               [alt]="ingredient.food" class="w-full h-full object-cover aspect-square min-w-min">
             <div
               class="absolute top-1 right-1 w-8 h-8 rounded-full flex items-center justify-center border-2 border-[var(--primary-200)]"
@@ -1025,8 +1025,8 @@
         (click)="openViewCollectionModal(col)">
         <div class="flex flex-col h-full">
           <div class="w-full h-40 overflow-hidden rounded-lg mb-4 bg-gray-100 flex items-center justify-center">
-            @if (col.recipes && col.recipes.length > 0 && col.recipes[0].imageString) {
-            <img src="{{ 'data:image/jpeg;base64,' + col.recipes[0].imageString }}" alt="{{ col.title }}"
+            @if (col.recipes && col.recipes.length > 0 && col.recipes[0].imageUrl) {
+            <img src="{{ col.recipes[0].imageUrl }}" alt="{{ col.title }}"
               class="w-full h-full object-cover">
             } @else {
             <div class="w-full h-full flex items-center justify-center text-3xl text-gray-400">
@@ -1060,8 +1060,8 @@
         class="collection-list-item glass rounded-xl p-4 flex items-center gap-6 cursor-pointer shadow-sm hover:translate-x-4 transition-all"
         (click)="openViewCollectionModal(col)">
         <div class="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
-          @if (col.recipes && col.recipes.length > 0 && col.recipes[0].imageString) {
-          <img src="{{ 'data:image/jpeg;base64,' + col.recipes[0].imageString }}" alt="{{ col.title }}"
+          @if (col.recipes && col.recipes.length > 0 && col.recipes[0].imageUrl) {
+          <img src="{{ col.recipes[0].imageUrl }}" alt="{{ col.title }}"
             class="w-full h-full object-cover">
           } @else {
           <div class="w-full h-full flex items-center justify-center text-3xl text-gray-400">
@@ -1277,8 +1277,8 @@
             (click)="viewProfile(user.username)">
             <div class="flex items-start gap-4 mb-4">
               <div class="relative">
-                @if (user.profileImageString) {
-                <img [src]="'data:image/png;base64,' + user.profileImageString" [alt]="user.displayName"
+                @if (user.profileImageUrl) {
+                <img [src]="user.profileImageUrl" [alt]="user.displayName"
                   style="background: var(--primary-400); border-color: var(--primary-300)"
                   class="w-16 h-16 rounded-full object-cover border-2">
                 } @else {
@@ -1344,8 +1344,8 @@
             (click)="viewProfile(user.username)">
             <div class="flex items-center gap-4 flex-1">
               <div class="relative">
-                @if (user.profileImageString) {
-                <img [src]="'data:image/png;base64,' + user.profileImageString" [alt]="user.displayName"
+                @if (user.profileImageUrl) {
+                <img [src]="user.profileImageUrl" [alt]="user.displayName"
                   class="w-16 h-16 rounded-full object-cover border-2"
                   style="background: var(--primary-400); border-color: var(--primary-300)">
                 } @else {

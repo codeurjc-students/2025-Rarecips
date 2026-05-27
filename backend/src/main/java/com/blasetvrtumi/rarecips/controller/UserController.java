@@ -51,6 +51,9 @@ public class UserController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private com.blasetvrtumi.rarecips.service.MinioService minioService;
+
     @Value("${app.frontend.url:https://localhost:8443}")
     private String frontendUrl;
 
@@ -203,8 +206,11 @@ public class UserController {
             Authentication authentication) {
         // Update user parameters
         User currentUser = userService.findByUsername(username);
-        currentUser.setProfileImageFile(updatedUser.getProfileImageFile());
-        currentUser.setProfileImageString(updatedUser.getProfileImageString());
+        String profileImageUrl = updatedUser.getProfileImageUrl();
+        if (profileImageUrl != null && profileImageUrl.startsWith("data:image")) {
+            profileImageUrl = minioService.uploadBase64Image(profileImageUrl);
+        }
+        currentUser.setProfileImageUrl(profileImageUrl);
         currentUser.setDisplayName(updatedUser.getDisplayName());
         currentUser.setEmail(updatedUser.getEmail());
         currentUser.setBio(updatedUser.getBio());

@@ -235,7 +235,7 @@ export class RecipeViewComponent implements OnInit, OnDestroy {
 
     this.userService.getDefaultPfp().subscribe({
       next: (data: any) => {
-        this.defaultPfp = data.profileImageString;
+        this.defaultPfp = data.profileImageUrl;
       }
     })
 
@@ -324,8 +324,8 @@ export class RecipeViewComponent implements OnInit, OnDestroy {
 
         if (this.recipe?.author) {
           this.userService.getUserByUsername(<string>this.recipe?.author).subscribe((res) => {
-            if (res.profileImageString) {
-              this.authorPfp = "data:image/png;base64," + res.profileImageString;
+            if (res.profileImageUrl) {
+              this.authorPfp = res.profileImageUrl;
             }
           });
         }
@@ -685,7 +685,7 @@ export class RecipeViewComponent implements OnInit, OnDestroy {
             try {
               let user: any;
               if (r.authorUsername) user = await firstValueFrom(this.userService.getUserByUsername(r.authorUsername));
-              if (user) r.authorPfp = "data:image/png;base64," + user?.profileImageString; else r.authorPfp = '/assets/img/user.png';
+              if (user) r.authorPfp = user?.profileImageUrl; else r.authorPfp = '/assets/img/user.png';
             } catch {
               r.authorPfp = '/assets/img/user.png';
             }

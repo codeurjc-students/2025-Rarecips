@@ -263,11 +263,11 @@ export class RecipeEditComponent implements OnInit {
               this.category = recipe.mealTypes[0];
             }
 
-            if (recipe.imageString && !this.defaultImageUrl.includes(recipe.imageString)) {
-              if (!recipe.imageString.startsWith('data:image')) {
-                this.imagePreviewUrl = 'data:image/jpeg;base64,' + recipe.imageString;
+            if (recipe.imageUrl && !this.defaultImageUrl.includes(recipe.imageUrl)) {
+              if (!recipe.imageUrl.startsWith('data:image')) {
+                this.imagePreviewUrl = recipe.imageUrl;
               } else {
-                this.imagePreviewUrl = recipe.imageString;
+                this.imagePreviewUrl = recipe.imageUrl;
               }
             }
 
@@ -880,9 +880,45 @@ export class RecipeEditComponent implements OnInit {
 
   onImageSelected(file: File): void {
     this.selectedImageFile = file;
+    this.compressImage(file, (compressedBase64: string) => {
+      this.imagePreviewUrl = compressedBase64;
+    });
+  }
+
+  private compressImage(file: File, callback: (compressedBase64: string) => void): void {
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      this.imagePreviewUrl = e.target.result;
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        const maxWidth = 800;
+        const maxHeight = 600;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+        }
+        
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+        callback(compressedBase64);
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
@@ -900,12 +936,7 @@ export class RecipeEditComponent implements OnInit {
   saveRecipe(): void {
     let cleanImageString = '';
     if (this.imagePreviewUrl) {
-      const base64Index = this.imagePreviewUrl.indexOf('base64,');
-      if (base64Index !== -1) {
-        cleanImageString = this.imagePreviewUrl.substring(base64Index + 7);
-      } else {
-        cleanImageString = this.imagePreviewUrl;
-      }
+      cleanImageString = this.imagePreviewUrl;
     }
 
     const recipeData = {
@@ -913,7 +944,7 @@ export class RecipeEditComponent implements OnInit {
       description: this.description || '',
       people: this.servings || 1,
       difficulty: this.difficulty || 1,
-      imageString: cleanImageString,
+      imageUrl: cleanImageString,
       ingredients: this.ingredients.map(ing => ({
         food: ing.name,
         quantity: parseFloat(<string>ing.quantity) || 0,

@@ -52,7 +52,7 @@ public class APIReviewTest {
         RestAssured.basePath = "/api/v1";
         RestAssured.useRelaxedHTTPSValidation();
 
-        testUser = new User("testuser", "password", "test@example.com", null, "Test User", "desc", "bio");
+        testUser = new User("testuser", "password", "test@example.com", "Test User", "desc", "bio");
         userRepository.save(testUser);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(testUser.getUsername(), testUser.getPassword());

@@ -107,7 +107,7 @@
                   <div class="quick-search-group-title">{{ t('recipes') }}</div>
                   @for (recipe of quickSearchResults.recipes; track recipe.id) {
                     <div class="quick-search-item" (click)="navigateTo('recipes/' + recipe.id, $event, true)" (tap)="navigateTo('recipes/' + recipe.id, $event, true)">
-                      <img [src]="recipe.imageString ? 'data:image/jpeg;base64,' + recipe.imageString : 'assets/img/recipe.png'" alt="recipe" class="quick-search-thumb" style="background-color: var(--primary-300);" />
+                      <img [src]="recipe.imageUrl ? recipe.imageUrl : 'assets/img/recipe.png'" alt="recipe" class="quick-search-thumb" style="background-color: var(--primary-300);" />
                       <span>{{ recipe.title }}</span>
                     </div>
                   }
@@ -118,7 +118,7 @@
                   <div class="quick-search-group-title">{{ t('ingredients') }}</div>
                   @for (ingredient of quickSearchResults.ingredients; track ingredient.id) {
                     <div class="quick-search-item" (click)="navigateTo('ingredients', $event, true)">
-                      <img [src]="ingredient.icon || ingredient.image || ingredient.imageString || '/assets/img/ingredient.png'" alt="ingredient" class="quick-search-thumb" />
+                      <img [src]="ingredient.icon || ingredient.image || ingredient.imageUrl || '/assets/img/ingredient.png'" alt="ingredient" class="quick-search-thumb" />
                       <span>{{ ingredient.food }}</span>
                     </div>
                   }
@@ -145,8 +145,8 @@
                   @if (quickSearchResults.users.length > 0) {
                     @for (user of quickSearchResults.users; track user.username) {
                       <div class="quick-search-item" (click)="navigateTo('users/' + user.username, $event, true)">
-                        <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2" />
-                        <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2" />
+                        <img *ngIf="user.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="user.profileImageUrl" alt="user" class="quick-search-thumb user-thumb border-2" />
+                        <img *ngIf="!user.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2" />
                         <span>{{ user.displayName || user.username }}</span>
                       </div>
                     }
@@ -327,9 +327,9 @@
         <button id="userMenuButton"
                 class="relative inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-100 border-2" style="border-color: var(--primary-300)"
                 (click)="navigateTo('profile', $event)" title="{{ t('user_menu') }}">
-          <img *ngIf="user.profileImageString" style="background: var(--primary-400);" class="aspect-square h-full w-full object-cover" src="data:image/jpeg;base64,{{user?.profileImageString}}"
+          <img *ngIf="user.profileImageUrl" style="background: var(--primary-400);" class="aspect-square h-full w-full object-cover" src="{{user?.profileImageUrl}}"
                alt="User avatar"/>
-          <img *ngIf="!user.profileImageString" class="aspect-square h-full w-full object-cover" style="background: var(--primary-400)" src="/assets/img/user.png"
+          <img *ngIf="!user.profileImageUrl" class="aspect-square h-full w-full object-cover" style="background: var(--primary-400)" src="/assets/img/user.png"
                alt="Default user avatar"/>
         </button>
       </div>

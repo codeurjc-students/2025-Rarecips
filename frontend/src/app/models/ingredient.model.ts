@@ -5,5 +5,5 @@ export interface Ingredient {
   isItOwned: boolean;
   category: string;
   image: string;
-  imageString?: string;
+  imageUrl?: string;
 }

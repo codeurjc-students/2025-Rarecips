@@ -31,6 +31,18 @@ public class SPAController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.blasetvrtumi.rarecips.service.MinioService minioService;
+
+    // Redirect static images to MinIO
+    @GetMapping("/assets/img/{imageName}")
+    public org.springframework.http.ResponseEntity<Void> redirectStaticImageToMinio(@PathVariable String imageName) {
+        String url = minioService.getPublicUrl(imageName);
+        return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.FOUND)
+            .location(java.net.URI.create(url))
+            .build();
+    }
+
     // Redirect all frontend paths to index.html for angular router to handle manually
     @GetMapping("/{path:^(?!assets|media|api|v3|swagger-ui|notify)[^.]*}/**")
     public String redirect() {
@@ -96,40 +108,57 @@ public class SPAController {
             if (recipeOpt.isPresent()) {
                 String lang = extractLanguage(request);
                 Recipe recipe = recipeOpt.get();
-                String title = recipe.getLabel() != null ? recipe.getLabel().replace("\"", "&quot;") : getTranslatedRecipeTitle(lang);
+                String title = recipe.getLabel() != null ? (getTranslatedRecipeDesc(lang) + ": " +  (recipe.getLabel().replace("\"", "&quot;"))) : getTranslatedRecipeTitle(lang);
                 String description = recipe.getDescription() != null ? recipe.getDescription().replace("\"", "&quot;") : getTranslatedRecipeDesc(lang);
-                String baseUrl = getBaseUrl(request);
-                String imageUrl = baseUrl + "/assets/img/recipe.png";
-
-                String ogTags = "<meta property=\"og:title\" content=\"" + title + "\">\n" +
-                                "<meta property=\"og:description\" content=\"" + description + "\">\n" +
-                                "<meta property=\"og:image\" content=\"" + imageUrl + "\">\n" +
-                                "<meta property=\"twitter:card\" content=\"summary_large_image\">\n";
-                return html.replace("</head>", ogTags + "</head>");
-            }
-            return html;
-        } catch (Exception e) {
-            return "forward:/index.html";
-        }
-    }
-
-    @GetMapping(value = "/users/{username}", produces = MediaType.TEXT_HTML_VALUE)
-    @ResponseBody
-    public String getUserOG(@PathVariable String username, HttpServletRequest request) {
-        try {
-            String html = getIndexHtml();
-            User user = userRepository.findByUsername(username);
-            if (user != null) {
-                String lang = extractLanguage(request);
-                String title = (user.getDisplayName() != null ? user.getDisplayName() : user.getUsername()).replace("\"", "&quot;");
-                String description = user.getBio() != null ? user.getBio().replace("\"", "&quot;") : getTranslatedUserDesc(lang, title);
-                String baseUrl = getBaseUrl(request);
-                String imageUrl = baseUrl + "/assets/img/user.png";
-
-                String ogTags = "<meta property=\"og:title\" content=\"" + title + "\">\n" +
-                                "<meta property=\"og:description\" content=\"" + description + "\">\n" +
-                                "<meta property=\"og:image\" content=\"" + imageUrl + "\">\n" +
-                                "<meta property=\"twitter:card\" content=\"summary_large_image\">\n";
+                 String baseUrl = getBaseUrl(request);
+                 String imageUrl = (recipe.getImageUrl() != null && !recipe.getImageUrl().isEmpty())
+                         ? recipe.getImageUrl()
+                         : (baseUrl + "/assets/img/recipe.png");
+ 
+                 String ogTags = "<meta name=\"description\" content=\"" + description + "\">\n" +
+                                 "<meta property=\"og:title\" content=\"" + title + "\">\n" +
+                                 "<meta property=\"og:description\" content=\"" + description + "\">\n" +
+                                 "<meta property=\"og:image\" content=\"" + imageUrl + "\">\n" +
+                                 "<meta property=\"og:type\" content=\"website\">\n" +
+                                 "<meta property=\"og:site_name\" content=\"Rarecips\">\n" +
+                                 "<meta name=\"twitter:card\" content=\"summary_large_image\">\n" +
+                                 "<meta name=\"twitter:title\" content=\"" + title + "\">\n" +
+                                 "<meta name=\"twitter:description\" content=\"" + description + "\">\n" +
+                                 "<meta name=\"twitter:image\" content=\"" + imageUrl + "\">\n";
+                 return html.replace("</head>", ogTags + "</head>");
+             }
+             return html;
+         } catch (Exception e) {
+             return "forward:/index.html";
+         }
+     }
+ 
+     @GetMapping(value = "/users/{username}", produces = MediaType.TEXT_HTML_VALUE)
+     @ResponseBody
+     public String getUserOG(@PathVariable String username, HttpServletRequest request) {
+         try {
+             String html = getIndexHtml();
+             User user = userRepository.findByUsername(username);
+             if (user != null) {
+                 String lang = extractLanguage(request);
+                 String name = (user.getDisplayName() != null ? user.getDisplayName() : user.getUsername()).replace("\"", "&quot;");
+                 String title = user.getDisplayName() != null ? (getTranslatedUserDesc(lang, name) + ": " + name) : getTranslatedUserDesc(lang, name);
+                 String description = user.getBio() != null ? user.getBio().replace("\"", "&quot;") : getTranslatedUserDesc(lang, name);
+                 String baseUrl = getBaseUrl(request);
+                 String imageUrl = (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty())
+                         ? user.getProfileImageUrl()
+                         : (baseUrl + "/assets/img/user.png");
+ 
+                 String ogTags = "<meta name=\"description\" content=\"" + description + "\">\n" +
+                                 "<meta property=\"og:title\" content=\"" + title + "\">\n" +
+                                 "<meta property=\"og:description\" content=\"" + description + "\">\n" +
+                                 "<meta property=\"og:image\" content=\"" + imageUrl + "\">\n" +
+                                 "<meta property=\"og:type\" content=\"profile\">\n" +
+                                 "<meta property=\"og:site_name\" content=\"Rarecips\">\n" +
+                                 "<meta name=\"twitter:card\" content=\"summary_large_image\">\n" +
+                                 "<meta name=\"twitter:title\" content=\"" + title + "\">\n" +
+                                 "<meta name=\"twitter:description\" content=\"" + description + "\">\n" +
+                                 "<meta name=\"twitter:image\" content=\"" + imageUrl + "\">\n";
                 return html.replace("</head>", ogTags + "</head>");
             }
             return html;

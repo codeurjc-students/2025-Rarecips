@@ -207,7 +207,7 @@ export class HomeComponent implements OnInit {
       if (isAdmin) {
         forkJoin({
           pendingRecipes: this.recipeService.getPendingRecipes(0, 100),
-          publicRecipes: this.recipeService.getRecipes(this.page)
+          publicRecipes: this.recipeService.getRecommendedRecipes(this.page)
         }).subscribe({
           next: (results: any) => {
             this.pendingLandingRecipes = results.pendingRecipes?.recipes || [];
@@ -224,15 +224,14 @@ export class HomeComponent implements OnInit {
       } else {
         forkJoin({
           userPendingRecipes: this.userService.getUserPendingRecipes(this.currentUser.username, 0, 100),
-          publicRecipes: this.recipeService.getRecipes(this.page)
+          publicRecipes: this.recipeService.getRecommendedRecipes(this.page)
         }).subscribe({
           next: (results: any) => {
             const ownPendingRecipes: Recipe[] = (results.userPendingRecipes?.content || [])
               .map((r: any) => ({
                 ...r,
                 title: r.label,
-                imageUrl: r.imageString,
-                imageString: r.imageString,
+                imageUrl: r.imageUrl,
                 pendingReview: !!r.pendingReview
               }));
 
@@ -281,12 +280,16 @@ export class HomeComponent implements OnInit {
 
   loadMoreRecipes(): void {
     this.isLoading = true;
-    this.recipeService.getRecipes(++this.page).subscribe({
+    const fetchObservable = this.currentUser
+      ? this.recipeService.getRecommendedRecipes(++this.page)
+      : this.recipeService.getRecipes(++this.page);
+
+    fetchObservable.subscribe({
       next: (moreRecipes) => {
         const mergedPublic = this.mergeRecipesUnique(this.recipeList, moreRecipes);
         this.recipeList = mergedPublic;
         this.isLoading = false;
-        this.hasMore = moreRecipes.length % this.itemsPerPage > 0;
+        this.hasMore = moreRecipes.length % this.itemsPerPage === 0 && moreRecipes.length > 0;
       },
       error: () => {
         this.isLoading = false;
@@ -420,8 +423,8 @@ export class HomeComponent implements OnInit {
     }
     return collection.recipes
       .slice(0, 3)
-      .filter(r => r.imageString)
-      .map(r => `data:image/png;base64,${r.imageString}`);
+      .filter(r => r.imageUrl)
+      .map(r => r.imageUrl);
   }
 
   async formatActivityDescription(activity: any): Promise<any> {

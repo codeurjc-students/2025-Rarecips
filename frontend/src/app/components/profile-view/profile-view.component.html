@@ -11,7 +11,7 @@
           <div class="flex w-full flex-col items-center gap-12">
             <div class="absolute top-7 right-7 flex gap-2 z-10">
               <button
-                class="w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110 relative"
+                class="userShareBut w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110 relative"
                 style="background: var(--primary-100); color: var(--primary-500);"
                 (click)="shareProfile()" title="{{ t('share') }}">
                 <i *ngIf="canShare" class="ti ti-share text-xl"></i>
@@ -39,11 +39,11 @@
               <div
                 class="flex h-36 w-36 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative border-2"
                 style="background: var(--primary-100); border-color: var(--primary-300)">
-                <img *ngIf="user?.profileImageString" class="h-36 w-36 flex-none object-cover absolute"
-                     src="data:image/jpeg;base64,{{user?.profileImageString}}"
+                <img *ngIf="user?.profileImageUrl" class="h-36 w-36 flex-none object-cover absolute"
+                     src="{{user?.profileImageUrl}}"
                      style="background: var(--primary-400);"
                      alt="Profile"/>
-                <img *ngIf="!user?.profileImageString" class="h-36 w-36 flex-none object-cover absolute"
+                <img *ngIf="!user?.profileImageUrl" class="h-36 w-36 flex-none object-cover absolute"
                      src="assets/img/user.png"
                      style="background: var(--primary-400)"
                      alt="Profile"/>
@@ -181,9 +181,9 @@
                        (click)="navigateToRecipe(recipe.id)">
                     <div class="flex w-full flex-wrap items-start gap-6">
                       <div class="recipe-image-wrapper h-44 w-64 flex-none">
-                        @if (recipe.imageString) {
+                        @if (recipe.imageUrl) {
                           <img class="h-44 w-64 rounded-md object-cover"
-                               [src]="'data:image/jpeg;base64,' + recipe.imageString"
+                               [src]="recipe.imageUrl"
                                [alt]="recipe.label" style="background-color: var(--primary-300);"/>
                         } @else {
                           <img class="h-44 w-64 rounded-md object-cover"
@@ -366,8 +366,8 @@
                         <img [src]="ingredient.image"
                              [alt]="ingredient.food"
                              class="w-16 h-16 rounded-lg object-cover flex-shrink-0"/>
-                      } @else if (ingredient.imageString) {
-                        <img [src]="ingredient.imageString"
+                      } @else if (ingredient.imageUrl) {
+                        <img [src]="ingredient.imageUrl"
                              [alt]="ingredient.food"
                              class="w-16 h-16 rounded-lg object-cover flex-shrink-0"/>
                       } @else {

@@ -54,6 +54,9 @@ public class RecipeController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private com.blasetvrtumi.rarecips.service.MinioService minioService;
+
     private User getAuthenticatedUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return null;
@@ -114,10 +117,10 @@ public class RecipeController {
             if (user.getRole().equals("ADMIN") && recipeData.get("username") != null) username = recipeData.get("username").toString();
             Recipe recipe = recipeService.createRecipeFromMap(recipeData, username);
 
-            if (Objects.equals(recipe.getImageString(), "")) {
-                String defaultRecipeImage = imageService.localImageToString("static/assets/img/recipe.png");
-                recipe.setImageString(defaultRecipeImage);
-                recipe = recipeService.updateRecipe(recipe.getId(), recipe, username);
+            if (recipe.getImageUrl() != null && recipe.getImageUrl().startsWith("data:image")) {
+                String url = minioService.uploadBase64Image(recipe.getImageUrl());
+                recipe.setImageUrl(url);
+                recipeRepository.save(recipe);
             }
 
             HashMap<String, Object> response = new HashMap<>();
@@ -158,6 +161,13 @@ public class RecipeController {
             User user = this.userService.findByUsername(username);
             if (user.getRole().equals("ADMIN") && recipeData.get("username") != null) username = recipeData.get("username").toString();
             Recipe updatedRecipe = recipeService.updateRecipeFromMap(id, recipeData, username);
+
+            if (updatedRecipe.getImageUrl() != null && updatedRecipe.getImageUrl().startsWith("data:image")) {
+                String url = minioService.uploadBase64Image(updatedRecipe.getImageUrl());
+                updatedRecipe.setImageUrl(url);
+                recipeRepository.save(updatedRecipe);
+            }
+
             HashMap<String, Object> response = new HashMap<>();
             response.put("recipe", updatedRecipe);
 
@@ -221,6 +231,28 @@ public class RecipeController {
 
         Page<Recipe> recipes = recipeRepository.findRecipesWithFilters(
             query, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, pageable);
+
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("recipes", recipes.getContent());
+        response.put("total", recipes.getTotalElements());
+        response.put("page", page);
+        response.put("size", size);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get recommended recipes for the current user based on favorites")
+    @GetMapping("/recommended")
+    public ResponseEntity<?> getRecommendedRecipes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("User must be authenticated");
+        }
+
+        String username = authentication.getName();
+        Page<Recipe> recipes = recipeService.getRecommendedRecipes(username, page, size);
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("recipes", recipes.getContent());

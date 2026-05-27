@@ -49,7 +49,7 @@ public class APIIngredientTest {
         RestAssured.basePath = "/api/v1";
         RestAssured.useRelaxedHTTPSValidation();
 
-        adminUser = new User("adminuser", "password", "admin@test.com", null, "Admin User", "Admin", "Admin bio");
+        adminUser = new User("adminuser", "password", "admin@test.com", "Admin User", "Admin", "Admin bio");
         adminUser.setRole("ADMIN");
         userRepository.save(adminUser);
 

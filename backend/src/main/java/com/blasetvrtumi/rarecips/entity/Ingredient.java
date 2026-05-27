@@ -23,18 +23,20 @@ public class Ingredient {
     @JsonView
     private String image;
 
+
+
     @JsonView
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    private String imageString;
+    private String imageUrl;
 
     public Ingredient() {
     }
 
-    public Ingredient(String food, String image, String imageString) {
+    public Ingredient(String food, String image, String imageUrl) {
         this.food = food;
         this.image = image;
-        this.imageString = imageString;
+        this.imageUrl = imageUrl;
     }
 
     public Long getId() {
@@ -49,11 +51,49 @@ public class Ingredient {
         this.food = food;
     }
 
-    public String getImageString() {
-        return imageString;
+    public String getImage() {
+        return image;
     }
 
-    public void setImageString(String imageString) {
-        this.imageString = imageString;
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+
+
+    public String getImageUrl() {
+        if (imageUrl == null) return null;
+        String externalUrl = com.blasetvrtumi.rarecips.service.MinioService.staticMinioUrl;
+        if (externalUrl != null && !externalUrl.isEmpty()) {
+            if (externalUrl.endsWith("/")) {
+                externalUrl = externalUrl.substring(0, externalUrl.length() - 1);
+            }
+            if (imageUrl.contains("localhost:9000")) {
+                return imageUrl.replace("http://localhost:9000", externalUrl);
+            }
+            if (imageUrl.contains("rarecips-minio:9000")) {
+                return imageUrl.replace("http://rarecips-minio:9000", externalUrl);
+            }
+        }
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    @PostLoad
+    public void sanitizeImageUrlAfterLoad() {
+        String externalUrl = com.blasetvrtumi.rarecips.service.MinioService.staticMinioUrl;
+        if (externalUrl != null && !externalUrl.isEmpty() && this.imageUrl != null) {
+            if (externalUrl.endsWith("/")) {
+                externalUrl = externalUrl.substring(0, externalUrl.length() - 1);
+            }
+            if (this.imageUrl.contains("localhost:9000")) {
+                this.imageUrl = this.imageUrl.replace("http://localhost:9000", externalUrl);
+            } else if (this.imageUrl.contains("rarecips-minio:9000")) {
+                this.imageUrl = this.imageUrl.replace("http://rarecips-minio:9000", externalUrl);
+            }
+        }
     }
 }

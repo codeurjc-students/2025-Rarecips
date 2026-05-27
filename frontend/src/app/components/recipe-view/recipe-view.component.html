@@ -44,10 +44,10 @@
           <div class="flex items-center gap-8 recipe-header">
             <!-- Recipe Image -->
                 <div class="recipe-view-image-wrapper relative w-2/4">
-                  <img *ngIf="recipe?.imageString || recipe?.imageUrl"
+                  <img *ngIf="recipe?.imageUrl || recipe?.imageUrl"
                     class="w-full h-full aspect-square rounded-3xl object-cover shadow-lg"
-                    src="data:image/png;base64,{{ recipe?.imageString || recipe?.imageUrl}}" alt="{{ recipe?.title }}" style="background-color: var(--primary-300);" />
-                  <img *ngIf="!recipe?.imageString && !recipe?.imageUrl"
+                    src="{{ recipe?.imageUrl || recipe?.imageUrl}}" alt="{{ recipe?.title }}" style="background-color: var(--primary-300);" />
+                  <img *ngIf="!recipe?.imageUrl && !recipe?.imageUrl"
                     class="w-full h-full aspect-square rounded-3xl object-cover shadow-lg" src="assets/img/recipe.png"
                     alt="{{ recipe?.title }}" style="background-color: var(--primary-300);" />
                   @if (recipe?.pendingReview) {
@@ -58,7 +58,7 @@
                   }
 
               <!-- Image Actions -->
-              <div class="absolute top-4 right-4 flex gap-2">
+              <div class="absolute top-4 right-4 flex gap-2 recipe-image-actions">
                 @if (isAuthenticated) {
                 <button (click)="toggleFavorite()"
                   class="glass-strong w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-transform hover:scale-110"
@@ -552,8 +552,8 @@
                     </button>
                   </div>
                   <div class="yourReviewCont flex items-start gap-3">
-                    <img *ngIf="user.profileImageString" class="object-cover w-12 h-12 rounded-full border-2"
-                      alt="Your profile" src="data:image/jpeg;base64,{{user.profileImageString}}"
+                    <img *ngIf="user.profileImageUrl" class="object-cover w-12 h-12 rounded-full border-2"
+                      alt="Your profile" src="{{user.profileImageUrl}}"
                       style="background: var(--primary-400); border-color: var(--primary-500);" />
                     <div class="flex-1">
                       <div class="flex items-center justify-between mb-2">
@@ -888,7 +888,7 @@
     </div>
 
     <div class="flex gap-10 items-center">
-      <img *ngIf="recipe?.imageString || recipe?.imageUrl" class="w-64 h-64 rounded-3xl object-cover shadow-lg flex-shrink-0" style="background-color: var(--primary-300);" src="data:image/png;base64,{{ recipe?.imageString || recipe?.imageUrl}}" />
+      <img *ngIf="recipe?.imageUrl || recipe?.imageUrl" class="w-64 h-64 rounded-3xl object-cover shadow-lg flex-shrink-0" style="background-color: var(--primary-300);" src="{{ recipe?.imageUrl || recipe?.imageUrl}}" />
       <div class="flex flex-col gap-4 w-full">
         <h1 class="text-4xl font-bold leading-tight" style="color: var(--primary-700);">{{ recipe?.title }}</h1>
         <p class="text-xl font-medium opacity-90" style="color: var(--primary-600);">{{ recipe?.description }}</p>

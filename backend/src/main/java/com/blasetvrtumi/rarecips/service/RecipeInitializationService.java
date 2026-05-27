@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
-import java.sql.Blob;
 
 import com.blasetvrtumi.rarecips.enums.*;
 import com.blasetvrtumi.rarecips.service.RecipeAttributeService;
@@ -90,7 +89,7 @@ public class RecipeInitializationService {
         if (recipeRepository.count() == 0 && recipes != null && recipes.length() > 0) {
             logger.info("Database is empty. Initializing recipes from JSON file...");
 
-            for (int i = 0; i < /*recipes.length()*/ 20; i++) {
+            for (int i = 0; i < recipes.length(); i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
 
                 String label = recipeJson.optString("label", null);
@@ -198,9 +197,8 @@ public class RecipeInitializationService {
                 String imageString = "static/assets/img/" + i + ".jpg";
                 
                 try {
-                    Blob imageBlob = imageService.localImageToBlob(imageString);
-                    recipe.setImageFile(imageBlob);
-                    recipe.setImageString(imageService.blobToString(imageBlob));
+                    String url = imageService.localImageToUrl(imageString);
+                    recipe.setImageUrl(url);
                 } catch (Exception e) {
                     logger.error("Error loading image for recipe " + label, e);
                 }

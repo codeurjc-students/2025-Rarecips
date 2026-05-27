@@ -49,14 +49,14 @@ public class APIAdminTest {
         User existingAdmin = userRepository.findByUsername("admin");
         if (existingAdmin != null) userRepository.delete(existingAdmin);
         
-        adminUser = new User("admin", "Admin", "Admin Bio", null, "static/assets/img/user.png", "admin@example.com", passwordEncoder.encode("adminpass"));
+        adminUser = new User("admin", "Admin", "Admin Bio", "http://localhost:9000/rarecips-images/user.png", "admin@example.com", passwordEncoder.encode("adminpass"));
         adminUser.setRole("ADMIN");
         userRepository.save(adminUser);
 
         User existingUser = userRepository.findByUsername("user_test");
         if (existingUser != null) userRepository.delete(existingUser);
 
-        regularUser = new User("user_test", "User Test", "User Bio", null, "static/assets/img/user.png", "user_test@example.com", passwordEncoder.encode("Password123!"));
+        regularUser = new User("user_test", "User Test", "User Bio", "http://localhost:9000/rarecips-images/user.png", "user_test@example.com", passwordEncoder.encode("Password123!"));
         userRepository.save(regularUser);
 
         Map<String, String> loginRequest = new HashMap<>();

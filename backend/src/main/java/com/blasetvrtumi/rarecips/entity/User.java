@@ -6,13 +6,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -46,13 +40,9 @@ public class User {
     @JsonView(BasicInfo.class)
     private String bio;
 
-    @Lob
-    @JsonIgnore
-    private Blob profileImageFile;
-
     @JsonView(BasicInfo.class)
     @Lob
-    private String profileImageString;
+    private String profileImageUrl;
 
     @JsonView(BasicInfo.class)
     private String email;
@@ -129,53 +119,13 @@ public class User {
     public User() {
     }
 
-    public User(String username, String displayName, String bio, Blob profileImageFile, String profileImageString, String email, String password) {
+    public User(String username, String displayName, String bio, String profileImageUrl, String email, String password) {
         this.username = username;
         this.displayName = displayName;
         this.bio = bio;
-        this.profileImageFile = profileImageFile;
         this.email = email;
         this.password = password;
-        this.profileImageFile = profileImageFile;
-        this.profileImageString = profileImageString;
-
-        try {
-            if (this.profileImageFile == null) {
-                this.profileImageFile = localImageToBlob(this.profileImageString);
-            }
-        } catch (IOException | SQLException e) {
-            this.profileImageFile = null;
-            logger.error("Error loading profile image for user {}: {}", this.username, e.getMessage());
-        }
-    }
-
-    public Blob localImageToBlob(String imagePath) throws IOException, SQLException {
-        try {
-            ClassPathResource imageResource = new ClassPathResource(imagePath);
-            if (imageResource.exists()) {
-                InputStream imageStream = imageResource.getInputStream();
-
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int bytesRead;
-                byte[] data = new byte[8192];
-
-                while ((bytesRead = imageStream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, bytesRead);
-                }
-
-                byte[] imageBytes = buffer.toByteArray();
-                Blob imageBlob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-
-                imageStream.close();
-                buffer.close();
-                return imageBlob;
-            } else {
-                logger.warn("Image not found: {}", imagePath);
-            }
-        } catch (IOException | SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public String getUsername() {
@@ -234,20 +184,25 @@ public class User {
         this.password = password;
     }
 
-    public void setProfileImageString(String profileImageString) {
-        this.profileImageString = profileImageString;
+    public String getProfileImageUrl() {
+        if (profileImageUrl == null) return null;
+        String externalUrl = com.blasetvrtumi.rarecips.service.MinioService.staticMinioUrl;
+        if (externalUrl != null && !externalUrl.isEmpty()) {
+            if (externalUrl.endsWith("/")) {
+                externalUrl = externalUrl.substring(0, externalUrl.length() - 1);
+            }
+            if (profileImageUrl.contains("localhost:9000")) {
+                return profileImageUrl.replace("http://localhost:9000", externalUrl);
+            }
+            if (profileImageUrl.contains("rarecips-minio:9000")) {
+                return profileImageUrl.replace("http://rarecips-minio:9000", externalUrl);
+            }
+        }
+        return profileImageUrl;
     }
 
-    public void setProfileImageFile(Blob profileImageFile) {
-        this.profileImageFile = profileImageFile;
-    }
-
-    public Blob getProfileImageFile() {
-        return profileImageFile;
-    }
-
-    public String getProfileImageString() {
-        return profileImageString;
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void setIngredients(List<Ingredient> ingredients) {

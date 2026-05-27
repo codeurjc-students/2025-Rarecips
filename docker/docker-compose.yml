@@ -8,21 +8,26 @@ services:
   rarecips-app:
 
     container_name: rarecips-app
-    image: blasetvrtumi/rarecips:0.2
+    image: blasetvrtumi/rarecips:1.0
     build:
       context: ../
       dockerfile: docker/Dockerfile
     ports:
-      - "8443:8443"
+      - "8443:8080"
     depends_on:
       rarecips-DB:
         condition: service_healthy
-    command: [ "/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 --timeout=20 -- && java -jar /app/rarecips-1.0.jar" ]
+    command: [ "/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 --timeout=20 -- && java -jar /app/rarecips.jar" ]
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-DB:3306/rarecips
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - APP_OLLAMA_URL=http://rarecips-ollama:11434
+      - MINIO_INTERNAL_URL=http://rarecips-minio:9000
+      - MINIO_EXTERNAL_URL=https://rarecips.spaincentral.cloudapp.azure.com
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
     secrets:
       - source: env_properties
         target: /run/secrets/env.properties
@@ -33,8 +38,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: rarecips
+      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
+      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -71,10 +78,45 @@ services:
     depends_on:
       rarecips-ollama:
         condition: service_healthy
+  
+  rarecips-minio:
+    container_name: rarecips-minio
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-init:
+    container_name: minio-init
+    image: minio/mc:latest
+    depends_on:
+      rarecips-minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO...';
+      sleep 2;
+      mc alias set myminio http://rarecips-minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc mb myminio/rarecips-images || echo 'Bucket already exists';
+      mc anonymous set public myminio/rarecips-images;
+      echo 'MinIO initialized successfully.';
+      "
 
 volumes:
   mysql:
   ollama_data:
+  minio_data:
 
 secrets:
   env_properties:

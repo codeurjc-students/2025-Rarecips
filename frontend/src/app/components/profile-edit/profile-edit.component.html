@@ -23,12 +23,12 @@
                   <div class="relative">
                     <div
                       class="flex h-32 w-32 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative border-2" style="border-color: var(--primary-300)">
-                      <img *ngIf="base64String" class="h-32 w-32 flex-none object-cover absolute"
-                           src="data:image/jpeg;base64,{{base64String}}" alt="Profile" style="background: var(--primary-400); border-color: var(--primary-300)"/>
-                      <img *ngIf="!base64String" class="h-32 w-32 flex-none object-cover absolute"
+                      <img *ngIf="imageUrl" class="h-32 w-32 flex-none object-cover absolute"
+                           src="{{imageUrl}}" alt="Profile" style="background: var(--primary-400); border-color: var(--primary-300)"/>
+                      <img *ngIf="!imageUrl" class="h-32 w-32 flex-none object-cover absolute"
                            [src]="user?.profilePictureUrl || 'assets/img/user.png'" alt="Profile" style="background: var(--primary-400)"/>
                     </div>
-                    <button *ngIf="base64String && !defaultPfp.includes(base64String)" type="button"
+                    <button *ngIf="imageUrl && !defaultPfp.includes(imageUrl)" type="button"
                             class="absolute top-1 px-3 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-105 flex gap-2 ml-32"
                             (click)="removeImage()"
                             style="background: var(--primary-500); color: white;"><i class="ti ti-trash"></i></button>

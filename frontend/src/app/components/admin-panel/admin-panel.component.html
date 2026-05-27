@@ -185,7 +185,7 @@
           </div>
           <div *ngFor="let recipe of popularRecipes" class="flex items-center gap-4 p-4 rounded-2xl glass-strong hover:scale-[1.02] cursor-pointer" style="background: var(--primary-100-40); transition: all 0.3s ease;" routerLink="/recipes/{{recipe.id}}">
             <img *ngIf="recipe.imageUrl" class="h-12 w-12 rounded-lg object-cover"
-                 [src]="'data:image/png;base64,' + recipe.imageUrl"
+                 [src]="recipe.imageUrl"
                  [alt]="recipe.title"/>
             <img *ngIf="!recipe.imageUrl" class="h-12 w-12 rounded-lg object-cover"
                  src="assets/img/recipe.png" style="background-color: var(--primary-300);"
@@ -346,8 +346,8 @@
       <div *ngFor="let admin of adminUsers" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
         <span class="font-semibold text-primary flex flex-row items-center justify-center gap-4 cursor-pointer" style="color: var(--primary-700);"
               routerLink="/users/{{admin.username}}">
-          <img *ngIf="admin.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + admin.profileImageString" alt="admin" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
-          <img *ngIf="!admin.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="admin.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="admin.profileImageUrl" alt="admin" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="!admin.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
           {{ admin.username }}
         </span>
         <button class="btn btn-sm text-xs px-3 py-2 text-white font-medium hover:scale-105 transition-transform rounded-xl" style="background: #ef4444;" (click)="changeUserRole(admin.username, 'USER')">{{ t('remove') }}</button>
@@ -389,8 +389,8 @@
       <div *ngFor="let user of users" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
         <span class="font-semibold text-primary flex flex-row items-center justify-center gap-4 cursor-pointer" style="color: var(--primary-700);"
               routerLink="/users/{{user.username}}">
-          <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
-          <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="user.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="user.profileImageUrl" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="!user.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
           {{ user.username }}
         </span>
         <div class="flex gap-2">
@@ -439,8 +439,8 @@
       <div *ngFor="let user of suspendedUsers" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
         <span class="font-semibold text-primary flex flex-row items-center justify-center gap-4 cursor-pointer" style="color: var(--primary-700);"
         routerLink="/users/{{user.username}}">
-          <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
-          <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="user.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="user.profileImageUrl" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+          <img *ngIf="!user.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
           {{ user.username }}
         </span>
         <button class="btn btn-sm text-xs font-medium text-white px-3 py-2 rounded-xl border-none cursor-pointer hover:scale-105 transition-transform" style="background: var(--gradient-primary);" (click)="liftSuspension(user.username)">
@@ -483,7 +483,7 @@
       </div>
       <div *ngFor="let recipe of pendingRecipes" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
         <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/recipes/{{recipe.id}}">
-          <img *ngIf="recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" [src]="'data:image/jpeg;base64,' + recipe.imageUrl" alt="recipe" />
+          <img *ngIf="recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" [src]="recipe.imageUrl" alt="recipe" />
           <img *ngIf="!recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" src="/assets/img/recipe.png" alt="default recipe" style="background-color: var(--primary-300);" />
           {{ recipe.title }}
         </span>
@@ -530,7 +530,7 @@
         </div>
         <div *ngFor="let recipe of reportedRecipes" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
           <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/recipes/{{recipe.id}}" (click)="closeModal()">
-            <img *ngIf="recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" [src]="'data:image/jpeg;base64,' + recipe.imageUrl" alt="recipe" />
+            <img *ngIf="recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" [src]="recipe.imageUrl" alt="recipe" />
             <img *ngIf="!recipe.imageUrl" class="h-10 w-10 rounded-lg object-cover" src="/assets/img/recipe.png" alt="default recipe" style="background-color: var(--primary-300);" />
             {{ recipe.title }}
           </span>
@@ -558,8 +558,8 @@
         </div>
         <div *ngFor="let user of reportedUsers" class="flex justify-between items-center py-2 border-b border-[var(--primary-300)] border-primary/10">
           <span class="font-semibold text-primary flex items-center gap-4 cursor-pointer" style="color: var(--primary-700);" routerLink="/users/{{user.username}}" (click)="closeModal()">
-            <img *ngIf="user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="'data:image/jpeg;base64,' + user.profileImageString" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
-            <img *ngIf="!user.profileImageString" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+            <img *ngIf="user.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" [src]="user.profileImageUrl" alt="user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
+            <img *ngIf="!user.profileImageUrl" style="background: var(--primary-400); border-color: var(--primary-300)" src="/assets/img/user.png" alt="default user" class="quick-search-thumb user-thumb border-2 max-h-12 rounded-3xl" />
             {{ user.username }}
           </span>
           <div class="flex gap-2">

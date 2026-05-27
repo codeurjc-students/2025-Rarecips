@@ -84,7 +84,7 @@ export class ProfileEditComponent implements OnInit {
 
   showCurrentPassword: boolean = false;
   isAdmin: boolean = false;
-  base64String: string | null = '';
+  imageUrl: string | null = '';
   selectedImageFile: File = null as any;
   defaultPfp: string = '';
 
@@ -131,8 +131,8 @@ export class ProfileEditComponent implements OnInit {
     this.userService.getUserByUsername(this.usernamePath).subscribe({
       next: (userData) => {
         this.user = userData;
-          if (this.user.profileImageString && !this.defaultPfp.includes(this.user.profileImageString)) {
-          this.base64String = this.user.profileImageString;
+          if (this.user.profileImageUrl && !this.defaultPfp.includes(this.user.profileImageUrl)) {
+          this.imageUrl = this.user.profileImageUrl;
         }
       },
       error: error => {
@@ -235,9 +235,9 @@ export class ProfileEditComponent implements OnInit {
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      this.base64String = e.target.result.split(',')[1];
+      this.imageUrl = e.target.result;
       // Change image in preview,not yet in backend until changes are confirmed
-      this.user.profileImageString = this.base64String;
+      this.user.profileImageUrl = this.imageUrl;
     };
     reader.readAsDataURL(file);
     this.selectedImageFile = file;
@@ -263,7 +263,7 @@ export class ProfileEditComponent implements OnInit {
       displayName: this.user.displayName,
       bio: this.user.bio,
       email: this.user.email,
-      profileImageString: this.base64String,
+      profileImageUrl: this.imageUrl,
       privateProfile: this.user.privateProfile
     };
 
@@ -569,7 +569,7 @@ export class ProfileEditComponent implements OnInit {
 
   removeImage(): void {
     this.selectedImageFile = null as any;
-    this.base64String = '';
+    this.imageUrl = '';
   }
 
   private getDefaultPfp() {

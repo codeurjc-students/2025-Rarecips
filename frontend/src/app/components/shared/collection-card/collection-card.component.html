@@ -118,7 +118,7 @@
                     @if (getCollectionImage(collection)) {
                       <img
                         class="h-20 w-28 flex-none rounded-md object-cover"
-                        [src]="'data:image/jpeg;base64,' + getCollectionImage(collection)"
+                        [src]="getCollectionImage(collection)"
                         alt="{{ collection.title }}"/>
                     } @else {
                       <div class="h-20 w-28 flex-none rounded-md flex items-center justify-center"
@@ -316,8 +316,8 @@
               <div class="flex gap-4 p-4 rounded-2xl glass-strong transition-all hover:scale-[1.02] cursor-pointer"
                    style="background: var(--primary-100-40);"
                    (click)="navigateToRecipe(recipe.id, $event)">
-                @if (recipe.imageString) {
-                  <img [src]="'data:image/jpeg;base64,' + recipe.imageString"
+                @if (recipe.imageUrl) {
+                  <img [src]="recipe.imageUrl"
                        [alt]="recipe.label"
                        class="w-24 h-24 rounded-xl object-cover flex-shrink-0"/>
                 } @else {

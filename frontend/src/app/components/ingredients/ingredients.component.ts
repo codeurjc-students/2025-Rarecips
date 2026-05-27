@@ -309,8 +309,8 @@ export class IngredientsComponent implements OnInit {
       this.editing = true;
       this.editIngredientInd = this.ingredients.findIndex(ing => ing.id === ingredient.id);
       this.newIngredient = { ...ingredient };
-      if (ingredient.imageString) ingredient.image = '';
-      this.currentImage = ingredient.image || ingredient.imageString as any;
+      if (ingredient.imageUrl) ingredient.image = '';
+      this.currentImage = ingredient.image || ingredient.imageUrl as any;
     } else {
       this.editing = false;
       this.editIngredientInd = -1;
@@ -385,9 +385,9 @@ export class IngredientsComponent implements OnInit {
     this.creatingIngredient = true;
     this.createIngredientError = null;
     if (this.currentImage) {
-      this.newIngredient.imageString = this.currentImage;
+      this.newIngredient.imageUrl = this.currentImage;
     } else {
-      this.newIngredient.imageString = 'assets/img/ingredient.png';
+      this.newIngredient.imageUrl = 'assets/img/ingredient.png';
     }
     if (this.editing) {
       this.ingredientService.updateIngredient(this.newIngredient.id!, this.newIngredient).subscribe({

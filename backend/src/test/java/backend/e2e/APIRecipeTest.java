@@ -43,7 +43,7 @@ public class APIRecipeTest {
     @Autowired
     private RecipeService recipeService;
 
-    private final User testUser = new User("testuser", "testpassword", "test@example.com", null, "Test User",
+    private final User testUser = new User("testuser", "testpassword", "test@example.com", "Test User",
             "This is a test user.", "");
 
     private Recipe testRecipe1;

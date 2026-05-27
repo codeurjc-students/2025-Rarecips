@@ -44,7 +44,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldCreateUserSuccessfully() {
-        User user = new User("testuser", "password", "test@example.com", null, "Test User", "desc", "bio");
+        User user = new User("testuser", "password", "test@example.com", "Test User", "desc", "bio");
         when(userRepository.save(any(User.class))).thenReturn(user);
         User result = userService.save(user);
         assertThat(result.getUsername()).isEqualTo("testuser");
@@ -53,7 +53,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldFindUserByUsername() {
-        User user = new User("testuser", "password", "test@example.com", null, "Test User", "desc", "bio");
+        User user = new User("testuser", "password", "test@example.com", "Test User", "desc", "bio");
         when(userRepository.findByUsername("testuser")).thenReturn(user);
         User result = userService.findByUsername("testuser");
         assertThat(result).isNotNull();
@@ -62,7 +62,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldUpdateUserSuccessfully() {
-        User user = new User("testuser", "password", "test@example.com", null, "Test User", "desc", "bio");
+        User user = new User("testuser", "password", "test@example.com", "Test User", "desc", "bio");
 
         Authentication auth = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -90,7 +90,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldGetUsersByRole() {
-        User user = new User("admin", "pass", "admin@test.com", null, "Admin", "desc", "bio");
+        User user = new User("admin", "pass", "admin@test.com", "Admin", "desc", "bio");
         user.setRole("ADMIN");
         Page<User> page = new PageImpl<>(java.util.Collections.singletonList(user));
         when(userRepository.findByRole(eq(User.Role.ADMIN), any(Pageable.class))).thenReturn(page);
@@ -102,7 +102,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldGetFilteredUsersStatus() {
-        User user = new User("suspended", "pass", "s@test.com", null, "Suspended", "desc", "bio");
+        User user = new User("suspended", "pass", "s@test.com", "Suspended", "desc", "bio");
         user.setSuspended(true);
         Page<User> page = new PageImpl<>(java.util.Collections.singletonList(user));
         when(userRepository.findByRoleNotAndSuspendedCustom(eq(User.Role.ADMIN), eq(true), any(Pageable.class))).thenReturn(page);
@@ -114,7 +114,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldDeleteUserAndCascade() {
-        User user = new User("todelete", "pass", "d@test.com", null, "Delete", "desc", "bio");
+        User user = new User("todelete", "pass", "d@test.com", "Delete", "desc", "bio");
         when(userRepository.findByUsername("todelete")).thenReturn(user);
         when(collectionRepository.findByUser(user)).thenReturn(java.util.Collections.emptyList());
         when(recipeRepository.findByAuthor(user)).thenReturn(java.util.Collections.emptyList());

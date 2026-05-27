@@ -319,7 +319,9 @@ export class NavbarComponent implements OnInit {
       }
 
       let navbar = document.getElementById('navbar') as HTMLElement;
-      this.anyActiveSections = !!navbar.querySelector('.nav-item.active');
+      if (navbar) {
+        this.anyActiveSections = !!navbar.querySelector('.nav-item.active');
+      }
     });
 
     this.syncLanguageUi();

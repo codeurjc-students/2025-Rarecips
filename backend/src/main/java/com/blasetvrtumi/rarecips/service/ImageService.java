@@ -3,9 +3,6 @@ package com.blasetvrtumi.rarecips.service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Blob;
-import java.sql.SQLException;
-import java.util.Base64;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -17,18 +14,15 @@ import org.slf4j.LoggerFactory;
 public class ImageService {
     private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
 
-    public Blob updateImageFile(String imageString) {
-        try {
-            byte[] imageBytes = Base64.getDecoder().decode(imageString);
-            Blob imageBlob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-            return imageBlob;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private final MinioService minioService;
+
+    public ImageService(MinioService minioService) {
+        this.minioService = minioService;
     }
 
-    public Blob localImageToBlob(String imagePath) {
+
+
+    public String localImageToUrl(String imagePath) {
         try {
             ClassPathResource imageResource = new ClassPathResource(imagePath);
             if (imageResource.exists()) {
@@ -43,35 +37,27 @@ public class ImageService {
                 }
 
                 byte[] imageBytes = buffer.toByteArray();
-                Blob imageBlob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
+                
+                String contentType = "image/jpeg";
+                if (imagePath.endsWith(".png")) contentType = "image/png";
+                else if (imagePath.endsWith(".webp")) contentType = "image/webp";
 
                 imageStream.close();
                 buffer.close();
-                return imageBlob;
+
+                return minioService.uploadBytes(imageBytes, contentType);
             } else {
                 logger.warn("Image not found: {}", imagePath);
             }
-        } catch (IOException | SQLException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public String blobToString(Blob blob) {
-        if (blob == null) {
-            return null;
-        }
-        try {
-            byte[] bytes = blob.getBytes(1, (int) blob.length());
-            String imageString = Base64.getEncoder().encodeToString(bytes);
-            return imageString;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 
     public String localImageToString(String s) {
-        return blobToString(localImageToBlob(s));
+        return localImageToUrl(s);
     }
 }

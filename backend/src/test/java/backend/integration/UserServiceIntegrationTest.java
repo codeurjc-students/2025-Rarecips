@@ -28,7 +28,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     void shouldCreateAndRetrieveUser() {
-        User user = new User("testuser", "password", "test@example.com", null, "Test User", "desc", "bio");
+        User user = new User("testuser", "password", "test@example.com", "Test User", "desc", "bio");
         User savedUser = userService.save(user);
         entityManager.flush();
         User retrieved = userService.findByUsername(savedUser.getUsername());
@@ -38,7 +38,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     void shouldFindUsersByRole() {
-        User admin = new User("admin", "pass", "admin@test.com", null, "Admin", "desc", "bio");
+        User admin = new User("admin", "pass", "admin@test.com", "Admin", "desc", "bio");
         admin.setRole("ADMIN");
         userService.save(admin);
         
@@ -50,7 +50,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     void shouldFindSuspendedUsers() {
-        User user = new User("suspended_user", "pass", "s@test.com", null, "Suspended", "desc", "bio");
+        User user = new User("suspended_user", "pass", "s@test.com", "Suspended", "desc", "bio");
         user.setSuspended(true);
         userService.save(user);
 
