@@ -46,13 +46,7 @@ public class UIUserTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".top-7"))).click();
-
-    {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".top-7")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).perform();
-    }
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".userEditBut"))).click();
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".bioInput"))).click();
     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".bioInput"))).sendKeys("Updated bio");
@@ -94,13 +88,7 @@ public class UIUserTest extends BaseUnitTest {
 
 
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".top-7"))).click();
-
-    {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".top-7")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).perform();
-    }
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".userEditBut"))).click();
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".py-3 > span"))).click();
 

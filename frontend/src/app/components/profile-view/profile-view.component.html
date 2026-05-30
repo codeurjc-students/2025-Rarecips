@@ -11,7 +11,7 @@
           <div class="flex w-full flex-col items-center gap-12">
             <div class="absolute top-7 right-7 flex gap-2 z-10">
               <button
-                class="userShareBut w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110 relative"
+                class="userShareBut w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"
                 style="background: var(--primary-100); color: var(--primary-500);"
                 (click)="shareProfile()" title="{{ t('share') }}">
                 <i *ngIf="canShare" class="ti ti-share text-xl"></i>
@@ -180,13 +180,13 @@
                        style="background: var(--primary-200-40);"
                        (click)="navigateToRecipe(recipe.id)">
                     <div class="flex w-full flex-wrap items-start gap-6">
-                      <div class="recipe-image-wrapper h-44 w-64 flex-none">
+                      <div class="recipe-image-wrapper h-44 w-64 flex-none overflow-hidden rounded-md">
                         @if (recipe.imageUrl) {
-                          <img class="h-44 w-64 rounded-md object-cover"
+                          <img class="profileRecipeImage h-44 w-64 rounded-md object-cover"
                                [src]="recipe.imageUrl"
                                [alt]="recipe.label" style="background-color: var(--primary-300);"/>
                         } @else {
-                          <img class="h-44 w-64 rounded-md object-cover"
+                          <img class="profileRecipeImage h-44 w-64 rounded-md object-cover"
                                src="assets/img/recipe.png"
                                [alt]="recipe.label" style="background-color: var(--primary-300);" />
                         }

@@ -86,11 +86,6 @@ public class RecipeController {
     public ResponseEntity<?> getRecipeById(@PathVariable Long id, Authentication authentication) {
         Recipe recipe = recipeService.findById(id);
         if (recipe == null) return ResponseEntity.status(404).body("Recipe not found");
-
-        User authenticatedUser = getAuthenticatedUser(authentication);
-        if (!canViewPendingRecipe(recipe, authenticatedUser)) {
-            return ResponseEntity.status(403).body("Recipe is pending approvak");
-        }
         
         HashMap<String, Object> response = new HashMap<>();
         response.put("recipe", recipe);

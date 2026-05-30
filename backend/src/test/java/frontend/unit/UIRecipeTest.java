@@ -24,7 +24,6 @@ public class UIRecipeTest extends BaseUnitTest {
   }
   @Test
   public void recipecrud() {
-    // Test name: Recipe CRUD - Create, Read, Update, Delete
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     // ========== CREATE RECIPE ==========
@@ -54,31 +53,18 @@ public class UIRecipeTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    WebElement createBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".gap-3")));
+    WebElement createBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".publishBut button")));
     jsClick(createBtn);
 
-    js.executeScript("window.scrollTo(0,0)");
-
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.urlMatches(".*/recipes/\\d+"));
+    String currentUrl = driver.getCurrentUrl();
+    String recipeId = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
 
     // ========== EDIT RECIPE ==========
-    driver.get("https://localhost:8443/");
+    driver.get("https://localhost:8443/recipes/" + recipeId);
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
-
-    WebElement recipeCard = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(1)")));
-    jsClick(recipeCard);
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipeCont")));
 
     js.executeScript("window.scrollTo(0,0)");
 
@@ -98,13 +84,11 @@ public class UIRecipeTest extends BaseUnitTest {
     jsClick(editBtn);
 
     wait.until(ExpectedConditions.elementToBeClickable(By.id("recipeLabel"))).click();
-
     WebElement labelInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeLabel")));
     labelInput.clear();
     labelInput.sendKeys("Updated Recipe");
 
     wait.until(ExpectedConditions.elementToBeClickable(By.id("recipeDesc"))).click();
-
     WebElement descInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeDesc")));
     descInput.clear();
     descInput.sendKeys("Updated description");
@@ -117,33 +101,16 @@ public class UIRecipeTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    WebElement updateBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".gap-3")));
+    WebElement updateBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".publishBut button")));
     jsClick(updateBtn);
 
-    js.executeScript("window.scrollTo(0,0)");
-
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.urlToBe("https://localhost:8443/recipes/" + recipeId));
 
     // ========== DELETE RECIPE ==========
-    driver.get("https://localhost:8443/");
+    driver.get("https://localhost:8443/recipes/" + recipeId);
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    js.executeScript("window.scrollTo(0,283)");
-
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
-
-    WebElement recipeCardDelete = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(1)")));
-    jsClick(recipeCardDelete);
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipeCont")));
 
     js.executeScript("window.scrollTo(0,0)");
 

@@ -1285,9 +1285,9 @@ button:focus {
 
   .dropdown-trigger span,
   .dropdown-trigger > div:not(.theme-circle) {
-    display: none !important;
-    opacity: 0 !important;
-    transform: translateX(-10px) !important;
+    display: none;
+    opacity: 0;
+    transform: translateX(-10px);
     transition: opacity 0.2s ease, transform 0.2s ease, display 0.2s allow-discrete !important;
   }
 
@@ -1413,6 +1413,12 @@ button:focus {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
+  .notif-badge {
+    display: block !important;
+    opacity: 1 !important;
+    transform: translateX(0.1rem) !important;
+  }
+
   .expanded > div > .auth-btn {
     width: 60% !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -1501,6 +1507,7 @@ button:focus {
 
 .notif-badge {
   will-change: transform, box-shadow;
+  text-align: center;
 }
 
 .animate-unread-pulse {

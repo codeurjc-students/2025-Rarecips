@@ -263,15 +263,6 @@
                   </div>
                 }
 
-                @if (recipe.pendingReview) {
-                  <div class="pending-recipe-overlay">
-                    <div class="pending-recipe-chip">
-                      <i class="ti ti-clock text-lg"></i>
-                      <span>{{ t('pending_admin_approval') }}</span>
-                    </div>
-                  </div>
-                }
-
                 @if (currentUser) {
                   <div class="actionButtons absolute top-4 right-4 flex gap-2">
                     <button
@@ -458,15 +449,6 @@
 
                     <!-- Gradient Overlay -->
                     <div class="absolute inset-0 gradient-overlay"></div>
-
-                    @if (recipe.pendingReview) {
-                      <div class="pending-recipe-overlay">
-                        <div class="pending-recipe-chip">
-                          <i class="ti ti-clock text-lg"></i>
-                          <span>{{ t('pending_admin_approval') }}</span>
-                        </div>
-                      </div>
-                    }
 
                     @if (recipe.pendingReview) {
                       <div class="pending-recipe-overlay">

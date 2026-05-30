@@ -7,6 +7,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.Duration;
 
 public class UIAuthTest extends BaseUnitTest {
@@ -39,21 +41,51 @@ public class UIAuthTest extends BaseUnitTest {
 
   @Test
   public void testSignup() {
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+    String uniqueUsername = "uitest" + System.currentTimeMillis() % 100000;
+
     driver.get(baseUrl + "/signup");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    helper.pause(500);
+    helper.pause(1000);
 
-    helper.waitAndSendKeys(By.id("signup-username"), "testuser");
-    helper.waitAndSendKeys(By.id("signup-email"), "testuser@example.com");
-    helper.waitAndSendKeys(By.id("signup-password"), "testpassword123_");
-    helper.waitAndSendKeys(By.id("signup-confirm-password"), "testpassword123_");
+    WebElement usernameInput = helper.waitForClickable(By.id("signup-username"));
+    usernameInput.clear();
+    usernameInput.sendKeys(uniqueUsername);
+    js.executeScript(
+      "var el = arguments[0]; " +
+      "el.dispatchEvent(new Event('input', { bubbles: true })); " +
+      "el.dispatchEvent(new Event('change', { bubbles: true }));",
+      usernameInput
+    );
+
+    helper.waitAndSendKeys(By.id("signup-email"), uniqueUsername + "@example.com");
+
+    WebElement passwordInput = helper.waitForClickable(By.id("signup-password"));
+    passwordInput.clear();
+    passwordInput.sendKeys("Testpassword1_");
+    js.executeScript(
+      "var el = arguments[0]; el.dispatchEvent(new Event('input', { bubbles: true }));",
+      passwordInput
+    );
+
+    WebElement confirmInput = helper.waitForClickable(By.id("signup-confirm-password"));
+    confirmInput.clear();
+    confirmInput.sendKeys("Testpassword1_");
+    js.executeScript(
+      "var el = arguments[0]; el.dispatchEvent(new Event('input', { bubbles: true }));",
+      confirmInput
+    );
+
+    helper.pause(2000);
 
     WebElement acceptTermsCheckbox = helper.waitAndGetElement(By.cssSelector("input[name='acceptTerms']"));
     helper.jsClick(acceptTermsCheckbox);
 
     js.executeScript("window.scrollTo(0,0)");
 
+    wait.until(ExpectedConditions.elementToBeClickable(By.id("signupBut")));
     helper.waitAndClick(By.id("signupBut"));
 
     helper.pause(1000);

@@ -28,17 +28,15 @@ public class UICollectionTest extends BaseUnitTest {
     // Test name: Collection CRUD - Create, Read, Update, Delete
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
+    String randomSuffix = String.valueOf(System.currentTimeMillis());
+    String colName = "Test Col " + randomSuffix;
+    String updatedColName = "Updated Col " + randomSuffix;
+
     // ========== CREATE COLLECTION ==========
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
     js.executeScript("window.scrollTo(0,24)");
-
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
 
@@ -59,38 +57,23 @@ public class UICollectionTest extends BaseUnitTest {
 
     js.executeScript("window.scrollTo(0,0)");
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    WebElement createNewBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".w-full > .font-semibold")));
+    WebElement createNewBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".visibleBackdrop button[style*='gradient-primary']")));
     jsClick(createNewBtn);
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".px-4"))).click();
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".px-4"))).sendKeys("Test Collection");
+    WebElement collectionInput = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".visibleBackdrop input[type='text']")));
+    collectionInput.click();
+    collectionInput.sendKeys(colName);
 
-    WebElement checkBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ti-check")));
+    WebElement checkBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".visibleBackdrop .ti-check")));
     jsClick(checkBtn);
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("visibleBackdrop")));
 
     // ========== ADD RECIPE TO COLLECTION ==========
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
     js.executeScript("window.scrollTo(0,246)");
-
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
 
@@ -99,88 +82,39 @@ public class UICollectionTest extends BaseUnitTest {
 
     js.executeScript("window.scrollTo(0,0)");
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    WebElement selectBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".w-full > .font-semibold")));
+    WebElement selectBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(@class, 'visibleBackdrop')]//button[contains(., '" + colName + "')]")));
     jsClick(selectBtn);
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("visibleBackdrop")));
 
     // ========== EDIT COLLECTION ==========
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    try {
-      Thread.sleep(1500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".aspect-square"))).click();
-
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
 
     js.executeScript("window.scrollTo(0,200)");
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".tab:nth-child(3)"))).click();
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex:nth-child(2) > .flex > .flex > .w-8:nth-child(1) > .ti"))).click();
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex-1"))).click();
-
-    WebElement titleInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex-1")));
+    
+    WebElement titleInput = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex-1")));
     titleInput.clear();
-    titleInput.sendKeys("Updated Collection");
+    titleInput.sendKeys(updatedColName);
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ti-check"))).click();
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("input.flex-1")));
 
     // ========== DELETE COLLECTION ==========
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".glass:nth-child(1) > .flex > .btn"))).click();
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".hover\\3Askew-x-12"))).click();
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".\\!delete-collection-btn > .font-semibold"))).click();
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//span[contains(text(), '" + updatedColName + "')]")));
   }
 }

@@ -4,6 +4,7 @@
 
 .recipe-view-image-wrapper {
   position: relative;
+  overflow: hidden;
 }
 
 .recipe-view-pending-overlay {
@@ -787,6 +788,10 @@
 
   .focus-mode-modal > *:not(.focus-step-card) {
     transform: scale(0.6);
+  }
+
+  .steps {
+    transform: scale(0.6) translateX(-15vw) !important;
   }
 
   .steps {

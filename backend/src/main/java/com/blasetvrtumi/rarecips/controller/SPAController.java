@@ -99,7 +99,7 @@ public class SPAController {
         return "en";
     }
 
-    @GetMapping(value = "/recipes/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "/recipes/{id:\\d+}", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
     public String getRecipeOG(@PathVariable Long id, HttpServletRequest request) {
         try {

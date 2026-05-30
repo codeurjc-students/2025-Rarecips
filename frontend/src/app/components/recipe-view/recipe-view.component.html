@@ -118,11 +118,11 @@
                 <!-- Author Info -->
                 <div class="chefInfo flex items-center gap-4">
                   @if (authorPfp) {
-                  <img class="w-12 h-12 rounded-full object-cover cursor-pointer border-2"
+                  <img class="w-12 h-12 rounded-full object-cover cursor-pointer border-2 aspect-square"
                     routerLink="/users/{{recipe?.author}}" src="{{ authorPfp }}"
                     style="background: var(--primary-400); border-color: var(--primary-300)" alt="Chef" />
                   } @else {
-                  <img class="w-12 h-12 rounded-full object-cover cursor-pointer border-2"
+                  <img class="w-12 h-12 rounded-full object-cover cursor-pointer border-2 aspect-square"
                     routerLink="/users/{{recipe?.author}}" src="assets/img/user.png"
                     style="background: var(--primary-400); border-color: var(--primary-300)" alt="Chef" />
                   }
@@ -458,7 +458,7 @@
                     <div class="flex gap-2">
                       @for (i of [1,2,3,4,5]; track i) {
                       <button type="button" (click)="setRating(i)" (mouseenter)="setHoverRating(i)"
-                        (mouseleave)="clearHoverRating()" class="transition-all hover:scale-125">
+                        (mouseleave)="clearHoverRating()" class="rating-star-btn transition-all hover:scale-125">
                         <i class="ti ti-star-filled text-3xl"
                           [style.color]="i <= (reviewHoverRating || newReview.rating) ? '#eab308' : 'var(--primary-300)'"></i>
                       </button>
