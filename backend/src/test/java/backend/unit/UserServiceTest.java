@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.blasetvrtumi.rarecips.repository.RecipeCollectionRepository;
+import com.blasetvrtumi.rarecips.repository.HealthReportRepository;
+import com.blasetvrtumi.rarecips.repository.NotificationRepository;
 import com.blasetvrtumi.rarecips.repository.RecipeRepository;
 import com.blasetvrtumi.rarecips.repository.ReviewRepository;
 import com.blasetvrtumi.rarecips.entity.User;
@@ -38,6 +40,12 @@ public class UserServiceTest {
 
     @Mock
     private RecipeCollectionRepository collectionRepository;
+
+    @Mock
+    private HealthReportRepository healthReportRepository;
+
+    @Mock
+    private NotificationRepository notificationRepository;
 
     @InjectMocks
     private UserService userService;
@@ -116,9 +124,14 @@ public class UserServiceTest {
     public void shouldDeleteUserAndCascade() {
         User user = new User("todelete", "pass", "d@test.com", "Delete", "desc", "bio");
         when(userRepository.findByUsername("todelete")).thenReturn(user);
+        when(userRepository.findAll()).thenReturn(java.util.Collections.emptyList());
+        when(collectionRepository.findAll()).thenReturn(java.util.Collections.emptyList());
         when(collectionRepository.findByUser(user)).thenReturn(java.util.Collections.emptyList());
         when(recipeRepository.findByAuthor(user)).thenReturn(java.util.Collections.emptyList());
         when(reviewRepository.findByAuthor(user)).thenReturn(java.util.Collections.emptyList());
+        when(healthReportRepository.findByUserOrderByCreatedAtDesc(user)).thenReturn(java.util.Collections.emptyList());
+        when(notificationRepository.findByRecipient_UsernameOrSender_Username(user.getUsername(), user.getUsername()))
+                .thenReturn(java.util.Collections.emptyList());
 
         userService.deleteUserAndCascade("todelete");
 
