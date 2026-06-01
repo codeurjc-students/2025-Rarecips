@@ -10,6 +10,8 @@ import com.blasetvrtumi.rarecips.repository.RecipeRepository;
 import com.blasetvrtumi.rarecips.repository.ReviewRepository;
 import com.blasetvrtumi.rarecips.repository.RecipeCollectionRepository;
 import com.blasetvrtumi.rarecips.repository.IngredientRepository;
+import com.blasetvrtumi.rarecips.repository.HealthReportRepository;
+import com.blasetvrtumi.rarecips.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,6 +43,12 @@ public class UserService {
 
     @Autowired
     private IngredientRepository ingredientRepository;
+
+    @Autowired
+    private HealthReportRepository healthReportRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -162,9 +170,41 @@ public class UserService {
     public void deleteUserAndCascade(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) return;
+
+        List<Recipe> userRecipes = recipeRepository.findByAuthor(user);
+        List<RecipeCollection> allCollections = collectionRepository.findAll();
+        for (RecipeCollection collection : allCollections) {
+            boolean modified = false;
+            for (Recipe recipe : userRecipes) {
+                if (collection.getRecipes().contains(recipe)) {
+                    collection.removeRecipe(recipe);
+                    modified = true;
+                }
+            }
+            if (modified) {
+                collectionRepository.save(collection);
+            }
+        }
+
+        List<User> allUsers = userRepository.findAll();
+        for (User u : allUsers) {
+            boolean userModified = false;
+            for (Recipe recipe : userRecipes) {
+                if (u.getSavedRecipes().contains(recipe)) {
+                    u.getSavedRecipes().remove(recipe);
+                    userModified = true;
+                }
+            }
+            if (userModified) {
+                userRepository.save(u);
+            }
+        }
+
         collectionRepository.deleteAll(collectionRepository.findByUser(user));
-        recipeRepository.deleteAll(recipeRepository.findByAuthor(user));
+        recipeRepository.deleteAll(userRecipes);
         reviewRepository.deleteAll(reviewRepository.findByAuthor(user));
+        healthReportRepository.deleteAll(healthReportRepository.findByUserOrderByCreatedAtDesc(user));
+        notificationRepository.deleteAll(notificationRepository.findByRecipient_UsernameOrSender_Username(user.getUsername(), user.getUsername()));
         user.setIngredients(new java.util.ArrayList<>());
         userRepository.save(user);
         userRepository.delete(user);

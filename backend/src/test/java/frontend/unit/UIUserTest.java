@@ -38,7 +38,7 @@ public class UIUserTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".aspect-square"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".navbarAvatar"))).click();
 
     try {
       Thread.sleep(500);

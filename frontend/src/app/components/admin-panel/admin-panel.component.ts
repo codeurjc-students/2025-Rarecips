@@ -167,10 +167,8 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   }
 
   fetchStats() {
-    console.log('DEBUG: Fetching admin stats with range:', this.selectedTimeRange);
     this.adminService.getStats(this.selectedTimeRange).subscribe({
       next: (data) => {
-        console.log('Admin Stats received:', data);
         this.stats = data;
       },
       error: (err) => console.error('Error fetching admin stats:', err)

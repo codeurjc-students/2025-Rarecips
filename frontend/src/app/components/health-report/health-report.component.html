@@ -1,4 +1,4 @@
-<div class="flex min-h-screen w-full flex-col items-start justify-center">
+<div class="flex min-h-screen w-[80rem] flex-col items-start justify-center">
   <!-- Main Content -->
   <div
     class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
@@ -101,8 +101,7 @@
           </div>
         </ng-container>
         <ng-template #noReportScore>
-          <div class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl border border-solid px-8 py-8 shadow-sm glass"
-               style="border-color: var(--primary-100-40); background: var(--primary-200-40);">
+          <div class="flex w-full max-w-3xl flex-col gap-6 rounded-3xl px-8 py-8 min-w-full">
             <p class="text-center opacity-70">{{ t('health_repo_no_nutrition') }}</p>
           </div>
         </ng-template>
@@ -301,7 +300,7 @@
 
 <div id="health-report-pdf-root" class="pdf-export-root" aria-hidden="true">
   <div class="pdf-export-panel flex flex-col gap-8">
-    
+
     <div class="flex flex-col items-center gap-4 mb-6">
       <div class="flex justify-center items-center gap-6">
         <div *ngIf="logos.get('Rarecips_Iconotipo')" [innerHTML]="logos.get('Rarecips_Iconotipo')" class="w-28 h-28 object-contain flex-shrink-0 [&>svg]:w-full [&>svg]:h-full"></div>

@@ -1427,7 +1427,7 @@
 
         @if (loadingMoreUsers) {
         <div class="flex justify-center mt-8">
-          <img src="assets/icons/Rarecips_Spinner.svg" alt="Loading" class="w-16 h-16">
+          <div [innerHTML]="logos.get('Rarecips_Spinner')" class="[&>svg]:w-16 [&>svg]:h-16"></div>
         </div>
         }
       </div>

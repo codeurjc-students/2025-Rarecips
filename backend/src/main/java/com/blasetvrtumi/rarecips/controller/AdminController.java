@@ -79,7 +79,6 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getStats(@RequestParam(name = "range", defaultValue = "admin_last_7_days") String range) {
-        System.out.println("DEBUG: Fetching stats for range: " + range);
         Map<String, Object> stats = new HashMap<>();
 
         long totalUsers = userRepository.count();

@@ -327,9 +327,9 @@
         <button id="userMenuButton"
                 class="relative inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-100 border-2" style="border-color: var(--primary-300)"
                 (click)="navigateTo('profile', $event)" title="{{ t('user_menu') }}">
-          <img *ngIf="user.profileImageUrl" style="background: var(--primary-400);" class="aspect-square h-full w-full object-cover" src="{{user?.profileImageUrl}}"
+          <img *ngIf="user.profileImageUrl" style="background: var(--primary-400);" class="navbarAvatar aspect-square h-full w-full object-cover" src="{{user?.profileImageUrl}}"
                alt="User avatar"/>
-          <img *ngIf="!user.profileImageUrl" class="aspect-square h-full w-full object-cover" style="background: var(--primary-400)" src="/assets/img/user.png"
+          <img *ngIf="!user.profileImageUrl" class="navbarAvatar aspect-square h-full w-full object-cover" style="background: var(--primary-400)" src="/assets/img/user.png"
                alt="Default user avatar"/>
         </button>
       </div>

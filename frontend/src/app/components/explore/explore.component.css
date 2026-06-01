@@ -1042,6 +1042,7 @@ button.glass-strong.favorites-active .heart-icon path {
   .flex.justify-center.mt-8 button {
     width: 100% !important;
     max-width: none !important;
+    justify-content: center;
   }
 
   .mobile-filter-toggle {

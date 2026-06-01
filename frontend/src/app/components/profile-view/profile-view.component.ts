@@ -127,9 +127,6 @@ export class ProfileViewComponent implements OnInit {
       }
     });
 
-    console.log(this.isOwnProfile)
-
-
     this.userService.getUserByUsername(this.username).subscribe({
       next: (userData) => {
         this.user = userData;

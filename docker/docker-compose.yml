@@ -5,6 +5,24 @@
 
 services:
 
+  rarecips-db-health:
+    container_name: rarecips-db-health
+    image: mysql:9.0.0
+    command: |
+      sh -c "
+      until mysql -h rarecips-db.mysql.database.azure.com -u ${SPRING_DATASOURCE_USERNAME} -p${SPRING_DATASOURCE_PASSWORD} -e 'SELECT 1' --ssl-mode=REQUIRED 2>/dev/null; do
+        echo 'Waiting for Azure Database for MySQL...'
+        sleep 5
+      done
+      echo 'Azure Database is ready'
+      "
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "rarecips-db.mysql.database.azure.com", "-u", "${SPRING_DATASOURCE_USERNAME}", "-e", "SELECT 1", "--ssl-mode=REQUIRED"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   rarecips-app:
 
     container_name: rarecips-app
@@ -15,11 +33,11 @@ services:
     ports:
       - "8443:8080"
     depends_on:
-      rarecips-DB:
-        condition: service_healthy
-    command: [ "/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 --timeout=20 -- && java -jar /app/rarecips.jar" ]
+      rarecips-db-health:
+        condition: service_completed_successfully
+    command: [ "/bin/sh", "-c", "java -jar /app/rarecips.jar" ]
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-DB:3306/rarecips
+      - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-db.mysql.database.azure.com:3306/rarecips
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - APP_OLLAMA_URL=http://rarecips-ollama:11434
@@ -28,27 +46,7 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - JWT_SECRET=${JWT_SECRET}
-    secrets:
-      - source: env_properties
-        target: /run/secrets/env.properties
 
-  rarecips-DB:
-    container_name: rarecips-DB
-    image: mysql:9.0.0
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: rarecips
-      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
-      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - /var/lib/mysql
 
   rarecips-ollama:
     container_name: rarecips-ollama
@@ -117,7 +115,3 @@ volumes:
   mysql:
   ollama_data:
   minio_data:
-
-secrets:
-  env_properties:
-    file: ../backend/src/main/resources/env.properties

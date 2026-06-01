@@ -1302,7 +1302,7 @@ button:focus {
     transition: opacity 0.3s ease, transform 0.3s ease, display 0.3s allow-discrete !important;
   }
 
-  #navbar.expanded .dropdown-trigger > span {
+  #navbar.expanded .dropdown-trigger > span:not(.notif-badge) {
     display: flex !important;
     justify-content: center;
     width: 68% !important;
@@ -1506,6 +1506,8 @@ button:focus {
 }
 
 .notif-badge {
+  width: 2rem !important;
+  aspect-ratio: 1/1;
   will-change: transform, box-shadow;
   text-align: center;
 }

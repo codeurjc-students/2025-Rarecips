@@ -388,6 +388,14 @@ public class RecipeService {
             }
         }
 
+        List<User> allUsers = userRepository.findAll();
+        for (User u : allUsers) {
+            if (u.getSavedRecipes().contains(recipe)) {
+                u.getSavedRecipes().remove(recipe);
+                userRepository.save(u);
+            }
+        }
+
         String recipeLabel = recipe.getLabel();
         recipeRepository.delete(recipe);
         activityService.logActivity(username, Activity.ActivityType.DELETE_RECIPE, recipeLabel,

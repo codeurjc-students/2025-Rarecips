@@ -1,7 +1,7 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
   <!-- Main Content -->
-  <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
-    <div class="flex max-w-7xl w-[70rem] min-h-full flex-col items-center gap-8">
+  <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-6 mt-32 overflow-auto">
+    <div class="flex max-w-7xl w-full min-h-full flex-col items-center gap-8">
 
       @if (isAuthenticated) {
         <!-- Tab Navigation -->
@@ -21,7 +21,7 @@
 
       <!-- Ingredients Tab -->
       <div class="w-full ingredientList" [class.active]="activeTab === 'ingredients'" [class.hidden]="activeTab !== 'ingredients'">
-        <div class="gap-8 max-w-7xl w-full glass p-8">
+        <div class="gap-8 max-w-7xl w-[80rem] glass p-8">
 
           @if (isAdmin) {
             <div class="w-full flex justify-end mb-4">

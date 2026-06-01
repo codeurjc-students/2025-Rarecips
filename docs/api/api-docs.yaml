@@ -1447,6 +1447,39 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AuthResponse"
+  /api/v1/users/me/import:
+    post:
+      tags:
+      - user-controller
+      summary: Import current user data
+      operationId: importUserData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: object
+        required: true
+      responses:
+        "200":
+          description: User data imported successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                type: object
   /api/v1/users/change-password:
     post:
       tags:
@@ -1492,6 +1525,25 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/v1/health-reports/generate:
+    post:
+      tags:
+      - health-report-controller
+      operationId: generateReport
+      parameters:
+      - name: lang
+        in: query
+        required: false
+        schema:
+          type: string
+          default: es
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
   /api/v1/enums/attributes:
     get:
       tags:
@@ -1523,6 +1575,76 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecipeAttribute"
+  /api/v1/notifications/{id}/read:
+    patch:
+      tags:
+      - notification-controller
+      summary: Mark a notification as read
+      operationId: markAsRead
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/notifications/read-all:
+    patch:
+      tags:
+      - notification-controller
+      summary: Mark all notifications as read
+      operationId: markAllAsRead
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /users/{username}:
+    get:
+      tags:
+      - spa-controller
+      operationId: getUserOG
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/html:
+              schema:
+                type: string
+  /recipes/{id}:
+    get:
+      tags:
+      - spa-controller
+      operationId: getRecipeOG
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            text/html:
+              schema:
+                type: string
   /api/v1/users/status:
     get:
       tags:
@@ -1735,6 +1857,29 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/v1/users/me/export:
+    get:
+      tags:
+      - user-controller
+      summary: Export current user data
+      operationId: exportUserData
+      responses:
+        "200":
+          description: User data exported successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "401":
+          description: Unauthorized access
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
   /api/v1/users/filter:
     get:
       tags:
@@ -1901,6 +2046,34 @@ paths:
       - recipe-controller
       summary: Get reported recipes (admin only)
       operationId: getReportedRecipes
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/recipes/recommended:
+    get:
+      tags:
+      - recipe-controller
+      summary: Get recommended recipes for the current user based on favorites
+      operationId: getRecommendedRecipes
       parameters:
       - name: page
         in: query
@@ -2110,6 +2283,19 @@ paths:
           description: Unauthorized - User must be authenticated for certain filters
         "404":
           description: No recipes found
+  /api/v1/notifications:
+    get:
+      tags:
+      - notification-controller
+      summary: Get current user notifications
+      operationId: getMyNotifications
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
   /api/v1/ingredients/search:
     get:
       tags:
@@ -2163,6 +2349,32 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/v1/health-reports:
+    get:
+      tags:
+      - health-report-controller
+      operationId: getUserReports
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HealthReport_BasicInfo"
+  /api/v1/health-reports/summary:
+    get:
+      tags:
+      - health-report-controller
+      operationId: getSummary
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HealthReport_BasicInfo"
   /api/v1/enums/meal-types:
     get:
       tags:
@@ -2535,47 +2747,6 @@ paths:
                 type: object
 components:
   schemas:
-    User:
-      type: object
-      properties:
-        username:
-          type: string
-        displayName:
-          type: string
-        bio:
-          type: string
-        profileImageString:
-          type: string
-        email:
-          type: string
-        role:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        lastOnline:
-          type: string
-          format: date-time
-        privateProfile:
-          type: boolean
-        suspended:
-          type: boolean
-        reported:
-          type: boolean
-        passwordResetToken:
-          type: string
-        passwordResetTokenExpiry:
-          type: string
-          format: date-time
-        savedRecipesCount:
-          type: integer
-          format: int32
-        recipesCount:
-          type: integer
-          format: int32
-        reviewsCount:
-          type: integer
-          format: int32
     Ingredient:
       type: object
       properties:
@@ -2586,7 +2757,7 @@ components:
           type: string
         image:
           type: string
-        imageString:
+        imageUrl:
           type: string
     Recipe:
       type: object
@@ -2598,7 +2769,7 @@ components:
           type: string
         description:
           type: string
-        imageString:
+        imageUrl:
           type: string
         people:
           type: integer
@@ -2706,6 +2877,51 @@ components:
           format: date-time
         reported:
           type: boolean
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        bio:
+          type: string
+        profileImageUrl:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastOnline:
+          type: string
+          format: date-time
+        savedRecipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recipe"
+        privateProfile:
+          type: boolean
+        suspended:
+          type: boolean
+        reported:
+          type: boolean
+        passwordResetToken:
+          type: string
+        passwordResetTokenExpiry:
+          type: string
+          format: date-time
+        recipesCount:
+          type: integer
+          format: int32
+        reviewsCount:
+          type: integer
+          format: int32
+        savedRecipesCount:
+          type: integer
+          format: int32
     RecipeAttribute:
       type: object
       properties:
@@ -2757,7 +2973,7 @@ components:
           type: string
         description:
           type: string
-        imageString:
+        imageUrl:
           type: string
         people:
           type: integer
@@ -2853,6 +3069,10 @@ components:
     User_BasicInfo:
       type: object
       properties:
+        savedRecipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recipe_BasicInfo"
         passwordResetToken:
           type: string
         passwordResetTokenExpiry:
@@ -2892,10 +3112,6 @@ components:
         number:
           type: integer
           format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
         numberOfElements:
           type: integer
           format: int32
@@ -2903,6 +3119,10 @@ components:
           $ref: "#/components/schemas/SortObject"
         pageable:
           $ref: "#/components/schemas/PageableObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
         empty:
           type: boolean
     PageableObject:
@@ -2913,14 +3133,14 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
-        paged:
-          type: boolean
         pageSize:
           type: integer
           format: int32
         pageNumber:
           type: integer
           format: int32
+        paged:
+          type: boolean
         unpaged:
           type: boolean
     SortObject:
@@ -2932,6 +3152,55 @@ components:
           type: boolean
         unsorted:
           type: boolean
+    HealthReport_BasicInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user:
+          $ref: "#/components/schemas/User_BasicInfo"
+        generatedSummary:
+          type: string
+        totalCalories:
+          type: number
+          format: float
+        totalWeight:
+          type: number
+          format: float
+        totalTime:
+          type: number
+          format: float
+        averageCalories:
+          type: number
+          format: float
+        averageDifficulty:
+          type: number
+          format: float
+        averagePeople:
+          type: number
+          format: float
+        recipesAnalyzed:
+          type: integer
+          format: int32
+        dietLabelsCount:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        healthLabelsCount:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        cautionsCount:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        createdAt:
+          type: string
+          format: date-time
     RecipeCollection_BasicInfo:
       type: object
       properties:
