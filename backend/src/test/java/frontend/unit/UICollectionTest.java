@@ -32,6 +32,39 @@ public class UICollectionTest extends BaseUnitTest {
     String colName = "Test Col " + randomSuffix;
     String updatedColName = "Updated Col " + randomSuffix;
 
+    driver.get("https://localhost:8443/");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
+
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.create-recipe-btn"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.id("recipeLabel"))).click();
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeLabel"))).sendKeys("Temp Recipe for Collection");
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeDesc"))).sendKeys("Temp desc");
+
+    for (int i = 0; i < 3; i++) {
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex:nth-child(3) > .ti-caret-up-filled"))).click();
+    }
+    for (int i = 0; i < 3; i++) {
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex:nth-child(2) > .ti-caret-up-filled"))).click();
+    }
+
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.name("difficulty"))).sendKeys("2");
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.name("category"))).sendKeys("Snack");
+
+    js.executeScript("window.scrollTo(0,300)");
+
+    try {
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
+    WebElement createBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".publishBut button")));
+    jsClick(createBtn);
+
+    wait.until(ExpectedConditions.urlMatches(".*/recipes/\\d+"));
+    String currentUrl = driver.getCurrentUrl();
+    String recipeId = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
+
     // ========== CREATE COLLECTION ==========
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1920, 1080));
@@ -41,12 +74,12 @@ public class UICollectionTest extends BaseUnitTest {
     wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
 
     {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
+      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card .ti-bookmark")));
       Actions builder = new Actions(driver);
       builder.moveToElement(element).perform();
     }
 
-    WebElement btnElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
+    WebElement btnElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card .ti-bookmark")));
     jsClick(btnElement);
 
     {
@@ -77,7 +110,7 @@ public class UICollectionTest extends BaseUnitTest {
 
     wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
 
-    WebElement addBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
+    WebElement addBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card .ti-bookmark")));
     jsClick(addBtn);
 
     js.executeScript("window.scrollTo(0,0)");
@@ -116,5 +149,27 @@ public class UICollectionTest extends BaseUnitTest {
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".\\!delete-collection-btn > .font-semibold"))).click();
 
     wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//span[contains(text(), '" + updatedColName + "')]")));
+
+    // ========== CLEANUP RECIPE ==========
+    driver.get("https://localhost:8443/recipes/" + recipeId);
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipeCont")));
+
+    WebElement deleteBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipeOptions .ti-trash")));
+    jsClick(deleteBtn);
+
+    try {
+      Thread.sleep(300);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
+    WebElement confirmBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".px-8:nth-child(2)")));
+    jsClick(confirmBtn);
+
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
   }
 }

@@ -70,7 +70,7 @@ public class UIReviewTest extends BaseUnitTest {
     js.executeScript("window.scrollTo(0,0)");
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".tab:nth-child(3)"))).click();
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".rounded-2xl"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".addReviewBut"))).click();
 
     helper.waitForClickable(By.cssSelector(".rating-star-btn:nth-child(4)")).click();
 
