@@ -71,8 +71,6 @@ public class UICollectionTest extends BaseUnitTest {
 
     js.executeScript("window.scrollTo(0,24)");
 
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
-
     {
       WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card .ti-bookmark")));
       Actions builder = new Actions(driver);
