@@ -5,14 +5,21 @@ Docker compose OCI image which provides a single step setup for the entire appli
 - ## Prerequisite:
   - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or any Docker CLI with OCI support) for windows or [Docker Engine](https://www.docker.com/products/docker-desktop/) + [Docker Compose](https://www.docker.com/products/docker-desktop/) for Linux.
 
-- ## Running the Application
-To run it, simply execute the following command anywhere in your terminal:
+- ## (Optional) Deploying the application:
+In case you don't possess one, ask an administrator for a SSH key to connect to the system's VM and run:
 
 ```bash
-docker compose -p rarecips --env-file NUL -f oci://blasetvrtumi/rarecips:latest-compose up --abort-on-container-exit --remove-orphans && docker compose -p rarecips down -v
+ssh -i "<SSH_KEY_PATH>" azureuser@158.158.17.112
 ```
 
-This command will pull the latest version of the application from the OCI registry and start all necessary containers, including the backend, frontend, and database.
+- ## Running the Application
+To run it, either locally or in the VM, simply execute the following command anywhere in your terminal:
+
+```bash
+docker compose -p rarecips -f oci://blasetvrtumi/rarecips:latest-compose up
+```
+
+This command will pull the latest version of the application from the OCI registry and start all necessary containers, including the backend, frontend, services and database.
 Any valid tag that points to compose image can also be used instead of the latest tag.
 
 - ## Accessing the Application

@@ -279,7 +279,7 @@
             <h4 class="text-lg font-bold" style="color: var(--primary-700);">{{ t('health_repo_report_of') }} {{ getLocalizedDateShort(report.createdAt) }}</h4>
             <p class="text-sm opacity-80 line-clamp-2 max-w-2xl">{{ report.generatedSummary }}</p>
           </div>
-          <div class="flex gap-4 items-center">
+          <div class="reportStats flex gap-4 items-center">
             <div class="text-center px-4">
               <p class="text-xs opacity-70 text-nowrap">{{ t('health_repo_recipes_analyzed') }}</p>
               <p class="font-bold">{{ report.recipesAnalyzed }}</p>

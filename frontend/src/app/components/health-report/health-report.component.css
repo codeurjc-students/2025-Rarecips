@@ -284,6 +284,14 @@
     text-align: center !important;
   }
 
+  .reportStats {
+    flex-direction: row;
+  }
+
+  .reportStats > hr {
+    display: none;
+  }
+
   .tabs .tab i {
     font-size: 1.1rem !important;
   }
