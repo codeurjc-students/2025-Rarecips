@@ -10,7 +10,7 @@ echo "Deploying OCI package: ${DOCKERHUB_USER}/rarecips:${TAG}..."
 docker pull "${DOCKERHUB_USER}/rarecips:${TAG}"
 
 # Run OCI
-docker compose -p rarecips -f "oci://docker.io/${DOCKERHUB_USER}/rarecips:${TAG}" up -d
+docker compose -p rarecips -f "oci://docker.io/${DOCKERHUB_USER}/rarecips:${TAG}" up -y -d
 
 # Clean up
 docker system prune -f
