@@ -72,7 +72,8 @@ public class UIReviewTest extends BaseUnitTest {
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".tab:nth-child(3)"))).click();
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".addReviewBut"))).click();
 
-    helper.waitForClickable(By.cssSelector(".rating-star-btn:nth-child(4)")).click();
+    WebElement starBut = helper.waitForClickable(By.cssSelector(".rating-star-btn"));
+    js.executeScript("arguments[0].click();", starBut);
 
     WebElement editor = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".min-h-\\[150px\\]")));
     js.executeScript("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", editor);

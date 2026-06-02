@@ -80,7 +80,7 @@ public class UIRecipeTest extends BaseUnitTest {
       builder.moveToElement(element).perform();
     }
 
-    WebElement editBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipeOptions button[routerLink*='/edit']")));
+    WebElement editBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipeEdit")));
     jsClick(editBtn);
 
     wait.until(ExpectedConditions.elementToBeClickable(By.id("recipeLabel"))).click();
