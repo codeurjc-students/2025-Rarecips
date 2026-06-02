@@ -95,6 +95,9 @@
       - User profile management (Registered users) ✔️
       - User ingredient list management (registered users) ✔️
       - Recipe saving and bookmarking (Registered users) ✔️
+      - Stat tracking (Administrators) ✔️
+      - Analytics dashboard viewing (Admins) ✔️
+      - User and content moderation (Admins) ✔️
     
     ### Intricate
     
