@@ -1,7 +1,7 @@
 <div class="flex min-h-screen w-full flex-col items-start justify-center">
   <!-- Main Content -->
-  <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-12 mt-32 overflow-auto">
-    <div class="flex max-w-7xl w-[70rem] min-h-full flex-col items-center gap-8">
+  <div class="container min-h-fit max-w-none flex w-full grow shrink-0 basis-0 flex-col items-center gap-4 py-6 mt-32 overflow-auto">
+    <div class="flex max-w-7xl w-full min-h-full flex-col items-center gap-8">
 
       @if (isAuthenticated) {
         <!-- Tab Navigation -->
@@ -21,7 +21,7 @@
 
       <!-- Ingredients Tab -->
       <div class="w-full ingredientList" [class.active]="activeTab === 'ingredients'" [class.hidden]="activeTab !== 'ingredients'">
-        <div class="gap-8 max-w-7xl w-full glass p-8">
+        <div class="gap-8 max-w-7xl w-[80rem] glass p-8">
 
           @if (isAdmin) {
             <div class="w-full flex justify-end mb-4">
@@ -63,7 +63,7 @@
                       <i class="ti ti-pencil"></i>
                   </button>
                 }
-                <img [src]="ingredient.imageString || ingredient.image || 'assets/img/ingredient.png'"
+                <img [src]="ingredient.imageUrl || ingredient.image || 'assets/img/ingredient.png'"
                      [alt]="ingredient.food"
                      class="w-full h-full object-cover">
                 <div class="ingredient-icon">
@@ -140,7 +140,7 @@
                 <div class="ingredient flex items-center justify-between p-4 rounded-2xl border-2"
                      style="background: var(--primary-100-40); border-color: var(--primary-100);">
                   <div class="flex items-center gap-4">
-                    <img [src]="ingredient.imageString || ingredient.image || 'assets/img/ingredient.png'"
+                    <img [src]="ingredient.imageUrl || ingredient.image || 'assets/img/ingredient.png'"
                          [alt]="ingredient.food"
                          class="w-16 h-16 rounded-xl object-cover">
                     <div>
@@ -224,7 +224,7 @@
                 </button>
               </ng-container>
               <ng-template #noImage>
-                <img src="assets/img/ingredient.png" alt="Ingredient" class="h-32 w-32 object-cover rounded-lg border-2 border-primary-300 opacity-60" style="border-color: var(--primary-300)" />
+                <img src="/assets/img/ingredient.png" alt="Ingredient" class="h-32 w-32 object-cover rounded-lg border-2 border-primary-300 opacity-60" style="border-color: var(--primary-300)" />
               </ng-template>
             </div>
             <div

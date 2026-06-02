@@ -22,6 +22,13 @@ export class RecipeService {
     );
   }
 
+  getRecommendedRecipes(page: number, size: number = 9): Observable<Recipe[]> {
+    return this.httpClient.get<any>(`${this.API_URL}/recommended?page=${page}&size=${size}`).pipe(
+      map(data => data.recipes.map((recipe: any) => this.mapRecipe(recipe))),
+      catchError(this.handleError)
+    );
+  }
+
   getFilteredRecipes(filters: any, page: number = 0, size: number = 10): Observable<any> {
     let params = new HttpParams();
 
@@ -78,8 +85,7 @@ export class RecipeService {
       label: recipe.label,
       title: recipe.label,
       description: recipe.description || "No description available.",
-      imageUrl: recipe.imageString,
-      imageString: recipe.imageString,
+      imageUrl: recipe.imageUrl,
       people: recipe.people || 4,
       difficulty: recipe.difficulty || 1,
       ingredients: recipe.ingredients?.map((ing: any) => ({

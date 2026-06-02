@@ -43,6 +43,9 @@ public class RecipeService {
     @Autowired
     private RecipeCollectionRepository recipeCollectionRepository;
 
+    @Autowired
+    private MinioService minioService;
+
     public Recipe findById(Long id) {
         return recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + id));
@@ -87,7 +90,17 @@ public class RecipeService {
         recipe.setDescription((String) recipeData.get("description"));
         recipe.setPeople((Integer) recipeData.get("people"));
         recipe.setDifficulty((Integer) recipeData.get("difficulty"));
-        recipe.setImageString((String) recipeData.get("imageString"));
+        String imageString = (String) recipeData.get("imageString");
+        if (imageString == null) {
+            imageString = (String) recipeData.get("imageUrl");
+        }
+        if (imageString != null && !imageString.isEmpty()) {
+            if (imageString.startsWith("http")) {
+                recipe.setImageUrl(imageString);
+            } else {
+                recipe.setImageUrl(minioService.uploadBase64Image(imageString));
+            }
+        }
         recipe.setSteps((List<String>) recipeData.get("steps"));
         recipe.setCuisineType((List<String>) recipeData.get("cuisineType"));
         recipe.setCautions((List<String>) recipeData.get("cautions"));
@@ -118,8 +131,13 @@ public class RecipeService {
             for (Map<String, Object> ingData : ingredientsData) {
                 String food = (String) ingData.get("food");
                 String image = (String) ingData.get("image");
-                String imageString = (String) ingData.get("imageString");
-                Ingredient ingredient = new Ingredient(food, image, imageString);
+                String ingImageString = (String) ingData.get("imageString");
+                if (ingImageString == null) ingImageString = (String) ingData.get("imageUrl");
+                String imageUrl = null;
+                if (ingImageString != null && !ingImageString.isEmpty()) {
+                    imageUrl = minioService.uploadBase64Image(ingImageString);
+                }
+                Ingredient ingredient = new Ingredient(food, image, imageUrl);
                 Ingredient savedIngredient = ingredientRepository.save(ingredient);
                 ingredients.add(savedIngredient);
 
@@ -211,8 +229,8 @@ public class RecipeService {
         if (recipeDetails.getSteps() != null) {
             existingRecipe.setSteps(recipeDetails.getSteps());
         }
-        if (recipeDetails.getImageString() != null) {
-            existingRecipe.setImageString(recipeDetails.getImageString());
+        if (recipeDetails.getImageUrl() != null) {
+            existingRecipe.setImageUrl(recipeDetails.getImageUrl());
         }
         if (recipeDetails.getIngredientQuantities() != null) {
             existingRecipe.setIngredientQuantities(recipeDetails.getIngredientQuantities());
@@ -250,8 +268,18 @@ public class RecipeService {
             existingRecipe.setDifficulty(difficulty);
             EnumValidator.validateDifficulty(difficulty);
         }
-        if (recipeData.containsKey("imageString")) {
-            existingRecipe.setImageString((String) recipeData.get("imageString"));
+        if (recipeData.containsKey("imageString") || recipeData.containsKey("imageUrl")) {
+            String imageString = (String) recipeData.get("imageString");
+            if (imageString == null) {
+                imageString = (String) recipeData.get("imageUrl");
+            }
+            if (imageString != null && !imageString.isEmpty()) {
+                if (imageString.startsWith("http")) {
+                    existingRecipe.setImageUrl(imageString);
+                } else {
+                    existingRecipe.setImageUrl(minioService.uploadBase64Image(imageString));
+                }
+            }
         }
         if (recipeData.containsKey("steps")) {
             existingRecipe.setSteps((List<String>) recipeData.get("steps"));
@@ -315,7 +343,16 @@ public class RecipeService {
                 String food = (String) ingData.get("food");
                 String image = (String) ingData.get("image");
                 String imageString = (String) ingData.get("imageString");
-                Ingredient ingredient = new Ingredient(food, image, imageString);
+                if (imageString == null) imageString = (String) ingData.get("imageUrl");
+                String imageUrl = null;
+                if (imageString != null && !imageString.isEmpty()) {
+                    if (imageString.startsWith("http")) {
+                        imageUrl = imageString;
+                    } else {
+                        imageUrl = minioService.uploadBase64Image(imageString);
+                    }
+                }
+                Ingredient ingredient = new Ingredient(food, image, imageUrl);
                 Ingredient savedIngredient = ingredientRepository.save(ingredient);
                 ingredients.add(savedIngredient);
 
@@ -351,6 +388,14 @@ public class RecipeService {
             }
         }
 
+        List<User> allUsers = userRepository.findAll();
+        for (User u : allUsers) {
+            if (u.getSavedRecipes().contains(recipe)) {
+                u.getSavedRecipes().remove(recipe);
+                userRepository.save(u);
+            }
+        }
+
         String recipeLabel = recipe.getLabel();
         recipeRepository.delete(recipe);
         activityService.logActivity(username, Activity.ActivityType.DELETE_RECIPE, recipeLabel,
@@ -381,6 +426,50 @@ public class RecipeService {
             return recipeMap;
         }).collect(Collectors.toList()));
         return response;
+    }
+
+    public Page<Recipe> getRecommendedRecipes(String username, int page, int size) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("User not found: " + username);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        RecipeCollection favoritesCollection = recipeCollectionRepository.findByUserAndIsFavoritesTrue(user).orElse(null);
+        
+        if (favoritesCollection == null || favoritesCollection.getRecipes().isEmpty()) {
+            return recipeRepository.findAllOrderByReviewsCountDesc(pageable);
+        }
+
+        List<Recipe> favorites = favoritesCollection.getRecipes();
+        List<Long> excludeIds = favorites.stream().map(Recipe::getId).collect(Collectors.toList());
+        
+        List<String> cuisineTypes = new ArrayList<>();
+        List<String> dishTypes = new ArrayList<>();
+        List<String> dietLabels = new ArrayList<>();
+
+        for (Recipe r : favorites) {
+            if (r.getCuisineType() != null) cuisineTypes.addAll(r.getCuisineType());
+            if (r.getDishTypes() != null) dishTypes.addAll(r.getDishTypes());
+            if (r.getDietLabels() != null) dietLabels.addAll(r.getDietLabels());
+        }
+
+        cuisineTypes = cuisineTypes.stream().distinct().collect(Collectors.toList());
+        dishTypes = dishTypes.stream().distinct().collect(Collectors.toList());
+        dietLabels = dietLabels.stream().distinct().collect(Collectors.toList());
+
+        if (cuisineTypes.isEmpty()) cuisineTypes.add("__DUMMY__");
+        if (dishTypes.isEmpty()) dishTypes.add("__DUMMY__");
+        if (dietLabels.isEmpty()) dietLabels.add("__DUMMY__");
+        if (excludeIds.isEmpty()) excludeIds.add(-1L);
+
+        Page<Recipe> recommendations = recipeRepository.findRecommendations(excludeIds, cuisineTypes, dishTypes, dietLabels, pageable);
+        
+        if (recommendations.isEmpty() && page == 0) {
+            return recipeRepository.findAllOrderByReviewsCountDesc(pageable);
+        }
+
+        return recommendations;
     }
 
     public List<Long> getUserIngredientIds(org.springframework.security.core.Authentication authentication) {

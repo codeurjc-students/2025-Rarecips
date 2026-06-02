@@ -32,7 +32,7 @@ public class RecipeCollectionServiceIntegrationTest {
 
     @Test
     void shouldCreateAndRetrieveCollection() {
-        User user = new User("testuser", "Test User", "bio", null, "", "test@example.com", "password");
+        User user = new User("testuser", "Test User", "bio", "", "test@example.com", "password");
         userRepository.save(user);
         entityManager.flush();
         RecipeCollection savedCollection = collectionService.createCollection(user.getUsername(), "My Collection", false);

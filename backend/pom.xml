@@ -14,7 +14,7 @@
 
     <groupId>com.blasetvrtumi</groupId>
     <artifactId>rarecips</artifactId>
-    <version>0.2.0</version>
+    <version>1.0</version>
     <name>Rarecips</name>
     <description>Rarecips</description>
     <url/>
@@ -150,7 +150,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
-            <version>3.3.5</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -167,6 +166,28 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.5.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

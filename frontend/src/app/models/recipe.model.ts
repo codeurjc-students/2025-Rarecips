@@ -7,7 +7,6 @@ export interface Recipe {
   title: string;
   description: string;
   imageUrl: string;
-  imageString: string;
   people: number;
   difficulty: number;
   ingredients: { id: number, description: string; food: string; quantity: number; measure: string; weight: number }[];

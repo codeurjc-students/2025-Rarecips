@@ -2,6 +2,8 @@ package backend.e2e;
 
 import com.blasetvrtumi.rarecips.RarecipsApplication;
 import com.blasetvrtumi.rarecips.entity.User;
+import com.blasetvrtumi.rarecips.repository.RecipeCollectionRepository;
+import com.blasetvrtumi.rarecips.repository.NotificationRepository;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -33,6 +35,12 @@ public class APIAdminTest {
     private UserRepository userRepository;
 
     @Autowired
+    private RecipeCollectionRepository recipeCollectionRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private User adminUser;
@@ -40,6 +48,21 @@ public class APIAdminTest {
     private String adminToken;
     private Map<String, String> cookies;
 
+    private void deleteUserData(User user) {
+        if (user == null || user.getUsername() == null) {
+            return;
+        }
+
+        notificationRepository.deleteAll(notificationRepository
+                .findByRecipient_UsernameOrSender_Username(user.getUsername(), user.getUsername()));
+        recipeCollectionRepository.deleteAll(recipeCollectionRepository.findByUserUsername(user.getUsername()));
+        User persistedUser = userRepository.findByUsername(user.getUsername());
+        if (persistedUser != null) {
+            userRepository.delete(persistedUser);
+        }
+    }
+
+    @BeforeEach
     public void setUp() {
         RestAssured.port = port;
         RestAssured.baseURI = "https://localhost";
@@ -47,16 +70,16 @@ public class APIAdminTest {
         RestAssured.useRelaxedHTTPSValidation();
 
         User existingAdmin = userRepository.findByUsername("admin");
-        if (existingAdmin != null) userRepository.delete(existingAdmin);
+        deleteUserData(existingAdmin);
         
-        adminUser = new User("admin", "Admin", "Admin Bio", null, "static/assets/img/user.png", "admin@example.com", passwordEncoder.encode("adminpass"));
+        adminUser = new User("admin", "Admin", "Admin Bio", "http://localhost:9000/rarecips-images/user.png", "admin@example.com", passwordEncoder.encode("adminpass"));
         adminUser.setRole("ADMIN");
         userRepository.save(adminUser);
 
         User existingUser = userRepository.findByUsername("user_test");
-        if (existingUser != null) userRepository.delete(existingUser);
+        deleteUserData(existingUser);
 
-        regularUser = new User("user_test", "User Test", "User Bio", null, "static/assets/img/user.png", "user_test@example.com", passwordEncoder.encode("Password123!"));
+        regularUser = new User("user_test", "User Test", "User Bio", "http://localhost:9000/rarecips-images/user.png", "user_test@example.com", passwordEncoder.encode("Password123!"));
         userRepository.save(regularUser);
 
         Map<String, String> loginRequest = new HashMap<>();
@@ -75,8 +98,8 @@ public class APIAdminTest {
 
     @AfterEach
     public void tearDown() {
-        if (adminUser != null) userRepository.delete(adminUser);
-        if (regularUser != null) userRepository.delete(regularUser);
+        deleteUserData(adminUser);
+        deleteUserData(regularUser);
     }
 
     @Test

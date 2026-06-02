@@ -34,7 +34,7 @@ public class ReviewServiceTest {
 
     @Test
     public void shouldCreateReviewSuccessfully() {
-        User author = new User("testuser", "password", "test@example.com", null, "Test User", "desc", "bio");
+        User author = new User("testuser", "password", "test@example.com", "Test User", "desc", "bio");
         Recipe recipe = new Recipe("Test Recipe", "desc", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 4, new ArrayList<>(), 1, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 30.0f, 500.0f, 400.0f, author, new ArrayList<>());
         recipe.setId(1L);
         Review review = new Review(recipe, author, 5.0f, "Great!", null, null);
@@ -59,7 +59,7 @@ public class ReviewServiceTest {
 
     @Test
     public void shouldUpdateReviewSuccessfully() {
-        User author = new User("testuser", "password", "test@example.com", null, "Test User", "desc", "bio");
+        User author = new User("testuser", "password", "test@example.com", "Test User", "desc", "bio");
         Recipe recipe = new Recipe("Test Recipe", "desc", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 4, new ArrayList<>(), 1, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 30.0f, 500.0f, 400.0f, author, new ArrayList<>());
         recipe.setId(1L);
         Review review = new Review(recipe, author, 5.0f, "Great!", null, null);

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, SecurityContext } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, SecurityContext } from '@angular/core';
 import { RecipeService } from '../../services/recipe.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Recipe } from '../../models/recipe.model';
@@ -27,12 +27,11 @@ import { Title } from '@angular/platform-browser';
     RouterLink,
     CommonModule,
     FormsModule,
-    CollectionCardComponent,
     CollectionCardComponent
   ],
   styleUrls: ['./recipe-view.component.css']
 })
-export class RecipeViewComponent implements OnInit {
+export class RecipeViewComponent implements OnInit, OnDestroy {
 
   // User interactions
   recipe: Recipe | null = null;
@@ -140,6 +139,10 @@ export class RecipeViewComponent implements OnInit {
 
   confirmDeleteReview: boolean = false;
 
+  private destroy$ = new Subject<void>();
+  private currentRecipeId: number | null = null;
+  private keyboardListenerAdded = false;
+
 
   constructor(
     private router: Router,
@@ -177,8 +180,48 @@ export class RecipeViewComponent implements OnInit {
     this.translatorService.onChange(() => {
       this.updateTitle();
     });
-    await this.initAll();
-    this.uniqueReviews = this.getUniqueReviewsArray();
+
+    this.activatedRoute.paramMap.pipe(takeUntil(this.destroy$)).subscribe(async params => {
+      const recipeId = Number(params.get('id'));
+      if (!recipeId || recipeId === this.currentRecipeId) return;
+
+      this.currentRecipeId = recipeId;
+      this.resetRecipeState();
+      await this.initAll();
+      this.uniqueReviews = this.getUniqueReviewsArray();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private resetRecipeState(): void {
+    this.recipe = null;
+    this.reviews = new Set<Review>();
+    this.uniqueReviews = [];
+    this.activeTab = 'instructions';
+    this.currentCarouselIndex = 0;
+    this.focusMode = false;
+    this.focusModeClosing = false;
+    this.userReview = null;
+    this.reviewsPage = 0;
+    this.hasMoreReviews = false;
+    this.loadingReviews = false;
+    this.userHasReview = false;
+    this.isRecipeAuthor = false;
+    this.showReviewForm = false;
+    this.showDeleteModal = false;
+    this.showAddToCollectionDialog = false;
+    this.selectedRecipeId = -1;
+    this.authorPfp = '';
+    this.created = '';
+    this.lastUpdated = '';
+    this.time = 0;
+    this.currentServings = 1;
+    this.originalServings = 1;
+    this.servingsScale = 1;
   }
 
   updateTitle() {
@@ -192,7 +235,7 @@ export class RecipeViewComponent implements OnInit {
 
     this.userService.getDefaultPfp().subscribe({
       next: (data: any) => {
-        this.defaultPfp = data.profileImageString;
+        this.defaultPfp = data.profileImageUrl;
       }
     })
 
@@ -249,16 +292,19 @@ export class RecipeViewComponent implements OnInit {
     if (this.recipe?.totalTime) {
       this.time = this.recipe.totalTime * 60;
     }
-    addEventListener('keydown', (event) => {
-      if (!this.focusMode) return;
-      if (event?.key === 'ArrowRight') {
-        this.nextStep();
-      } else if (event?.key === 'ArrowLeft') {
-        this.previousStep();
-      } else if (event?.key === 'Escape') {
-        this.exitFocusMode();
-      }
-    });
+    if (!this.keyboardListenerAdded) {
+      this.keyboardListenerAdded = true;
+      addEventListener('keydown', (event) => {
+        if (!this.focusMode) return;
+        if (event?.key === 'ArrowRight') {
+          this.nextStep();
+        } else if (event?.key === 'ArrowLeft') {
+          this.previousStep();
+        } else if (event?.key === 'Escape') {
+          this.exitFocusMode();
+        }
+      });
+    }
   }
 
   async loadRecipe(): Promise<void> {
@@ -278,8 +324,8 @@ export class RecipeViewComponent implements OnInit {
 
         if (this.recipe?.author) {
           this.userService.getUserByUsername(<string>this.recipe?.author).subscribe((res) => {
-            if (res.profileImageString) {
-              this.authorPfp = "data:image/png;base64," + res.profileImageString;
+            if (res.profileImageUrl) {
+              this.authorPfp = res.profileImageUrl;
             }
           });
         }
@@ -639,7 +685,7 @@ export class RecipeViewComponent implements OnInit {
             try {
               let user: any;
               if (r.authorUsername) user = await firstValueFrom(this.userService.getUserByUsername(r.authorUsername));
-              if (user) r.authorPfp = "data:image/png;base64," + user?.profileImageString; else r.authorPfp = '/assets/img/user.png';
+              if (user) r.authorPfp = user?.profileImageUrl; else r.authorPfp = '/assets/img/user.png';
             } catch {
               r.authorPfp = '/assets/img/user.png';
             }
@@ -975,9 +1021,11 @@ export class RecipeViewComponent implements OnInit {
     }
   }
 
+  canShare: boolean = !!navigator.share;
+  showShareFeedback: boolean = false;
 
   shareRecipe() {
-    if (navigator.share) {
+    if (this.canShare) {
       navigator.share({
         title: this.recipe?.title,
         text: `${this.t('share_recipe_desc')} ${this.recipe?.title}`,
@@ -985,6 +1033,63 @@ export class RecipeViewComponent implements OnInit {
       }).catch((error) => {
         console.error('Error sharing:', error);
       });
+    } else {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        this.showShareFeedback = true;
+        setTimeout(() => this.showShareFeedback = false, 2000);
+      });
+    }
+  }
+
+  get currentUrl(): string {
+    return window.location.href;
+  }
+
+  isExportingPdf: boolean = false;
+
+  async downloadRecipeAsPdf() {
+    const reportSection = document.getElementById('recipe-pdf-root');
+    if (!reportSection) {
+      console.error('Recipe PDF section not found');
+      return;
+    }
+
+    this.isExportingPdf = true;
+
+    try {
+      // @ts-ignore
+      const html2pdf = (await import('html2pdf-pro/dist/html2pdf.bundle.min.js')).default || window.html2pdf;
+
+      const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
+      if (fonts?.ready) {
+        await fonts.ready;
+      }
+
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+      const width = reportSection.scrollWidth || 1310;
+      const height = reportSection.scrollHeight || 1000;
+
+      const clone = reportSection.cloneNode(true) as HTMLElement;
+      clone.style.left = '0px';
+      clone.style.position = 'relative';
+
+      const cleanTitle = (this.recipe?.title || 'recipe');
+
+      const opt = {
+        margin:       0,
+        filename:     `Rarecips - ${cleanTitle}.pdf`,
+        image:        { type: 'jpeg', quality: 1.0 },
+        enableLinks:  true,
+        html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: width, windowHeight: height },
+        jsPDF:        { unit: 'px', format: [width, height], orientation: width >= height ? 'landscape' : 'portrait' }
+      };
+
+      await html2pdf().set(opt).from(clone).save();
+    } catch (error) {
+      console.error('Error exporting recipe to PDF', error);
+    } finally {
+      this.isExportingPdf = false;
     }
   }
 

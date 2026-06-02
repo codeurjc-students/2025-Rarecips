@@ -98,8 +98,6 @@ public class AuthService {
 
             User userEnt = userRepository.findByUsername(authRequest.getUsername());
 
-            System.out.println("Is user suspended: " + userEnt.isSuspended());
-
             if (userEnt.isSuspended()) {
                 AuthResponse loginResponse = new AuthResponse(AuthResponse.Status.FAILURE,
                         "User account is suspended");

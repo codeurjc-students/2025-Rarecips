@@ -31,6 +31,9 @@ public class RepositoryUserDetailService implements UserDetailsService {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private com.blasetvrtumi.rarecips.service.MinioService minioService;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
@@ -61,8 +64,7 @@ public class RepositoryUserDetailService implements UserDetailsService {
         newUser.setEmail(email);
         newUser.setPassword(passwordEncoder.encode(password));
         newUser.setCreatedAt(LocalDateTime.now());
-        newUser.setProfileImageFile(imageService.localImageToBlob("static/assets/img/user.png"));
-        newUser.setProfileImageString(imageService.blobToString(newUser.getProfileImageFile()));
+        newUser.setProfileImageUrl(minioService.getPublicUrl("user.png"));
         userRepository.save(newUser);
         return loadUserByUsername(username);
     }

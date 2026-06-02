@@ -4,6 +4,7 @@
 
 .recipe-view-image-wrapper {
   position: relative;
+  overflow: hidden;
 }
 
 .recipe-view-pending-overlay {
@@ -417,6 +418,11 @@
     width: unset;
   }
 
+  .recipe-image-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100% - 2rem);
+  }
 
   .flex-row {
     flex-direction: column !important;
@@ -785,6 +791,10 @@
   }
 
   .steps {
+    transform: scale(0.6) translateX(-15vw) !important;
+  }
+
+  .steps {
     justify-self: anchor-center;
     min-width: fit-content;
   }
@@ -1058,4 +1068,25 @@
   background: var(--primary-600);
   width: 24px;
   border-radius: 4px;
+}
+
+.pdf-export-root {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1280px;
+  background: var(--primary-200-40);
+  color: var(--primary-700);
+  overflow: visible;
+  pointer-events: none;
+  padding: 32px;
+}
+
+.pdf-export-panel {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--primary-200-40);
+  padding: 48px;
+  border-radius: 32px;
+  overflow: visible;
 }

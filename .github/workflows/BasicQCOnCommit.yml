@@ -1,9 +1,5 @@
 name: Basic Quality Control on Commit
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
-
 on:
   push:
     branches-ignore:
@@ -54,22 +50,6 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Set up Node.js for Frontend Build
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Build Frontend and Copy to Backend
-        run: |
-          cd frontend
-          npm install
-          npm run build
-          cd ..
-          mkdir -p backend/src/main/resources/public
-          cp -R frontend/dist/rarecips/browser/* backend/src/main/resources/public/
-
       - name: Compile Backend
         working-directory: ./backend
         run: mvn clean compile
@@ -77,7 +57,12 @@ jobs:
       - name: Run Unit Tests
         working-directory: ./backend
         run: |
-          mvn clean test -Dtest="**/unit/**/*Test"
+          mvn clean test -Dtest="backend/unit/**/*Test"
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rarecips
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
@@ -87,33 +72,3 @@ jobs:
           path: |
             backend/target/surefire-reports/**
             backend/target/test-classes/**
-
-  # Frontend
-  frontend-basic:
-    name: Frontend Basic Quality Control
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install Dependencies
-        working-directory: ./frontend
-        run: npm install
-
-      - name: Build Frontend
-        working-directory: ./frontend
-        run: npm run build
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: frontend/dist

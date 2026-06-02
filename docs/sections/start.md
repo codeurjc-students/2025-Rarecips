@@ -11,6 +11,7 @@ The platform provides users full control over the content they're allowed to see
 - User notifications
 - User ingredient list management
 - Stat tracking
+- User data importing/exporting
 - User and content moderation
 - Recipe browsing with search and filtering
 - Recipe visualization
@@ -18,7 +19,7 @@ The platform provides users full control over the content they're allowed to see
 - Recipe reviewing and rating
 - Recipe saving and bookmarking
 - Health report feedbacking: Registered users can check health statistics based off their liked recipes simulating a
-  consumption analysis
+  consumption analysis, even allowing to generate custom reports with AI
 
 ### Technical Objectives
 
@@ -29,12 +30,11 @@ practices.
 - Backend: Spring Boot (Java)
 - Database: MySQL
 - RESTful API design
-- Dockerized deployment
+- Compose dockerized deployment
 - CI/CD with GitHub Actions
 - Automated testing (unit/integration)
 - Websocket implementation
-- Cloud deployment
-- Static analysis
+- Azure Cloud deployment
 
 ## 🛠️ Methodology
 
@@ -60,6 +60,11 @@ The project will follow an agile, iterative, and incremental development process
 </p>
 
 - **Phase 5 (01/03/2026 - 15/04/2026):** Intricate features
+
+<p align="center">
+   <img src="../../readme-resources/Gantt10.png" width="80%"/>
+</p>
+
 - **Phase 6 (15/04/2026 - 15/05/2026):** Final report
 - **Phase 7 (15/05/2026 - 15/06/2026):** Project presentation
 

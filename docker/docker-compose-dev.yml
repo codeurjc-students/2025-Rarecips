@@ -5,6 +5,24 @@
 
 services:
 
+  rarecips-db-health:
+    container_name: rarecips-db-health
+    image: mysql:9.0.0
+    command: |
+      sh -c "
+      until mysql -h rarecips-db.mysql.database.azure.com -u ${SPRING_DATASOURCE_USERNAME} -p${SPRING_DATASOURCE_PASSWORD} -e 'SELECT 1' --ssl-mode=REQUIRED 2>/dev/null; do
+        echo 'Waiting for Azure Database for MySQL...'
+        sleep 5
+      done
+      echo 'Azure Database is ready'
+      "
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "rarecips-db.mysql.database.azure.com", "-u", "${SPRING_DATASOURCE_USERNAME}", "-e", "SELECT 1", "--ssl-mode=REQUIRED"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   rarecips-app:
 
     container_name: rarecips-app
@@ -13,33 +31,86 @@ services:
       context: ../
       dockerfile: docker/Dockerfile
     ports:
-      - "8443:8443"
+      - "8443:8080"
     depends_on:
-      rarecips-DB:
-        condition: service_healthy
-    command: [ "/bin/sh", "-c", "./wait-for-it.sh rarecips-DB:3306 --timeout=20 --strict --quiet -- java -jar /app/rarecips-0.2.0.jar" ]
+      rarecips-db-health:
+        condition: service_completed_successfully
+    command: [ "/bin/sh", "-c", "java -jar /app/rarecips.jar" ]
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-DB:3306/rarecips
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=password
-    secrets:
-      - source: env_properties
-        target: /run/secrets/env.properties
+      - SPRING_DATASOURCE_URL=jdbc:mysql://rarecips-db.mysql.database.azure.com:3306/rarecips
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - APP_OLLAMA_URL=http://rarecips-ollama:11434
+      - MINIO_INTERNAL_URL=http://rarecips-minio:9000
+      - MINIO_EXTERNAL_URL=https://rarecips.spaincentral.cloudapp.azure.com
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
 
-  rarecips-DB:
-    container_name: rarecips-DB
-    image: mysql:9.0.0
+  rarecips-ollama:
+    container_name: rarecips-ollama
+    image: ollama/ollama:latest
     ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: rarecips
+      - "11434:11434"
     volumes:
-      - /var/lib/mysql
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama-init:
+    container_name: ollama-init
+    image: curlimages/curl:latest
+    restart: "no"
+    command: >
+      sh -c "
+      echo 'Waiting for Ollama to be ready...';
+      while ! curl -sSf http://rarecips-ollama:11434/api/tags > /dev/null; do sleep 2; done;
+      echo 'Ollama is ready. Pulling llama3.2:1b...';
+      curl -s -X POST http://rarecips-ollama:11434/api/pull -d '{\"model\": \"llama3.2:1b\"}';
+      echo 'Model pulled successfully.';
+      "
+    depends_on:
+      rarecips-ollama:
+        condition: service_healthy
+  
+  rarecips-minio:
+    container_name: rarecips-minio
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-init:
+    container_name: minio-init
+    image: minio/mc:latest
+    depends_on:
+      rarecips-minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO...';
+      sleep 2;
+      mc alias set myminio http://rarecips-minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc mb myminio/rarecips-images || echo 'Bucket already exists';
+      mc anonymous set public myminio/rarecips-images;
+      echo 'MinIO initialized successfully.';
+      "
 
 volumes:
   mysql:
-
-secrets:
-  env_properties:
-    file: ../backend/src/main/resources/env.properties
+  ollama_data:
+  minio_data:

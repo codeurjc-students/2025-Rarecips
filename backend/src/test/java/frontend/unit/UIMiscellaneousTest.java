@@ -5,20 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.Duration;
 
 public class UIMiscellaneousTest extends BaseUnitTest {
   private JavascriptExecutor js;
-
-  private void jsClick(WebElement element) {
-    js.executeScript("arguments[0].click();", element);
-  }
 
   @BeforeEach
   public void setUpTest() {
@@ -28,204 +19,127 @@ public class UIMiscellaneousTest extends BaseUnitTest {
 
   @Test
   public void changelanguage() {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    // Ensure server is ready
+    helper.waitForServerReady();
+    helper.pause(1000);
 
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    // ...existing code...
 
-    WebElement langSelector = wait.until(ExpectedConditions.elementToBeClickable(By.id("selectedLangText")));
-    jsClick(langSelector);
+    helper.jsClickAfterVisible(By.id("selectedLangText"));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
 
-    WebElement langOption = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#dropdownLangMenu > .dropdown-item:nth-child(2)")));
-    jsClick(langOption);
+    helper.jsClickAfterVisible(By.cssSelector("[id*='dropdownLangMenu'] .dropdown-item:nth-child(2)"));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
   }
 
   @Test
   public void changetheme() {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    // Ensure server is ready
+    helper.waitForServerReady();
+    helper.pause(1000);
 
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    // ...existing code...
 
-    WebElement themeDropdown = wait.until(ExpectedConditions.elementToBeClickable(By.id("dropdownTrigger")));
-    jsClick(themeDropdown);
+    helper.jsClickAfterVisible(By.id("dropdownTrigger"));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
 
-    WebElement themeOption = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".\\!rose-dark > .absolute")));
-    jsClick(themeOption);
+    helper.jsClickAfterVisible(By.cssSelector("[class*='rose-dark'] .absolute, [class*='dark-mode'] .absolute"));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
   }
 
   @Test
   public void searchsomething() {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+    // Ensure server is ready
+    helper.waitForServerReady();
 
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
+    // ...existing code...
 
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(2000);
 
     driver.get("https://localhost:8443/explore");
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(1000);
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".tab:nth-child(3)"))).click();
+    helper.jsClickAfterVisible(By.cssSelector(".tab[class*='active'], .tabs .tab:not(.active)"));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
 
-    WebElement searchInput = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".pl-14")));
-    searchInput.click();
-    searchInput.sendKeys("a");
-    searchInput.sendKeys(Keys.ENTER);
+    helper.waitAndSendKeys(By.cssSelector(".pl-14"), "a");
+    helper.jsClickAfterVisible(By.cssSelector(".pl-14"));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
+    js.executeScript("arguments[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));",
+      driver.findElement(By.cssSelector(".pl-14")));
+
+    helper.pause(500);
+
+    {
+      helper.waitAndGetElement(By.cssSelector(".right-3"));
     }
 
     {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".right-3")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).perform();
-    }
-
-    {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element, 0, 0).perform();
+      helper.waitAndGetElement(By.tagName("body"));
     }
   }
 
   @Test
   public void filtersomething() {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+    // Ensure server is ready
+    helper.waitForServerReady();
 
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
+    // ...existing code...
 
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(2000);
 
     driver.get("https://localhost:8443/explore");
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(1000);
 
-    WebElement filterCheckbox = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".space-y-2 > .flex:nth-child(2) > .checkbox-custom")));
-    jsClick(filterCheckbox);
+    helper.jsClickAfterVisible(By.cssSelector("input[type='checkbox'] + span.checkbox-custom"));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
 
-    WebElement applyBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".border-none")));
-    jsClick(applyBtn);
+    helper.jsClickAfterVisible(By.cssSelector("button[class*='border-none']"));
 
     {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".border-none")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).perform();
+      helper.waitAndGetElement(By.cssSelector("button[class*='border-none']"));
     }
 
     {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element, 0, 0).perform();
+      helper.waitAndGetElement(By.tagName("body"));
     }
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
 
-    WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".w-full:nth-child(4)")));
-    jsClick(dropdown);
+    helper.jsClickAfterVisible(By.cssSelector(".w-full:not(.pl-14)"));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
 
     {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".ti-list")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).perform();
+      helper.waitAndGetElement(By.cssSelector("[class*='ti-list']"));
     }
 
-    WebElement listToggle = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ti-list")));
-    jsClick(listToggle);
+    helper.jsClickAfterVisible(By.cssSelector("[class*='ti-list']"));
 
     {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element, 0, 0).perform();
+      helper.waitAndGetElement(By.tagName("body"));
     }
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.pause(500);
   }
 }

@@ -4,6 +4,8 @@ import com.blasetvrtumi.rarecips.entity.Ingredient;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.repository.UserRepository;
 import com.blasetvrtumi.rarecips.service.UserService;
+import com.blasetvrtumi.rarecips.service.NotificationService;
+import com.blasetvrtumi.rarecips.entity.Notification;
 import com.blasetvrtumi.rarecips.service.MailService;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -12,6 +14,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +48,12 @@ public class UserController {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private com.blasetvrtumi.rarecips.service.MinioService minioService;
+
     @Value("${app.frontend.url:https://localhost:8443}")
     private String frontendUrl;
 
@@ -65,6 +74,41 @@ public class UserController {
 
         User user = userService.findByUsername(principal.getName());
         return ResponseEntity.ok(user);
+    }
+
+    @Operation(summary = "Export current user data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User data exported successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
+    @GetMapping("/me/export")
+    public ResponseEntity<Map<String, Object>> exportUserData(HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        Map<String, Object> data = userService.exportUserData(principal.getName());
+        return ResponseEntity.ok(data);
+    }
+
+    @Operation(summary = "Import current user data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User data imported successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
+    @PostMapping("/me/import")
+    public ResponseEntity<?> importUserData(HttpServletRequest request, @RequestBody Map<String, Object> data) {
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        try {
+            userService.importUserData(principal.getName(), data);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Data imported successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Failed to import data: " + e.getMessage()));
+        }
     }
 
     @Operation(summary = "Get user info by username with optional display parameter")
@@ -162,8 +206,11 @@ public class UserController {
             Authentication authentication) {
         // Update user parameters
         User currentUser = userService.findByUsername(username);
-        currentUser.setProfileImageFile(updatedUser.getProfileImageFile());
-        currentUser.setProfileImageString(updatedUser.getProfileImageString());
+        String profileImageUrl = updatedUser.getProfileImageUrl();
+        if (profileImageUrl != null && profileImageUrl.startsWith("data:image")) {
+            profileImageUrl = minioService.uploadBase64Image(profileImageUrl);
+        }
+        currentUser.setProfileImageUrl(profileImageUrl);
         currentUser.setDisplayName(updatedUser.getDisplayName());
         currentUser.setEmail(updatedUser.getEmail());
         currentUser.setBio(updatedUser.getBio());
@@ -656,6 +703,18 @@ public class UserController {
         
         user.setReported(true);
         userService.save(user);
+
+        if (notificationService != null) {
+            notificationService.createAndSendNotificationWithTemplate(
+                    user,
+                    null,
+                    Notification.NotificationType.REPORTED_USER,
+                    Map.of(),
+                    "notification.reported_user",
+                    null
+            );
+        }
+
         return ResponseEntity.ok(Map.of("message", "User reported successfully"));
     }
 

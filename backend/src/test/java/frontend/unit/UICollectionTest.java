@@ -15,34 +15,12 @@ import java.time.Duration;
 public class UICollectionTest extends BaseUnitTest {
   private JavascriptExecutor js;
 
-  private void jsClick(WebElement element) {
-    js.executeScript("arguments[0].click();", element);
-  }
-
   @BeforeEach
   public void setUpTest() {
     super.setUp();
     js = (JavascriptExecutor) driver;
 
-    // Login with admin user
-    driver.get("https://localhost:8443/login");
-    driver.manage().window().setSize(new Dimension(1920, 1080));
-    driver.findElement(By.id("login-username")).click();
-    driver.findElement(By.id("login-username")).sendKeys("admin");
-    js.executeScript("window.scrollTo(0,100)");
-    driver.findElement(By.id("login-password")).sendKeys("adminpass");
-    driver.findElement(By.id("loginBut")).click();
-
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    wait.until(ExpectedConditions.urlToBe("https://localhost:8443/"));
-
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
-
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.login("admin", "adminpass");
   }
 
   @Test
@@ -50,11 +28,29 @@ public class UICollectionTest extends BaseUnitTest {
     // Test name: Collection CRUD - Create, Read, Update, Delete
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-    // ========== CREATE COLLECTION ==========
+    String randomSuffix = String.valueOf(System.currentTimeMillis());
+    String colName = "Test Col " + randomSuffix;
+    String updatedColName = "Updated Col " + randomSuffix;
+
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    js.executeScript("window.scrollTo(0,24)");
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.create-recipe-btn"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.id("recipeLabel"))).click();
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeLabel"))).sendKeys("Temp Recipe for Collection");
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeDesc"))).sendKeys("Temp desc");
+
+    for (int i = 0; i < 3; i++) {
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex:nth-child(3) > .ti-caret-up-filled"))).click();
+    }
+    for (int i = 0; i < 3; i++) {
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex:nth-child(2) > .ti-caret-up-filled"))).click();
+    }
+
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.name("difficulty"))).sendKeys("2");
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.name("category"))).sendKeys("Snack");
+
+    js.executeScript("window.scrollTo(0,300)");
 
     try {
       Thread.sleep(500);
@@ -62,15 +58,26 @@ public class UICollectionTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
+    WebElement createBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".publishBut button")));
+    jsClick(createBtn);
+
+    wait.until(ExpectedConditions.urlMatches(".*/recipes/\\d+"));
+    String currentUrl = driver.getCurrentUrl();
+    String recipeId = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
+
+    // ========== CREATE COLLECTION ==========
+    driver.get("https://localhost:8443/");
+    driver.manage().window().setSize(new Dimension(1920, 1080));
+
+    js.executeScript("window.scrollTo(0,24)");
 
     {
-      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
+      WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card .ti-bookmark")));
       Actions builder = new Actions(driver);
       builder.moveToElement(element).perform();
     }
 
-    WebElement btnElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
+    WebElement btnElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card .ti-bookmark")));
     jsClick(btnElement);
 
     {
@@ -81,26 +88,17 @@ public class UICollectionTest extends BaseUnitTest {
 
     js.executeScript("window.scrollTo(0,0)");
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    WebElement createNewBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".w-full > .font-semibold")));
+    WebElement createNewBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".visibleBackdrop button[style*='gradient-primary']")));
     jsClick(createNewBtn);
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".px-4"))).click();
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".px-4"))).sendKeys("Test Collection");
+    WebElement collectionInput = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".visibleBackdrop input[type='text']")));
+    collectionInput.click();
+    collectionInput.sendKeys(colName);
 
-    WebElement checkBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ti-check")));
+    WebElement checkBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".visibleBackdrop .ti-check")));
     jsClick(checkBtn);
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("visibleBackdrop")));
 
     // ========== ADD RECIPE TO COLLECTION ==========
     driver.get("https://localhost:8443/");
@@ -108,96 +106,63 @@ public class UICollectionTest extends BaseUnitTest {
 
     js.executeScript("window.scrollTo(0,246)");
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipe-card")));
 
-    WebElement addBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card:nth-of-type(3) .ti-bookmark")));
+    WebElement addBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipe-card .ti-bookmark")));
     jsClick(addBtn);
 
     js.executeScript("window.scrollTo(0,0)");
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    WebElement selectBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".w-full > .font-semibold")));
+    WebElement selectBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(@class, 'visibleBackdrop')]//button[contains(., '" + colName + "')]")));
     jsClick(selectBtn);
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("visibleBackdrop")));
 
     // ========== EDIT COLLECTION ==========
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
-    try {
-      Thread.sleep(1500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".aspect-square"))).click();
-
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
 
     js.executeScript("window.scrollTo(0,200)");
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".tab:nth-child(3)"))).click();
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex:nth-child(2) > .flex > .flex > .w-8:nth-child(1) > .ti"))).click();
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex-1"))).click();
-
-    WebElement titleInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex-1")));
+    
+    WebElement titleInput = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex-1")));
     titleInput.clear();
-    titleInput.sendKeys("Updated Collection");
+    titleInput.sendKeys(updatedColName);
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ti-check"))).click();
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("input.flex-1")));
 
     // ========== DELETE COLLECTION ==========
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1837, 944));
 
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".glass:nth-child(1) > .flex > .btn"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".hover\\3Askew-x-12"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".\\!delete-collection-btn > .font-semibold"))).click();
+
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//span[contains(text(), '" + updatedColName + "')]")));
+
+    // ========== CLEANUP RECIPE ==========
+    driver.get("https://localhost:8443/recipes/" + recipeId);
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipeCont")));
+
+    WebElement deleteBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".recipeOptions .ti-trash")));
+    jsClick(deleteBtn);
+
     try {
-      Thread.sleep(500);
+      Thread.sleep(300);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".glass:nth-child(1) > .flex > .btn"))).click();
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".hover\\3Askew-x-12"))).click();
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".\\!delete-collection-btn > .font-semibold"))).click();
+    WebElement confirmBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".px-8:nth-child(2)")));
+    jsClick(confirmBtn);
 
     try {
       Thread.sleep(1000);

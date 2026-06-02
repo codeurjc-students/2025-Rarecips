@@ -15,43 +15,38 @@ import java.time.Duration;
 public class UIReviewTest extends BaseUnitTest {
   private JavascriptExecutor js;
 
-  private void jsClick(WebElement element) {
-    js.executeScript("arguments[0].click();", element);
-  }
-
   @BeforeEach
   public void setUpTest() {
     super.setUp();
     js = (JavascriptExecutor) driver;
 
     // Login with admin user
-    driver.get("https://localhost:8443/login");
-    driver.manage().window().setSize(new Dimension(1920, 1080));
-    driver.findElement(By.id("login-username")).click();
-    driver.findElement(By.id("login-username")).sendKeys("admin");
-    js.executeScript("window.scrollTo(0,100)");
-    driver.findElement(By.id("login-password")).sendKeys("adminpass");
-    driver.findElement(By.id("loginBut")).click();
-
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    wait.until(ExpectedConditions.urlToBe("https://localhost:8443/"));
-
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
-
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    helper.login("admin", "adminpass");
   }
   @Test
   public void reviewcrud() {
-    // Test name: Review CRUD - Create and Delete
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-    // ========== CREATE REVIEW ==========
+    // ========== CREATE TEMP RECIPE ==========
     driver.get("https://localhost:8443/");
     driver.manage().window().setSize(new Dimension(1920, 1080));
+
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.create-recipe-btn"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.id("recipeLabel"))).click();
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeLabel"))).sendKeys("Temp Recipe For Review");
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.id("recipeDesc"))).sendKeys("Temporary recipe description");
+
+    for (int i = 0; i < 3; i++) {
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex:nth-child(3) > .ti-caret-up-filled"))).click();
+    }
+    for (int i = 0; i < 3; i++) {
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".flex:nth-child(2) > .ti-caret-up-filled"))).click();
+    }
+
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.name("difficulty"))).sendKeys("2");
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.name("category"))).sendKeys("Snack");
+
+    js.executeScript("window.scrollTo(0,300)");
 
     try {
       Thread.sleep(500);
@@ -59,43 +54,32 @@ public class UIReviewTest extends BaseUnitTest {
       Thread.currentThread().interrupt();
     }
 
-    WebElement recipeButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex:nth-child(1) .absolute:nth-child(2)")));
-    js.executeScript("arguments[0].click();", recipeButton);
+    WebElement createBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".publishBut button")));
+    jsClick(createBtn);
 
-    js.executeScript("window.scrollTo(0,0)");
+    wait.until(ExpectedConditions.urlMatches(".*/recipes/\\d+"));
+    String currentUrl = driver.getCurrentUrl();
+    String recipeId = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
+
+    // ========== CREATE REVIEW ==========
+    driver.get("https://localhost:8443/recipes/" + recipeId);
+    driver.manage().window().setSize(new Dimension(1920, 1080));
+
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipeCont")));
+
     js.executeScript("window.scrollTo(0,0)");
 
     wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".tab:nth-child(3)"))).click();
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".rounded-2xl"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".addReviewBut"))).click();
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".transition-all:nth-child(4) > .ti"))).click();
-
-    try {
-      Thread.sleep(800);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    WebElement starBut = helper.waitForClickable(By.cssSelector(".rating-star-btn"));
+    js.executeScript("arguments[0].click();", starBut);
 
     WebElement editor = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".min-h-\\[150px\\]")));
-
     js.executeScript("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", editor);
-
-    try {
-      Thread.sleep(300);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     js.executeScript("arguments[0].focus();", editor);
 
-    try {
-      Thread.sleep(300);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     String reviewText = "Good, <b>Very Good</b>";
-
     js.executeScript("arguments[0].innerHTML = '<p>" + reviewText + "</p>';", editor);
 
     js.executeScript(
@@ -103,76 +87,33 @@ public class UIReviewTest extends BaseUnitTest {
         "arguments[0].dispatchEvent(event);",
         editor
     );
-
     js.executeScript(
         "var event = new Event('change', { bubbles: true, cancelable: true });" +
         "arguments[0].dispatchEvent(event);",
         editor
     );
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     String editorContent = (String) js.executeScript("return arguments[0].innerText || arguments[0].textContent;", editor);
-
     if (editorContent == null || editorContent.trim().isEmpty()) {
       editor.click();
       editor.sendKeys(reviewText);
-      try {
-        Thread.sleep(500);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-      }
-    }
-
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
     }
 
     WebElement submitButton = wait.until(ExpectedConditions.presenceOfElementLocated(
         By.cssSelector("button.flex-1.px-6.py-3, button.py-3")));
 
     js.executeScript("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", submitButton);
-
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     js.executeScript("arguments[0].click();", submitButton);
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".yourReview")));
 
     js.executeScript("window.scrollTo(0,0)");
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
     // ========== DELETE REVIEW ==========
-    driver.get("https://localhost:8443/");
+    driver.get("https://localhost:8443/recipes/" + recipeId);
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    WebElement recipeButtonDelete = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".flex:nth-child(1) .absolute:nth-child(2)")));
-    js.executeScript("arguments[0].click();", recipeButtonDelete);
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipeCont")));
 
     js.executeScript("window.scrollTo(0,0)");
 
@@ -192,8 +133,26 @@ public class UIReviewTest extends BaseUnitTest {
 
     js.executeScript("window.scrollTo(0,0)");
 
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".btn > .ti"))).click();
-    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ti-check"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".yourReview .deleteBut"))).click();
+    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".yourReview .confirmDelete"))).click();
+
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".yourReview")));
+
+    // ========== CLEANUP RECIPE ==========
+    driver.get("https://localhost:8443/recipes/" + recipeId);
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.className("recipeCont")));
+
+    WebElement deleteBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".ti-trash")));
+    jsClick(deleteBtn);
+
+    try {
+      Thread.sleep(300);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
+    WebElement confirmBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".px-8:nth-child(2)")));
+    jsClick(confirmBtn);
 
     try {
       Thread.sleep(1000);

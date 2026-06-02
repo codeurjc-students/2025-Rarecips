@@ -9,14 +9,24 @@
           class="flex min-w-[240px] max-w-[448px] w-screen grow shrink-0 basis-0 flex-col items-center justify-center gap-6 rounded-md border border-solid px-8 pt-12 pb-8 shadow-sm relative glass"
           style="border-color: var(--primary-200-40); background: var(--primary-200-40)">
           <div class="flex w-full flex-col items-center gap-12">
-            @if (isOwnProfile || isAdmin) {
+            <div class="absolute top-7 right-7 flex gap-2 z-10">
               <button
-                class="userEditBut absolute top-7 right-7 w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"
-                style="background: var(--gradient-primary); color: white;"
-                (click)="navigateToEditProfile()">
-                <i class="ti ti-user-edit text-primary-700 text-xl"></i>
+                class="userShareBut w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"
+                style="background: var(--primary-100); color: var(--primary-500);"
+                (click)="shareProfile()" title="{{ t('share') }}">
+                <i *ngIf="canShare" class="ti ti-share text-xl"></i>
+                <i *ngIf="!canShare && !showShareFeedback" class="ti ti-copy text-xl"></i>
+                <i *ngIf="!canShare && showShareFeedback" class="ti ti-check text-xl" style="color: green;"></i>
               </button>
-            }
+              @if (isOwnProfile || isAdmin) {
+                <button
+                  class="userEditBut w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"
+                  style="background: var(--gradient-primary); color: white;"
+                  (click)="navigateToEditProfile()" title="{{ t('edit_profile') }}">
+                  <i class="ti ti-user-edit text-primary-700 text-xl"></i>
+                </button>
+              }
+            </div>
             @if (!isOwnProfile && isLoggedIn && profileLoaded) {
               <button
                 class="userReportBut absolute top-7 left-7 w-12 h-12 flex items-center justify-center rounded-xl transition hover:scale-110"
@@ -29,11 +39,11 @@
               <div
                 class="flex h-36 w-36 flex-none flex-col items-center justify-center gap-2 overflow-hidden rounded-full relative border-2"
                 style="background: var(--primary-100); border-color: var(--primary-300)">
-                <img *ngIf="user?.profileImageString" class="h-36 w-36 flex-none object-cover absolute"
-                     src="data:image/jpeg;base64,{{user?.profileImageString}}"
+                <img *ngIf="user?.profileImageUrl" class="h-36 w-36 flex-none object-cover absolute"
+                     src="{{user?.profileImageUrl}}"
                      style="background: var(--primary-400);"
                      alt="Profile"/>
-                <img *ngIf="!user?.profileImageString" class="h-36 w-36 flex-none object-cover absolute"
+                <img *ngIf="!user?.profileImageUrl" class="h-36 w-36 flex-none object-cover absolute"
                      src="assets/img/user.png"
                      style="background: var(--primary-400)"
                      alt="Profile"/>
@@ -170,13 +180,13 @@
                        style="background: var(--primary-200-40);"
                        (click)="navigateToRecipe(recipe.id)">
                     <div class="flex w-full flex-wrap items-start gap-6">
-                      <div class="recipe-image-wrapper h-44 w-64 flex-none">
-                        @if (recipe.imageString) {
-                          <img class="h-44 w-64 rounded-md object-cover"
-                               [src]="'data:image/jpeg;base64,' + recipe.imageString"
+                      <div class="recipe-image-wrapper h-44 w-64 flex-none overflow-hidden rounded-md">
+                        @if (recipe.imageUrl) {
+                          <img class="profileRecipeImage h-44 w-64 rounded-md object-cover"
+                               [src]="recipe.imageUrl"
                                [alt]="recipe.label" style="background-color: var(--primary-300);"/>
                         } @else {
-                          <img class="h-44 w-64 rounded-md object-cover"
+                          <img class="profileRecipeImage h-44 w-64 rounded-md object-cover"
                                src="assets/img/recipe.png"
                                [alt]="recipe.label" style="background-color: var(--primary-300);" />
                         }
@@ -356,8 +366,8 @@
                         <img [src]="ingredient.image"
                              [alt]="ingredient.food"
                              class="w-16 h-16 rounded-lg object-cover flex-shrink-0"/>
-                      } @else if (ingredient.imageString) {
-                        <img [src]="ingredient.imageString"
+                      } @else if (ingredient.imageUrl) {
+                        <img [src]="ingredient.imageUrl"
                              [alt]="ingredient.food"
                              class="w-16 h-16 rounded-lg object-cover flex-shrink-0"/>
                       } @else {

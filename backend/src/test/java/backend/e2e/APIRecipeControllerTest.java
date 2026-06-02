@@ -52,7 +52,7 @@ public class APIRecipeControllerTest {
         RestAssured.basePath = "/api/v1";
         RestAssured.useRelaxedHTTPSValidation();
 
-        testUser = new User("testuser", "testpassword", "test@example.com", null, "Test User", "Test description", "Test bio");
+        testUser = new User("testuser", "testpassword", "test@example.com", "Test User", "Test description", "Test bio");
         userRepository.save(testUser);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(testUser.getUsername(), testUser.getPassword());

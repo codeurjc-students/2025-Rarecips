@@ -4,6 +4,9 @@ import com.blasetvrtumi.rarecips.entity.Review;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.service.ReviewService;
 import com.blasetvrtumi.rarecips.service.UserService;
+import com.blasetvrtumi.rarecips.service.NotificationService;
+import com.blasetvrtumi.rarecips.entity.Notification;
+import com.blasetvrtumi.rarecips.entity.Recipe;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -31,6 +34,9 @@ public class ReviewController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Operation(summary = "Submit a review for a recipe")
     @ApiResponses(value = {
@@ -64,6 +70,18 @@ public class ReviewController {
                 .path("/api/v1/reviews/{id}")
                 .buildAndExpand(savedReview.getId())
                 .toUri();
+
+            Recipe recipe = savedReview.getRecipe();
+            if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(username) && notificationService != null) {
+                notificationService.createAndSendNotificationWithTemplate(
+                        recipe.getAuthorUser(),
+                        userAuthor,
+                        Notification.NotificationType.REVIEW_ADDED,
+                        Map.of("user", username, "recipe", recipe.getLabel() != null ? recipe.getLabel() : ""),
+                        "notification.review_added",
+                        recipe.getId()
+                );
+            }
 
             return ResponseEntity.ok().header("Location", location.toString()).body(savedReview);
         } catch (RuntimeException e) {
@@ -195,6 +213,17 @@ public class ReviewController {
         }
         try {
             reviewService.reportReview(reviewId);
+            Review review = reviewService.findById(reviewId);
+            if (review != null && review.getAuthor() != null && notificationService != null) {
+                notificationService.createAndSendNotificationWithTemplate(
+                        review.getAuthor(),
+                        null,
+                        Notification.NotificationType.REPORTED_REVIEW,
+                        Map.of("recipe", review.getRecipe().getLabel() != null ? review.getRecipe().getLabel() : ""),
+                        "notification.reported_review",
+                        review.getRecipe().getId()
+                );
+            }
             return ResponseEntity.ok(Map.of("message", "Review reported successfully"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body(e.getMessage());

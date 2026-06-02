@@ -12,6 +12,7 @@ import { ReviewService } from '../../services/review.service';
 import { EnumService, RecipeAttribute } from '../../services/enum.service';
 import { FormsModule } from '@angular/forms';
 import { AdminService, SystemStatus } from '../../services/admin.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-admin-panel',
@@ -120,7 +121,8 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private reviewService: ReviewService,
     private enumService: EnumService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private http: HttpClient
   ) {
   }
 
@@ -165,10 +167,8 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   }
 
   fetchStats() {
-    console.log('DEBUG: Fetching admin stats with range:', this.selectedTimeRange);
     this.adminService.getStats(this.selectedTimeRange).subscribe({
       next: (data) => {
-        console.log('Admin Stats received:', data);
         this.stats = data;
       },
       error: (err) => console.error('Error fetching admin stats:', err)
@@ -212,7 +212,10 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
   fetchSystemStatus() {
     this.adminService.getSystemStatus().subscribe({
-      next: (status) => this.systemStatus = status,
+      next: (status) => {
+        this.systemStatus = status;
+        this.checkWebSockets();
+      },
       error: (err: any) => {
         console.error('Error fetching system status:', err);
         this.systemStatus = {
@@ -222,6 +225,17 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
           mail: 'admin_down',
           websockets: 'admin_down'
         };
+      }
+    });
+  }
+
+  private checkWebSockets() {
+    this.http.get('/notify/info').subscribe({
+      next: () => {
+        this.systemStatus.websockets = 'admin_operational';
+      },
+      error: () => {
+        this.systemStatus.websockets = 'admin_down';
       }
     });
   }

@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import java.time.Duration;
 
 public class UIAuthTest extends BaseUnitTest {
   private JavascriptExecutor js;
@@ -23,35 +25,69 @@ public class UIAuthTest extends BaseUnitTest {
     driver.get(baseUrl + "/login");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    driver.findElement(By.id("login-username")).click();
-    driver.findElement(By.id("login-username")).sendKeys("testuser");
+    helper.pause(500);
+
+    helper.waitAndSendKeys(By.id("login-username"), "testuser");
+    helper.waitAndSendKeys(By.id("login-password"), "testpassword123_");
 
     js.executeScript("window.scrollTo(0,100)");
 
-    driver.findElement(By.id("login-password")).sendKeys("testpassword123_");
-    driver.findElement(By.id("loginBut")).click();
+    helper.waitAndClick(By.id("loginBut"));
 
     js.executeScript("window.scrollTo(0,54)");
+
+    helper.pause(1000);
   }
 
   @Test
   public void testSignup() {
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+    String uniqueUsername = "uitest" + System.currentTimeMillis() % 100000;
+
     driver.get(baseUrl + "/signup");
     driver.manage().window().setSize(new Dimension(1920, 1080));
 
-    driver.findElement(By.id("signup-username")).click();
-    driver.findElement(By.id("signup-username")).sendKeys("testuser");
-    driver.findElement(By.id("signup-email")).sendKeys("testuser@example.com");
-    driver.findElement(By.id("signup-password")).sendKeys("testpassword123_");
-    driver.findElement(By.id("signup-confirm-password")).sendKeys("testpassword123_");
+    helper.pause(1000);
 
-    driver.findElement(By.cssSelector(".form-options:nth-child(6) .checkbox-custom")).click();
-    driver.findElement(By.cssSelector(".justify-center:nth-child(1)")).click();
+    WebElement usernameInput = helper.waitForClickable(By.id("signup-username"));
+    usernameInput.clear();
+    usernameInput.sendKeys(uniqueUsername);
+    js.executeScript(
+      "var el = arguments[0]; " +
+      "el.dispatchEvent(new Event('input', { bubbles: true })); " +
+      "el.dispatchEvent(new Event('change', { bubbles: true }));",
+      usernameInput
+    );
 
-    WebElement signupButton = driver.findElement(By.id("signupBut"));
-    Actions builder = new Actions(driver);
-    builder.moveToElement(signupButton).perform();
+    helper.waitAndSendKeys(By.id("signup-email"), uniqueUsername + "@example.com");
+
+    WebElement passwordInput = helper.waitForClickable(By.id("signup-password"));
+    passwordInput.clear();
+    passwordInput.sendKeys("Testpassword1_");
+    js.executeScript(
+      "var el = arguments[0]; el.dispatchEvent(new Event('input', { bubbles: true }));",
+      passwordInput
+    );
+
+    WebElement confirmInput = helper.waitForClickable(By.id("signup-confirm-password"));
+    confirmInput.clear();
+    confirmInput.sendKeys("Testpassword1_");
+    js.executeScript(
+      "var el = arguments[0]; el.dispatchEvent(new Event('input', { bubbles: true }));",
+      confirmInput
+    );
+
+    helper.pause(2000);
+
+    WebElement acceptTermsCheckbox = helper.waitAndGetElement(By.cssSelector("input[name='acceptTerms']"));
+    helper.jsClick(acceptTermsCheckbox);
 
     js.executeScript("window.scrollTo(0,0)");
+
+    wait.until(ExpectedConditions.elementToBeClickable(By.id("signupBut")));
+    helper.waitAndClick(By.id("signupBut"));
+
+    helper.pause(1000);
   }
 }

@@ -313,7 +313,7 @@ export class CollectionCardComponent implements OnInit, OnChanges {
 
   getCollectionImage(collection: RecipeCollection): string {
     if (collection.recipes && collection.recipes.length > 0) {
-      return collection.recipes[0].imageString || '';
+      return collection.recipes[0].imageUrl || '';
     }
     return '';
   }

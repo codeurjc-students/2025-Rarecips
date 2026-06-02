@@ -62,7 +62,6 @@ public class AdminBaseE2ETest extends BaseE2ETest {
     }
 
     protected void logout() {
-        System.out.println("Logging out...");
         driver.manage().deleteAllCookies();
         driver.get(baseUrl + "/logout");
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
@@ -101,7 +100,6 @@ public class AdminBaseE2ETest extends BaseE2ETest {
             try {
                 element.click();
             } catch (Exception e) {
-                System.out.println("Standard click failed, using jsClick for: " + locator);
                 jsClick(element);
             }
         } catch (Exception e) {
@@ -112,7 +110,6 @@ public class AdminBaseE2ETest extends BaseE2ETest {
     }
 
     protected void createRecipe(String title, String description) {
-        System.out.println("Creating recipe: " + title);
         driver.get(baseUrl + "/recipes/create");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         
@@ -137,21 +134,18 @@ public class AdminBaseE2ETest extends BaseE2ETest {
     }
 
     protected void reportRecipe(String recipeId) {
-        System.out.println("Reporting recipe: " + recipeId);
         driver.get(baseUrl + "/recipes/" + recipeId);
         waitAndClick(By.cssSelector(".ti-flag"), 15);
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
 
     protected void reportUser(String username) {
-        System.out.println("Reporting user: " + username);
         driver.get(baseUrl + "/users/" + username);
         waitAndClick(By.className("userReportBut"), 15);
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
 
     protected void addReviewAndReport(String recipeId, String comment) {
-        System.out.println("Adding and reporting review for recipe: " + recipeId);
         driver.get(baseUrl + "/recipes/" + recipeId);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         

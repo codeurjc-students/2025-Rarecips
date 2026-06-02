@@ -138,6 +138,18 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query("SELECT COUNT(r) FROM Recipe r JOIN r.mealTypes mt WHERE mt = :mealType AND r.pendingReview = false")
     long countByMealType(@Param("mealType") String mealType);
 
+    @Query("SELECT DISTINCT r FROM Recipe r WHERE r.pendingReview = false AND r.id NOT IN :excludeIds AND (" +
+            "EXISTS (SELECT ct FROM r.cuisineType ct WHERE ct IN :cuisineTypes) OR " +
+            "EXISTS (SELECT dt FROM r.dishTypes dt WHERE dt IN :dishTypes) OR " +
+            "EXISTS (SELECT dl FROM r.dietLabels dl WHERE dl IN :dietLabels))")
+    Page<Recipe> findRecommendations(
+            @Param("excludeIds") List<Long> excludeIds,
+            @Param("cuisineTypes") List<String> cuisineTypes,
+            @Param("dishTypes") List<String> dishTypes,
+            @Param("dietLabels") List<String> dietLabels,
+            Pageable pageable
+    );
+
     @Query("SELECT r FROM Recipe r LEFT JOIN r.reviews rev WHERE r.pendingReview = false GROUP BY r.id ORDER BY COUNT(rev) DESC")
     Page<Recipe> findAllOrderByReviewsCountDesc(Pageable pageable);
 }

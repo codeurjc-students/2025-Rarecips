@@ -493,13 +493,15 @@
     margin-left: 25vw !important;
   }
 
-  .container {
-    margin-top: 3rem !important;
+  .ingredientList > div {
+    max-width: 100%;
   }
 
-  .container > div {
-    max-width: 90%;
+  .container {
+    margin-top: 10vh !important;
+    max-width: 60vw;
   }
+
 
   .tabs > .tab {
     flex-direction: column;

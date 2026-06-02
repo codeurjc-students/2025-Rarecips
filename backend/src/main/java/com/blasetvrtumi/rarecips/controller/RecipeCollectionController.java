@@ -5,6 +5,9 @@ import com.blasetvrtumi.rarecips.entity.RecipeCollection;
 import com.blasetvrtumi.rarecips.entity.User;
 import com.blasetvrtumi.rarecips.service.RecipeCollectionService;
 import com.blasetvrtumi.rarecips.service.UserService;
+import com.blasetvrtumi.rarecips.service.NotificationService;
+import com.blasetvrtumi.rarecips.service.RecipeService;
+import com.blasetvrtumi.rarecips.entity.Notification;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,6 +36,10 @@ public class RecipeCollectionController {
     private RecipeCollectionService collectionService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private RecipeService recipeService;
 
     private User getAuthenticatedUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -217,6 +224,20 @@ public class RecipeCollectionController {
 
             RecipeCollection favorites = collectionService.getOrCreateFavoritesCollection(username);
             RecipeCollection updated = collectionService.addRecipeToCollection(favorites.getId(), recipeId, user);
+            
+            Recipe recipe = recipeService.findById(recipeId);
+            if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(username) && notificationService != null) {
+                String senderName = user.getDisplayName() != null && !user.getDisplayName().isBlank() ? user.getDisplayName() : user.getUsername();
+                String recipeTitle = recipe.getLabel() != null ? recipe.getLabel() : "";
+                notificationService.createAndSendNotificationWithTemplate(
+                        recipe.getAuthorUser(),
+                        user,
+                        Notification.NotificationType.LIKED_RECIPE,
+                        Map.of("user", senderName, "recipe", recipeTitle),
+                        "notification.liked_recipe",
+                        recipe.getId()
+                );
+            }
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -260,6 +281,33 @@ public class RecipeCollectionController {
                     collection = collectionService.removeRecipeFromCollection(id, recipeId);
                 } else {
                     collection = collectionService.addRecipeToCollection(id, recipeId, user);
+                    
+                    Recipe recipe = recipeService.findById(recipeId);
+                    if (recipe != null && recipe.getAuthorUser() != null && !recipe.getAuthorUser().getUsername().equals(user.getUsername()) && notificationService != null) {
+                        Notification.NotificationType notifType = collection.isFavorites() ? Notification.NotificationType.LIKED_RECIPE : Notification.NotificationType.ADDED_TO_COLLECTION;
+
+                        String senderName = user.getDisplayName() != null && !user.getDisplayName().isBlank() ? user.getDisplayName() : user.getUsername();
+                        String recipeTitle = recipe.getLabel() != null ? recipe.getLabel() : "";
+                        if (notifType == Notification.NotificationType.LIKED_RECIPE) {
+                            notificationService.createAndSendNotificationWithTemplate(
+                                    recipe.getAuthorUser(),
+                                    user,
+                                    notifType,
+                                    Map.of("user", senderName, "recipe", recipeTitle),
+                                    "notification.liked_recipe",
+                                    recipe.getId()
+                            );
+                        } else {
+                            notificationService.createAndSendNotificationWithTemplate(
+                                    recipe.getAuthorUser(),
+                                    user,
+                                    notifType,
+                                    Map.of("user", senderName, "recipe", recipeTitle, "collection", ""),
+                                    "notification.added_to_collection",
+                                    recipe.getId()
+                            );
+                        }
+                    }
                 }
 
                 URI location = ServletUriComponentsBuilder

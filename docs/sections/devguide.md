@@ -32,8 +32,8 @@ information from database.
 | **Type**                | Web SPA with REST API                                     |
 | **Technologies**        | Angular, TypeScript, Java, Spring Boot, MySQL, Docker     |
 | **Tools**               | VSCode, WebStorm, Postman, Maven, npm, Docker, Git        |
-| **Quality Control**     | Unit testing (JUnit), Integration testing, System testing 
-| **Deployment**          | Docker containers, CI/CD with GitHub Actions              |
+| **Quality Control**     | Unit testing (JUnit), Integration testing, System testing |
+| **Deployment**          | Docker containers, CI/CD with GitHub Actions, Azure Cloud |
 | **Development Process** | Iterative and incremental, Git workflow, DevOps practices |
 
 ## Technologies
@@ -139,18 +139,34 @@ of processes, optimization, testing and feedback.
 
 ### Deployment Architecture
 
-```
-┌─────────────────┐    HTTP/HTTPS    ┌─────────────────┐            ┌─────────────────┐
-│    Angular      │ ──────────────→  │  Spring Boot    │   JDBC     │     MySQL       │
-│   static SPA    │                  │   (Backend)     │ ────────→  │   (Database)    │
-│   Port: 8443    │ ←──────────────  │   Port: 8443    │            │   Port: 3306    │
-└─────────────────┘    REST API      └─────────────────┘            └─────────────────┘
+```text
+                                                 Azure Cloud Environment
+                                 ┌────────────────────────────────────────────────────────┐
+                                 │   Azure Virtual Machine (Docker Compose Environment)   │
+                                 │                                                        │
+                                 │   ┌──────────────┐         ┌──────────────────────┐    │           ┌────────────────────────────┐
+Client Browser ───── HTTPS ────> │   │    NGINX     │ ──HTTP─>│ Spring Boot App      │    │── JDBC ──>│ Azure Database for MySQL   │
+                                 │   │(Certificates)│         │ (REST API + Angular) │    │           │ Flexible Server (Managed)  │
+                                 │   └──────────────┘         └──────────────────────┘    │           └────────────────────────────┘
+                                 │                               │            │           │
+                                 │                               │            │           │
+                                 │                         HTTP/S3 API      HTTP/REST     │
+                                 │                               │            │           │
+                                 │                               v            v           │
+                                 │                          ┌─────────┐   ┌───────────┐   │
+                                 │                          │  MinIO  │   │  Ollama   │   │
+                                 │                          │(Storage)│   │(AI Engine)│   │
+                                 │                          └─────────┘   └───────────┘   │
+                                 └────────────────────────────────────────────────────────┘
 ```
 
 **Communication Protocols:**
 
-- Frontend ↔ Backend: HTTP/HTTPS REST API + WebSockets for real-time notifications
-- Backend ↔ Database: JDBC connections for data persistence
+- **Client ↔ NGINX:** HTTPS for secure traffic routing and TLS termination.
+- **NGINX ↔ Backend (Spring Boot):** HTTP reverse proxy routing for API requests and serving static Angular files.
+- **Backend ↔ Database (Azure MySQL):** JDBC connections for managed, flexible data persistence in the cloud.
+- **Backend ↔ MinIO:** HTTP/S3 API for object storage (images).
+- **Backend ↔ Ollama:** HTTP/REST API for generative AI health reports.
 
 ### REST API Documentation
 
@@ -198,6 +214,8 @@ at [Rarecips API Documentation](https://raw.githack.com/codeurjc-students/2025-R
 As of 0.1, deployment of the bundled application is only available through the local running of the [docker container](https://hub.docker.com/repository/docker/blasetvrtumi/rarecips).
 To see more information, take a look at the [Setup]((docs/sections/setup.md)) section.
 
+As of 1.0, the application's OCI artifact is ran and served through Azure Virtual Machine. The Database is managed through Azure Database for MySQL Flexible Server. To deploy the application locally, check [Setup]((docs/sections/setup.md)).
+
 ## Development Process
 
 ### Agile Methodology
@@ -220,12 +238,14 @@ practices from Extreme Programming (XP) and Kanban methodologies.
 
 *Git metrics will be updated as development progresses*
 
-#### Continuous Integration
+#### Continuous Integration and Deployment
 
 GitHub Actions workflows automate:
 
 - **Build Verification:** Compile and package both frontend and backend
 - **Automated Testing:** Run unit and integration tests on pull requests
+- **Push to Registry:** Push the application to the Docker registry
+- **Deploy to Azure:** Deploy the application to Azure Virtual Machine
 
 #### Versioning and Releases
 

@@ -34,7 +34,10 @@ public class MailService {
     @Autowired
     private RecipeService recipeService;
 
-    @Value("${spring.mail.username}")
+    @Autowired
+    private MinioService minioService;
+
+    @Value("${spring.mail.username:}")
     private String fromAddress;
 
     public void sendChangePasswordEmail(String to, String token, String baseUrl, String lang, String theme, String username, String passwordChangeLink) {
@@ -99,7 +102,13 @@ public class MailService {
                 r.put("id", recipe.getId().toString());
                 r.put("label", recipe.getLabel());
 
-                r.put("imageString", "https://www.edamam.com/food-img/e31/e310952d214e78a4cb8b73f30ceeaaf2.jpg"); //TODO: minio hosted images
+                String imageUrl = recipe.getImageUrl();
+                if (imageUrl == null || imageUrl.isEmpty()) {
+                    imageUrl = minioService.getPublicUrl("recipe.png");
+                } else {
+                    imageUrl = minioService.sanitizeUrl(imageUrl);
+                }
+                r.put("imageString", imageUrl);
                 recipeList.add(r);
             }
             context.put("recipes", recipeList);

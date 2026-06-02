@@ -36,7 +36,7 @@ public class ReviewServiceIntegrationTest {
 
     @Test
     void shouldCreateAndRetrieveReview() {
-        User user = new User("testuser", "password", "test@example.com", null, "Test User", "desc", "bio");
+        User user = new User("testuser", "password", "test@example.com", "Test User", "desc", "bio");
         User savedUser = userService.save(user);
         Recipe recipe = new Recipe("Test Recipe", "desc", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 4, new ArrayList<>(), 1, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 30.0f, 500.0f, 400.0f, savedUser, new ArrayList<>());
         Recipe savedRecipe = recipeService.createRecipe(recipe, savedUser.getUsername());

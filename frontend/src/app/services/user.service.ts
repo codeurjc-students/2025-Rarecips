@@ -261,4 +261,12 @@ export class UserService {
   dismissReport(username: string): Observable<any> {
     return this.httpClient.put(`${this.API_URL}/${username}/dismiss-report`, null);
   }
+
+  exportUserData(): Observable<Blob> {
+    return this.httpClient.get(`${this.API_URL}/me/export`, { responseType: 'blob' });
+  }
+
+  importUserData(data: any): Observable<any> {
+    return this.httpClient.post(`${this.API_URL}/me/import`, data);
+  }
 }
