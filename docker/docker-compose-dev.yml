@@ -54,27 +54,23 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        /bin/ollama serve &
+        while ! ollama list > /dev/null 2>&1; do
+          echo "Waiting for Ollama to be ready..."
+          sleep 5
+        done
+        echo "Ollama is ready!"
+        ollama pull llama3.2:1b
+        wait
     healthcheck:
       test: ["CMD", "ollama", "list"]
       interval: 10s
       timeout: 5s
       retries: 5
-
-  ollama-init:
-    container_name: ollama-init
-    image: curlimages/curl:latest
-    restart: "no"
-    command: >
-      sh -c "
-      echo 'Waiting for Ollama to be ready...';
-      while ! curl -sSf http://rarecips-ollama:11434/api/tags > /dev/null; do sleep 2; done;
-      echo 'Ollama is ready. Pulling llama3.2:1b...';
-      curl -s -X POST http://rarecips-ollama:11434/api/pull -d '{\"model\": \"llama3.2:1b\"}';
-      echo 'Model pulled successfully.';
-      "
-    depends_on:
-      rarecips-ollama:
-        condition: service_healthy
   
   rarecips-minio:
     container_name: rarecips-minio
