@@ -54,6 +54,8 @@
 
 Rarecips is a progressive web application designed to help users discover, share, and manage unique and rare recipes from around the world. The platform allows users to browse, upload, review, and save recipes, fostering a community of culinary enthusiasts who can access personalized health reports and recommendations based on their culinary preferences.
 
+The project report can be found [here](https://github.com/user-attachments/files/28911050/TFG_GIS_BlasVitaRamos_Rarecips.pdf) (PDF) or [here](https://github.com/user-attachments/files/28911089/TFG___Blas_Vita.zip) (Overleaf Project).
+
 
 ## ✏️ Mockup
 <p align="center">
